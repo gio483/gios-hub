@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDLR Estimator dashboard</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #FAF8F3;
+  --surface: #FFFFFF;
+  --surface-2: #F4F0E8;
+  --ink: #2A2724;
+  --ink-muted: #6B655E;
+  --ink-faint: #9C958A;
+  --border: #E8E2D8;
+  --border-strong: #D4CDC0;
+  --accent: #8B6B3A;
+  --accent-soft: #F0E6D2;
+  --success: #5C7A4F;
+  --success-soft: #EAF0E5;
+  --warn: #B8853A;
+  --warn-soft: #F8EBD2;
+  --danger: #8B3A3A;
+  --danger-soft: #F2DEDE;
+  --serif: 'Iowan Old Style', 'Apple Garamond', Georgia, 'Times New Roman', serif;
+  --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'SF Mono', Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.dash {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 20px 18px 60px;
+}
+header.brand {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 14px;
+  margin-bottom: 22px;
+}
+header.brand .name {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+header.brand .tag {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-muted);
+  font-size: 13px;
+  margin: 2px 0 0;
+}
+header.brand .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+section.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+section.card > summary,
+section.card > .head {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+}
+section.card > summary::-webkit-details-marker { display: none; }
+section.card > summary:hover,
+section.card > .head:hover { background: var(--surface-2); }
+section.card[open] > summary { border-bottom: 1px solid var(--border); }
+section.card .title {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+section.card .title .num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-faint);
+  letter-spacing: 0.05em;
+}
+section.card .title .badge {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+section.card .toggle {
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-family: var(--mono);
+}
+section.card[open] .toggle::before { content: 'collapse'; }
+section.card:not([open]) .toggle::before { content: 'expand'; }
+section.card .body { padding: 16px; }
+section.card .body > p:first-child { margin-top: 0; }
+section.card .body > p:last-child { margin-bottom: 0; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+.stat .label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+  margin: 0 0 4px;
+}
+.stat .num {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 540px) { .grid-2, .stats { grid-template-columns: 1fr 1fr; } }
+
+label.field {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+label.field > .l {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink-muted);
+}
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  background: var(--surface);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s;
+}
+textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+  font-family: var(--sans);
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.checks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.check {
+  font-size: 12px;
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.check input { margin: 3px 0 0; flex-shrink: 0; }
+.check span { color: var(--ink); }
+
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  margin: 18px 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 500;
+}
+.section-label:first-child { margin-top: 0; }
+
+.btn {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 6px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn:hover { opacity: 0.85; }
+.btn.secondary { background: var(--surface); color: var(--ink); border-color: var(--border-strong); }
+.btn.secondary:hover { background: var(--surface-2); }
+.btn.small { padding: 6px 12px; font-size: 12px; }
+.btn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+
+.estimate-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+}
+.estimate-row:first-child { border-top: 0; }
+.estimate-row .meta { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
+.estimate-row .slug { font-family: var(--mono); font-size: 11px; color: var(--ink-muted); }
+.empty {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--ink-muted);
+  font-style: italic;
+  font-size: 13px;
+}
+
+.workflow-step {
+  display: flex;
+  gap: 14px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+.workflow-step:first-child { border-top: 0; padding-top: 0; }
+.workflow-step .num {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--ink);
+}
+.workflow-step .name {
+  font-weight: 500;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+.workflow-step .desc { font-size: 12px; color: var(--ink-muted); }
+.workflow-step .file {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+  margin-top: 4px;
+}
+
+.brand-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 600px) { .brand-grid { grid-template-columns: 1fr; } }
+.brand-cat .h {
+  font-weight: 500;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.brand-cat .b {
+  font-size: 12px;
+  color: var(--ink-muted);
+  line-height: 1.6;
+}
+.brand-cat .b code {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--surface-2);
+  padding: 1px 4px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
+.prompt-card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 12px;
+  margin: 10px 0;
+}
+.prompt-card .ph { font-weight: 500; font-size: 13px; margin: 0 0 6px; display: flex; justify-content: space-between; align-items: center; }
+.prompt-card pre {
+  margin: 0;
+  font-family: var(--mono);
+  font-size: 11px;
+  white-space: pre-wrap;
+  color: var(--ink);
+  line-height: 1.5;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--surface);
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.rule-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rule-list li {
+  border-top: 1px solid var(--border);
+  padding: 10px 0;
+  font-size: 13px;
+}
+.rule-list li:first-child { border-top: 0; padding-top: 0; }
+.rule-list li .lab {
+  display: inline-block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 8px;
+  font-weight: 500;
+  vertical-align: middle;
+}
+.lab.ok { background: var(--success-soft); color: var(--success); }
+.lab.no { background: var(--danger-soft); color: var(--danger); }
+.lab.flag { background: var(--warn-soft); color: var(--warn); }
+
+.banned-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 4px 8px;
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--danger);
+  margin-top: 6px;
+}
+.banned-grid span {
+  background: var(--danger-soft);
+  padding: 3px 7px;
+  border-radius: 3px;
+  text-decoration: line-through;
+}
+
+.allowed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 6px 8px;
+  font-size: 12px;
+  margin-top: 6px;
+}
+.allowed-grid span {
+  background: var(--success-soft);
+  color: var(--success);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+
+.callout {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  padding: 10px 14px;
+  margin: 12px 0;
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.6;
+}
+.callout .h {
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.outputbox {
+  margin-top: 14px;
+  padding: 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: none;
+}
+.outputbox.shown { display: block; }
+.outputbox textarea {
+  font-family: var(--mono);
+  font-size: 11px;
+  min-height: 220px;
+  background: var(--surface);
+}
+
+.notice {
+  background: var(--success-soft);
+  border-left: 3px solid var(--success);
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  color: var(--success);
+  margin-bottom: 14px;
+  display: none;
+}
+.notice.shown { display: block; }
+
+.svc-pill {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  margin: 2px 4px 2px 0;
+  color: var(--ink-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.svc-pill.on {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+
+.area-pill {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  margin: 2px 4px 2px 0;
+  color: var(--ink-muted);
+  cursor: pointer;
+  user-select: none;
+}
+.area-pill.on {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+p.lede {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--ink-muted);
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+
+.footer {
+  margin-top: 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink-faint);
+  text-align: center;
+  line-height: 1.6;
+}
+.footer code {
+  font-family: var(--mono);
+  font-size: 10px;
+}
+</style>
+</head>
+<body>
+<div class="dash">
+
+  <header class="brand">
+    <p class="name">San Diego Landscape Remodeling</p>
+    <p class="tag">Estimator dashboard · By design, not by dispatch.</p>
+    <div class="meta">
+      <span id="today"></span>
+      <span>CSLB #1139785</span>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat"><p class="label">Active</p><p class="num" id="stat-active">0</p></div>
+    <div class="stat"><p class="label">Awaiting renders</p><p class="num" id="stat-renders">0</p></div>
+    <div class="stat"><p class="label">Pending review</p><p class="num" id="stat-review">0</p></div>
+    <div class="stat"><p class="label">Sent</p><p class="num" id="stat-sent">0</p></div>
+  </div>
+
+  <details class="card" open>
+    <summary>
+      <span class="title"><span class="num">01</span> New estimate intake <span class="badge">Start here</span></span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="lede">Fill in what you have. Anything blank is fine — Claude will ask about gaps. The agent reads the whole submission, scaffolds the folder, writes 00-intake.md, and tells you what photos to upload next.</p>
+
+      <form id="intake">
+
+        <p class="section-label">Client</p>
+        <div class="grid-2">
+          <label class="field"><span class="l">First names</span><input type="text" name="clientNames" placeholder="John and Mary"></label>
+          <label class="field"><span class="l">Phone</span><input type="tel" name="phone" placeholder="(619) 555-0142"></label>
+          <label class="field"><span class="l">Email</span><input type="email" name="email" placeholder="they@example.com"></label>
+          <label class="field"><span class="l">Decision-maker(s)</span><input type="text" name="decisionMakers" placeholder="Both spouses / Mary only / designer involved"></label>
+        </div>
+
+        <p class="section-label">Property</p>
+        <label class="field"><span class="l">Full address (internal — never on proposal)</span><input type="text" name="address" placeholder="2453 Bonita Vista Way"></label>
+        <div class="grid-2">
+          <label class="field"><span class="l">City / neighborhood</span><input type="text" name="city" placeholder="Bonita"></label>
+          <label class="field"><span class="l">Source</span>
+            <select name="source">
+              <option value="">— select —</option>
+              <option>Referral — neighbor</option>
+              <option>Referral — designer / architect</option>
+              <option>Referral — realtor</option>
+              <option>Referral — past client</option>
+              <option>Google Business Profile</option>
+              <option>Website organic</option>
+              <option>Instagram</option>
+              <option>Facebook organic</option>
+              <option>Facebook ad</option>
+              <option>Yard sign</option>
+              <option>Postcard / direct mail</option>
+              <option>Community Facebook group</option>
+              <option>Network — Gio's contacts</option>
+              <option>Network — Mike's contacts</option>
+              <option>Other</option>
+            </select>
+          </label>
+        </div>
+        <label class="field"><span class="l">HOA?</span><input type="text" name="hoa" placeholder="Yes — Bonita Long Canyon, contact tbd / No"></label>
+
+        <p class="section-label">On-site conversation</p>
+        <label class="field"><span class="l">What they want, what they don't, lifestyle, family — Gio's words, raw is fine</span>
+          <textarea name="onsiteNotes" rows="6" placeholder="They've owned the home 18 years, two grandkids visit weekly, husband cooks, they entertain about once a month. They want a pergola dining area and 'somewhere to sit by a fire.' She doesn't want a pool. He hates the existing concrete patio. Triggering event: granddaughter's first birthday next summer is on their mind."></textarea>
+        </label>
+        <div class="grid-2">
+          <label class="field"><span class="l">Triggering event</span>
+            <select name="trigger">
+              <option value="">— select —</option>
+              <option>Just bought the home</option>
+              <option>Long-owned, ready for refresh</option>
+              <option>New kids or grandkids</option>
+              <option>Retired, finally have time</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field"><span class="l">Timeline expectation (their words)</span><input type="text" name="timeline" placeholder="Done by next summer"></label>
+        </div>
+
+        <p class="section-label">Budget signal</p>
+        <div class="grid-2">
+          <label class="field"><span class="l">What they said</span><input type="text" name="budgetSaid" placeholder="They said $80–150K is fine"></label>
+          <label class="field"><span class="l">Gio's read</span>
+            <select name="budgetRead">
+              <option value="">— select —</option>
+              <option>Realistic for our sweet spot</option>
+              <option>Soft — willing to flex up</option>
+              <option>Aspirational — number too low for scope</option>
+              <option>Hunting on price — flag for Mike</option>
+              <option>Likely under $20K floor — escalate</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="section-label">Preliminary scope (check what's likely)</p>
+        <div id="scope-pills">
+          <span class="svc-pill" data-v="Full backyard remodel">Full backyard remodel</span>
+          <span class="svc-pill" data-v="Outdoor kitchen / BBQ island">Outdoor kitchen / BBQ island</span>
+          <span class="svc-pill" data-v="Patio / hardscape">Patio / hardscape</span>
+          <span class="svc-pill" data-v="Pergola">Pergola</span>
+          <span class="svc-pill" data-v="Fire pit / fireplace">Fire pit / fireplace</span>
+          <span class="svc-pill" data-v="Retaining / seating walls">Retaining / seating walls</span>
+          <span class="svc-pill" data-v="Pool deck">Pool deck</span>
+          <span class="svc-pill" data-v="New pool">New pool</span>
+          <span class="svc-pill" data-v="Spa / hot tub">Spa / hot tub</span>
+          <span class="svc-pill" data-v="Water feature">Water feature</span>
+          <span class="svc-pill" data-v="Artificial turf">Artificial turf</span>
+          <span class="svc-pill" data-v="Live sod / lawn">Live sod / lawn</span>
+          <span class="svc-pill" data-v="Planting beds (in remodel)">Planting beds (in remodel)</span>
+          <span class="svc-pill" data-v="Drainage / grading">Drainage / grading</span>
+          <span class="svc-pill" data-v="Landscape lighting">Landscape lighting</span>
+        </div>
+
+        <p class="section-label">Site areas seen / discussed</p>
+        <div id="area-pills">
+          <span class="area-pill" data-v="Back yard">Back yard</span>
+          <span class="area-pill" data-v="Side yard">Side yard</span>
+          <span class="area-pill" data-v="Front yard">Front yard</span>
+          <span class="area-pill" data-v="Pool area">Pool area</span>
+          <span class="area-pill" data-v="Driveway">Driveway</span>
+          <span class="area-pill" data-v="Slope / hillside">Slope / hillside</span>
+        </div>
+
+        <p class="section-label">Risk flags spotted on-site</p>
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="risks" value="HOA approval required"><span>HOA approval required</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Slope / grading challenge"><span>Slope / grading challenge</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Drainage problem visible"><span>Drainage problem visible</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Mature trees / root protection"><span>Mature trees / root protection</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Neighbor easement / shared driveway"><span>Neighbor easement / shared driveway</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Permit-heavy scope"><span>Permit-heavy scope (pool, retaining, gas, electrical)</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Pets / kids affecting site access"><span>Pets / kids affecting site access</span></label>
+          <label class="check"><input type="checkbox" name="risks" value="Out of geographic scope"><span>Outside the 28 service areas</span></label>
+        </div>
+
+        <p class="section-label">Photos uploaded (or about to upload in this chat)</p>
+        <div class="checks">
+          <label class="check"><input type="checkbox" name="photos" value="Lot satellite (Google Maps, scale-bar visible)"><span>Lot satellite (Google Maps, scale-bar visible)</span></label>
+          <label class="check"><input type="checkbox" name="photos" value="House footprint satellite"><span>House footprint satellite</span></label>
+          <label class="check"><input type="checkbox" name="photos" value="Drone photos (for renders)"><span>Drone photos (for renders)</span></label>
+          <label class="check"><input type="checkbox" name="photos" value="Ground-level photos of every zone"><span>Ground-level photos of every zone</span></label>
+          <label class="check"><input type="checkbox" name="photos" value="Annotated zone sketch"><span>Annotated zone sketch</span></label>
+          <label class="check"><input type="checkbox" name="photos" value="Reference dimension noted"><span>Reference dimension noted (for sub-area math)</span></label>
+        </div>
+
+        <p class="section-label">Measurements (Tier 1, optional now — can come later)</p>
+        <div class="grid-2">
+          <label class="field"><span class="l">Total lot sqft (Google Maps)</span><input type="number" name="lotSqft" placeholder="22000"></label>
+          <label class="field"><span class="l">House footprint sqft</span><input type="number" name="houseSqft" placeholder="3400"></label>
+          <label class="field"><span class="l">Permanent unchanged hardscape sqft</span><input type="number" name="otherSqft" placeholder="850"></label>
+          <label class="field"><span class="l">Outdoor working area (auto)</span><input type="number" name="workSqft" id="work-sqft" placeholder="auto-calculated" readonly></label>
+        </div>
+
+        <p class="section-label">Reference dimension for sub-area math</p>
+        <div class="grid-2">
+          <label class="field"><span class="l">Feature</span><input type="text" name="refFeature" placeholder="Existing concrete slab"></label>
+          <label class="field"><span class="l">Known length (ft)</span><input type="number" name="refLength" placeholder="20"></label>
+        </div>
+
+        <div class="callout">
+          <span class="h">Brand-rule reminders before submit</span>
+          The proposal will use city/neighborhood, never the full address. Field Lead and Mike's other companies stay unnamed publicly. Renders get the "Concept visualization — not a photograph of completed work" caption automatically. The $20K floor stays internal.
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn" id="submit-btn">Send to Claude</button>
+          <button type="button" class="btn secondary" id="copy-btn">Copy structured intake</button>
+          <button type="reset" class="btn secondary">Clear form</button>
+        </div>
+
+        <div class="notice" id="notice"></div>
+
+        <div class="outputbox" id="output">
+          <p class="section-label" style="margin-top: 0;">Structured intake — paste this into Claude chat</p>
+          <textarea id="output-text" readonly></textarea>
+          <div class="btn-row">
+            <button type="button" class="btn secondary small" id="copy-output">Copy to clipboard</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">02</span> Active estimates</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="lede">Estimates the agent has scaffolded under <code>clients/san-diego-landscape-remodeling/estimates/</code>. Update this list manually or ask Claude to refresh.</p>
+      <div id="estimates-list" class="empty">No estimates yet. Submit the intake form above to scaffold your first one.</div>
+      <div class="btn-row">
+        <button type="button" class="btn secondary small" id="refresh-estimates">Refresh from folder</button>
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">03</span> The seven-step workflow</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <div class="workflow-step">
+        <div class="num">1</div>
+        <div>
+          <p class="name">Intake — capture the on-site conversation</p>
+          <p class="desc">Four launch questions (scope reality, timeline reality, budget signal, risk flags), client info, decision-makers.</p>
+          <p class="file">00-intake.md</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">2</div>
+        <div>
+          <p class="name">Site capture — drop photos in subfolders</p>
+          <p class="desc">Lot satellite (scale-bar visible), house footprint satellite, drone shots, ground-level photos, annotated sketches.</p>
+          <p class="file">01-site/{lot,house,drone,ground,sketches}/</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">3</div>
+        <div>
+          <p class="name">Measurements — the satellite math</p>
+          <p class="desc">Tier 1 (Google Maps measure tool) for lot/house/working area. Tier 2 (sub-areas) from screenshot or reference dimension. Reconcile within ±10%.</p>
+          <p class="file">02-measurements.md</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">4</div>
+        <div>
+          <p class="name">Scope of work — line items by trade order</p>
+          <p class="desc">Demo, hardscape, structures, soft scape, lighting, drainage, finish. Conditional items flagged separately.</p>
+          <p class="file">03-scope.md</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">5</div>
+        <div>
+          <p class="name">Selections — name the materials</p>
+          <p class="desc">Belgard / Techo-Bloc / Eldorado partner brands by default. 2700 K lighting always. Drives both price and renders.</p>
+          <p class="file">04-selections.md</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">6</div>
+        <div>
+          <p class="name">Render prompts — Freepik Reimagine + Mystic</p>
+          <p class="desc">Reimagine for drone-photo edits (preserves geometry). Mystic for hero shots. Every export labeled "Concept visualization — not a photograph of completed work."</p>
+          <p class="file">05-renders/prompts.md</p>
+        </div>
+      </div>
+      <div class="workflow-step">
+        <div class="num">7</div>
+        <div>
+          <p class="name">Estimate — editorial-luxury proposal</p>
+          <p class="desc">Zone-by-zone prose, embedded renders with mandatory captions, prose-wrapped investment number, "by design, not by dispatch" landed naturally. Voice-check before send.</p>
+          <p class="file">06-estimate.md</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">04</span> Selections library — preferred brands</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="lede">Defaults the estimator agent suggests. You can override anywhere.</p>
+      <div class="brand-grid">
+        <div class="brand-cat">
+          <div class="h">Pavers / hardscape</div>
+          <div class="b"><code>Belgard</code> Dimensions, Mega-Arbel, Catalina Stone · <code>Techo-Bloc</code> Blu, Aberdeen, Industria · <code>Eldorado Stone</code> for veneer. Polymeric joints in graphite or stone for restraint.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Pool coping & waterline</div>
+          <div class="b">Travertine bullnose · honed limestone · large-format porcelain. Waterline tile from Mike's specialty material network.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Pergolas</div>
+          <div class="b">Cedar with satin walnut stain (warm) · powder-coated aluminum or steel (modern). Slatted, louvered, or solid waterproof roof. Integrated 2700 K down-lighting in beams.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Outdoor kitchens</div>
+          <div class="b"><code>Danver</code> stainless cabinetry (matte black or champagne) · honed black granite or Dekton counters · <code>Lynx</code> or <code>Wolf</code> grills · stainless or fluted-stone backsplash.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Decking</div>
+          <div class="b"><code>Trex</code> Transcend · <code>Fiberon</code> Concordia · IPE for the hero spend. Hidden clip fasteners. Color: warm gray or weathered teak default.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Lighting</div>
+          <div class="b"><code>FX Luminaire</code> · <code>Coastal Source</code> · <code>Kichler</code> · <code>Hinkley</code>. <strong style="font-weight: 500;">2700 K everywhere — always.</strong> Smart controller at panel.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Turf</div>
+          <div class="b"><code>SYNLawn</code> Cool Plus · <code>EasyTurf</code>. SBR-free infill (cooling). Hidden bender-board edge. Pile 1.5"–2".</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Plants — anchor palette</div>
+          <div class="b">Mediterranean default: olive (Olea Wilsonii) · Italian cypress · Westringia Wynyabbie Gem · Lomandra Breeze · agave/aloe accents. Modern desert and coastal as alternates.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Fire features</div>
+          <div class="b">Round 48" gas pit clad in honed limestone (warm) or board-form concrete (modern). Fireplaces faced in Eldorado or stacked stone. Always natural gas, never propane unless required.</div>
+        </div>
+        <div class="brand-cat">
+          <div class="h">Drainage</div>
+          <div class="b"><code>NDS</code> channel drains at patio edges · French drain at slope · catch basins at low points · pop-up emitters to daylight. Spec separately, never bury in hardscape.</div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top: 14px;">
+        <span class="h">Material pricing tier shorthand (internal)</span>
+        E = entry · M = mid · L = luxury · Hero = top-of-line. Log every selection's tier in <code>04-selections.md</code> so the investment range stays reconciled when a client upgrades a single item.
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">05</span> Render prompts — Freepik</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="lede">Two prompt templates. Reimagine when a drone shot exists (image-to-image, preserves the actual yard geometry — best for hero). Mystic for concept hero shots from scratch.</p>
+
+      <p class="section-label">Quick decision</p>
+      <p style="font-size: 12px; color: var(--ink-muted); margin: 0 0 10px;">
+        Drone or aerial photo of the property → <strong style="font-weight: 500;">Reimagine</strong> (image-to-image, 0.55–0.7 strength).<br>
+        No usable photo, or hero "moment" from scratch → <strong style="font-weight: 500;">Mystic</strong> (text-to-image, photorealistic preset).
+      </p>
+
+      <div class="prompt-card">
+        <p class="ph">Reimagine — drone-shot transformation
+          <button type="button" class="btn secondary small" data-copy="reimagine-prompt">Copy</button>
+        </p>
+<pre id="reimagine-prompt">A photorealistic aerial render of a finished luxury backyard remodel in San Diego, California. Editorial architectural photography, golden hour, warm directional sun, soft shadows.
+
+PRESERVE: the existing house architecture, property boundaries, and surrounding mature trees from the input image.
+
+REPLACE the existing back yard with the following finished design:
+
+— A {patio_dimensions} ft paver terrace in {paver_brand} {paver_line}, color {paver_color}, laid in {paver_pattern} pattern, with polymeric joints in {joint_color}.
+
+— A {pergola_dimensions} ft {pergola_material} pergola in {pergola_finish} with a {pergola_roof_type} roof, positioned over the patio's eastern half. Integrated 2700K down-lighting visible in beams.
+
+— An outdoor kitchen along the eastern edge: {kitchen_dimensions} ft of {cabinetry_finish} cabinetry, {counter_material} counters in {counter_color}, a {grill_brand} built-in grill, and a {backsplash_material} backsplash.
+
+— A {fire_feature_type} in {fire_feature_material} as the centerpiece of the lounge zone, {fire_feature_dimensions}.
+
+— Planting palette: {aesthetic_direction}, featuring {anchor_plants}. Plant beds with {mulch_or_dg} ground cover. {turf_section}
+
+— Landscape lighting throughout: warm 2700K up-lighting on trees and architectural features, low-voltage path lights along walkways. {lighting_brand} fixtures.
+
+— Walkways: {walkway_material} matching the patio.
+
+— Drainage: invisible — channel drains tucked at patio edges, beds graded to daylight.
+
+OVERALL FEEL: editorial-luxury, calm, symmetrical, expensive but lived-in. Reference brands: Aman resorts, Architectural Digest, Dwell. NOT a stock landscape rendering, NOT cartoonish, NOT over-saturated.
+
+EXCLUDE: people, cars, dogs, signs, brand logos, text overlays, watermarks, tools, debris.</pre>
+      </div>
+
+      <div class="prompt-card">
+        <p class="ph">Mystic — hero shot at golden hour
+          <button type="button" class="btn secondary small" data-copy="mystic-prompt">Copy</button>
+        </p>
+<pre id="mystic-prompt">Architectural editorial photograph of a finished luxury backyard in {neighborhood}, San Diego County. Golden hour, warm directional sunlight, long soft shadows. Eye-level perspective from the patio's western edge looking east toward the outdoor kitchen.
+
+Foreground: a {paver_brand} {paver_line} paver terrace in {paver_color}, laid in {paver_pattern}. Clean polymeric joints. Patio surface dry and softly reflective from the low sun.
+
+Mid-ground: a {pergola_dimensions} ft {pergola_material} pergola in {pergola_finish} with a {pergola_roof_type} roof. Integrated warm down-lighting just beginning to glow against the dusk sky. A six-seat dining table runs lengthwise under the pergola, with linen-upholstered chairs (vacant — no people).
+
+Background: an outdoor kitchen with {counter_material} counters in {counter_color}, {cabinetry_finish} cabinetry, a {grill_brand} grill, and a single low pendant light over the island. Behind the kitchen, a planting bed of {aesthetic_direction} character — {anchor_plants} — backlit by warm up-lights. Mature olive trees frame the rear property line.
+
+Sky: clean Southern California dusk, soft gradient from peach to pale denim. No clouds, no birds.
+
+Lighting design: 2700 K low-voltage landscape lighting throughout — up-lights on trees and architecture, path lights along the patio edge, integrated pergola down-lighting.
+
+Mood: editorial-luxury, calm, lived-in. Reference: Aman resorts at dusk; Rolls-Royce showroom restraint. NOT a stock vendor render, NOT a real-estate listing photo.
+
+Composition: rule-of-thirds, leading line from foreground patio joints into the kitchen at mid-distance, the pergola roofline pulling the eye to the trees behind.
+
+Camera notes: full-frame, 35mm equivalent, f/4, ISO 200. Realistic depth of field — foreground tack-sharp, distant trees just slightly soft.
+
+EXCLUDE: people, cars, signs, brand logos, watermarks, text overlays, harsh midday sun, tools, construction equipment, plastic plants, AI rendering artifacts, melted geometry.</pre>
+      </div>
+
+      <div class="prompt-card">
+        <p class="ph">Negative prompt (use with both)
+          <button type="button" class="btn secondary small" data-copy="neg-prompt">Copy</button>
+        </p>
+<pre id="neg-prompt">cartoonish, illustrated, oversaturated, neon, fluorescent lighting, daytime harsh shadows, fish-eye distortion, low-resolution, watermark, signage, text, brand logos, tools, equipment piles, construction debris, people, animals, cars, parked vehicles, blurry, motion blur, double image, plastic-looking plants, AI artifacts, warped geometry, melted edges</pre>
+      </div>
+
+      <div class="callout">
+        <span class="h">Mandatory caption on every export</span>
+        <strong style="font-weight: 500;">Concept visualization — not a photograph of completed work.</strong>
+        Goes in the file name and under every embedded render in the proposal. SDLR's trust premium dies if a render gets passed off as portfolio. No exceptions.
+      </div>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">06</span> Brand rules quick reference</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="lede">The estimator agent already enforces these. This is the cheat sheet for when you're writing or editing manually.</p>
+
+      <p class="section-label">Banned in client-facing prose</p>
+      <div class="banned-grid">
+        <span>dream backyard</span>
+        <span>transform your space</span>
+        <span>your vision, our expertise</span>
+        <span>starting at $20K</span>
+        <span>from $20K</span>
+        <span>minimum project size</span>
+        <span>our studio</span>
+        <span>visit our showroom</span>
+        <span>same-day</span>
+        <span>immediate</span>
+        <span>best budget</span>
+        <span>most affordable</span>
+        <span>cheapest</span>
+        <span>price match</span>
+        <span>maintenance plan</span>
+        <span>tree trimming</span>
+      </div>
+
+      <p class="section-label">Use instead</p>
+      <div class="allowed-grid">
+        <span>by design, not by dispatch</span>
+        <span>built slowly, built once</span>
+        <span>full backyard remodels</span>
+        <span>small-scope work (filter)</span>
+        <span>our office in La Mesa (NAP only)</span>
+        <span>for the backyard you actually use</span>
+        <span>one honest number</span>
+        <span>References available on request</span>
+      </div>
+
+      <p class="section-label">Naming rules</p>
+      <ul class="rule-list">
+        <li><span class="lab no">Never</span>Name our Field Lead by full name. Use "our Field Lead" or "our lead craftsman."</li>
+        <li><span class="lab no">Never</span>Name Mike's other companies in public copy. If material depth needs context: "a separate specialty company Mike also operates."</li>
+        <li><span class="lab ok">Always</span>Reference Mike's CSLB license #1139785 on the proposal cover.</li>
+        <li><span class="lab ok">Always</span>Use city / neighborhood on the proposal — never the full address.</li>
+      </ul>
+
+      <p class="section-label">AI render rules</p>
+      <ul class="rule-list">
+        <li><span class="lab ok">Always</span>Caption every render exactly: "Concept visualization — not a photograph of completed work."</li>
+        <li><span class="lab no">Never</span>Pass an AI render off as portfolio or completed work.</li>
+        <li><span class="lab flag">Flag</span>If a Freepik render contains text, brand logos, or rendered signs — re-run.</li>
+      </ul>
+
+      <p class="section-label">Pricing language</p>
+      <ul class="rule-list">
+        <li><span class="lab no">Never</span>Put the $20K floor in any client-facing prose. Internal only.</li>
+        <li><span class="lab ok">Allowed</span>Per-service investment bands in a services table (e.g., "Retaining walls $20K – $100K") — context for serious readers, not a filter.</li>
+        <li><span class="lab ok">Allowed</span>Scope-language filters: "small-scope work," "design-build at this scale," "full backyard remodels."</li>
+      </ul>
+
+      <p class="section-label">Engagement model (mention in every proposal)</p>
+      <ul class="rule-list">
+        <li><span class="lab ok">Include</span>The 10-Month Walk-Through (free post-completion inspection).</li>
+        <li><span class="lab ok">Include</span>Direct-Founder Access (Gio + Mike on every project, no account managers).</li>
+        <li><span class="lab ok">Include</span>Single-crew, scheduled cadence — "by design, not by dispatch."</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="card">
+    <summary>
+      <span class="title"><span class="num">07</span> Service area + offer reference</span>
+      <span class="toggle"></span>
+    </summary>
+    <div class="body">
+      <p class="section-label">The 28 service areas (premium-fair-value tier)</p>
+      <p style="font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
+        <strong style="font-weight: 500;">East / South County:</strong> Bonita · La Mesa · Rancho San Diego · Mount Helix · El Cajon · Eastlake · Otay Ranch · Rolling Hills Ranch · San Miguel Ranch · Millenia · Sunbow · Coronado<br>
+        <strong style="font-weight: 500;">Central / Urban:</strong> Point Loma · Mission Hills · La Jolla · Tierrasanta<br>
+        <strong style="font-weight: 500;">North County Coastal:</strong> Del Mar · Solana Beach · Encinitas · Olivenhain · Carlsbad<br>
+        <strong style="font-weight: 500;">North County Inland:</strong> Rancho Santa Fe · Fairbanks Ranch · Santaluz · 4S Ranch · Del Sur · Rancho Bernardo · Poway
+      </p>
+
+      <p class="section-label">Service menu</p>
+      <p style="font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
+        Full backyard remodels (hero) · Outdoor kitchens & BBQ islands · Patios & hardscape · Fire pits & fireplaces · Pergolas & shade structures · Retaining & seating walls · Artificial turf · Landscape lighting · Pool decks & poolside hardscape · Drainage & grading · In-house design visualization (supporting)
+      </p>
+
+      <p class="section-label">Pricing posture (internal)</p>
+      <p style="font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
+        Floor: <strong style="font-weight: 500;">$20K</strong> (never in prose) · Sweet spot: <strong style="font-weight: 500;">$50K–$300K</strong> · Hero range: $150K–$500K · Goal: $500K–$1M+ once portfolio supports it. Premium-fair-value. We don't price-match. One honest number.
+      </p>
+
+      <p class="section-label">What we don't sell</p>
+      <p style="font-size: 12px; color: var(--ink-muted); line-height: 1.7;">
+        Landscape maintenance · Tree trimming · Anything below the small-scope floor · Anything where margin won't support the quality standard. Standalone planting & irrigation only inside a full remodel.
+      </p>
+    </div>
+  </details>
+
+  <p class="footer">
+    Estimator dashboard for San Diego Landscape Remodeling.<br>
+    Workflow lives at <code>.claude/skills/landscape-estimate/</code> · Agent at <code>.claude/agents/estimator.md</code> · Estimates at <code>clients/san-diego-landscape-remodeling/estimates/</code>
+  </p>
+</div>
+
+<script>
+(function(){
+  const today = new Date();
+  document.getElementById('today').textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+
+  function pillToggle(selector) {
+    document.querySelectorAll(selector + ' .svc-pill, ' + selector + ' .area-pill').forEach(p => {
+      p.addEventListener('click', () => p.classList.toggle('on'));
+    });
+  }
+  pillToggle('#scope-pills');
+  pillToggle('#area-pills');
+
+  const lot = document.querySelector('[name="lotSqft"]');
+  const house = document.querySelector('[name="houseSqft"]');
+  const other = document.querySelector('[name="otherSqft"]');
+  const work = document.getElementById('work-sqft');
+  function recalc(){
+    const a = parseFloat(lot.value) || 0;
+    const b = parseFloat(house.value) || 0;
+    const c = parseFloat(other.value) || 0;
+    if (a > 0) work.value = Math.max(0, a - b - c);
+    else work.value = '';
+  }
+  [lot, house, other].forEach(el => el.addEventListener('input', recalc));
+
+  function buildIntakeMessage() {
+    const f = document.getElementById('intake');
+    const get = n => (f.elements[n] && f.elements[n].value || '').trim();
+    const checked = n => Array.from(f.querySelectorAll('input[name="' + n + '"]:checked')).map(el => el.value);
+    const pills = sel => Array.from(document.querySelectorAll(sel + ' .svc-pill.on, ' + sel + ' .area-pill.on')).map(el => el.dataset.v);
+
+    const lines = [];
+    lines.push('Acting as the estimator agent for SDLR — please scaffold a new estimate from this intake. Pick a job slug, copy the template into clients/san-diego-landscape-remodeling/estimates/<slug>/, populate 00-intake.md from the data below, update the per-job README checklist, and tell me which photos you need me to upload next in this chat.');
+    lines.push('');
+    lines.push('## Client');
+    if (get('clientNames')) lines.push('- Names: ' + get('clientNames'));
+    if (get('phone')) lines.push('- Phone: ' + get('phone'));
+    if (get('email')) lines.push('- Email: ' + get('email'));
+    if (get('decisionMakers')) lines.push('- Decision-makers: ' + get('decisionMakers'));
+
+    lines.push('');
+    lines.push('## Property');
+    if (get('address')) lines.push('- Full address (internal): ' + get('address'));
+    if (get('city')) lines.push('- City / neighborhood: ' + get('city'));
+    if (get('source')) lines.push('- Source: ' + get('source'));
+    if (get('hoa')) lines.push('- HOA: ' + get('hoa'));
+
+    lines.push('');
+    lines.push('## On-site conversation');
+    if (get('onsiteNotes')) lines.push(get('onsiteNotes'));
+    else lines.push('_(none captured yet)_');
+
+    lines.push('');
+    lines.push('## Trigger / timeline / budget');
+    if (get('trigger')) lines.push('- Trigger: ' + get('trigger'));
+    if (get('timeline')) lines.push('- Timeline: ' + get('timeline'));
+    if (get('budgetSaid')) lines.push('- Budget said: ' + get('budgetSaid'));
+    if (get('budgetRead')) lines.push('- Gio’s read: ' + get('budgetRead'));
+
+    const scope = pills('#scope-pills');
+    if (scope.length) {
+      lines.push('');
+      lines.push('## Preliminary scope');
+      scope.forEach(s => lines.push('- ' + s));
+    }
+
+    const areas = pills('#area-pills');
+    if (areas.length) {
+      lines.push('');
+      lines.push('## Areas seen / discussed');
+      areas.forEach(a => lines.push('- ' + a));
+    }
+
+    const risks = checked('risks');
+    if (risks.length) {
+      lines.push('');
+      lines.push('## Risk flags');
+      risks.forEach(r => lines.push('- ' + r));
+    }
+
+    const photos = checked('photos');
+    if (photos.length) {
+      lines.push('');
+      lines.push('## Photos uploaded / about to upload');
+      photos.forEach(p => lines.push('- ' + p));
+    }
+
+    if (get('lotSqft') || get('houseSqft') || get('otherSqft')) {
+      lines.push('');
+      lines.push('## Tier 1 measurements (from Google Maps)');
+      if (get('lotSqft')) lines.push('- Total lot: ' + get('lotSqft') + ' sqft');
+      if (get('houseSqft')) lines.push('- House footprint: ' + get('houseSqft') + ' sqft');
+      if (get('otherSqft')) lines.push('- Permanent unchanged hardscape: ' + get('otherSqft') + ' sqft');
+      if (work.value) lines.push('- Outdoor working area: ' + work.value + ' sqft');
+    }
+
+    if (get('refFeature') || get('refLength')) {
+      lines.push('');
+      lines.push('## Reference dimension for sub-area math');
+      if (get('refFeature')) lines.push('- Feature: ' + get('refFeature'));
+      if (get('refLength')) lines.push('- Known length: ' + get('refLength') + ' ft');
+    }
+
+    lines.push('');
+    lines.push('---');
+    lines.push('Brand rules: enforce SDLR-CLAUDE.md (banned phrases scrubbed, AI renders captioned "Concept visualization — not a photograph of completed work," no $20K floor in prose, city/neighborhood on proposal not full address, Field Lead and Mike’s other companies unnamed publicly, CSLB #1139785 on cover).');
+
+    return lines.join('\n');
+  }
+
+  function showNotice(msg, ok){
+    const n = document.getElementById('notice');
+    n.textContent = msg;
+    n.style.background = ok ? 'var(--success-soft)' : 'var(--warn-soft)';
+    n.style.color = ok ? 'var(--success)' : 'var(--warn)';
+    n.style.borderLeftColor = ok ? 'var(--success)' : 'var(--warn)';
+    n.classList.add('shown');
+    setTimeout(() => n.classList.remove('shown'), 4000);
+  }
+
+  document.getElementById('submit-btn').addEventListener('click', () => {
+    const msg = buildIntakeMessage();
+    if (typeof window.sendPrompt === 'function') {
+      window.sendPrompt(msg);
+      showNotice('Sent to Claude. The estimator agent will scaffold the folder.', true);
+    } else {
+      const out = document.getElementById('output');
+      document.getElementById('output-text').value = msg;
+      out.classList.add('shown');
+      out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      showNotice('No live Claude connection — copy the structured intake below into chat.', false);
+    }
+  });
+
+  document.getElementById('copy-btn').addEventListener('click', async () => {
+    const msg = buildIntakeMessage();
+    document.getElementById('output-text').value = msg;
+    document.getElementById('output').classList.add('shown');
+    try {
+      await navigator.clipboard.writeText(msg);
+      showNotice('Intake copied to clipboard. Paste into Claude chat.', true);
+    } catch (e) {
+      showNotice('Copy failed — select the text below manually.', false);
+    }
+  });
+
+  document.getElementById('copy-output').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(document.getElementById('output-text').value);
+      showNotice('Copied.', true);
+    } catch (e) {
+      const t = document.getElementById('output-text');
+      t.select(); t.setSelectionRange(0, 99999);
+    }
+  });
+
+  document.querySelectorAll('[data-copy]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.copy;
+      const text = document.getElementById(id).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(() => { btn.textContent = orig; }, 1500);
+      } catch (e) {
+        showNotice('Copy failed.', false);
+      }
+    });
+  });
+
+  document.getElementById('refresh-estimates').addEventListener('click', () => {
+    if (typeof window.sendPrompt === 'function') {
+      window.sendPrompt('List the active estimates under clients/san-diego-landscape-remodeling/estimates/ and give me their current step / status from each per-job README.md. Format: a markdown table with columns Slug, Client, Step, Last activity. Then ask if I want this dashboard updated.');
+    } else {
+      showNotice('No live Claude connection — open the dashboard inside Cowork to refresh.', false);
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
