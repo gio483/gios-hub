@@ -1,1 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSH — Designer & Architect Outreach</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#f4f5f7;color:#1a1a2e;padding:0}
+/* NAV */
+.topnav{background:#1A2B3C;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topnav a{color:#fbbf24;font-size:13px;font-weight:600;text-decoration:none;letter-spacing:.01em}
+.topnav a:hover{color:#fde68a}
+.nav-title{color:#e2e8f0;font-size:14px;font-weight:600}
+/* HEADER */
+.header{background:linear-gradient(135deg,#1A2B3C 0%,#253D55 100%);padding:28px 28px 24px;color:#fff}
+.header h1{font-size:22px;font-weight:700;color:#fbbf24;margin-bottom:4px}
+.header p{font-size:13px;color:#94a3b8}
+/* STATS ROW */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;padding:20px 24px;background:#fff;border-bottom:1px solid #e5e7eb}
+.stat{text-align:center;padding:12px 8px;border-radius:10px;border:1px solid #e5e7eb}
+.stat .sval{font-size:24px;font-weight:700;line-height:1}
+.stat .slbl{font-size:11px;color:#6b7280;margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
+.stat.s-total{background:#f8fafc}.stat.s-total .sval{color:#1A2B3C}
+.stat.s-sent{background:#eff6ff}.stat.s-sent .sval{color:#2563eb}
+.stat.s-responded{background:#fffbeb}.stat.s-responded .sval{color:#d97706}
+.stat.s-scheduled{background:#fff7ed}.stat.s-scheduled .sval{color:#ea580c}
+.stat.s-met{background:#f0fdf4}.stat.s-met .sval{color:#16a34a}
+.stat.s-existing{background:#faf5ff}.stat.s-existing .sval{color:#7c3aed}
+/* PROGRESS BAR */
+.prog-wrap{padding:12px 24px;background:#fff;border-bottom:1px solid #e5e7eb}
+.prog-label{display:flex;justify-content:space-between;font-size:12px;color:#6b7280;margin-bottom:6px}
+.prog-bar{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#2563eb,#16a34a);border-radius:99px;transition:width .5s ease}
+/* FILTERS */
+.filters{padding:14px 24px;background:#fff;border-bottom:.px solid #e5e7eb;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.filters input{flex:1;min-width:200px;padding:8px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;color:#1a1a2e;outline:none}
+.filters input:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.2)}
+.filters select{padding:8px 12px;border:1px solid #d1d5db;border-radius:8px;font-size:13px;color:#1a1a2e;background:#fff;outline:none;cursor:pointer}
+.filters select:focus{border-color:#fbbf24}
+.filters .filter-count{font-size:12px;color:#6b7280;white-space:nowrap;margin-left:auto}
+/* TABLE */
+.table-wrap{overflow-x:auto;padding:0 24px 24px}
+table{width:100%;border-collapse:collapse;margin-top:16px;background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+thead tr{background:#1A2B3C}
+thead th{padding:12px 14px;text-align:left;font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+tbody tr{border-bottom:1px solid #f3f4f6;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#fafbfc}
+tbody tr.is-existing{background:#faf5ff}
+tbody tr.is-met{background:#f0fdf4}
+tbody td{padding:11px 14px;font-size:13px;vertical-align:middle}
+td.td-num{color:#9ca3af;font-size:12px;font-weight:600;width:36px}
+td.td-name{font-weight:600;color:#111827;min-width:160px}
+td.td-name .firm-website{font-size:11px;color:#6b7280;font-weight:400;margin-top:2px}
+td.td-name .firm-recog{font-size:10px;color:#9ca3af;margin-top:2px;line-height:1.3}
+td.td-principal{color:#374151;font-size:12px;min-width:120px}
+td.td-type span{display:inline-block;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:600}
+.type-id{background:#eff6ff;color:#1d4ed8}
+.type-arch{background:#fef3c7;color:#92400e}
+td.td-ig a{color:#2563eb;font-size:12px;text-decoration:none}
+td.td-ig a:hover{text-decoration:underline}
+td.td-ig .no-ig{color:#d1d5db;font-size:11px}
+td.td-location{color:#6b7280;font-size:12px;min-width:100px}
+/* STATUS DROPDOWN */
+td.td-status{min-width:170px}
+.status-select{width:100%;padding:5px 8px;border-radius:7px;font-size:12px;font-weight:600;border:1.5px solid;outline:none;cursor:pointer;background:#fff}
+.status-select:focus{box-shadow:0 0 0 2px rgba(251,191,36,.3)}
+.s-not-started{border-color:#d1d5db;color:#6b7280}
+.s-dm-sent{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}
+.s-email-sent{border-color:#6ee7b7;color:#065f46;background:#ecfdf5}
+.s-dm-email{border-color:#818cf8;color:#3730a3;background:#eef2ff}
+.s-responded{border-color:#fcd34d;color:#92400e;background:#fffbeb}
+.s-meeting{border-color:#fdba74;color:#c2410c;background:#fff7ed}
+.s-met-in-person{border-color:#86efac;color:#166534;background:#f0fdf4}
+.s-existing{border-color:#c4b5fd;color:#5b21b6;background:#faf5ff}
+.s-phone-only{border-color:#f9a8d4;color:#9d174d;background:#fdf2f8}
+/* MET IN PERSON TOGGLE */
+td.td-met{width:90px;text-align:center}
+.met-toggle{display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer}
+.met-toggle input{width:16px;height:16px;cursor:pointer;accent-color:#16a34a}
+.met-label{font-size:11px;color:#6b7280}
+/* NOTES */
+td.td-notes{min-width:200px}
+.notes-input{width:100%;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;color:#374151;resize:none;font-family:inherit;outline:none}
+.notes-input:focus{border-color:#fbbf24;box-shadow:0 0 0 2px rgba(251,191,36,.2)}
+/* LAST CONTACT */
+td.td-date{min-width:100px}
+.date-input{width:100%;padding:5px 8px;border:1px solid #e5e7eb;border-radius:6px;font-size:12px;color:#374151;outline:none}
+.date-input:focus{border-color:#fbbf24}
+/* FOOTER */
+.dash-footer{text-align:center;padding:20px;font-size:12px;color:#9ca3af}
+/* EMPTY */
+.empty{text-align:center;padding:48px;color:#9ca3af;font-size:14px}
+/* RESET BTN */
+.reset-btn{padding:7px 14px;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.reset-btn:hover{background:#fecaca}
+.export-btn{padding:7px 14px;background:#1A2B3C;color:#fbbf24;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer}
+.export-btn:hover{background:#253D55}
+@media(max-width:768px){
+  .stats{grid-template-columns:repeat(3,1fr)}
+  .topnav .nav-title{display:none}
+  td.td-notes,td.td-date{display:none}
+}
+</style>
+</head>
+<body>
 
+<nav class="topnav">
+  <a href="index.html">← Gio's Hub</a>
+  <span class="nav-title">KSH Construction</span>
+  <span style="font-size:12px;color:#64748b;">Auto-saves in browser</span>
+</nav>
+
+<div class="header">
+  <h1>🤝 Designer & Architect Outreach</h1>
+  <p>Kyle Harrell · KSH Construction · (619) 987-2700 · Coronado · Solana Beach · La Jolla · Rancho Santa Fe</p>
+</div>
+
+<div class="stats" id="statsRow">
+  <div class="stat s-total"><div class="sval" id="s-total">105</div><div class="slbl">Total Firms</div></div>
+  <div class="stat s-sent"><div class="sval" id="s-sent">0</div><div class="slbl">DM / Email Sent</div></div>
+  <div class="stat s-responded"><div class="sval" id="s-responded">0</div><div class="slbl">Responded</div></div>
+  <div class="stat s-scheduled"><div class="sval" id="s-scheduled">0</div><div class="slbl">Meeting Scheduled</div></div>
+  <div class="stat s-met"><div class="sval" id="s-met">0</div><div class="slbl">Met In Person</div></div>
+  <div class="stat s-existing"><div class="sval" id="s-existing">0</div><div class="slbl">Existing Rel.</div></div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-label">
+    <span>Outreach progress</span>
+    <span id="prog-pct">0% contacted</span>
+  </div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div class="filters">
+  <input type="text" id="searchBox" placeholder="🔍  Search firm, principal, or location…">
+  <select id="typeFilter">
+    <option value="">All Types</option>
+    <option value="Interior Design">Interior Design</option>
+    <option value="Architecture">Architecture</option>
+  </select>
+  <select id="statusFilter">
+    <option value="">All Statuses</option>
+    <option value="Not Started">Not Started</option>
+    <option value="DM Sent">DM Sent</option>
+    <option value="Email Sent">Email Sent</option>
+    <option value="DM + Email Sent">DM + Email Sent</option>
+    <option value="Responded">Responded</option>
+    <option value="Meeting Scheduled">Meeting Scheduled</option>
+    <option value="Met In Person">Met In Person</option>
+    <option value="Existing Relationship">Existing Relationship</option>
+    <option value="Phone/Email Only">Phone/Email Only</option>
+  </select>
+  <select id="locationFilter">
+    <option value="">All Locations</option>
+    <option value="Coronado">Coronado</option>
+    <option value="La Jolla">La Jolla</option>
+    <option value="Del Mar">Del Mar</option>
+    <option value="Solana Beach">Solana Beach</option>
+    <option value="Rancho Santa Fe">Rancho Santa Fe</option>
+    <option value="San Diego">San Diego</option>
+    <option value="Encinitas">Encinitas</option>
+  </select>
+  <select id="metFilter">
+    <option value="">Met Status: All</option>
+    <option value="met">Met In Person ✓</option>
+    <option value="not-met">Not Yet Met</option>
+  </select>
+  <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+  <button class="reset-btn" onclick="resetAll()">Reset All</button>
+  <span class="filter-count" id="filterCount">Showing 105 firms</span>
+</div>
+
+<div class="table-wrap">
+<table id="mainTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Firm / Studio</th>
+      <th>Principal</th>
+      <th>Type</th>
+      <th>Location</th>
+      <th>Instagram</th>
+      <th>Outreach Status</th>
+      <th>Met In Person</th>
+      <th>Date Contacted</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody"></tbody>
+</table>
+<div class="empty" id="emptyMsg" style="display:none">No firms match your filters.</div>
+</div>
+
+<div class="dash-footer">
+  KSH Construction · Designer & Architect Outreach Tracker · Data auto-saved in your browser · Kyle Harrell (619) 987-2700
+</div>
+
+<script>
+const FIRMS = [{"num": 1, "name": "Rachel Moriarty Interiors", "type": "Interior Design", "principal": "Rachel Moriarty", "ig": "@rachelmoriartyinteriors", "ig_url": "https://instagram.com/rachelmoriartyinteriors", "website": "rachelminteriors.com", "location": "San Diego", "recognition": "Forbes, AD PRO, HGTV, #1 Best-Selling Author", "initialStatus": "Not Started"}, {"num": 2, "name": "Navilize Studio", "type": "Interior Design", "principal": "Navilize Team", "ig": "@navilize", "ig_url": "https://instagram.com/navilize", "website": "navilize.com", "location": "San Diego", "recognition": "Architectural Digest, SD Mag Home+Design Award 2024", "initialStatus": "Not Started"}, {"num": 3, "name": "Studio Surface", "type": "Interior Design", "principal": "Michelle Salz-Smith", "ig": "@studiosurface", "ig_url": "https://instagram.com/studiosurface", "website": "studio-surface.com", "location": "San Diego", "recognition": "Award-winning, luxury resort projects", "initialStatus": "Not Started"}, {"num": 4, "name": "Tracy Lynn Studio", "type": "Interior Design", "principal": "Tracy Lynn", "ig": "@tracylynnstudio", "ig_url": "https://instagram.com/tracylynnstudio", "website": "tracylynnstudio.com", "location": "San Diego", "recognition": "20+ years, Houzz recognized", "initialStatus": "Not Started"}, {"num": 5, "name": "Salt + Willow", "type": "Interior Design", "principal": "Lindley Favor", "ig": "@saltandwillow", "ig_url": "https://instagram.com/saltandwillow", "website": "saltandwillow.com", "location": "San Diego", "recognition": "Coastal luxury, editorial features", "initialStatus": "Existing Relationship"}, {"num": 6, "name": "M. Swabb Interior Design", "type": "Interior Design", "principal": "Maegan Swabb", "ig": "@m.swabbdesign", "ig_url": "https://instagram.com/m.swabbdesign", "website": "maeganswabb.com", "location": "Del Mar / La Jolla", "recognition": "Tastemaker Award, Architectural Digest", "initialStatus": "Not Started"}, {"num": 7, "name": "Kristyn Harvey Interiors", "type": "Interior Design", "principal": "Kristyn Harvey", "ig": "@kristynharveyinteriors", "ig_url": "https://instagram.com/kristynharveyinteriors", "website": "kristynharveyinteriors.com", "location": "San Diego", "recognition": "Soulful luxury interiors, editorial features", "initialStatus": "Existing Relationship"}, {"num": 8, "name": "Amy Meier Design", "type": "Interior Design", "principal": "Amy Meier", "ig": "@amymeierdesign", "ig_url": "https://instagram.com/amymeierdesign", "website": "amymeier.com", "location": "Rancho Santa Fe", "recognition": "43K Instagram followers, national projects", "initialStatus": "Not Started"}, {"num": 9, "name": "Jules Wilson Design Studio", "type": "Interior Design", "principal": "Jules Wilson", "ig": "@juleswilsondesign", "ig_url": "https://instagram.com/juleswilsondesign", "website": "juleswilsondesign.com", "location": "San Diego", "recognition": "High-end full-service, La Jolla & Del Mar", "initialStatus": "Not Started"}, {"num": 10, "name": "Brian Brown Studio", "type": "Interior Design", "principal": "Brian Brown", "ig": "@brianbrownstudio", "ig_url": "https://instagram.com/brianbrownstudio", "website": "brianbrownstudio.com", "location": "La Jolla / Del Mar", "recognition": "Livable luxury, sleek coastal style", "initialStatus": "Not Started"}, {"num": 11, "name": "Kern & Co / Susan Spath", "type": "Interior Design", "principal": "Susan Spath", "ig": "@kerncodesigns", "ig_url": "https://instagram.com/kerncodesigns", "website": "kerncodesigns.com", "location": "Solana Beach", "recognition": "25+ years, SD Mag featured, showroom", "initialStatus": "Not Started"}, {"num": 12, "name": "Beach Bungalow Designs", "type": "Interior Design", "principal": "Tritia Gustine", "ig": "@beachbungalowgirls", "ig_url": "https://instagram.com/beachbungalowgirls", "website": "beachbungalowdesigns.com", "location": "San Diego", "recognition": "Award-winning luxury custom residential", "initialStatus": "Not Started"}, {"num": 13, "name": "REDinterior", "type": "Interior Design", "principal": "Rebecca Soechtig", "ig": "@red_interior", "ig_url": "https://instagram.com/red_interior", "website": "redinterior.com", "location": "La Jolla", "recognition": "La Jolla, Del Mar, Rancho Santa Fe specialist", "initialStatus": "Not Started"}, {"num": 14, "name": "JY Design Interiors", "type": "Interior Design", "principal": "Jaki Yermian", "ig": "@jydesigninteriors", "ig_url": "https://instagram.com/jydesigninteriors", "website": "jydesigninteriors.com", "location": "Encinitas", "recognition": "Coastal communities specialist", "initialStatus": "Not Started"}, {"num": 15, "name": "The True House", "type": "Interior Design", "principal": "Alyce Lopez", "ig": "@thetruehouse", "ig_url": "https://instagram.com/thetruehouse", "website": "thetruehouse.com", "location": "San Diego", "recognition": "13K followers, livable luxury", "initialStatus": "Not Started"}, {"num": 16, "name": "Blythe Interiors", "type": "Interior Design", "principal": "Jennifer Verruto", "ig": "@blytheinteriors", "ig_url": "https://instagram.com/blytheinteriors", "website": "blytheinteriors.com", "location": "San Diego", "recognition": "Best of Houzz 2015-2020, Top 50 CA Designers", "initialStatus": "Existing Relationship"}, {"num": 17, "name": "Esteban Interiors", "type": "Interior Design", "principal": "Esteban Lopez", "ig": "@esteban_interiors", "ig_url": "https://instagram.com/esteban_interiors", "website": "estebaninteriors.com", "location": "San Diego", "recognition": "Award-winning, full-service luxury", "initialStatus": "Not Started"}, {"num": 18, "name": "AGK Design Studio", "type": "Interior Design", "principal": "Audrey Graham Kennedy", "ig": "@agk_designstudio", "ig_url": "https://instagram.com/agk_designstudio", "website": "agkdesignstudio.com", "location": "La Jolla", "recognition": "High-end residential to ocean yachts", "initialStatus": "Not Started"}, {"num": 19, "name": "Diane Luna Design", "type": "Interior Design", "principal": "Diane Luna", "ig": "@dianelunadesign", "ig_url": "https://instagram.com/dianelunadesign", "website": "dianelunadesign.com", "location": "San Diego", "recognition": "Luxury residential, editorial features", "initialStatus": "Not Started"}, {"num": 20, "name": "House and Harmony", "type": "Interior Design", "principal": "Claudia Davis", "ig": "@houseandharmony", "ig_url": "https://instagram.com/houseandharmony", "website": "houseandharmony.com", "location": "San Diego", "recognition": "Full-service luxury, SD Magazine featured", "initialStatus": "Not Started"}, {"num": 21, "name": "Joli G Interiors", "type": "Interior Design", "principal": "Michelle Meyers", "ig": "@joligdesigns", "ig_url": "https://instagram.com/joligdesigns", "website": "joligdesigns.com", "location": "Carlsbad", "recognition": "Full-service, coastal San Diego", "initialStatus": "Not Started"}, {"num": 22, "name": "Keri Michelle Interiors", "type": "Interior Design", "principal": "Keri Michelle", "ig": "@kerimichelleinteriors", "ig_url": "https://instagram.com/kerimichelleinteriors", "website": "kerimichelleinteriors.com", "location": "Solana Beach", "recognition": "Best of Houzz 2022-2024, boutique coastal", "initialStatus": "Existing Relationship"}, {"num": 23, "name": "Hide Studio", "type": "Interior Design", "principal": "Hanin Smith", "ig": "@hidestudiointeriors", "ig_url": "https://instagram.com/hidestudiointeriors", "website": "hidestudio.com", "location": "Carlsbad", "recognition": "Modern Luxury featured, woman-led", "initialStatus": "Not Started"}, {"num": 24, "name": "Joey Snow Design Co.", "type": "Interior Design", "principal": "Joey Snow", "ig": "@joeysnowdesign_co", "ig_url": "https://instagram.com/joeysnowdesign_co", "website": "joeysnowdesignco.com", "location": "Carlsbad", "recognition": "16K followers, high-end renovations", "initialStatus": "Not Started"}, {"num": 25, "name": "Kristin Lomauro Interior Design", "type": "Interior Design", "principal": "Kristin Lomauro", "ig": "@kristinlomaurointeriordesign", "ig_url": "https://instagram.com/kristinlomaurointeriordesign", "website": "kristinlomauro.com", "location": "Point Loma", "recognition": "25+ years, luxury residential & resorts", "initialStatus": "Not Started"}, {"num": 26, "name": "Savvy Interiors", "type": "Interior Design", "principal": "Susan Wintersteen", "ig": "@insidebysavvy", "ig_url": "https://instagram.com/insidebysavvy", "website": "savvyinteriors.com", "location": "Carlsbad", "recognition": "SD Mag Award Judges' Pick 2025", "initialStatus": "Not Started"}, {"num": 27, "name": "ASR Design Studio", "type": "Interior Design", "principal": "Ariel Richardson", "ig": "@asrdesignstudio", "ig_url": "https://instagram.com/asrdesignstudio", "website": "asrdesignstudio.com", "location": "San Diego", "recognition": "Luxury kitchen & bath specialist", "initialStatus": "Not Started"}, {"num": 28, "name": "Blush Interior Designs", "type": "Interior Design", "principal": "Jeanelle Ditto", "ig": "@blushinteriordesigns", "ig_url": "https://instagram.com/blushinteriordesigns", "website": "blushinteriordesigns.com", "location": "San Diego", "recognition": "Luxury residential San Diego", "initialStatus": "Not Started"}, {"num": 29, "name": "Charles Taylor Interior Design", "type": "Interior Design", "principal": "Charles Taylor", "ig": "@charlestaylorinteriordesign", "ig_url": "https://instagram.com/charlestaylorinteriordesign", "website": "charlestaylorhome.com", "location": "San Diego", "recognition": "Full-service, high-end residential", "initialStatus": "Not Started"}, {"num": 30, "name": "Nativa Interiors", "type": "Interior Design", "principal": "Nativa Team", "ig": "@nativainteriors", "ig_url": "https://instagram.com/nativainteriors", "website": "nativainteriors.com", "location": "La Jolla", "recognition": "Luxury interiors, La Jolla focus", "initialStatus": "Not Started"}, {"num": 31, "name": "Robeson Design", "type": "Interior Design", "principal": "Rebecca Robeson", "ig": "@rebeccarobeson", "ig_url": "https://instagram.com/rebeccarobeson", "website": "rebeccarobeson.com", "location": "San Diego", "recognition": "HGTV, large following, luxury residential", "initialStatus": "Not Started"}, {"num": 32, "name": "Le Dimora", "type": "Interior Design", "principal": "Le Dimora Team", "ig": "@le_dimora", "ig_url": "https://instagram.com/le_dimora", "website": "ledimora.com", "location": "Carmel Valley", "recognition": "RSF, Del Mar, La Jolla, ocean villas", "initialStatus": "Not Started"}, {"num": 33, "name": "Bungalow 56", "type": "Interior Design", "principal": "Jessica Nicolls", "ig": "@bungalow56living", "ig_url": "https://instagram.com/bungalow56living", "website": "bungalow56design.com", "location": "Coronado", "recognition": "Award-winning Coronado & San Diego firm", "initialStatus": "Not Started"}, {"num": 34, "name": "KW Designs", "type": "Interior Design", "principal": "Kristianne Watts", "ig": "@kwdesigns_interiors", "ig_url": "https://instagram.com/kwdesigns_interiors", "website": "kwdesigns.com", "location": "San Diego", "recognition": "Luxury residential, full-service", "initialStatus": "Not Started"}, {"num": 35, "name": "Leanne Michael LUXE", "type": "Interior Design", "principal": "Leanne Michael", "ig": "@leannemichael_luxelifestyle", "ig_url": "https://instagram.com/leannemichael_luxelifestyle", "website": "leannemichael.com", "location": "San Diego", "recognition": "Luxury lifestyle and interiors", "initialStatus": "Not Started"}, {"num": 36, "name": "Allito Spaces", "type": "Interior Design", "principal": "Allison Garrison", "ig": "@allito_spaces", "ig_url": "https://instagram.com/allito_spaces", "website": "allito.com", "location": "San Diego", "recognition": "House Beautiful featured, award-winning", "initialStatus": "Not Started"}, {"num": 37, "name": "Rose Lake Design", "type": "Interior Design", "principal": "Lylah Healy", "ig": "@roselakedesign", "ig_url": "https://instagram.com/roselakedesign", "website": "roselakedesign.com", "location": "San Diego", "recognition": "California coastal & modern organic", "initialStatus": "Not Started"}, {"num": 38, "name": "Paschall Design", "type": "Interior Design", "principal": "Sarah Paschall", "ig": "@paschalldesign", "ig_url": "https://instagram.com/paschalldesign", "website": "paschalldesign.com", "location": "San Diego", "recognition": "Luxury homes, La Jolla & Rancho Santa Fe", "initialStatus": "Not Started"}, {"num": 39, "name": "Design Theory Studio", "type": "Interior Design", "principal": "Audra Siao", "ig": "@designtheorystudio", "ig_url": "https://instagram.com/designtheorystudio", "website": "designtheorystudio.com", "location": "Rancho Santa Fe", "recognition": "High-end residential, Rancho Santa Fe base", "initialStatus": "Not Started"}, {"num": 40, "name": "Intimate Living Interiors", "type": "Interior Design", "principal": "Kari Arendsen & Tory Peterson", "ig": "@intimatelivinginteriors", "ig_url": "https://instagram.com/intimatelivinginteriors", "website": "intimatelivinginteriors.com", "location": "Solana Beach", "recognition": "Globally recognized, architectural approach", "initialStatus": "Not Started"}, {"num": 41, "name": "Vance Design Studio", "type": "Interior Design", "principal": "Karlin Vance", "ig": "@vancedesignco", "ig_url": "https://instagram.com/vancedesignco", "website": "vancedesignstudio.com", "location": "San Diego", "recognition": "Luxury residential, San Diego", "initialStatus": "Not Started"}, {"num": 42, "name": "JM Living Concepts", "type": "Interior Design", "principal": "Jordy Miranda", "ig": "@jmlivingconcepts", "ig_url": "https://instagram.com/jmlivingconcepts", "website": "jmlivingconcepts.com", "location": "San Diego", "recognition": "Coastal, laid-back, functional luxury", "initialStatus": "Not Started"}, {"num": 43, "name": "7 Sisters Interiors", "type": "Interior Design", "principal": "7 Sisters Team", "ig": "@7sistersinteriors", "ig_url": "https://instagram.com/7sistersinteriors", "website": "7sistersinteriors.com", "location": "San Diego", "recognition": "Luxury custom residential, Carmel Valley", "initialStatus": "Not Started"}, {"num": 44, "name": "Studio H Design Group", "type": "Interior Design", "principal": "Kelly Hinchman", "ig": "@studiohdesign", "ig_url": "https://instagram.com/studiohdesign", "website": "studioh-int.com", "location": "San Diego", "recognition": "Full-service luxury interiors", "initialStatus": "Not Started"}, {"num": 45, "name": "Andrea May Interiors", "type": "Interior Design", "principal": "Andrea May", "ig": "@andreamayinteriorslj", "ig_url": "https://instagram.com/andreamayinteriorslj", "website": "andreamayinteriors.com", "location": "La Jolla", "recognition": "La Jolla luxury specialist", "initialStatus": "Not Started"}, {"num": 46, "name": "Studio Henree", "type": "Interior Design", "principal": "Studio Henree Team", "ig": "@studiohenree", "ig_url": "https://instagram.com/studiohenree", "website": "studiohenree.com", "location": "San Diego", "recognition": "High-end residential & boutique commercial", "initialStatus": "Not Started"}, {"num": 47, "name": "EEZ Interiors", "type": "Interior Design", "principal": "EEZ Team", "ig": "@eezinteriors", "ig_url": "https://instagram.com/eezinteriors", "website": "eezinteriors.com", "location": "San Diego", "recognition": "Luxury residential interiors", "initialStatus": "Not Started"}, {"num": 48, "name": "Apple of My Eye Design", "type": "Interior Design", "principal": "Melissa Ducey", "ig": "@_appleofmyeyedesign_", "ig_url": "https://instagram.com/_appleofmyeyedesign_", "website": "appleofmyeyedesign.com", "location": "San Diego", "recognition": "High-end residential San Diego", "initialStatus": "Not Started"}, {"num": 49, "name": "KC Interior Design", "type": "Interior Design", "principal": "Kitchy Crouse", "ig": "@kc_interiordesign", "ig_url": "https://instagram.com/kc_interiordesign", "website": "kc-interiordesign.com", "location": "San Diego", "recognition": "Award-winning boutique studio", "initialStatus": "Not Started"}, {"num": 50, "name": "Jackson Design & Remodeling", "type": "Construction / Design-Build", "principal": "Jackson Team", "ig": "@jacksondesignandremodeling", "ig_url": "https://instagram.com/jacksondesignandremodeling", "website": "jacksondesignandremodeling.com", "location": "San Diego", "recognition": "Full-service design-build, luxury", "initialStatus": "Not Started"}, {"num": 51, "name": "Kim Grant Design", "type": "Architecture", "principal": "Kim Grant, AIA", "ig": "@kimgrantdesign", "ig_url": "https://instagram.com/kimgrantdesign", "website": "kimgrantdesign.com", "location": "Coronado / Del Mar", "recognition": "AIA member; coastal & historic restoration specialist; Coronado, La Jolla, RSF, Solana Beach", "initialStatus": "Not Started"}, {"num": 52, "name": "Valletta Design Group", "type": "Interior Design", "principal": "Lauren Valletta", "ig": "@vallettadesigngroup", "ig_url": "https://instagram.com/vallettadesigngroup", "website": "vallettadesigngroup.com", "location": "Encinitas", "recognition": "Encinitas boutique luxury studio", "initialStatus": "Not Started"}, {"num": 53, "name": "Southcoast Design Group", "type": "Interior Design", "principal": "Tamara Romeo", "ig": "@thedesignboss", "ig_url": "https://instagram.com/thedesignboss", "website": "southcoastdesigngroup.com", "location": "San Diego", "recognition": "Women of Influence Award, SD Magazine", "initialStatus": "Not Started"}, {"num": 54, "name": "Denise Haddock Interiors", "type": "Interior Design", "principal": "Denise Haddock", "ig": "@denisehaddockinteriors", "ig_url": "https://instagram.com/denisehaddockinteriors", "website": "denisehaddockinteriors.com", "location": "La Mesa / La Jolla", "recognition": "Full-service, La Jolla & La Mesa", "initialStatus": "Not Started"}, {"num": 55, "name": "Tidal Interiors", "type": "Interior Design", "principal": "Tidal Team", "ig": "@tidalinteriors", "ig_url": "https://instagram.com/tidalinteriors", "website": "tidalinteriors.com", "location": "La Jolla", "recognition": "Effortlessly sophisticated La Jolla homes", "initialStatus": "Not Started"}, {"num": 56, "name": "Acacia + Spruce Design Studio", "type": "Interior Design", "principal": "Acacia + Spruce Team", "ig": "@acaciaandspruce", "ig_url": "https://instagram.com/acaciaandspruce", "website": "acaciaandspruce.com", "location": "San Diego", "recognition": "14K followers, HGTV & Apartment Therapy", "initialStatus": "Not Started"}, {"num": 57, "name": "Raili CA Design", "type": "Interior Design", "principal": "Raili Clasen", "ig": "@railiclasen", "ig_url": "https://instagram.com/railiclasen", "website": "railicadesign.com", "location": "Rancho Santa Fe", "recognition": "84K followers, Surf Style at Home author", "initialStatus": "Not Started"}, {"num": 58, "name": "Jaccard Interiors", "type": "Interior Design", "principal": "Shelley Jaccard NCIDQ", "ig": "@jaccardinteriors", "ig_url": "https://instagram.com/jaccardinteriors", "website": "jaccardinteriors.com", "location": "San Diego", "recognition": "NCIDQ-certified, award-winning studio", "initialStatus": "Not Started"}, {"num": 59, "name": "Tiny Lane Interiors", "type": "Interior Design", "principal": "Erika Johnston", "ig": "@tinylaneinteriors", "ig_url": "https://instagram.com/tinylaneinteriors", "website": "tinylaneinteriors.com", "location": "North County SD", "recognition": "Residential & commercial, North County", "initialStatus": "Not Started"}, {"num": 60, "name": "Vivo Design Studios", "type": "Interior Design", "principal": "Lily Arg\u00fcelles", "ig": "@vivodesignstudios", "ig_url": "https://instagram.com/vivodesignstudios", "website": "vivodesignstudios.com", "location": "San Diego", "recognition": "Boutique San Diego studio", "initialStatus": "Not Started"}, {"num": 61, "name": "J Hill Interiors", "type": "Interior Design", "principal": "Jessica Hill-Tompane", "ig": "@jhillinteriors", "ig_url": "https://instagram.com/jhillinteriors", "website": "jhillinteriors.com", "location": "Coronado", "recognition": "Luxe Red Award, HGTV Magazine, Luxe Mag", "initialStatus": "Not Started"}, {"num": 62, "name": "Design 4 Corners", "type": "Interior Design", "principal": "Elaina Myers & Susanna Ward", "ig": "@sistersof4corners", "ig_url": "https://instagram.com/sistersof4corners", "website": "design4corners.com", "location": "Leucadia", "recognition": "19K followers, Elle Decor, Harper's Bazaar", "initialStatus": "Not Started"}, {"num": 63, "name": "NABER Design", "type": "Interior Design", "principal": "Abbie Naber", "ig": "@anaberdesign", "ig_url": "https://instagram.com/anaberdesign", "website": "naberdesign.com", "location": "San Diego", "recognition": "62K followers, artfully layered spaces", "initialStatus": "Not Started"}, {"num": 64, "name": "BlueGrape Staging and Design", "type": "Interior Design", "principal": "BlueGrape Team", "ig": "@bluegrapestaging", "ig_url": "https://instagram.com/bluegrapestaging", "website": "bluegrapestaging.com", "location": "San Diego", "recognition": "HGTV, Apartment Therapy, BHG featured", "initialStatus": "Not Started"}, {"num": 65, "name": "Novo Interiors by Carla", "type": "Interior Design", "principal": "Carla Jaber", "ig": "@novointeriorsbycarla", "ig_url": "https://instagram.com/novointeriorsbycarla", "website": "novointeriorsbycarla.com", "location": "San Diego", "recognition": "Full-service, 4.9\u2605 rated, custom design", "initialStatus": "Not Started"}, {"num": 66, "name": "Andesign Inc.", "type": "Interior Design", "principal": "Andesign Team", "ig": "@andesigninc", "ig_url": "https://instagram.com/andesigninc", "website": "andesigninc.com", "location": "La Jolla", "recognition": "International boutique, La Jolla & Shanghai", "initialStatus": "Not Started"}, {"num": 67, "name": "J.P. Walters Design", "type": "Interior Design", "principal": "Jim P. Walters", "ig": "@jimpwalters", "ig_url": "https://instagram.com/jimpwalters", "website": "jpwaltersdesign.com", "location": "San Diego", "recognition": "La Jolla, RSF, Coronado, Mission Hills", "initialStatus": "Not Started"}, {"num": 68, "name": "Spaces Renewed", "type": "Interior Design", "principal": "Spaces Renewed Team", "ig": "@spacesrenewed", "ig_url": "https://instagram.com/spacesrenewed", "website": "spacesrenewed.com", "location": "San Diego", "recognition": "Boutique design-build, whole-home remodels", "initialStatus": "Not Started"}, {"num": 69, "name": "House of Hive Design Co.", "type": "Interior Design", "principal": "Kailee Blalock & Taylor Troia", "ig": "@houseofhivedesignco", "ig_url": "https://instagram.com/houseofhivedesignco", "website": "houseofhive.co", "location": "San Diego", "recognition": "AD, Elle Decor, NYT, House Beautiful", "initialStatus": "Not Started"}, {"num": 70, "name": "Honeycomb Design & Remodel", "type": "Construction / Design-Build", "principal": "Ati Williams", "ig": "@hey.honeycomb", "ig_url": "https://instagram.com/hey.honeycomb", "website": "heyhoneycomb.com", "location": "San Diego", "recognition": "Netflix + HGTV host, design-build", "initialStatus": "Not Started"}, {"num": 71, "name": "EN Design and Build", "type": "Construction / Design-Build", "principal": "EN Design Team", "ig": "@en_designers", "ig_url": "https://instagram.com/en_designers", "website": "en-designbuild.com", "location": "San Diego", "recognition": "Luxury spaces, ADUs, custom home builds", "initialStatus": "Not Started"}, {"num": 72, "name": "Hope Pinc Design", "type": "Interior Design", "principal": "Hope Pinc Team", "ig": "@hopepincdesign", "ig_url": "https://instagram.com/hopepincdesign", "website": "hopepincdesign.com", "location": "San Diego", "recognition": "Full-service, residential & commercial", "initialStatus": "Not Started"}, {"num": 73, "name": "Madelene Ross Design Studio", "type": "Interior Design", "principal": "Madelene Ross", "ig": "@madelenerossdesignstudio", "ig_url": "https://instagram.com/madelenerossdesignstudio", "website": "madelenerossdesign.com", "location": "San Diego", "recognition": "Full-service San Diego studio", "initialStatus": "Not Started"}, {"num": 74, "name": "Hila Design Studio", "type": "Interior Design", "principal": "Hila Team", "ig": "@hilaa_design", "ig_url": "https://instagram.com/hilaa_design", "website": "hilainteriordesigner.com", "location": "San Diego", "recognition": "Luxury home staging & interior styling", "initialStatus": "Not Started"}, {"num": 75, "name": "Eco Minded Solutions", "type": "Construction / Design-Build", "principal": "Eco Minded Team", "ig": "@ecomindedsolutions", "ig_url": "https://instagram.com/ecomindedsolutions", "website": "ecomindedsolutions.com", "location": "San Diego", "recognition": "Best of Houzz multiple years, award-winning", "initialStatus": "Not Started"}, {"num": 76, "name": "Ross Thiele & Son", "type": "Interior Design", "principal": "Ross Thiele Team", "ig": "@rossthieleandson", "ig_url": "https://instagram.com/rossthieleandson", "website": "rossthiele.com", "location": "La Jolla", "recognition": "90+ year legacy, 4th-generation family firm", "initialStatus": "Not Started"}, {"num": 77, "name": "Amala Raj Interiors", "type": "Interior Design", "principal": "Amala Raj Swenson", "ig": "@amalarajinteriors", "ig_url": "https://instagram.com/amalarajinteriors", "website": "amalarajinteriors.com", "location": "San Diego", "recognition": "Forbes, Sunset, ABC featured; SD 2024 Best", "initialStatus": "Not Started"}, {"num": 78, "name": "CPD Studio", "type": "Interior Design", "principal": "CPD Team", "ig": "@cpdstudio_", "ig_url": "https://instagram.com/cpdstudio_", "website": "cpdstudio.com", "location": "San Diego", "recognition": "CA Home & Design Award, residential & hospitality", "initialStatus": "Not Started"}, {"num": 79, "name": "Architects Magnus", "type": "Architecture", "principal": "Hector & Pamela Magnus", "ig": "@architectsmagnus", "ig_url": "https://instagram.com/architectsmagnus", "website": "architectsmagnus.com", "location": "San Diego", "recognition": "Husband-wife duo, collaborative luxury", "initialStatus": "Not Started"}, {"num": 80, "name": "Jonathan Segal, FAIA", "type": "Architecture", "principal": "Jonathan Segal", "ig": "@jonathansegalfaia", "ig_url": "https://instagram.com/jonathansegalfaia", "website": "jonathansegalarchitect.com", "location": "San Diego", "recognition": "40+ AIA awards, urban & residential", "initialStatus": "Not Started"}, {"num": 81, "name": "Safdie Rabines Architects", "type": "Architecture", "principal": "Ricardo Rabines & Taal Safdie", "ig": "@safdierabines", "ig_url": "https://instagram.com/safdierabines", "website": "safdierabines.com", "location": "San Diego", "recognition": "Since 1993, 50+ person team, luxury custom", "initialStatus": "Not Started"}, {"num": 82, "name": "SK7 Architecture", "type": "Architecture", "principal": "SK7 Team", "ig": "@sk7architecture", "ig_url": "https://instagram.com/sk7architecture", "website": "sk7architecture.com", "location": "Encinitas", "recognition": "Leading SoCal residential luxury firm", "initialStatus": "Not Started"}, {"num": 83, "name": "Carrier Johnson + Culture", "type": "Architecture", "principal": "Carrier Johnson Team", "ig": "@carrierjohnsonculture", "ig_url": "https://instagram.com/carrierjohnsonculture", "website": "carrierjohnson.com", "location": "San Diego", "recognition": "Major SD firm, culture-driven design", "initialStatus": "Not Started"}, {"num": 84, "name": "Christian Rice Architects", "type": "Architecture", "principal": "Christian Rice", "ig": "@christianricearchitects", "ig_url": "https://instagram.com/christianricearchitects", "website": "christianrice.com", "location": "San Diego", "recognition": "Top SoCal residential architect", "initialStatus": "Not Started"}, {"num": 85, "name": "HGW Architecture", "type": "Architecture", "principal": "HGW Team", "ig": "@hgwarchitecture", "ig_url": "https://instagram.com/hgwarchitecture", "website": "hgwarchitecture.com", "location": "Ocean Beach", "recognition": "Architecture, site & interior design", "initialStatus": "Not Started"}, {"num": 86, "name": "Island Architects", "type": "Architecture", "principal": "Island Architects Team", "ig": "@island_architects", "ig_url": "https://instagram.com/island_architects", "website": "islandarch.com", "location": "Coronado", "recognition": "Coronado Mediterranean & luxury residential", "initialStatus": "Not Started"}, {"num": 87, "name": "Dean Meredith Architecture", "type": "Architecture", "principal": "Dean Meredith", "ig": "@deanmereditharchitecture", "ig_url": "https://instagram.com/deanmereditharchitecture", "website": "deanmereditharchitecture.com", "location": "Del Mar", "recognition": "Award-winning, coastal luxury custom", "initialStatus": "Not Started"}, {"num": 88, "name": "Ten Seventy Architecture", "type": "Architecture", "principal": "Sean & Margaret Canning", "ig": "@1070architecture", "ig_url": "https://instagram.com/1070architecture", "website": "tenseventyarchitecture.com", "location": "San Diego", "recognition": "Modern minimalist luxury homes & ADUs", "initialStatus": "Not Started"}, {"num": 89, "name": "Golba Architecture", "type": "Architecture", "principal": "Tom Golba", "ig": "@golbaarchitecture", "ig_url": "https://instagram.com/golbaarchitecture", "website": "golba.com", "location": "San Diego", "recognition": "33 years, residential & commercial", "initialStatus": "Not Started"}, {"num": 90, "name": "domusstudio architecture", "type": "Architecture", "principal": "domusstudio Team", "ig": "@domusstudio", "ig_url": "https://instagram.com/domusstudio", "website": "domusstudio.com", "location": "San Diego", "recognition": "Award-winning, owner-occupied focus", "initialStatus": "Not Started"}, {"num": 91, "name": "Marengo Morton Architects", "type": "Architecture", "principal": "Marengo Morton Team", "ig": "@marengomorton", "ig_url": "https://instagram.com/marengomorton", "website": "marengomortonarchitects.com", "location": "San Diego", "recognition": "Luxury custom residential SD", "initialStatus": "Not Started"}, {"num": 92, "name": "Hubbell & Hubbell Architects", "type": "Architecture", "principal": "Hubbell & Hubbell Team", "ig": "@hubbellandhubbellarchitects", "ig_url": "https://instagram.com/hubbellandhubbellarchitects", "website": "hubbellandhubbell.com", "location": "San Diego", "recognition": "Award-winning San Diego residential", "initialStatus": "Not Started"}, {"num": 93, "name": "Mark D. Lyon Architect", "type": "Architecture", "principal": "Mark D. Lyon", "ig": "@archmarkdlyon", "ig_url": "https://instagram.com/archmarkdlyon", "website": "mdla.net", "location": "San Diego", "recognition": "Coastal expert, beachside home specialist", "initialStatus": "Not Started"}, {"num": 94, "name": "Matrix Design Studio", "type": "Architecture", "principal": "Matrix Team", "ig": "@matrixdesignstudio", "ig_url": "https://instagram.com/matrixdesignstudio", "website": "matrixdesignstudio.com", "location": "San Diego", "recognition": "Architecture & design, San Diego", "initialStatus": "Not Started"}, {"num": 95, "name": "DNA Design Group", "type": "Architecture", "principal": "Jesper Pedersen", "ig": "@dnadesigngroup", "ig_url": "https://instagram.com/dnadesigngroup", "website": "dnadesigngroup.com", "location": "La Jolla", "recognition": "European heritage, 30+ yrs, custom homes", "initialStatus": "Not Started"}, {"num": 96, "name": "Studio E Architects", "type": "Architecture", "principal": "Studio E Team", "ig": "@studioearchitects", "ig_url": "https://instagram.com/studioearchitects", "website": "studioearchitects.com", "location": "San Diego", "recognition": "Varied portfolio, SW United States", "initialStatus": "Not Started"}, {"num": 97, "name": "IS Architecture", "type": "Architecture", "principal": "IS Architecture Team", "ig": "@is.architecture", "ig_url": "https://instagram.com/is.architecture", "website": "isarchitecture.com", "location": "La Jolla", "recognition": "75+ awards, Best Custom Home nationally", "initialStatus": "Not Started"}, {"num": 98, "name": "MW Steele Group", "type": "Architecture", "principal": "Mark Steele FAIA", "ig": "@mwsteelearchitects", "ig_url": "https://instagram.com/mwsteelearchitects", "website": "mwsteele.com", "location": "San Diego", "recognition": "Since 1983, urban design & residential", "initialStatus": "Not Started"}, {"num": 99, "name": "Brett Farrow Architect", "type": "Architecture", "principal": "Brett Farrow", "ig": "@lagunarow", "ig_url": "https://instagram.com/lagunarow", "website": "brettfarrowarchitect.com", "location": "North County SD", "recognition": "Modern, sustainable, site-specific", "initialStatus": "Not Started"}, {"num": 100, "name": "SGPA Architecture & Planning", "type": "Architecture", "principal": "SGPA Team", "ig": "@sgpa.arch", "ig_url": "https://instagram.com/sgpa.arch", "website": "sgpa.com", "location": "San Diego", "recognition": "50+ yrs, multi-studio, residential & mixed-use", "initialStatus": "Not Started"}, {"num": 101, "name": "Kevin deFreitas Architects", "type": "Architecture", "principal": "Kevin deFreitas, FAIA", "ig": "@kd.architects", "ig_url": "https://instagram.com/kd.architects", "website": "defreitasarchitects.com", "location": "San Diego", "recognition": "National AIA Honor Award; AIA Young Architect of the Year; SD Home & Garden Home of the Year; FAIA since 2015", "initialStatus": "Not Started"}, {"num": 102, "name": "LUCE et Studio", "type": "Architecture", "principal": "Jennifer Luce, FAIA", "ig": "@luceetstudio", "ig_url": "https://instagram.com/luceetstudio", "website": "lucestudio.com", "location": "La Jolla", "recognition": "21 AIA awards; 2024 AIA National Honor Award; Architectural Record Design Vanguard; AIA College of Fellows 2016", "initialStatus": "Not Started"}, {"num": 103, "name": "JWDA Architects", "type": "Architecture", "principal": "JWDA Principal Team", "ig": "@jwda_architects", "ig_url": "https://instagram.com/jwda_architects", "website": "jwdainc.com", "location": "San Diego", "recognition": "50+ local & national design awards; established 1977; AIA San Diego members", "initialStatus": "Not Started"}, {"num": 104, "name": "Laura Abrams Design", "type": "Interior Design", "principal": "Laura Abrams, ASID", "ig": "@laura_abrams_design", "ig_url": "https://instagram.com/laura_abrams_design", "website": "lauraabramsdesign.com", "location": "San Diego (La Jolla / Del Mar / RSF)", "recognition": "ASID member, NCIDQ certified, LEED AP; 20+ years luxury residential", "initialStatus": "Not Started"}, {"num": 105, "name": "H2 Architects (Hawkins & Hawkins)", "type": "Architecture", "principal": "Steven & David Hawkins", "ig": "", "ig_url": "", "website": "h2asandiego.com", "location": "San Diego (Downtown / 9th Ave)", "recognition": "Grand Gold Nugget Award winners; 7 Gold Nugget awards; Home of the Year \u2014 SD D\u00e9cor Magazine; La Jolla custom home featured in SD Home & Garden", "initialStatus": "Phone/Email Only"}];
+
+const STORAGE_KEY = 'ksh_outreach_v2';
+const STATUSES = ['Not Started','DM Sent','Email Sent','DM + Email Sent','Responded','Meeting Scheduled','Met In Person','Existing Relationship','Phone/Email Only'];
+const STATUS_CLASS = {
+  'Not Started':'s-not-started',
+  'DM Sent':'s-dm-sent',
+  'Email Sent':'s-email-sent',
+  'DM + Email Sent':'s-dm-email',
+  'Responded':'s-responded',
+  'Meeting Scheduled':'s-meeting',
+  'Met In Person':'s-met-in-person',
+  'Existing Relationship':'s-existing',
+  'Phone/Email Only':'s-phone-only'
+};
+
+function loadData() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e) { return {}; }
+}
+function saveData(data) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+let trackingData = loadData();
+
+function getFirmData(num) {
+  if (!trackingData[num]) {
+    const firm = FIRMS.find(f => f.num === num);
+    trackingData[num] = { status: firm ? firm.initialStatus : 'Not Started', met: false, date: '', notes: '' };
+  }
+  return trackingData[num];
+}
+
+function updateFirm(num, field, value) {
+  getFirmData(num);
+  trackingData[num][field] = value;
+  // If status changed to Met In Person, auto-check met
+  if (field === 'status' && value === 'Met In Person') {
+    trackingData[num].met = true;
+  }
+  saveData(trackingData);
+  updateStats();
+  // Re-apply row class
+  const row = document.getElementById('row-' + num);
+  if (row) applyRowClass(row, num);
+}
+
+function applyRowClass(row, num) {
+  const d = getFirmData(num);
+  row.className = '';
+  if (d.status === 'Existing Relationship') row.classList.add('is-existing');
+  if (d.met || d.status === 'Met In Person') row.classList.add('is-met');
+}
+
+function updateStats() {
+  let sent=0, responded=0, scheduled=0, met=0, existing=0;
+  FIRMS.forEach(f => {
+    const d = getFirmData(f.num);
+    const s = d.status;
+    if (['DM Sent','Email Sent','DM + Email Sent','Phone/Email Only'].includes(s)) sent++;
+    if (s === 'Responded') responded++;
+    if (s === 'Meeting Scheduled') scheduled++;
+    if (s === 'Met In Person' || d.met) met++;
+    if (s === 'Existing Relationship') existing++;
+  });
+  document.getElementById('s-total').textContent = FIRMS.length;
+  document.getElementById('s-sent').textContent = sent;
+  document.getElementById('s-responded').textContent = responded;
+  document.getElementById('s-scheduled').textContent = scheduled;
+  document.getElementById('s-met').textContent = met;
+  document.getElementById('s-existing').textContent = existing;
+  const contacted = sent + responded + scheduled + met + existing;
+  const pct = Math.round(contacted / FIRMS.length * 100);
+  document.getElementById('prog-pct').textContent = pct + '% contacted';
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function renderTable() {
+  const search = document.getElementById('searchBox').value.toLowerCase();
+  const typeF = document.getElementById('typeFilter').value;
+  const statusF = document.getElementById('statusFilter').value;
+  const locF = document.getElementById('locationFilter').value;
+  const metF = document.getElementById('metFilter').value;
+
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = '';
+
+  let count = 0;
+  FIRMS.forEach(firm => {
+    const d = getFirmData(firm.num);
+    // Filters
+    if (search && !firm.name.toLowerCase().includes(search) && !firm.principal.toLowerCase().includes(search) && !firm.location.toLowerCase().includes(search)) return;
+    if (typeF && firm.type !== typeF) return;
+    if (statusF && d.status !== statusF) return;
+    if (locF && !firm.location.toLowerCase().includes(locF.toLowerCase())) return;
+    if (metF === 'met' && !(d.met || d.status === 'Met In Person')) return;
+    if (metF === 'not-met' && (d.met || d.status === 'Met In Person')) return;
+
+    count++;
+    const tr = document.createElement('tr');
+    tr.id = 'row-' + firm.num;
+    applyRowClass(tr, firm.num);
+
+    const typeClass = firm.type === 'Architecture' ? 'type-arch' : 'type-id';
+    const typeShort = firm.type === 'Architecture' ? 'Architect' : 'Designer';
+    const igHtml = firm.ig
+      ? `<a href="${firm.ig_url}" target="_blank">${firm.ig}</a>`
+      : `<span class="no-ig">No IG — phone/email</span>`;
+    const websiteHtml = firm.website ? `<div class="firm-website">🌐 <a href="https://${firm.website}" target="_blank" style="color:#6b7280;font-size:11px">${firm.website}</a></div>` : '';
+    const recognitionHtml = firm.recognition ? `<div class="firm-recog">${firm.recognition.substring(0,80)}${firm.recognition.length>80?'…':''}</div>` : '';
+
+    // Status select options
+    const optHtml = STATUSES.map(s =>
+      `<option value="${s}"${d.status===s?' selected':''}>${s}</option>`
+    ).join('');
+
+    tr.innerHTML = `
+      <td class="td-num">${firm.num}</td>
+      <td class="td-name">
+        ${firm.name}
+        ${websiteHtml}
+        ${recognitionHtml}
+      </td>
+      <td class="td-principal">${firm.principal}</td>
+      <td class="td-type"><span class="${typeClass}">${typeShort}</span></td>
+      <td class="td-location">${firm.location}</td>
+      <td class="td-ig">${igHtml}</td>
+      <td class="td-status">
+        <select class="status-select ${STATUS_CLASS[d.status]||'s-not-started'}"
+          onchange="handleStatusChange(${firm.num},this)">
+          ${optHtml}
+        </select>
+      </td>
+      <td class="td-met">
+        <label class="met-toggle">
+          <input type="checkbox" ${d.met||d.status==='Met In Person'?'checked':''} onchange="updateFirm(${firm.num},'met',this.checked)">
+          <span class="met-label">${d.met||d.status==='Met In Person'?'✓ Yes':'No'}</span>
+        </label>
+      </td>
+      <td class="td-date">
+        <input type="date" class="date-input" value="${d.date||''}" onchange="updateFirm(${firm.num},'date',this.value)">
+      </td>
+      <td class="td-notes">
+        <textarea class="notes-input" rows="2" placeholder="Add notes…" onblur="updateFirm(${firm.num},'notes',this.value)">${d.notes||''}</textarea>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.getElementById('filterCount').textContent = `Showing ${count} of ${FIRMS.length} firms`;
+  document.getElementById('emptyMsg').style.display = count === 0 ? 'block' : 'none';
+  document.getElementById('mainTable').style.display = count === 0 ? 'none' : '';
+  updateStats();
+}
+
+function handleStatusChange(num, sel) {
+  const newStatus = sel.value;
+  // Update class on select
+  sel.className = 'status-select ' + (STATUS_CLASS[newStatus] || 's-not-started');
+  updateFirm(num, 'status', newStatus);
+  // Update met checkbox label in same row
+  const row = document.getElementById('row-' + num);
+  if (row) {
+    const d = getFirmData(num);
+    const cb = row.querySelector('input[type=checkbox]');
+    const lbl = row.querySelector('.met-label');
+    if (cb && lbl) { cb.checked = d.met; lbl.textContent = d.met ? '✓ Yes' : 'No'; }
+  }
+}
+
+function resetAll() {
+  if (!confirm('Reset ALL outreach tracking data? This cannot be undone.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  trackingData = {};
+  renderTable();
+}
+
+function exportCSV() {
+  const rows = [['#','Firm','Principal','Type','Location','Instagram','Outreach Status','Met In Person','Date Contacted','Notes']];
+  FIRMS.forEach(f => {
+    const d = getFirmData(f.num);
+    rows.push([f.num, f.name, f.principal, f.type, f.location, f.ig, d.status, d.met?'Yes':'No', d.date||'', (d.notes||'').replace(/,/g,';')]);
+  });
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'KSH_Outreach_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+}
+
+// Wire up filters
+document.getElementById('searchBox').addEventListener('input', renderTable);
+document.getElementById('typeFilter').addEventListener('change', renderTable);
+document.getElementById('statusFilter').addEventListener('change', renderTable);
+document.getElementById('locationFilter').addEventListener('change', renderTable);
+document.getElementById('metFilter').addEventListener('change', renderTable);
+
+// Initial render
+renderTable();
+</script>
+</body>
+</html>
