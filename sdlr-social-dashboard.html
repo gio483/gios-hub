@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDLR — 90-Day Organic Social Game Plan</title>
+<style>
+  :root{
+    --bg:#0e0f0d; --panel:#16170f; --panel2:#1c1d15; --ink:#f3efe4; --muted:#a7a290;
+    --line:#2c2d22; --gold:#c8a96a; --gold2:#e4cf9a; --green:#7d8a5c; --soft:#cfc8b4;
+    --r-transformation:#c8a96a; --r-craft:#b08b5c; --r-experience:#cfae7a;
+    --r-education:#8fa06a; --r-trust:#a9846b; --r-tech:#7e93a3; --r-local:#9a8f6a; --r-offer:#c77b5a;
+    --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+    --sans:'Helvetica Neue',Arial,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:var(--gold2)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+  header.top{padding:34px 0 18px;border-bottom:1px solid var(--line)}
+  .brandrow{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .kicker{letter-spacing:.32em;text-transform:uppercase;font-size:11px;color:var(--gold);margin-bottom:8px}
+  h1{font-family:var(--serif);font-weight:600;font-size:42px;line-height:1.02;margin:0;letter-spacing:.3px}
+  h1 .sub{display:block;font-size:17px;letter-spacing:.06em;color:var(--muted);font-family:var(--sans);font-weight:400;margin-top:8px;text-transform:none}
+  .meta{font-size:12px;color:var(--muted);text-align:right;line-height:1.7}
+  .meta b{color:var(--soft)}
+  nav.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:22px 0 6px}
+  nav.tabs button{background:transparent;border:1px solid var(--line);color:var(--muted);padding:9px 16px;border-radius:999px;cursor:pointer;font-size:13px;letter-spacing:.02em;transition:.18s}
+  nav.tabs button:hover{color:var(--ink);border-color:var(--gold)}
+  nav.tabs button.active{background:var(--gold);color:#1a1a14;border-color:var(--gold);font-weight:600}
+  section.view{display:none;padding:26px 0 70px}
+  section.view.active{display:block}
+  .lead{font-family:var(--serif);font-size:22px;color:var(--soft);max-width:760px;margin:0 0 24px}
+  /* summary cards */
+  .grid-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:28px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .card h3{margin:0 0 6px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .card .big{font-family:var(--serif);font-size:30px;line-height:1.1;color:var(--ink)}
+  .card p{margin:6px 0 0;font-size:13px;color:var(--muted)}
+  /* phase legend */
+  .phasebar{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:6px 0 26px}
+  .phase{border:1px solid var(--line);border-radius:14px;padding:16px 18px;background:linear-gradient(180deg,var(--panel),var(--bg))}
+  .phase .pn{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+  .phase h4{font-family:var(--serif);font-size:21px;margin:4px 0 6px}
+  .phase p{font-size:12.5px;color:var(--muted);margin:0}
+  /* week controls */
+  .weekbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 18px}
+  .weekbar button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px}
+  .weekbar button:hover{border-color:var(--gold)}
+  .weekbar select{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 12px;font-size:13px}
+  .weeklabel{font-family:var(--serif);font-size:20px;color:var(--soft);margin-left:4px}
+  /* calendar grid */
+  .dow{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:8px}
+  .dow span{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);text-align:left;padding-left:4px}
+  .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  .day{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px 11px 12px;min-height:150px;cursor:pointer;transition:.16s;position:relative;overflow:hidden}
+  .day:hover{border-color:var(--gold);transform:translateY(-2px)}
+  .day .dnum{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .day .dnum .d{font-family:var(--serif);font-size:19px;color:var(--ink)}
+  .day .dnum .dt{font-size:10px;color:var(--muted)}
+  .pill{display:inline-block;font-size:9.5px;letter-spacing:.04em;padding:3px 7px;border-radius:999px;margin:0 3px 4px 0;color:#13140e;font-weight:600;white-space:nowrap}
+  .post-mini{font-size:11px;color:var(--soft);margin:6px 0 0;display:flex;gap:5px;align-items:flex-start}
+  .post-mini .fmt{color:var(--gold2);font-weight:600}
+  .day .count{position:absolute;bottom:8px;right:10px;font-size:9.5px;color:var(--muted)}
+  .day.offerday{box-shadow:inset 0 0 0 1px var(--r-offer)}
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(6,6,4,.78);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:34px 16px;z-index:50;overflow:auto}
+  .ov.show{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--line);border-radius:18px;max-width:780px;width:100%;padding:0;overflow:hidden;animation:pop .2s ease}
+  @keyframes pop{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal .mhead{padding:22px 26px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--panel2),var(--panel));display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+  .modal .mhead .dd{font-family:var(--serif);font-size:27px;line-height:1.05}
+  .modal .mhead .ds{font-size:12px;color:var(--muted);margin-top:4px}
+  .modal .mh-actions{display:flex;gap:8px;flex-shrink:0}
+  .iconbtn{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 11px;cursor:pointer;font-size:12px}
+  .iconbtn:hover{border-color:var(--gold)}
+  .mbody{padding:8px 26px 26px}
+  .post-block{border:1px solid var(--line);border-radius:14px;margin-top:18px;overflow:hidden}
+  .post-block .pb-head{padding:13px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+  .post-block .pb-head .platf{font-size:11px;color:var(--muted)}
+  .post-block .pb-head .time{margin-left:auto;font-size:11px;color:var(--gold2)}
+  .pb-body{padding:14px 16px}
+  .fieldlabel{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:14px 0 5px}
+  .fieldlabel:first-child{margin-top:0}
+  .hook{font-family:var(--serif);font-size:20px;color:var(--ink);line-height:1.25}
+  .cap{font-size:13.5px;color:var(--soft);white-space:pre-wrap}
+  .shots{font-size:13px;color:var(--soft);margin:0;padding-left:18px}
+  .shots li{margin-bottom:4px}
+  .tags{font-size:12px;color:var(--gold2);word-spacing:2px}
+  .cta-line{font-size:13px;color:var(--ink);background:var(--panel2);border-left:3px solid var(--gold);padding:9px 12px;border-radius:0 8px 8px 0}
+  .stories-block{border:1px dashed var(--line);border-radius:12px;padding:14px 16px;margin-top:18px;background:repeating-linear-gradient(135deg,transparent,transparent 12px,rgba(200,169,106,.03) 12px,rgba(200,169,106,.03) 24px)}
+  .ai-block{border:1px solid var(--line);border-top:2px solid var(--gold);border-radius:0 0 14px 14px;margin-top:-6px;background:linear-gradient(180deg,rgba(200,169,106,.05),transparent)}
+  .ai-head{padding:11px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+  .ai-mode{font-size:11px;letter-spacing:.06em;color:var(--gold2);font-weight:600}
+  .ai-tool-tag{font-size:10.5px;color:var(--muted)}
+  .cw-btn{margin-left:auto;background:var(--gold);color:#1a1a14;border:none;border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;letter-spacing:.01em;transition:.15s}
+  .cw-btn:hover{background:var(--gold2)}
+  .cw-btn.cw-done{background:var(--green);color:#fff}
+  .ai-prompt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--ink);background:#0b0c08;border:1px solid var(--line);border-radius:8px;padding:11px 13px;white-space:pre-wrap;line-height:1.5}
+  .stories-block h5{margin:0 0 8px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+  .stories-block ul{margin:0;padding-left:18px;font-size:13px;color:var(--soft)}
+  /* generic content sections */
+  .longread{max-width:880px}
+  .longread h2{font-family:var(--serif);font-size:30px;margin:34px 0 8px;font-weight:600}
+  .longread h3{font-family:var(--serif);font-size:22px;margin:26px 0 6px;color:var(--gold2)}
+  .longread p{color:var(--soft);font-size:14.5px;margin:8px 0}
+  .longread ul{color:var(--soft);font-size:14px}
+  .longread li{margin-bottom:7px}
+  .hookcat{margin:22px 0}
+  .hookcat h3{display:flex;align-items:center;gap:10px}
+  .hookcat .tagchip{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px}
+  .hooklist{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+  .hooklist li{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:0 10px 10px 0;padding:11px 14px;font-family:var(--serif);font-size:17px;color:var(--ink)}
+  .hooklist li .form{display:block;font-family:var(--sans);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  .table th,.table td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+  .table th{background:var(--panel2);color:var(--gold);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .table td{color:var(--soft)}
+  .hl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:16px 0}
+  .hl{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .hl .ring{width:42px;height:42px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px}
+  .hl h4{margin:0 0 4px;font-size:14px;font-family:var(--serif);font-size:18px}
+  .hl p{margin:0;font-size:12px;color:var(--muted)}
+  .callout{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--gold);border-radius:14px;padding:18px 20px;margin:18px 0}
+  .callout h4{margin:0 0 6px;font-family:var(--serif);font-size:21px;color:var(--gold2)}
+  .footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--muted);font-size:12px;text-align:center}
+  .legendrow{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .legendrow .lg{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
+  .legendrow .dotc{width:10px;height:10px;border-radius:3px;display:inline-block}
+  @media(max-width:820px){
+    .cal,.dow{grid-template-columns:repeat(2,1fr)}
+    .dow{display:none}
+    .phasebar{grid-template-columns:1fr}
+    h1{font-size:32px}
+  }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="brandrow">
+    <div>
+      <div class="kicker">San Diego Landscape Remodeling</div>
+      <h1>The 90-Day Organic Game Plan
+        <span class="sub">Instagram · TikTok · Facebook + Groups — built for max-growth, founder-produced content</span>
+      </h1>
+    </div>
+    <div class="meta">
+      <div><b>Goal:</b> trust → booked design consultations → referrals</div>
+      <div><b>Cadence:</b> multi-daily, Reels-first</div>
+      <div><b>Start:</b> Mon Jun 15, 2026</div>
+      <div><b>By design, not by dispatch.</b></div>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-v="overview" class="active">Overview</button>
+    <button data-v="calendar">90-Day Calendar</button>
+    <button data-v="hooks">Hook Bank</button>
+    <button data-v="swipe">Swipe File</button>
+    <button data-v="aistudio">AI Studio</button>
+    <button data-v="stories">Stories &amp; Highlights</button>
+    <button data-v="referral">Referral Game</button>
+    <button data-v="offers">Offers</button>
+    <button data-v="playbook">Playbook</button>
+  </nav>
+</div></header>
+
+<main class="wrap">
+
+<!-- OVERVIEW -->
+<section class="view active" id="overview">
+  <p class="lead">A homeowner in Rancho Santa Fe is on Instagram right now, dreaming about their backyard. They have the budget. They have the timeline. They just need to see the right project from the right builder — and be reminded you exist the moment they're ready. This plan makes sure that builder is you.</p>
+
+  <div class="grid-cards">
+    <div class="card"><h3>Weekly output</h3><div class="big">7–9</div><p>feed posts/week (1+/day), plus daily Stories and daily TikTok recuts.</p></div>
+    <div class="card"><h3>Reels share</h3><div class="big">~60%</div><p>of feed is short-form video — the format that earns reach. Carousels for depth, statics sparingly.</p></div>
+    <div class="card"><h3>Stories/day</h3><div class="big">3–5</div><p>frames daily keep you top-of-feed and feed the algorithm between posts.</p></div>
+    <div class="card"><h3>FB Groups</h3><div class="big">3×/wk</div><p>genuine value posts in Bonita-area community groups — where warm local demand actually lives.</p></div>
+  </div>
+
+  <h2 style="font-family:var(--serif);font-weight:600;font-size:26px;margin:10px 0 4px">The three acts of the 90 days</h2>
+  <div class="phasebar">
+    <div class="phase"><div class="pn">Days 1–30</div><h4>Foundation &amp; Proof</h4><p>Look established from post one. Lead with your strongest existing assets (Mike's LA project, the Field Lead's past builds), build out Highlights, and warm the local audience with undeniable transformations. Goal: a feed that signals luxury and momentum, plus your first 300–500 real local followers.</p></div>
+    <div class="phase"><div class="pn">Days 31–60</div><h4>Momentum &amp; Authority</h4><p>Now they trust the eye — show them the brain. Materials education, process craft, the founders, neighborhood design character, and the tech edge. Goal: saves, shares, and DM conversations. People start tagging their spouse.</p></div>
+    <div class="phase"><div class="pn">Days 61–90</div><h4>Offer &amp; Referral</h4><p>Convert the warm audience. Activate the complimentary design consultation (framed as scarcity, not discount), launch the referral game, and lean into client-reveal moments. Goal: booked consultations and a referral loop that compounds past day 90.</p></div>
+  </div>
+
+  <div class="callout">
+    <h4>Why multiple posts a day works here — without burning you out</h4>
+    <p style="color:var(--soft);font-size:14px;margin:0">You're not creating multiple <em>shoots</em> a day — you're <strong>atomizing one shoot into many posts</strong>. One jobsite visit with your camera + drone yields a drone reveal Reel, a process Reel, a carousel of material close-ups, 5–8 Story frames, and a TikTok recut. Batch-film one day a week on-site; the calendar below spaces that footage across 7 days. The "multiple daily" volume is a <em>scheduling</em> outcome, not a daily-filming burden. <strong>Reality check:</strong> until Project 1 is underway, days lean on Mike's LA photos, the Field Lead's past work, AI concept visualizations (always labeled), and talking-head/education content you can shoot anywhere.</p>
+  </div>
+
+  <p style="color:var(--muted);font-size:13px;margin-top:18px">Open the <b>90-Day Calendar</b> tab and click any day to see the full post: hook, caption, exact shot list for your gear, hashtags, CTA, and the day's Stories plan. Every card also opens in its own tab for shooting on-site.</p>
+</section>
+
+<!-- CALENDAR -->
+<section class="view" id="calendar">
+  <div class="legendrow" id="legend"></div>
+  <div class="weekbar">
+    <button id="prevW">‹ Prev</button>
+    <select id="weekSel"></select>
+    <button id="nextW">Next ›</button>
+    <span class="weeklabel" id="weekLabel"></span>
+  </div>
+  <div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+  <div class="cal" id="cal"></div>
+</section>
+
+<!-- HOOKS -->
+<section class="view" id="hooks"><div class="longread" id="hookContent"></div></section>
+
+<!-- SWIPE FILE -->
+<section class="view" id="swipe"><div class="longread" id="swipeContent"></div></section>
+
+<!-- AI STUDIO -->
+<section class="view" id="aistudio"><div class="longread" id="aiContent"></div></section>
+
+<!-- STORIES -->
+<section class="view" id="stories"><div class="longread" id="storyContent"></div></section>
+
+<!-- REFERRAL -->
+<section class="view" id="referral"><div class="longread" id="refContent"></div></section>
+
+<!-- OFFERS -->
+<section class="view" id="offers"><div class="longread" id="offerContent"></div></section>
+
+<!-- PLAYBOOK -->
+<section class="view" id="playbook"><div class="longread" id="playContent"></div></section>
+
+</main>
+
+<div class="footer"><div class="wrap">San Diego Landscape Remodeling · Organic Social Game Plan · Generated by Claude for Gio · Sell the experience, not the product.</div></div>
+
+<!-- MODAL -->
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+
+<script>
+/* ============================ CONTENT ENGINE ============================ */
+const START = new Date(2026,5,15); // Jun 15 2026 (Mon)
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DOWS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const PILLARS={
+  transformation:{name:'Transformation',c:'var(--r-transformation)',k:'TRNS'},
+  craft:{name:'Craft & Process',c:'var(--r-craft)',k:'CRFT'},
+  experience:{name:'The Experience',c:'var(--r-experience)',k:'EXP'},
+  education:{name:'Education',c:'var(--r-education)',k:'EDU'},
+  trust:{name:'Trust & People',c:'var(--r-trust)',k:'TRST'},
+  tech:{name:'Tech Edge',c:'var(--r-tech)',k:'TECH'},
+  local:{name:'Local / SEO',c:'var(--r-local)',k:'LOCL'},
+  offer:{name:'Offer & CTA',c:'var(--r-offer)',k:'OFFR'}
+};
+
+// Hashtag sets (rotate). Geo + niche + design layered per Hook Agency guidance.
+const HASH={
+  A:'#sandiegolandscaping #sandiegobackyard #ranchosantafe #lajolla #delmar #outdoorliving #backyarddesign #hardscape #sandiegohomes #socalliving',
+  B:'#outdoorkitchen #pavers #travertine #firepit #pergola #landscapedesign #designbuild #luxuryoutdoorliving #architecturaldigest #dwell',
+  C:'#hardscapelife #masonry #craftsmanship #beforeandafter #patiodesign #retainingwall #poolside #goldenhour #sandiegocontractor #builtnotbought',
+  D:'#bonita #lamesa #chulavista #eastlake #sandiegocounty #619 #sandiegorealestate #homeremodel #curbappeal #backyardgoals'
+};
+
+// Concept pools. Each: {t:title, fmt, hook, cap, shots:[], why, cta, h:set}
+const C={
+transformation:[
+ {t:'Drone reveal — full backyard',fmt:'Reel',hook:'Three months ago this was just dirt and a slope nobody used.',cap:'A backyard that sat empty for years — now the room the whole family lives in.\n\nWe don\'t build patios. We build the place your people gather.\n\nReferences available on request.',shots:['Drone: start tight on a detail (fire feature), pull up + back for the full reveal','Hold the final wide for 3s — let scale land','Match cut from a ground "before" frame to the drone "after"'],why:'Drone reveals show scale no ground shot can — the single most shareable hardscape format.',cta:'Save this for your own backyard. DM "DESIGN" to start a concept.',h:'A'},
+ {t:'Before/After carousel',fmt:'Carousel',hook:'Swipe to watch a forgotten yard become an outdoor living room.',cap:'Same footprint. Completely different life.\n\nSwipe → for the before. The transformation isn\'t the pavers — it\'s how the family uses the space now.',shots:['Slide 1: golden-hour hero of finished space','Slide 2: the raw before','Slides 3–6: progression — demo, base, set, planted, lit','Final slide: detail macro + soft CTA'],why:'Carousels are Instagram\'s highest-engagement format; before/after is undeniable proof.',cta:'Which would you rather come home to? DM "DESIGN".',h:'C'},
+ {t:'Time-lapse install',fmt:'Reel',hook:'Watch 3 weeks of work happen in 20 seconds.',cap:'Every paver set by hand. Every grade checked twice. Compressed into the most satisfying 20 seconds on your feed.\n\nThis is what "built once" looks like.',shots:['Lock a tripod on the same frame across days','Capture 1 clip/hour during set days','Edit to a building beat; final 3s = the reveal'],why:'Time-lapses are hard to scroll past and signal craftsmanship without a word.',cta:'Follow for the finish. DM "DESIGN" to plan yours.',h:'C'},
+ {t:'Night transformation',fmt:'Reel',hook:'The same backyard at noon vs. after dark will change how you think about lighting.',cap:'Most people design for daylight. The magic happens after sunset.\n\nLandscape lighting isn\'t an add-on — it\'s half the experience.',shots:['Day wide of finished space','Hard cut to identical frame at blue hour with lighting on','Slow push through the lit space'],why:'Day-to-night contrast is a pattern interrupt + educates on a high-margin service.',cta:'DM "DESIGN" — let\'s plan your space for the hours you actually use it.',h:'B'},
+ {t:'Slope problem solved',fmt:'Reel',hook:'This hill was useless. Here\'s what we did with it.',cap:'An unusable slope became a tiered outdoor room with a seating wall and a view.\n\nThe hardest lots make the best backyards — if you build them right.',shots:['Drone before: show the grade','Process: retaining wall going in','Drone after: tiered reveal'],why:'Problem→solution framing hooks anyone who has a "bad" yard.',cta:'Got a tricky lot? DM "DESIGN".',h:'A'},
+ {t:'Pool deck redo',fmt:'Carousel',hook:'They almost replaced the pool. They only needed to replace what surrounds it.',cap:'The pool was fine. The dated deck around it was the problem.\n\nNew poolside hardscape changed the entire backyard without touching the water.',shots:['Hero: new pool deck golden hour','Before of cracked/dated deck','Material close-ups','Wide lifestyle frame'],why:'Reframes a "big" project as a smart, contained one — reduces perceived risk.',cta:'DM "DESIGN" to reimagine your poolside.',h:'B'},
+ {t:'Front-yard curb moment',fmt:'Reel',hook:'Your backyard is for you. Your front yard is for the whole neighborhood.',cap:'A front-yard remodel is the first thing guests see — and the last thing they forget.\n\nQuiet luxury that makes a statement when people pull up.',shots:['Drone approach down the street to the home','Detail of entry hardscape + lighting','Slow reveal walking up'],why:'Front-yard angle widens the project menu and plays to "subtle wealth statement".',cta:'DM "DESIGN" for a front-yard concept.',h:'A'},
+ {t:'One-week small-scope reveal',fmt:'Reel',hook:'A backyard doesn\'t have to take months to change your life.',cap:'A focused build — fire feature, seating, lighting — done in about a week.\n\nNot every project is a full remodel. Some just need the right room added.',shots:['Day 1 before','Mid-build process clips','Final golden-hour reveal'],why:'Shows range; reassures buyers who fear endless timelines (their #2 fear).',cta:'DM "DESIGN" — let\'s scope your space.',h:'C'}
+],
+craft:[
+ {t:'Wet saw on stone (ASMR)',fmt:'Reel',hook:'Turn your sound on for this.',cap:'The cut that makes the corner perfect. No music — just the wet saw through travertine.\n\nThis is the part most people never see. It\'s the part that lasts 30 years.',shots:['Macro on the blade meeting stone','Water spray in slow-mo','Hands placing the cut piece — it fits clean'],why:'Process ASMR signals craft and holds watch-time; great audio-on hook.',cta:'Craft you can hear. Follow for more.',h:'C'},
+ {t:'Base prep truth',fmt:'Reel',hook:'90% of failed patios fail here — and you can\'t see it once it\'s done.',cap:'Everyone photographs the pavers. Almost nobody shows the base.\n\nCompaction, grade, and the right depth are why our work is still flat in year ten. Ask any contractor to show you THIS.',shots:['Excavation + grading','Compactor passes','Screeding the base level'],why:'Builds trust by showing the unglamorous part — savvy buyers respect it.',cta:'DM "DESIGN" — we\'ll show you our spec.',h:'C'},
+ {t:'Setting pavers by hand',fmt:'Reel',hook:'A machine can\'t do this. 25 years of hands can.',cap:'Each piece placed, checked, adjusted. Our lead craftsman has been doing this for over two decades.\n\nThis is what you\'re paying for — and it\'s why we don\'t price-match.',shots:['Over-shoulder of hands setting','Level check','Pull-back to the growing pattern'],why:'Human + experience = premium justification without saying "expensive".',cta:'Follow the craft. DM "DESIGN" to work with the crew.',h:'C'},
+ {t:'Dry-laid vs mortared',fmt:'Carousel',hook:'Two ways to build the same wall. One lasts. One looks good for a year.',cap:'A quick education in why method matters more than material.\n\nSwipe → for the difference your eye can\'t catch but your wallet will.',shots:['Diagram-style slides','Real photos of each method','Close-up of the joint detail'],why:'Education + craft hybrid; positions SDLR as the honest expert.',cta:'Questions? DM us — we answer every one.',h:'B'},
+ {t:'The detail nobody asked for',fmt:'Reel',hook:'Nobody would have noticed if we skipped this. We never skip it.',cap:'A hidden drainage channel under the patio. Invisible forever. The reason your space stays dry and your investment lasts.\n\nThe details you don\'t see are the ones that matter most.',shots:['Close on the hidden detail being installed','Cover it up','Cut to the finished surface above it'],why:'"Invisible craft" reframes price as protection; strong trust signal.',cta:'DM "DESIGN" — ask us what others skip.',h:'C'},
+ {t:'Material haul / supplier',fmt:'Reel',hook:'This pallet of stone costs more than some contractors\' entire patios.',cap:'Premium travertine, sourced through relationships most crews don\'t have.\n\nThe material is the bones of the build. We don\'t cut corners here.',shots:['Stone arriving / forklift','Macro of the slab grain','Hand running across the surface'],why:'Signals material tier; subtly contrasts with cheaper competitors.',cta:'DM "DESIGN" to see options for your space.',h:'B'},
+ {t:'Tools of the trade',fmt:'Reel',hook:'Three tools that separate a real hardscape crew from a weekend one.',cap:'It\'s not about owning them. It\'s about knowing exactly when each one matters.\n\nCraft is judgment, not equipment.',shots:['Quick cuts of 3 tools in use','Text overlay naming each','End on finished result'],why:'List-tease format; educational + craft credibility.',cta:'Follow for the how-behind-the-wow.',h:'C'}
+],
+experience:[
+ {t:'Golden-hour gathering',fmt:'Reel',hook:'This is 6:47pm on a Tuesday. Nothing special. Except everything.',cap:'No occasion. Just family, in the space they built to be in.\n\nWe don\'t sell patios. We sell the Tuesday you didn\'t want to end.',shots:['Lifestyle: family/friends at the fire feature, golden hour','Candid laughter, drinks, no posing','Slow drift across the scene'],why:'Pure "sell the experience" — emotional, on the governing brand line.',cta:'Imagine your version of this. DM "DESIGN".',h:'A'},
+ {t:'The morning coffee spot',fmt:'Reel',hook:'Everyone designs for the dinner party. We design for the quiet morning.',cap:'The best seat in the house isn\'t inside.\n\nA space you actually use isn\'t about how it photographs — it\'s about the 6am cup of coffee nobody sees.',shots:['Steam off a coffee cup, soft light','Wide of the serene morning space','Bare feet on warm stone'],why:'Quieter emotional angle differentiates from generic "entertaining" content.',cta:'DM "DESIGN" — let\'s build your favorite room.',h:'B'},
+ {t:'Kids in the space',fmt:'Reel',hook:'The grandkids will remember this backyard longer than they remember the house.',cap:'New grandkids. A reason to make the outside the heart of the home.\n\nA space built for the people you love to come back to.',shots:['Kids playing / s\'mores at the fire pit','Grandparents watching','Warm candid moments'],why:'Speaks directly to the ICP trigger (new grandkids); deeply emotional.',cta:'Building for your family? DM "DESIGN".',h:'A'},
+ {t:'Host like it\'s effortless',fmt:'Reel',hook:'The host who looks relaxed designed for it.',cap:'An outdoor kitchen means you\'re never stuck inside while everyone\'s out here.\n\nThe luxury isn\'t the grill. It\'s being part of your own party.',shots:['Host cooking at outdoor kitchen, guests around','Plating / pour','Group toast'],why:'Sells outdoor kitchen via the feeling, not specs.',cta:'DM "DESIGN" for an outdoor kitchen concept.',h:'B'},
+ {t:'A space for two',fmt:'Reel',hook:'You don\'t need a crowd to justify a beautiful backyard.',cap:'Sometimes the best night is just the two of you, the fire, and nowhere to be.\n\nWe build for your life — not for the photos.',shots:['Couple at fire feature, dusk','Wine, blanket, low light','Wide pull to the lit space'],why:'Counters the idea that luxury outdoor = entertaining only.',cta:'DM "DESIGN" to plan your evenings outside.',h:'B'}
+],
+education:[
+ {t:'Travertine vs porcelain vs bluestone',fmt:'Carousel',hook:'Before you pick a single paver, understand these three.',cap:'The material decides the look, the feel underfoot, and how it ages in San Diego sun.\n\nSwipe → a 60-second education that\'ll save you a $40k mistake.',shots:['Clean slide per material','Real macro photos','Pros/cons text overlay','CTA slide'],why:'High-save educational carousel; positions SDLR as the trusted advisor.',cta:'Not sure which fits your home? DM us.',h:'B'},
+ {t:'What a real quote includes',fmt:'Carousel',hook:'If your backyard quote is one page, run.',cap:'A line-item scope protects you. A round number protects them.\n\nHere\'s exactly what an honest proposal should show you — swipe →.',shots:['Slide list of what to look for','Example line-item layout','Trust CTA'],why:'Speaks to the #1 fear (budget blown); builds enormous trust.',cta:'Want our proposal checklist? DM "QUOTE".',h:'D'},
+ {t:'5 questions to ask any builder',fmt:'Reel',hook:'Ask your contractor these 5 questions. Watch how fast some of them fold.',cap:'Licensing. Base spec. Timeline accountability. Who\'s actually on site. What happens after.\n\nWe\'ll answer all five on camera, any day.',shots:['Talking head (Gio) listing 5','Bold text overlays per question','End on confident close'],why:'Empowers the buyer; subtly disqualifies weaker competitors.',cta:'DM "DESIGN" — ask us all five.',h:'D'},
+ {t:'Why permits matter',fmt:'Reel',hook:'The cheapest bid often skips the one thing that protects you.',cap:'Permits, proper licensing, and insurance aren\'t red tape — they\'re your safety net if anything goes wrong.\n\nWe build under a licensed Class B GC. Always ask.',shots:['Talking head + B-roll of paperwork/jobsite','Text: "Licensed & insured GC"','Calm authoritative close'],why:'Trust + differentiation on legitimacy; aligns with brand.',cta:'DM us your licensing questions.',h:'D'},
+ {t:'Drainage 101',fmt:'Reel',hook:'Your beautiful new patio is worthless if water pools on it.',cap:'Grade and drainage are designed before a single paver is laid.\n\nThe stuff nobody Instagrams is the stuff that decides whether your space lasts.',shots:['Diagram of slope/grade','Real drainage install','Water running off correctly'],why:'Educational, trust-building, and seeds a premium service.',cta:'DM "DESIGN" — we design water out first.',h:'C'},
+ {t:'How long should it really take',fmt:'Carousel',hook:'Anyone who promises your backyard "next weekend" is lying to you.',cap:'Real timelines for real scopes — small builds, mid-size, full remodels.\n\nBy design, not by dispatch. Swipe → for honest numbers.',shots:['Timeline slides per scope','Calendar-style visual','Brand CTA'],why:'Directly answers fear #2 (takes too long) + reinforces positioning line.',cta:'DM "DESIGN" for a real timeline on your project.',h:'B'}
+],
+trust:[
+ {t:'Meet Gio & Mike',fmt:'Reel',hook:'When you hire us, you get our personal cell numbers. Both of them.',cap:'No account managers. No call centers. The two founders are in every project.\n\nGio handles design and communication. Mike runs the build. You talk to us directly — always.',shots:['Two-shot of Gio + Mike on a jobsite','Each says one line to camera','Handshake / walk-and-talk'],why:'Founder access is part of the product; humanizes the brand.',cta:'DM "DESIGN" — you\'ll be talking to us, not a rep.',h:'D'},
+ {t:'The 10-Month Walk-Through',fmt:'Reel',hook:'Most contractors disappear after the final payment. We come back.',cap:'Ten months after we finish, we return to inspect your space with a fine-toothed comb. No charge. Part of every project.\n\nWe don\'t build and vanish. We stand behind it.',shots:['Walk-through B-roll inspecting a finished space','Text: "The 10-Month Walk-Through"','Founder explaining to camera'],why:'Signature program; directly answers fear #3 (never finished/abandoned).',cta:'DM "DESIGN" to learn how we back our work.',h:'D'},
+ {t:'Meet the craftsman',fmt:'Reel',hook:'25 years. Thousands of square feet of stone. One pair of hands.',cap:'Our lead craftsman has spent a career making outdoor spaces that outlast trends.\n\nThe people on your site are the whole difference. Ours are the best we\'ve ever worked with.',shots:['Field Lead working (no full name shown)','Hands + craft detail','Wide of crew on site'],why:'Trust via people; respects naming rule (no full name).',cta:'Follow to meet the crew behind the work.',h:'C'},
+ {t:'Communication promise',fmt:'Reel',hook:'The #1 complaint about contractors isn\'t quality. It\'s silence.',cap:'You\'ll always know what\'s happening, what\'s next, and who to call.\n\nClear updates, a direct line, and a digital portal for your whole project. Communication is a feature here, not an afterthought.',shots:['Phone showing a project update','Founder texting client back quickly','Calm reassuring tone'],why:'Targets fear #5 (bad communication); a known competitor weakness.',cta:'DM "DESIGN" and feel the difference from message one.',h:'D'},
+ {t:'Why we say no',fmt:'Reel',hook:'We turn down projects every month. Here\'s why that protects you.',cap:'One crew. Projects planned months ahead. We don\'t overbook, so your build gets the attention it deserves.\n\nBy design, not by dispatch.',shots:['Founder to camera, honest tone','B-roll of focused single-crew work','Calendar/planning visual'],why:'Scarcity + intention; reinforces the governing positioning line.',cta:'DM "DESIGN" to see if we\'re a fit this season.',h:'D'}
+],
+tech:[
+ {t:'AI concept → reality',fmt:'Reel',hook:'You\'ll see your finished backyard before we move a single shovel.',cap:'We render your actual property into a photorealistic concept so you make decisions with your eyes, not your imagination.\n\n(Concept visualization shown — not a completed project.)',shots:['Screen-capture of the concept render','Side-by-side concept vs real direction','Founder walking through it on a tablet'],why:'Tech moat made visible; LABELS the render (critical brand rule).',cta:'DM "DESIGN" — see your space before you commit.',h:'B'},
+ {t:'Digital proposal walkthrough',fmt:'Reel',hook:'Most backyard quotes are a number on a napkin. Ours is a digital portal.',cap:'Line-item scope, materials, timeline, and your concept — all in one place you can revisit any time.\n\nTech-forward in a trade that usually isn\'t. That\'s on purpose.',shots:['Screen-record of the proposal portal','Tap through sections','Founder narrating'],why:'Differentiates on tech; reduces buyer risk/anxiety.',cta:'DM "QUOTE" to see how we present projects.',h:'B'},
+ {t:'Behind the design',fmt:'Reel',hook:'Watch a hand sketch become a photorealistic backyard.',cap:'It starts on paper with our craftsman\'s eye, then becomes a render you can walk through.\n\nDesign-to-reality. (Concept visualization — not a finished build.)',shots:['Sketch on paper','Transition to render','Reveal of the direction'],why:'Showcases Design-to-Reality program; labeled render.',cta:'DM "DESIGN" to start your concept.',h:'B'}
+],
+local:[
+ {t:'Neighborhood spotlight',fmt:'Reel',hook:'Designing a backyard in {HOOD}? Here\'s what most people get wrong.',cap:'Every San Diego pocket has its own soil, slope, and style. {HOOD} is no exception.\n\nWe design for where you actually live — not a template.',shots:['Drone establishing the neighborhood feel','Local design detail','Founder talking local specifics'],why:'Local SEO + relevance; geo-tag and local hashtags drive nearby reach.',cta:'In {HOOD}? DM "DESIGN".',h:'A'},
+ {t:'San Diego design character',fmt:'Carousel',hook:'A backyard in Del Mar should not look like one in El Cajon.',cap:'Coastal vs inland changes everything — materials, shade, planting, drainage.\n\nSwipe → for how we tailor design to your corner of the county.',shots:['Slides per region with mood imagery','Material notes per climate','CTA slide'],why:'Positions SDLR as the county-wide local expert; SEO depth.',cta:'DM your neighborhood — we\'ll talk specifics.',h:'A'},
+ {t:'We work all of SD County',fmt:'Reel',hook:'From La Jolla to Bonita, one crew, one standard.',cap:'We work across San Diego County. By design, not by dispatch.\n\nWherever your home is, the craft doesn\'t change.',shots:['Map-style motion graphic of service areas','Drone clips from a few areas','Founder close'],why:'Signals full-county service from day one per brand strategy.',cta:'DM "DESIGN" — tell us where home is.',h:'A'}
+],
+offer:[
+ {t:'Founding projects — complimentary consult',fmt:'Reel',hook:'We\'re selecting a small number of founding projects this season. Here\'s what that means for you.',cap:'A complimentary on-site design consultation and a concept visualization of your actual space — normally part of our paid design process.\n\nWe\'re intentionally taking only a few. By design, not by dispatch.',shots:['Founder to camera, warm + exclusive tone','B-roll of consultation / tablet concept','Text: "Complimentary design consultation"'],why:'Scarcity-framed offer; no discount language, on-brand.',cta:'DM "DESIGN" to apply for a founding-project consult.',h:'B'},
+ {t:'What happens on a consult',fmt:'Carousel',hook:'A design consultation with us isn\'t a sales pitch. Here\'s exactly what happens.',cap:'We walk your space, listen to how you want to live in it, and show you what\'s possible — no pressure, no obligation.\n\nSwipe → for the four steps.',shots:['Step slides','Real consultation B-roll','Soft CTA'],why:'Removes friction/fear around booking; warms the CTA.',cta:'DM "DESIGN" to book yours.',h:'B'},
+ {t:'Limited season capacity',fmt:'Reel',hook:'There are only so many backyards one crew can build right this year.',cap:'We plan months ahead and build with a single crew, so the calendar is genuinely limited.\n\nIf this is your year, now\'s the time to start the conversation.',shots:['Calendar/planning visual','Crew on site','Founder close'],why:'Honest scarcity tied to the real operating model.',cta:'DM "DESIGN" to check this season\'s availability.',h:'D'}
+]
+};
+
+const HOODS=['Rancho Santa Fe','La Jolla','Del Mar','Bonita','Encinitas','Coronado','Point Loma','Carlsbad','Poway','Mount Helix'];
+
+/* ---- 12-week rotation plan (Mon..Sun). Each entry = pillar key OR special token. ---- */
+/* Phase 1 (wk1-4): proof-heavy. Phase 2 (wk5-8): authority. Phase 3 (wk9-13): offer+referral. */
+const WEEK_PLANS=[
+ // wk1
+ ['transformation','craft','education','experience','transformation','trust','local'],
+ ['transformation','experience','craft','education','transformation','local','trust'],
+ ['transformation','craft','experience','education','transformation','trust','local'],
+ ['transformation','education','craft','experience','transformation','local','trust'],
+ // wk5
+ ['education','craft','trust','experience','transformation','tech','local'],
+ ['trust','education','craft','tech','transformation','experience','local'],
+ ['education','experience','trust','craft','transformation','tech','local'],
+ ['craft','education','trust','experience','transformation','local','tech'],
+ // wk9 (offer activates)
+ ['offer','transformation','education','experience','trust','craft','local'],
+ ['experience','offer','craft','transformation','trust','education','local'],
+ ['transformation','education','offer','experience','craft','trust','local'],
+ ['trust','experience','transformation','offer','craft','education','local'],
+ ['transformation','craft','experience','education','offer','trust','local']
+];
+
+// counters to cycle through each pillar's concept pool
+const ctr={}; Object.keys(C).forEach(k=>ctr[k]=0);
+let hoodIdx=0;
+
+function pickConcept(pillar){
+  const pool=C[pillar];
+  const item={...pool[ctr[pillar]%pool.length]};
+  ctr[pillar]++;
+  // fill neighborhood tokens
+  if(item.hook&&item.hook.includes('{HOOD}')||item.cap.includes('{HOOD}')||item.cta.includes('{HOOD}')){
+    const h=HOODS[hoodIdx%HOODS.length]; hoodIdx++;
+    item.hook=item.hook.replace(/{HOOD}/g,h); item.cap=item.cap.replace(/{HOOD}/g,h); item.cta=item.cta.replace(/{HOOD}/g,h);
+  }
+  return {pillar,...item};
+}
+
+const POST_TIMES={Reel:'6:30 PM',Carousel:'12:00 PM',Static:'7:30 AM'};
+
+/* ---- AI CREATIVE ENGINE: per-pillar Freepik/AI workflow (respects the "concept visualization" brand rule) ---- */
+const AICREATIVE={
+ transformation:{mode:'REAL FOOTAGE FIRST',badge:'#7d8a5c',
+   tools:'Your drone + camera are the hero — real proof always wins. Use AI only for (a) a scroll-stopping cover frame or (b) a labeled concept slide inside a carousel. Never post an AI image as a finished SDLR project.',
+   prompt:t=>`Photorealistic architectural visualization, luxury San Diego backyard — ${t.toLowerCase()}. Travertine + natural stone, built-in seating, fire feature, warm landscape lighting at golden hour, modern-Mediterranean design, three-quarter aerial drone angle, Architectural Digest editorial style, ultra-detailed, shallow depth, 9:16. NOTE: label output "Concept visualization".`,
+   steps:['Shoot the real thing first: drone reveal + ground hero (this is the post).','If you need a cover/concept slide → Freepik → AI Image Generator (Mystic/Flux, Realism ON).','Paste the prompt, set 9:16 (Reels) or 4:5, generate 4, pick the best.','Upscale in Freepik; optional subtle motion via Freepik AI Video / Runway.','In CapCut or Canva, add a small "Concept visualization" caption — required.','Rename to the SEO filename and drop into your editor as a cover or carousel slide only.']},
+ craft:{mode:'REAL MACRO FIRST',badge:'#7d8a5c',
+   tools:'Real macro footage of cutting/setting/compacting is the content. AI is a backup for a stylized material hero or a cover graphic only.',
+   prompt:t=>`Studio macro photograph — ${t.toLowerCase()}: close-up of hands setting travertine pavers / wet saw cutting natural stone, water spray, dramatic side light, ultra-sharp texture detail, luxury craftsmanship mood, cinematic, 9:16.`,
+   steps:['Film the real process in macro (phone in 4K, get tight).','Need a hero/cover? Freepik → Image Generator, paste prompt, Realism ON.','Generate, pick, upscale.','Layer the spoken hook as on-screen text in CapCut.','Export 9:16, SEO filename.']},
+ experience:{mode:'REAL LIFESTYLE FIRST',badge:'#7d8a5c',
+   tools:'Real golden-hour moments win. If you use AI, generate EMPTY ambiance/establishing frames only — never AI "people" implied to be real clients (brand + FTC risk).',
+   prompt:t=>`Cinematic golden-hour photograph of a luxury outdoor living space at dusk — ${t.toLowerCase()}. Fire feature glowing, string/landscape lighting, set table, NO visible faces, warm inviting mood, Architectural Digest style, 9:16. Concept/ambiance frame.`,
+   steps:['Capture the real moment on a finished/staged space at golden hour.','For a mood establishing frame only: Freepik Image Generator, paste prompt (no people).','Generate, upscale, add subtle motion (Freepik AI Video) if desired.','Pair with the experience hook as on-screen text.','Export, SEO filename.']},
+ education:{mode:'AI-FRIENDLY (graphics)',badge:'#c8a96a',
+   tools:'Great for AI: build clean carousel/diagram graphics. Freepik for textures/backgrounds + Canva for layout with brand fonts.',
+   prompt:t=>`Set of clean studio macro textures for an educational carousel — ${t.toLowerCase()}: travertine, porcelain, and bluestone paver surfaces, top-down, soft natural light, neutral luxury palette, ultra-detailed, square 1:1.`,
+   steps:['Freepik → Image Generator: generate each material/texture image (1:1).','Open Canva, build the carousel on a dark editorial template with your brand serif.','Slide 1 = the hook; middle slides = the teaching; final = soft CTA.','Keep copy tight; let visuals carry it. Export as 1:1 carousel.','SEO filenames per slide.']},
+ trust:{mode:'REAL PEOPLE + AI graphics',badge:'#b08b5c',
+   tools:'Founders/crew must be real footage. Use AI/Canva only for branded quote cards, lower-thirds, and title frames — not generative people.',
+   prompt:t=>`Minimal luxury brand graphic background for a quote/title card — "${t}". Dark editorial texture, subtle gold thin-line accent, generous negative space for text, 9:16.`,
+   steps:['Film the real founders/crew piece to camera.','Freepik: generate the background texture (no people, no text).','In Canva, overlay the quote/title in your brand serif + thin-gold rule.','Use as a Reel cover, lower-third, or Story frame.','Export, SEO filename.']},
+ tech:{mode:'AI IS THE POINT (labeled)',badge:'#7e93a3',
+   tools:'This pillar SHOWS the AI concept process. Use Freepik Reimagine on the client\'s ACTUAL yard photo — that\'s the magic, and it stays honest because it\'s explicitly a concept.',
+   prompt:t=>`Reimagine this backyard photo as a finished luxury outdoor living concept — ${t.toLowerCase()}: travertine patio, outdoor kitchen, fire feature, built-in seating, landscape lighting at dusk, photorealistic architectural rendering, AD style. Output is a CONCEPT visualization, not a real build.`,
+   steps:['Get the client\'s real before photo (or use a sample lot).','Freepik → Reimagine (img2img): upload the photo, paste the prompt, mid strength to keep the real geometry.','Generate variations; screen-record the reveal for the Reel.','Always caption "Concept visualization — not a completed project".','Show sketch → render → (eventually) real build progression.','Export 9:16, SEO filename.']},
+ local:{mode:'REAL DRONE + AI graphics',badge:'#9a8f6a',
+   tools:'Real drone of the neighborhood is best. AI/Canva for a stylized establishing frame or an animated service-area map.',
+   prompt:t=>`Stylized editorial establishing graphic — ${t}: San Diego coastal/inland neighborhood character, warm luxury palette, soft light, no recognizable private homes, 9:16.`,
+   steps:['Capture real drone of the area if you can.','Freepik for a stylized establishing frame; Canva for an animated map of service areas.','Overlay the local hook as text.','Export, SEO filename.']},
+ offer:{mode:'AI-FRIENDLY (graphics)',badge:'#c77b5a',
+   tools:'Build the offer card + Story frames in Canva over a Freepik luxury background. Keep it editorial — no "SALE" energy.',
+   prompt:t=>`Elegant minimal background for a luxury offer card — "${t}". Dark editorial texture, thin gold accent line, lots of negative space, no text baked in, 9:16 and 1:1 versions.`,
+   steps:['Freepik: generate the background (no text).','Canva: set the offer headline + one line in brand serif; add a clear CTA.','Make a 9:16 Story version with a link sticker zone and a 1:1 feed version.','Keep scarcity/access language — never discount language.','Export, SEO filenames.']}
+};
+/* Registry of copy-to-Cowork meta-prompts, keyed by day-post id */
+const COWORK_PROMPTS={};
+function buildCoworkPrompt(p){
+ const a=AICREATIVE[p.pillar]||{};
+ return `Act as San Diego Landscape Remodeling's AI creative director. I'm making this social post and need image prompts I can paste into Freepik (Mystic/Flux) and finish in Magnific.
+
+POST: ${p.t}
+Pillar: ${PILLARS[p.pillar].name} · Format: ${p.fmt} · Platforms: ${p.platforms||'IG/TikTok/FB'}
+Hook (first line / first 3s): "${p.hook}"
+Creative mode for this pillar: ${a.mode||''}
+
+BRAND RULES (must follow):
+- Editorial-luxury, Aman-resort feel — NOT a generic landscaping company.
+- AI images are concept/graphics only — NEVER imply a finished SDLR project. Where the image is a concept of a built space, the final must carry a small "Concept visualization" caption.
+- No AI people implied to be real clients. No discount/price language. No "dream backyard / transform your space" clichés.
+
+GIVE ME:
+1) Three ready-to-paste Freepik prompts for THIS post — photorealistic, 9:16, each with explicit style, lighting (favor golden hour/dusk), lens/angle (favor drone or editorial eye-level), and material detail (travertine, natural stone, landscape lighting).
+2) The best Magnific settings to finish the winning image (creativity, resolution, HDR, prompt-guidance).
+3) One alt prompt for a 1:1 carousel cover.
+4) Tell me exactly which outputs need the "Concept visualization" label.
+Keep everything on-brand and San Diego-specific.`;
+}
+function copyCowork(id,btn){
+ const txt=COWORK_PROMPTS[id]||'';
+ const done=()=>{const o=btn.textContent;btn.textContent='Copied ✓ — paste into Cowork';btn.classList.add('cw-done');setTimeout(()=>{btn.textContent=o;btn.classList.remove('cw-done');},2600);};
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fallbackCopy(txt,done));}
+ else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){
+ const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+ try{document.execCommand('copy');done();}catch(e){window.prompt('Copy this prompt, then paste it into Cowork:',txt);}
+ document.body.removeChild(ta);
+}
+function aiCreativeHTML(p,pid){
+ const a=AICREATIVE[p.pillar]; if(!a) return '';
+ if(pid) COWORK_PROMPTS[pid]=buildCoworkPrompt(p);
+ const btn=pid?`<button class="cw-btn" onclick="copyCowork('${pid}',this)">⚡ Copy prompt for Cowork</button>`:'';
+ return `<div class="ai-block">
+   <div class="ai-head"><span class="pill" style="background:${a.badge}">AI Creative</span><span class="ai-mode">${a.mode}</span>${btn}<span class="ai-tool-tag">Freepik · Magnific · Canva</span></div>
+   <div class="pb-body">
+     <div class="fieldlabel">How to make this creative</div>
+     <div class="cap">${a.tools}</div>
+     <div class="fieldlabel">Ready-to-paste AI prompt</div>
+     <div class="ai-prompt">${a.prompt(p.t)}</div>
+     <div class="fieldlabel">Step by step (start → finish)</div>
+     <ol class="shots">${a.steps.map(s=>`<li>${s}</li>`).join('')}</ol>
+   </div>
+ </div>`;
+}
+
+// Stories templates by day-of-week
+const STORY_SETS=[
+ ['Behind-the-scenes clip from today\'s shoot','Poll: "Fire pit or fireplace?" (engagement)','Re-share today\'s feed post to Stories with a "New post 👇" sticker'],
+ ['Material of the week close-up + 1-line fact','"Ask us anything" question sticker','Countdown sticker to an upcoming reveal'],
+ ['Jobsite progress frame (raw, authentic)','This-or-that: two design options, let them vote','Quote/positioning line on a clean branded frame'],
+ ['Founder face-to-camera 10-sec tip','Re-share a saved/DM\'d comment (social proof)','Link sticker → "Book a design consult"'],
+ ['Golden-hour b-roll, no words, just vibe','Poll on a real design decision from a current project','Tease tomorrow\'s post'],
+ ['Weekend "where we\'re working" map/location sticker','Client moment or reveal clip','Soft CTA frame: "Booking founding projects → DM DESIGN"'],
+ ['Sunday reset: re-post the week\'s best Reel','Highlight refresh reminder','Gratitude / brand-story frame']
+];
+
+// FB group days (Tue, Thu, Sat -> index 1,3,5 within week Mon=0)
+const FBGROUP_DAYS=[1,3,5];
+const FBGROUP_POSTS=[
+ 'Value post in a Bonita/East County community group: share a quick "before you hire any backyard contractor, ask these 3 questions" tip. No pitch — pure help. Reply to every comment.',
+ 'Share a (labeled) before/after with a short story about solving a tricky slope. Ask the group "what would you do with a yard like this?" Engagement > promotion.',
+ 'Answer a common local question (drainage, turf vs grass, HOA-friendly materials) as a helpful mini-guide. Drop expertise, not links.'
+];
+
+/* Build 90 days */
+const DAYS=[];
+for(let i=0;i<90;i++){
+  const date=new Date(START); date.setDate(START.getDate()+i);
+  const wk=Math.floor(i/7); const dow=i%7; // 0=Mon
+  const plan=WEEK_PLANS[Math.min(wk,WEEK_PLANS.length-1)];
+  const pillar=plan[dow];
+  const phase = i<30?1 : i<60?2 : 3;
+  const posts=[];
+  const main=pickConcept(pillar);
+  main.platforms = main.fmt==='Carousel' ? 'Instagram + Facebook' : 'Instagram + TikTok + Facebook';
+  main.time=POST_TIMES[main.fmt]||'6:30 PM';
+  posts.push(main);
+
+  // Second feed post on key days: offer days + 1 transformation booster on Mondays in phase 3
+  if(pillar==='offer'){
+    const boost=pickConcept('experience'); boost.platforms='Instagram + TikTok'; boost.time='8:00 AM'; boost.secondary=true; posts.push(boost);
+  }
+  // TikTok native note
+  const tiktok = main.fmt!=='Carousel';
+
+  // FB group
+  let fbgroup=null;
+  if(FBGROUP_DAYS.includes(dow)){ fbgroup=FBGROUP_POSTS[FBGROUP_DAYS.indexOf(dow)%FBGROUP_POSTS.length]; }
+
+  DAYS.push({i,date,dow,wk,phase,pillar,posts,stories:STORY_SETS[dow],fbgroup,tiktok});
+}
+
+/* ============================ RENDER ============================ */
+function fmtDate(d){return DOWS[d.getDay()]+' '+MONTHS[d.getMonth()]+' '+d.getDate();}
+function pillBadge(p){const P=PILLARS[p];return `<span class="pill" style="background:${P.c}">${P.name}</span>`;}
+
+// legend
+const legend=document.getElementById('legend');
+legend.innerHTML=Object.values(PILLARS).map(P=>`<span class="lg"><span class="dotc" style="background:${P.c}"></span>${P.name}</span>`).join('');
+
+// week selector
+const weekSel=document.getElementById('weekSel');
+for(let w=0;w<13;w++){const ph=w<4?'P1':w<8?'P2':'P3';weekSel.innerHTML+=`<option value="${w}">Week ${w+1} — Days ${w*7+1}–${Math.min(w*7+7,90)} (${ph})</option>`;}
+let curWeek=0;
+
+function renderWeek(w){
+  curWeek=w; weekSel.value=w;
+  const ph=w<4?'Phase 1 · Foundation & Proof':w<8?'Phase 2 · Momentum & Authority':'Phase 3 · Offer & Referral';
+  document.getElementById('weekLabel').textContent=ph;
+  const cal=document.getElementById('cal'); cal.innerHTML='';
+  for(let d=0; d<7; d++){
+    const idx=w*7+d; if(idx>=90){cal.innerHTML+='<div></div>';continue;}
+    const day=DAYS[idx];
+    const minis=day.posts.map(p=>`<div class="post-mini"><span class="fmt">${p.fmt}</span> ${p.t}</div>`).join('');
+    const extra=(day.fbgroup?'<div class="post-mini" style="color:var(--green)">＋ FB Group value post</div>':'')+(day.tiktok?'':'');
+    cal.innerHTML+=`<div class="day ${day.pillar==='offer'?'offerday':''}" onclick="openDay(${idx})">
+      <div class="dnum"><span class="d">Day ${idx+1}</span><span class="dt">${fmtDate(day.date)}</span></div>
+      ${pillBadge(day.pillar)}
+      ${minis}${extra}
+      <div class="count">${day.posts.length} post${day.posts.length>1?'s':''} · ${day.stories.length} stories</div>
+    </div>`;
+  }
+}
+document.getElementById('prevW').onclick=()=>renderWeek(Math.max(0,curWeek-1));
+document.getElementById('nextW').onclick=()=>renderWeek(Math.min(12,curWeek+1));
+weekSel.onchange=e=>renderWeek(+e.target.value);
+
+function postHTML(p,pid){
+  return `<div class="post-block">
+    <div class="pb-head">${pillBadge(p.pillar)}<span class="platf">${p.fmt} · ${p.platforms}</span><span class="time">Best post: ${p.time}</span></div>
+    <div class="pb-body">
+      <div class="fieldlabel">Hook (first 3 seconds / first line)</div>
+      <div class="hook">"${p.hook}"</div>
+      <div class="fieldlabel">Caption</div>
+      <div class="cap">${p.cap}</div>
+      <div class="fieldlabel">Shot list — your gear (camera · drone · AI)</div>
+      <ul class="shots">${p.shots.map(s=>`<li>${s}</li>`).join('')}</ul>
+      <div class="fieldlabel">Why this works</div>
+      <div class="cap" style="font-style:italic">${p.why}</div>
+      <div class="fieldlabel">Hashtags</div>
+      <div class="tags">${HASH[p.h]}</div>
+      <div class="fieldlabel">Call to action</div>
+      <div class="cta-line">${p.cta}</div>
+    </div>
+    ${aiCreativeHTML(p,pid)}
+  </div>`;
+}
+
+function dayDetailHTML(idx){
+  const day=DAYS[idx];
+  const phn=day.phase===1?'Foundation & Proof':day.phase===2?'Momentum & Authority':'Offer & Referral';
+  let html=`<div class="mhead">
+      <div><div class="dd">Day ${idx+1}</div><div class="ds">${fmtDate(day.date)} · Phase ${day.phase} — ${phn}</div></div>
+      <div class="mh-actions">
+        <button class="iconbtn" onclick="openTab(${idx})">⧉ New tab</button>
+        <button class="iconbtn" onclick="closeOv()">✕ Close</button>
+      </div>
+    </div>
+    <div class="mbody">`;
+  day.posts.forEach((p,pi)=>html+=postHTML(p,idx+'-'+pi));
+  if(day.tiktok) html+=`<div class="post-block"><div class="pb-head"><span class="pill" style="background:var(--r-tech)">TikTok</span><span class="platf">Recut of today's Reel</span></div><div class="pb-body"><div class="cap">Re-export today's Reel for TikTok: punchier first frame, on-screen captions, trending audio swapped in. Add 2–3 TikTok-native tags (#hardscape #backyardmakeover #sandiego). Post within a few hours of the IG Reel.</div></div></div>`;
+  if(day.fbgroup) html+=`<div class="post-block"><div class="pb-head"><span class="pill" style="background:var(--green)">Facebook Group</span><span class="platf">Community — value first</span></div><div class="pb-body"><div class="cap">${day.fbgroup}</div></div></div>`;
+  html+=`<div class="stories-block"><h5>Stories plan (post across the day — 3 to 5 frames)</h5><ul>${day.stories.map(s=>`<li>${s}</li>`).join('')}</ul></div>`;
+  html+=`</div>`;
+  return html;
+}
+
+function openDay(idx){
+  document.getElementById('modal').innerHTML=dayDetailHTML(idx);
+  document.getElementById('ov').classList.add('show');
+}
+function closeOv(){document.getElementById('ov').classList.remove('show');}
+document.getElementById('ov').addEventListener('click',e=>{if(e.target.id==='ov')closeOv();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOv();});
+
+function openTab(idx){
+  const day=DAYS[idx];
+  const inner=dayDetailHTML(idx).replace(/onclick="[^"]*"/g,'');
+  const doc=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>SDLR Day ${idx+1}</title>
+    <style>${document.querySelector('style').innerHTML}
+    body{padding:24px}.modal{max-width:820px;margin:0 auto;border-radius:18px}</style></head>
+    <body><div class="modal">${inner}</div></body></html>`;
+  const w=window.open('','_blank');
+  if(w){w.document.write(doc);w.document.close();}
+  else{alert('Pop-up blocked — allow pop-ups to open posts in a new tab. The in-page view still works.');}
+}
+
+/* ---------------- Static content tabs ---------------- */
+document.getElementById('hookContent').innerHTML=`
+<p class="lead">Hooks are the single biggest lever on reach — 65% of viewers decide to stay or scroll in the first 3 seconds. Keep spoken hooks to 10–14 words, put the strongest words on screen too, and rotate formulas so the audience never learns to predict you. Below: the best-performing hook archetypes, each rewritten for SDLR's luxury, San Diego, outdoor-living world.</p>
+<div class="hookcat"><h3>Curiosity & Contrarian <span class="tagchip">stops the scroll</span></h3>
+<ul class="hooklist">
+<li>"Three months ago this was just dirt and a slope nobody used."<span class="form">Unfinished story → reveal</span></li>
+<li>"Everything you think you know about backyard quotes is wrong."<span class="form">Contrarian claim</span></li>
+<li>"Anyone who promises your backyard 'next weekend' is lying to you."<span class="form">Contrarian + trust</span></li>
+<li>"The most expensive part of this patio is the part you'll never see."<span class="form">Curiosity gap</span></li>
+<li>"A backyard in Del Mar should not look like one in El Cajon. Here's why."<span class="form">Local contrarian</span></li>
+</ul></div>
+<div class="hookcat"><h3>Authority & Trust <span class="tagchip">earns the call</span></h3>
+<ul class="hooklist">
+<li>"When you hire us, you get our personal cell numbers. Both founders."<span class="form">Credential / access</span></li>
+<li>"Most contractors disappear after the final payment. We come back 10 months later."<span class="form">Social proof of standards</span></li>
+<li>"Ask your contractor these 5 questions. Watch how fast some of them fold."<span class="form">Myth-buster</span></li>
+<li>"25 years. Thousands of square feet of stone. One pair of hands."<span class="form">Credential lead</span></li>
+<li>"We turn down projects every month — and that protects you."<span class="form">Pattern interrupt + trust</span></li>
+</ul></div>
+<div class="hookcat"><h3>Emotional / Experience <span class="tagchip">sells the feeling</span></h3>
+<ul class="hooklist">
+<li>"This is 6:47pm on a Tuesday. Nothing special. Except everything."<span class="form">Aspiration</span></li>
+<li>"The grandkids will remember this backyard longer than the house."<span class="form">Emotional / legacy</span></li>
+<li>"Everyone designs for the dinner party. We design for the quiet morning."<span class="form">Contrarian + aspiration</span></li>
+<li>"Imagine the one night this summer you don't want to end."<span class="form">Aspiration hook</span></li>
+<li>"You don't need a crowd to justify a beautiful backyard."<span class="form">Empathy / reframe</span></li>
+</ul></div>
+<div class="hookcat"><h3>Visual / Pattern-Break <span class="tagchip">no words needed</span></h3>
+<ul class="hooklist">
+<li>Open mid-action: wet saw biting into travertine, water spraying. "Turn your sound on."<span class="form">Sensory pattern interrupt</span></li>
+<li>Hard cut: identical frame, noon → blue hour with the lighting on.<span class="form">Before/after visual</span></li>
+<li>Drone starts tight on a fire feature, then rockets up to reveal the whole yard.<span class="form">Scale reveal</span></li>
+<li>Split screen: dirt slope | finished tiered outdoor room.<span class="form">Transformation visual</span></li>
+</ul></div>
+<div class="hookcat"><h3>List & How-To <span class="tagchip">high saves</span></h3>
+<ul class="hooklist">
+<li>"Before you pick a single paver, understand these three materials."<span class="form">List tease</span></li>
+<li>"5 questions that separate a real hardscape crew from a weekend one."<span class="form">Numbered list</span></li>
+<li>"3 mistakes that quietly ruin a $50k backyard."<span class="form">Numbered mistake + loss aversion</span></li>
+<li>"Here's exactly what an honest backyard proposal should show you."<span class="form">How-to promise</span></li>
+</ul></div>
+<div class="callout"><h4>Hook discipline (tape this to your monitor)</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">Every hook should fire at least <b>two</b> of: curiosity · pattern-interrupt · self-relevance · emotion. Cut the intro — start <em>inside</em> the most interesting moment. Mirror the spoken hook in on-screen text (most viewers watch on mute). Rotate 5–10 formulas; never repeat the same opener two days running.</p></div>`;
+
+document.getElementById('storyContent').innerHTML=`
+<p class="lead">Your feed earns the follow. Your Stories keep you in their head daily, and your Highlights are the silent salesperson that converts a curious visitor into a DM. Here's the architecture.</p>
+<h2>Stories — the daily rhythm</h2>
+<p>Stories are where the algorithm rewards <em>presence</em>. Aim for 3–5 frames a day, mostly raw and human — the opposite of the polished feed. They also feed your Highlights. A simple daily formula:</p>
+<table class="table"><tr><th>Slot</th><th>Frame</th><th>Why</th></tr>
+<tr><td>Morning</td><td>Behind-the-scenes / jobsite progress (raw)</td><td>Authenticity + "they're always working"</td></tr>
+<tr><td>Midday</td><td>An interactive sticker — poll, this-or-that, question box</td><td>Engagement signals + soft market research</td></tr>
+<tr><td>Afternoon</td><td>Re-share today's feed post with a "New post 👇" sticker</td><td>Drives the feed post's reach</td></tr>
+<tr><td>Evening</td><td>Golden-hour b-roll or a founder face-to-camera tip</td><td>Brand mood + parasocial trust</td></tr>
+<tr><td>As needed</td><td>Link/CTA sticker → "Book a design consult"</td><td>Always-on conversion path</td></tr></table>
+<p><b>Weekly Story staples:</b> Monday "what we're building this week" · mid-week material/education frame · Friday client moment or reveal tease · Sunday re-post the week's best Reel.</p>
+
+<h2>Highlights — the silent salesperson</h2>
+<p>When someone taps your Reel and lands on your profile, you have ~4 seconds. Highlights let them self-educate without scrolling your whole feed. Build these nine, in this order, with consistent editorial cover icons (thin gold line-art on a dark background):</p>
+<div class="hl-grid">
+<div class="hl"><div class="ring">✶</div><h4>Start Here</h4><p>30-sec brand intro + how to begin. The first tap.</p></div>
+<div class="hl"><div class="ring">⌂</div><h4>Transformations</h4><p>Your best before/after & drone reveals. The proof.</p></div>
+<div class="hl"><div class="ring">⚒</div><h4>The Craft</h4><p>Process, base prep, materials by hand. Justifies premium.</p></div>
+<div class="hl"><div class="ring">☼</div><h4>The Experience</h4><p>Lifestyle & golden-hour moments. Sells the feeling.</p></div>
+<div class="hl"><div class="ring">✎</div><h4>Design Process</h4><p>Sketch → AI concept → build. The tech edge (labeled).</p></div>
+<div class="hl"><div class="ring">◷</div><h4>10-Month Return</h4><p>Your signature back-end guarantee. Huge trust.</p></div>
+<div class="hl"><div class="ring">⚐</div><h4>Service Areas</h4><p>The county pockets you serve. Local SEO + relevance.</p></div>
+<div class="hl"><div class="ring">❝</div><h4>Founders</h4><p>Gio & Mike. Direct-access is part of the product.</p></div>
+<div class="hl"><div class="ring">→</div><h4>Book a Consult</h4><p>What happens on a consult + the link/CTA. The close.</p></div>
+</div>
+<div class="callout"><h4>Profile = landing page, not photo album</h4>
+<p style="color:var(--soft);font-size:14px;margin:0"><b>Bio:</b> one line on what you do, one on where, one CTA. e.g. <em>"Boutique design-build for full backyard remodels · All of San Diego County · By design, not by dispatch. Tap below to start a concept ↓"</em> · <b>Link in bio:</b> a purpose-built consult page (not the homepage) with a form + phone. · <b>DM automation:</b> when someone comments "DESIGN" or "QUOTE," auto-reply with the consult link before a competitor answers.</p></div>`;
+
+document.getElementById('refContent').innerHTML=`
+<p class="lead">Referrals are where your ICP actually starts — neighbors, designers, realtors, friends. The job of social is to make referring you easy, repeatable, and rewarding. Here's a referral game designed to run through your channels.</p>
+<h2>"The Circle" — SDLR's referral game</h2>
+<p>Position it like everything else: scarce and tasteful, never a discount scramble. The Circle is an invite to a small group of people whose taste you trust, rewarded for connecting you to the right homeowners.</p>
+<h3>Tier 1 — Past & current clients</h3>
+<ul>
+<li><b>The offer:</b> for every introduction that becomes a project, a meaningful gift to <em>their</em> outdoor space — a fire feature upgrade, a lighting scene, a seasonal refresh from the maintenance service. Reward the space, not a gift card. It stays on-brand and keeps you in their yard.</li>
+<li><b>The mechanic:</b> a simple "Know someone whose backyard deserves this?" card + a personal ask at the 10-Month Walk-Through (peak goodwill moment).</li>
+</ul>
+<h3>Tier 2 — Trade partners (designers, architects, realtors, pool builders)</h3>
+<ul>
+<li><b>The offer:</b> a structured referral arrangement + co-created content. You film their projects beautifully (you have the gear) and tag them — their feed gets premium content, your work gets in front of their affluent audience. Their followers are your buyers.</li>
+<li><b>The mechanic:</b> a monthly "partner spotlight" Reel. Cross-promotion compounds: a custom-home builder's audience is exactly the homeowner you want.</li>
+</ul>
+<h3>Tier 3 — The social engagement game (top-of-funnel)</h3>
+<ul>
+<li><b>Quarterly "Backyard of the Season":</b> followers tag a friend whose backyard needs a glow-up + follow to enter. Prize = a complimentary design consultation + concept visualization (your normally-paid design step — high perceived value, low hard cost). Tag-a-friend mechanics expand reach to exactly the neighbors you want.</li>
+<li><b>UGC loop:</b> ask finished clients to film their space and tag you; re-share it (with consent). Real client footage outperforms any ad.</li>
+<li><b>Always respect FTC rules:</b> real referrals only, disclose material connections, no fabricated testimonials (per brand legal rule).</li>
+</ul>
+<div class="callout"><h4>Why "reward the space" beats cash</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">Cash referral bounties read transactional and cheapen a luxury brand. Rewarding the referrer's own outdoor space (an upgrade, a lighting scene, a maintenance refresh) keeps every touchpoint inside the experience you're selling — and literally keeps your craftsmanship in their backyard where their guests keep seeing it. The reward <em>is</em> marketing.</p></div>`;
+
+document.getElementById('offerContent').innerHTML=`
+<p class="lead">The brand bans price-floor language and discount-speak. So every offer is framed as <b>access and scarcity</b>, never as "cheap." Here's the offer ladder for the 90 days, activating in Phase 3.</p>
+<h2>The hero offer — Founding Projects</h2>
+<p>SDLR is pre-launch with limited portfolio, so turn that into the story: you're hand-selecting a small number of <b>founding projects</b> this season. The carrot is a <b>complimentary on-site design consultation + a concept visualization of the client's actual property</b> — normally part of the paid design process.</p>
+<table class="table"><tr><th>Element</th><th>How to frame it (on-brand)</th></tr>
+<tr><td>The hook</td><td>"We're selecting a small number of founding projects this season."</td></tr>
+<tr><td>The value</td><td>Complimentary design consult + concept visualization (labeled as concept, never as completed work).</td></tr>
+<tr><td>The scarcity</td><td>Real: one crew, projects planned months ahead. "By design, not by dispatch."</td></tr>
+<tr><td>The CTA</td><td>DM "DESIGN" to apply for a founding-project consultation.</td></tr>
+<tr><td>What to avoid</td><td>No "$ off," no "free estimate" (commodity), no price floor, no "act now / same-day."</td></tr></table>
+
+<h2>Supporting offers</h2>
+<ul>
+<li><b>The Concept Reveal:</b> book a consult and we'll show you a photorealistic concept of your space before any commitment. Leads with the tech moat.</li>
+<li><b>Seasonal capacity drop:</b> "There are only so many backyards one crew can build this year." Honest scarcity tied to the operating model — repeat monthly.</li>
+<li><b>Partner consult:</b> for trade referrals, a priority design session for their client. Strengthens Tier-2 referral loop.</li>
+</ul>
+
+<h2>Offer cadence across 90 days</h2>
+<table class="table"><tr><th>Phase</th><th>Offer posture</th></tr>
+<tr><td>Days 1–30</td><td><b>No hard offer.</b> Build proof and trust first. Only soft "DM DESIGN to start a concept" CTAs.</td></tr>
+<tr><td>Days 31–60</td><td><b>Warm the offer.</b> Educate on what a consult is, remove friction/fear, seed scarcity. Start "what happens on a consult" content.</td></tr>
+<tr><td>Days 61–90</td><td><b>Activate Founding Projects.</b> Dedicated offer Reels + Story link stickers + the referral game launch. Convert the warm audience.</td></tr></table>
+<div class="callout"><h4>One honest number</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">When pricing inevitably comes up in DMs, never quote a floor in public-facing copy. Move the conversation to a consult: "Every project is backed by a walk-through and a line-item scope — let's get you a concept and one honest number." That single move keeps you on-brand and qualifies the lead.</p></div>`;
+
+document.getElementById('playContent').innerHTML=`
+<p class="lead">The operating system behind the calendar. This is how a solo founder with pro gear produces "multiple posts a day" without living on the editing timeline.</p>
+<h2>The weekly production rhythm</h2>
+<table class="table"><tr><th>Day</th><th>Job</th></tr>
+<tr><td>Mon</td><td><b>Plan + batch-write</b> (30 min): open this dashboard, confirm the week, pre-write any captions you want to tweak. Schedule everything you can in Buffer/Later.</td></tr>
+<tr><td>1 day/wk on-site</td><td><b>The big shoot.</b> Camera + drone + phone at a jobsite (or staged finished space). Capture: 1 drone reveal, 2–3 process clips, material macros, 8–10 Story frames, 1 lifestyle setup. This single day feeds most of the week.</td></tr>
+<tr><td>Anywhere</td><td><b>Talking-head bank.</b> Film 4–5 education/trust hooks back-to-back in one sitting (good light, clean background). Drip them across weeks.</td></tr>
+<tr><td>Daily (10 min)</td><td><b>Engage.</b> Reply to every comment & DM within the hour. Comment on 5–10 local/ICP-adjacent accounts (designers, realtors, luxury SD pages). This is half the algorithm game.</td></tr>
+<tr><td>Sun</td><td><b>Review.</b> Check which posts saved/shared best; double down on those angles next week.</td></tr></table>
+
+<h2>Should you really post multiple times a day?</h2>
+<p><b>Yes — but understand what "multiple" means here.</b> The growth lever is total quality touchpoints, not feed spam. A high-growth day = <b>1 feed Reel + a TikTok recut + 3–5 Stories</b>, with FB cross-posting and 3×/week group value posts. Two <em>feed</em> posts in a day is reserved for offer launches and big reveals (the calendar marks these). Posting 5 mediocre feed posts a day would <em>hurt</em> you; posting 1 great Reel + living in Stories + engaging hard is what compounds. The calendar is already balanced to this.</p>
+
+<h2>Platform roles</h2>
+<table class="table"><tr><th>Platform</th><th>Role</th></tr>
+<tr><td><b>Instagram</b></td><td>Home base. Reels for reach, carousels for saves, Stories for daily presence, Highlights to convert. Geo-tag every post; layer local + niche hashtags.</td></tr>
+<tr><td><b>TikTok</b></td><td>Free reach upside. Recut the IG Reel with a punchier first frame + trending audio. Worthwhile because the production cost is ~0 once the Reel exists. Reassess at day 30 — if a couple of recuts pop, lean in.</td></tr>
+<tr><td><b>Facebook (feed)</b></td><td>Cross-post from IG (30 seconds). Your ICP's older/affluent end skews here. Don't overthink it — presence + consistency.</td></tr>
+<tr><td><b>Facebook Groups</b></td><td>Where warm local demand actually lives (Bonita/East County community groups). 3×/week, value-first, never spammy. This is a top-3 lead source for you — treat it like relationship-building, not posting.</td></tr></table>
+
+<h2>Measurement — what to actually watch</h2>
+<ul>
+<li><b>Leading (weekly):</b> Reel reach, saves, shares, profile visits, DM conversations started, follower growth from your service area.</li>
+<li><b>Lagging (monthly):</b> consults booked from social, referral intros, partner collabs landed.</li>
+<li><b>Ignore:</b> vanity likes. A warm <em>local</em> audience of 1,200 beats 20k random followers for a $50k–$300k project.</li>
+</ul>
+
+<h2>Brand guardrails (non-negotiable on every post)</h2>
+<ul>
+<li>AI renders are always labeled <b>"concept visualization"</b> — never implied as completed SDLR work.</li>
+<li>No price floor in public copy. No "$ off," "cheapest," "same-day," "transform your space," "dream backyard."</li>
+<li>"Licensed & insured general contractor" claims reference Mike's Class B license. Never imply Gio is licensed.</li>
+<li>No testimonials until a real client consents in writing — use "References available on request."</li>
+<li>Never name Mike's other companies or the Field Lead's full name in public copy.</li>
+<li>Editorial-luxury voice with human warmth. Aman resort, not landscaping company.</li>
+</ul>
+<div class="callout"><h4>The one-line strategy</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">Show undeniable transformations, prove the craft and the people behind them, sell the <em>experience</em> of the finished space, and make the next step (a complimentary concept consult) feel like access — then engage like a human every single day. Trust compounds; the calls follow.</p></div>`;
+
+/* ---- Swipe File ---- */
+const SWIPE=[
+ {acc:'@westmoddesign',label:'⭐ Closest model to SDLR',niche:'Luxury outdoor living · Design-Build · LA & OC',fmt:'Cinematic drone reveals + reels',hook:'Slow aerial reveal of a high-end build set to moody music — zero spoken words, pure scale.',good:'Magazine-grade cinematography + drone scale makes every project look like an AD feature. Consistent editorial color grade builds an instantly recognizable luxury brand.',why:'Almost identical positioning to SDLR (luxury design-build, SoCal). This is the bar to clear. Study their grade, pacing, and how they sell the feeling, not the spec.',reach:'561k followers',eng:'1.9% engagement',link:'https://www.instagram.com/westmoddesign/'},
+ {acc:'@notyouraverage.life',label:'Lifestyle-led luxury',niche:'Luxury pools + outdoor living',fmt:'Lifestyle reels (people in the space)',hook:'"#coolpoolgirl" — a person and personality fronting luxury outdoor spaces.',good:'Sells the lifestyle and the human, not just the build. Faces + aspiration outperform sterile project shots.',why:'Proves the "sell the experience" thesis. Put Gio/Mike and real moments on camera — personality compounds trust faster than logos.',reach:'114k followers',eng:'0.5% engagement',link:'https://www.instagram.com/notyouraverage.life/'},
+ {acc:'@hardscapementor',label:'Authority / education',niche:'Outdoor living design & build training',fmt:'Education reels + process teaching',hook:'"Here\'s what most contractors get wrong about ___" — myth-buster authority openers.',good:'Teaches the trade openly, which builds enormous credibility. Education content gets saved and shared — the two signals that matter most.',why:'Your education pillar in action. Position SDLR as the honest expert; saves and shares beat likes for high-ticket buyers.',reach:'56k followers',eng:'community-driven',link:'https://www.instagram.com/reel/DIYwogQOyYw/'},
+ {acc:'@creeksideoutdoorliving',label:'Aspirational branding',niche:'"Crafting bougie outdoor spaces"',fmt:'Before/after + reveal reels',hook:'Personality-forward captions + clean transformation reveals.',good:'Strong, ownable brand voice ("bougie") + consistent transformation format. Memorable and on-message.',why:'Shows a defined voice can be premium AND personable. Lift the consistency, keep SDLR\'s editorial-luxury register.',reach:'56k followers',eng:'1.2% engagement',link:'https://www.instagram.com/creeksideoutdoorliving/'},
+ {acc:'@dreambuildersoutdoorliving',label:'Comparable stage',niche:'"Bringing backyards to life" · FL licensed',fmt:'Project reels + carousels',hook:'"Bringing backyards to life" + licensed-builder trust framing.',good:'Smaller account proving the formula works before huge follower counts — licensed framing + steady project posting.',why:'Closest to where SDLR starts. Note how they signal "licensed" for trust (mirror with Mike\'s Class B). Realistic near-term benchmark.',reach:'29k followers',eng:'steady growth',link:'https://www.instagram.com/dreambuildersoutdoorliving/'},
+ {acc:'@sandbox.creations',label:'Satisfying install',niche:'Hardscape / paver installs',fmt:'TikTok process + reveal',hook:'"Front walkway transformation" — satisfying paver install compressed to a clean reveal.',good:'Oddly-satisfying process footage (cutting, setting, compacting) holds watch-time; the reveal pays it off. Built for TikTok\'s content-first algorithm.',why:'Your craft/ASMR pillar. This is the easiest viral lane on TikTok — process + payoff. Recut your jobsite footage exactly like this.',reach:'transformation format',eng:'open link for live count',link:'https://www.tiktok.com/@sandbox.creations/video/7412039728112913669'},
+ {acc:'Yard Maintenance Geelong',label:'Documented viral case',niche:'Lawn/yard transformations (TikTok)',fmt:'Before/after + trending sound + voiceover',hook:'Transformation set to a trending sound with a personal voiceover walking through the change.',good:'"Transformation + explanation" formula on trending audio. Documented: top video 1.6M views, 398k total likes on 51k followers — proof a small local account can hit massive reach.',why:'Blueprint for going viral from a standing start: ride trending audio, narrate the transformation, geo-target. Reach is not gated by follower count.',reach:'1.6M views (top video)',eng:'398k total likes',link:'https://www.tiktok.com/discover/landscaping'},
+ {acc:'Broad Landscapes',label:'Process at scale',niche:'Paving installations (TikTok)',fmt:'Satisfying install process',hook:'Tight macro on pavers being cut and set — the satisfying, hypnotic loop.',good:'Built a ~500k following almost entirely on oddly-satisfying paving process clips. Proves process content alone can scale.',why:'Confirms the craft pillar is a growth engine, not just trust content. Film every cut and set in macro.',reach:'~500k followers',eng:'process-driven',link:'https://www.tiktok.com/discover/landscaping'},
+ {acc:'Green Genie Landscapes',label:'Personality + before/after',niche:'Garden transformations (TikTok)',fmt:'Two-brother duo + transformations',hook:'Two brothers narrating garden-to-garden transformations with personality.',good:'~500k fans on the back of relatable personalities + the universally loved before/after. People follow people.',why:'Shows founder-led content (Gio + Mike) is a moat. Lean into the duo dynamic and the human story behind the builds.',reach:'~500k followers',eng:'personality-led',link:'https://www.tiktok.com/discover/landscaping'},
+ {acc:'@hardscapecontractors',label:'Before/after carousels',niche:'Outdoor living spaces',fmt:'Carousels + reels',hook:'Swipe-to-reveal before/after carousels with material detail.',good:'Consistent use of Instagram\'s highest-engagement format (carousel) for proof. Clean, repeatable, easy to produce per job.',why:'Your transformation pillar, carousel version. Easy default for every completed job — high saves, low production cost.',reach:'active local brand',eng:'open link for live count',link:'https://www.instagram.com/hardscapecontractors/'}
+];
+
+const swipeRows=SWIPE.map(s=>`<tr>
+  <td><b>${s.acc}</b><br><span style="color:var(--gold);font-size:11px">${s.label}</span><br><span style="color:var(--muted);font-size:11.5px">${s.niche}</span></td>
+  <td><span style="color:var(--gold2)">${s.fmt}</span><br><span style="font-family:var(--serif);font-size:15px;color:var(--ink)">"${s.hook}"</span></td>
+  <td>${s.good}</td>
+  <td style="color:var(--soft)">${s.why}</td>
+  <td style="white-space:nowrap"><b style="color:var(--ink)">${s.reach}</b><br><span style="color:var(--muted);font-size:11.5px">${s.eng}</span></td>
+  <td><a href="${s.link}" target="_blank" rel="noopener">Open ↗</a></td>
+</tr>`).join('');
+
+document.getElementById('swipeContent').innerHTML=`
+<p class="lead">A model file of accounts and posts crushing it in luxury outdoor living, hardscape, and transformations — what made each work, the hook, why SDLR should model it, and a link to study it live.</p>
+<div class="callout"><h4>A note on the numbers — read this</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">Instagram and TikTok deliberately gate per-post view/comment counts from any automated tool, and those counts change every day, so I will not paste invented figures into a plan you\'re making real decisions on. The <b>Reach</b> column shows <b>verified account-level metrics</b> (from a published 2025 industry influencer index) and <b>documented viral figures</b> where they exist. For exact, current views and comments on any specific post, click <b>Open ↗</b> — that\'s the only source that\'s actually accurate. The real value here is the strategic breakdown: <em>what made it good, the hook, and why to model it.</em></p></div>
+<table class="table">
+<tr><th>Account / Post</th><th>Format &amp; Hook</th><th>What made it good</th><th>Why SDLR should model it</th><th>Reach</th><th>Link</th></tr>
+${swipeRows}
+</table>
+<h2>The pattern across every winner</h2>
+<ul>
+<li><b>Transformation + payoff</b> is the universal formula — before/after and slow drone reveals win on every platform.</li>
+<li><b>Process that satisfies</b> (cutting, setting, compacting in macro) holds watch-time and scales accounts on its own.</li>
+<li><b>People beat logos</b> — the accounts with personality and faces (founders, duos, a "host") build trust and follows fastest.</li>
+<li><b>Trending audio + geo-targeting</b> is how small local accounts hit huge reach without a following (Geelong: 1.6M views on 51k followers).</li>
+<li><b>Education earns the save</b> — myth-busters and "how to choose ___" carousels get saved and shared, the signals that move high-ticket buyers.</li>
+</ul>
+<p style="color:var(--muted);font-size:13px">Tip: build your own live swipe file — every time a post stops <em>your</em> scroll, screenshot it, note which hook formula it used, and drop it in a folder. Within a month you\'ll have a San-Diego-specific playbook tuned to your exact audience.</p>`;
+
+/* ---- AI Studio tab ---- */
+document.getElementById('aiContent').innerHTML=`
+<p class="lead">Every post in the calendar has a built-in <b>AI Creative</b> block — click any day to see the tool, a ready-to-paste prompt, and step-by-step directions. This tab is the master reference: the tool stack, the one rule you can't break, and reusable prompt templates.</p>
+<div class="callout"><h4>⚡ The one-click Cowork → Freepik/Magnific loop</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">On every post's AI Creative block there's a gold <b>"⚡ Copy prompt for Cowork"</b> button. Click it → a tailored, brand-aware request is copied to your clipboard → paste it straight into Cowork (this chat) → Cowork hands you 3 ready Freepik prompts + the exact Magnific finishing settings + a carousel-cover prompt, all on-brand and labeled where needed. Click button → paste in Cowork → paste Cowork's output into Freepik/Magnific. That's the whole loop.</p></div>
+<div class="callout"><h4>⚠ The one rule (brand-critical)</h4>
+<p style="color:var(--soft);font-size:14px;margin:0">AI imagery is <b>never</b> passed off as a completed SDLR project. Real footage — Mike's LA photos, the Field Lead's past work, and your own jobsite shoots — is the proof, and proof is the entire luxury trust premium. AI is for <b>concept visualizations (always labeled), education graphics, covers/title cards, mood frames, and Story graphics</b>. If a buyer or competitor ever catches an AI image posing as your portfolio, it breaks the brand. When in doubt: shoot it real, or label it "Concept visualization."</p></div>
+
+<h2>When to use real vs AI</h2>
+<table class="table"><tr><th>Pillar</th><th>Default</th><th>AI's role</th></tr>
+<tr><td>Transformation</td><td><b>Real</b> drone + camera</td><td>Cover frame or a labeled concept slide only</td></tr>
+<tr><td>Craft & Process</td><td><b>Real</b> macro footage</td><td>Stylized material hero / cover</td></tr>
+<tr><td>The Experience</td><td><b>Real</b> golden-hour moments</td><td>Empty ambiance frames only — never AI "clients"</td></tr>
+<tr><td>Education</td><td><b>AI-friendly</b></td><td>Carousel graphics, diagrams, textures</td></tr>
+<tr><td>Trust & People</td><td><b>Real</b> founders/crew</td><td>Quote cards, lower-thirds, title frames</td></tr>
+<tr><td>Tech Edge</td><td><b>AI is the point</b></td><td>Freepik Reimagine on the client's real photo (labeled concept)</td></tr>
+<tr><td>Local / SEO</td><td><b>Real</b> drone preferred</td><td>Stylized establishing frame / service-area map</td></tr>
+<tr><td>Offer & CTA</td><td><b>AI-friendly</b></td><td>Offer cards + Story frames (editorial, no "SALE")</td></tr></table>
+
+<h2>The tool stack</h2>
+<table class="table"><tr><th>Tool</th><th>Use it for</th></tr>
+<tr><td><b>Freepik AI</b> (Mystic / Flux)</td><td>Photoreal concept renders, textures, backgrounds, establishing frames. Your default image generator.</td></tr>
+<tr><td><b>Freepik Reimagine</b> (img2img)</td><td>Turn a client's <em>real</em> before-photo into a finished concept while keeping the real geometry. The Tech-Edge magic.</td></tr>
+<tr><td><b>Freepik AI Video</b> / Runway / Kling</td><td>Add subtle motion to a still (drift, parallax, fire flicker) for a Reel cover or B-roll.</td></tr>
+<tr><td><b>Canva</b></td><td>Carousel layout, quote/offer cards, Story frames — with your brand serif + thin-gold accents.</td></tr>
+<tr><td><b>CapCut</b></td><td>Reel/TikTok editing, on-screen hook text, captions, trending audio.</td></tr>
+<tr><td><b>Topaz / Freepik Upscaler</b></td><td>Upscale + sharpen before posting.</td></tr></table>
+
+<h2>The universal generation workflow</h2>
+<ol>
+<li><b>Decide real or AI</b> using the table above. Proof pillars → shoot real.</li>
+<li><b>Generate</b> in Freepik: paste the prompt from the day's AI Creative block, turn Realism ON, set ratio (9:16 Reels/Stories, 1:1/4:5 feed).</li>
+<li><b>Curate</b>: generate 4, pick the strongest, regenerate if the light/composition is off.</li>
+<li><b>Upscale</b> for crispness.</li>
+<li><b>Motion (optional)</b>: run the still through Freepik AI Video / Runway for a slow drift.</li>
+<li><b>Compose</b> in Canva/CapCut: add the hook as on-screen text, brand fonts, and — for any concept/transformation/experience AI image — a small <b>"Concept visualization"</b> caption.</li>
+<li><b>Rename</b> to the SEO filename and schedule.</li>
+</ol>
+
+<h2>Reusable prompt templates (swap the brackets)</h2>
+<div class="ai-prompt" style="margin-bottom:10px">Photorealistic architectural visualization, luxury San Diego backyard — [scope: outdoor kitchen / fire feature / travertine patio]. Natural stone, built-in seating, warm landscape lighting, golden hour, modern-Mediterranean, [drone aerial / eye-level] angle, Architectural Digest editorial style, ultra-detailed, [9:16 / 4:5]. Label "Concept visualization".</div>
+<div class="ai-prompt" style="margin-bottom:10px">Reimagine this backyard photo as a finished luxury outdoor living concept — [scope]. Travertine + stone, fire feature, landscape lighting at dusk, photorealistic AD-style rendering. Keep existing layout. CONCEPT only, not a real build.</div>
+<div class="ai-prompt" style="margin-bottom:10px">Studio macro photograph of [material: travertine / bluestone / porcelain] paver surface, soft natural light, top-down, ultra-detailed texture, neutral luxury palette, 1:1.</div>
+<div class="ai-prompt">Minimal dark editorial background, subtle gold thin-line accent, generous negative space for text overlay, luxury brand mood, [9:16 / 1:1]. No text, no people.</div>
+<p style="color:var(--muted);font-size:13px;margin-top:14px">Tip: keep a running Freepik "winners" board of prompts that produced great results — your prompt library compounds just like your swipe file.</p>`;
+
+/* tab switching */
+document.querySelectorAll('#tabs button').forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll('#tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('section.view').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.getElementById(b.dataset.v).classList.add('active');
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
+});
+
+renderWeek(0);
+</script>
+</body>
+</html>

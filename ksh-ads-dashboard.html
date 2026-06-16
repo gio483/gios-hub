@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KSH Construction — Google Ads Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f5f5f5; color: #1a1a1a; padding: 24px; }
+  .dash { max-width: 1100px; margin: 0 auto; }
+  .header { margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid #2E5F8A; display: flex; justify-content: space-between; align-items: flex-end; }
+  .header h1 { font-size: 22px; font-weight: 600; color: #1A2B3C; margin-bottom: 4px; }
+  .header p { font-size: 13px; color: #666; }
+  .header .period { font-size: 13px; color: #2E5F8A; font-weight: 600; text-align: right; }
+  .section-title { font-size: 11px; font-weight: 600; color: #888; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 12px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 28px; }
+  .kpi { background: #fff; border-radius: 10px; padding: 16px 18px; border: 1px solid #e5e5e5; }
+  .kpi .label { font-size: 12px; color: #888; margin-bottom: 6px; }
+  .kpi .value { font-size: 24px; font-weight: 600; color: #1a1a1a; }
+  .kpi .change { font-size: 12px; margin-top: 4px; }
+  .kpi .change.up { color: #27500A; }
+  .kpi .change.down { color: #A32D2D; }
+  .kpi.good .value { color: #27500A; }
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .chart-card { background: #fff; border-radius: 12px; border: 1px solid #e5e5e5; padding: 18px 20px; }
+  .chart-title { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .chart-sub { font-size: 12px; color: #888; margin-bottom: 14px; }
+  .campaign-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+  .camp-card { border-radius: 12px; border: 1px solid #e5e5e5; padding: 16px 18px; background: #fff; }
+  .camp-card.green-card { border-left: 5px solid #639922; }
+  .camp-card.red-card { border-left: 5px solid #A32D2D; }
+  .camp-card.blue-card { border-left: 5px solid #378ADD; }
+  .camp-card.paused-card { border-left: 5px solid #888; }
+  .camp-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin: 8px 0 10px; }
+  .camp-stat { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid #f0f0f0; color: #666; }
+  .camp-stat:last-child { border-bottom: none; }
+  .camp-stat .val { font-weight: 600; color: #1a1a1a; }
+  .camp-stat .val.red { color: #A32D2D; }
+  .camp-stat .val.green { color: #27500A; }
+  .camp-stat .val.amber { color: #854F0B; }
+  .camp-stat .val.grey { color: #888; }
+  .badge { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 6px; font-weight: 500; }
+  .badge.green { background: #EAF3DE; color: #27500A; }
+  .badge.red { background: #FCEBEB; color: #791F1F; }
+  .badge.blue { background: #E6F1FB; color: #0C447C; }
+  .badge.grey { background: #f0f0f0; color: #555; }
+  .alerts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+  .alert { border-radius: 10px; padding: 14px 16px; font-size: 13px; line-height: 1.5; }
+  .alert.red { background: #FCEBEB; border-left: 4px solid #A32D2D; color: #501313; }
+  .alert.amber { background: #FAEEDA; border-left: 4px solid #854F0B; color: #412402; }
+  .alert.green { background: #EAF3DE; border-left: 4px solid #3B6D11; color: #173404; }
+  .alert .alert-title { font-weight: 600; margin-bottom: 4px; }
+  .trend-full { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; }
+  .legend { display: flex; gap: 16px; margin-bottom: 10px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 12px; color: #888; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+  .win-banner { background: #EAF3DE; border: 1px solid #C0DD97; border-radius: 10px; padding: 14px 18px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+  .win-banner .win-text { font-size: 13px; color: #173404; line-height: 1.5; }
+  .win-banner .win-label { font-weight: 600; }
+  .footer { font-size: 12px; color: #999; padding-top: 16px; border-top: 1px solid #e5e5e5; }
+  .per-camp-chart { background: #fff; border: 1px solid #e5e5e5; border-radius: 12px; padding: 18px 20px; margin-bottom: 24px; }
+</style>
+</head>
+<body>
+<div class="dash">
+
+  <div class="header">
+    <div>
+      <h1>KSH Construction — Google Ads Dashboard</h1>
+      <p>Prepared by Shift Vision Media &nbsp;·&nbsp; gio@shiftvisionmedia.com</p>
+    </div>
+    <div class="period">Apr 25 – May 24, 2026<br><span style="font-weight:400;color:#888;font-size:12px;">Last 30 days</span></div>
+  </div>
+
+  <!-- Win banner -->
+  <div class="win-banner">
+    <span style="font-size:22px;">✅</span>
+    <div class="win-text">
+      <span class="win-label">Audit actions are working.</span> Leads improved from 8 → 11 (+38%), cost per lead dropped from $189 → $137 (−28%), and the bathroom campaign spend was cut from $124 to just $21 after being paused.
+    </div>
+  </div>
+
+  <p class="section-title">Month at a glance</p>
+  <div class="kpi-row">
+    <div class="kpi">
+      <p class="label">Total spent</p>
+      <p class="value">$1,510</p>
+      <p class="change" style="color:#888;">vs ~$1,500 budget</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Clicks</p>
+      <p class="value">180</p>
+      <p class="change down">↓ vs 191 last period</p>
+    </div>
+    <div class="kpi">
+      <p class="label">Impressions</p>
+      <p class="value">7,154</p>
+      <p class="change up">↑ vs 6,267 last period</p>
+    </div>
+    <div class="kpi good">
+      <p class="label">Leads generated</p>
+      <p class="value">11</p>
+      <p class="change up">↑ vs 8 last period (+38%)</p>
+    </div>
+    <div class="kpi good">
+      <p class="label">Cost per lead</p>
+      <p class="value">$137</p>
+      <p class="change up">↑ improved from $189 (−28%)</p>
+    </div>
+  </div>
+
+  <p class="section-title">Campaign comparison</p>
+  <div class="campaign-cards">
+    <div class="camp-card blue-card">
+      <span class="badge blue">Workhorse</span>
+      <p class="camp-name">General Remodeling</p>
+      <div class="camp-stat"><span>Budget used</span><span class="val">$1,324 (88%)</span></div>
+      <div class="camp-stat"><span>Leads</span><span class="val green">10 ↑ from 7</span></div>
+      <div class="camp-stat"><span>Cost per lead</span><span class="val green">$132 ↓ from $184</span></div>
+      <div class="camp-stat"><span>Clicks</span><span class="val">150</span></div>
+      <div class="camp-stat"><span>Click rate</span><span class="val">2.45%</span></div>
+      <div class="camp-stat"><span>Avg. CPC</span><span class="val">$8.83</span></div>
+    </div>
+    <div class="camp-card green-card">
+      <span class="badge green">Growing — needs more budget</span>
+      <p class="camp-name">Kitchen Remodels</p>
+      <div class="camp-stat"><span>Budget used</span><span class="val">$165 (11%)</span></div>
+      <div class="camp-stat"><span>Leads</span><span class="val">1</span></div>
+      <div class="camp-stat"><span>Cost per lead</span><span class="val amber">$165</span></div>
+      <div class="camp-stat"><span>Clicks</span><span class="val">25</span></div>
+      <div class="camp-stat"><span>Click rate</span><span class="val green">3.68%</span></div>
+      <div class="camp-stat"><span>Avg. CPC</span><span class="val green">$6.59</span></div>
+    </div>
+    <div class="camp-card paused-card">
+      <span class="badge grey">Paused May 10 ✅</span>
+      <p class="camp-name">Bathroom Remodels</p>
+      <div class="camp-stat"><span>Budget used</span><span class="val green">$21 (1%) ↓ from $124</span></div>
+      <div class="camp-stat"><span>Leads</span><span class="val red">0</span></div>
+      <div class="camp-stat"><span>Cost per lead</span><span class="val grey">— (paused)</span></div>
+      <div class="camp-stat"><span>Clicks</span><span class="val">5</span></div>
+      <div class="camp-stat"><span>Click rate</span><span class="val red">1.38%</span></div>
+      <div class="camp-stat"><span>Avg. CPC</span><span class="val">$4.29</span></div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <p class="chart-title">Spend vs. leads per campaign</p>
+      <p class="chart-sub">General is the engine. Kitchen is efficient. Bathroom nearly stopped.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#85B7EB;border:1px solid #378ADD;"></span>Spend ($)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:rgba(99,153,34,0.3);border:2px dashed #639922;"></span>Leads</span>
+      </div>
+      <div style="position:relative;width:100%;height:260px;">
+        <canvas id="spendLeadsChart" role="img" aria-label="Bar chart: General Remodeling $1324 spend 10 leads; Kitchen $165 spend 1 lead; Bathroom $21 spend 0 leads">General Remodeling: $1324 spent, 10 leads. Kitchen Remodels: $165 spent, 1 lead. Bathroom Remodels: $21 spent, 0 leads.</canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <p class="chart-title">Cost per lead — this period vs last</p>
+      <p class="chart-sub">Lower is better. Overall cost per lead improved 28%.</p>
+      <div class="legend">
+        <span class="legend-item"><span class="legend-dot" style="background:#B5D4F4;border:1px solid #378ADD;"></span>April (previous)</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#378ADD;border:1px solid #185FA5;"></span>May (current)</span>
+      </div>
+      <div style="position:relative;width:100%;height:260px;">
+        <canvas id="cpaChart" role="img" aria-label="Grouped bar chart comparing cost per lead: General improved $184 to $132, Kitchen worsened $98 to $165, Bathroom still zero leads">General: $184 → $132. Kitchen: $98 → $165. Bathroom: no leads either period.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="trend-full">
+    <p class="chart-title">Daily impressions — Apr 25 to May 24, 2026</p>
+    <p class="chart-sub">Weekdays are consistently higher. May 11 was the biggest day (859). Bathroom campaign (grey) went to zero from May 10.</p>
+    <div class="legend" style="margin-bottom:14px;">
+      <span class="legend-item"><span class="legend-dot" style="background:#378ADD;"></span>General Remodeling</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#639922;"></span>Kitchen Remodels</span>
+      <span class="legend-item"><span class="legend-dot" style="background:#ccc;border:1px solid #999;"></span>Bathroom (paused May 10)</span>
+    </div>
+    <div style="position:relative;width:100%;height:240px;">
+      <canvas id="trendChart" role="img" aria-label="Stacked area chart of daily impressions by campaign from April 25 to May 24. May 11 peaks at 859. Bathroom goes to zero from May 10.">Impressions by campaign daily. Bathroom impressions stopped May 10. May 11 was the highest day overall at 859.</canvas>
+    </div>
+  </div>
+
+  <p class="section-title">Status on audit action items</p>
+  <div class="alerts">
+    <div class="alert green">
+      <div class="alert-title">✅ Bathroom campaign paused — $103 saved</div>
+      Was spending $124/month with zero leads. Now down to $21 (pre-pause spend). That budget is now available for better-performing campaigns.
+    </div>
+    <div class="alert green">
+      <div class="alert-title">✅ Overall leads up 38% — cost per lead down 28%</div>
+      8 leads at $189 each → 11 leads at $137 each. The account is getting more efficient.
+    </div>
+    <div class="alert green">
+      <div class="alert-title">✅ General Remodeling cost per lead improved</div>
+      Dropped from $184 to $132 per lead — a 28% improvement with 3 more leads generated.
+    </div>
+    <div class="alert amber">
+      <div class="alert-title">⚠️ Kitchen cost per lead rose — small sample size</div>
+      Went from $98 to $165, but this is based on just 1 conversion. More spend here over time will give a clearer picture. Still worth funding.
+    </div>
+    <div class="alert amber">
+      <div class="alert-title">⚠️ Kitchen still only getting 11% of budget</div>
+      Despite having the best click rate (3.68%) and lowest CPC ($6.59), Kitchen Remodels is still underfunded. Consider pushing more budget here.
+    </div>
+    <div class="alert amber">
+      <div class="alert-title">⚠️ No keywords set up in Kitchen &amp; Bath campaign</div>
+      Google flagged "Ad groups do not have any keywords" — this needs to be fixed or the campaign won't run properly.
+    </div>
+  </div>
+
+  <p class="footer">KSH Construction Google Ads Dashboard · Apr 25 – May 24, 2026 · Prepared by Gio Azzarello, Shift Vision Media · gio@shiftvisionmedia.com</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const textColor = '#888';
+const gridColor = 'rgba(0,0,0,0.06)';
+const baseScales = {
+  x: { ticks: { color: textColor, font: { size: 11 }, autoSkip: false, maxRotation: 0 }, grid: { display: false }, border: { display: false } },
+  y: { ticks: { color: textColor, font: { size: 11 } }, grid: { color: gridColor }, border: { display: false } }
+};
+
+// Spend vs Leads
+new Chart(document.getElementById('spendLeadsChart'), {
+  type: 'bar',
+  data: {
+    labels: ['General Remodeling', 'Kitchen Remodels', 'Bathroom (paused)'],
+    datasets: [
+      { label: 'Spend ($)', data: [1324, 165, 21], backgroundColor: '#85B7EB', borderColor: '#378ADD', borderWidth: 1, yAxisID: 'y' },
+      { label: 'Leads', data: [10, 1, 0], backgroundColor: ['rgba(99,153,34,0.25)','rgba(99,153,34,0.25)','rgba(163,45,45,0.1)'], borderColor: ['#639922','#639922','#ccc'], borderWidth: 2, borderDash: [4,2], yAxisID: 'y2' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: baseScales.x,
+      y: { ...baseScales.y, position: 'left', title: { display: true, text: 'Spend ($)', color: textColor, font: { size: 10 } } },
+      y2: { ...baseScales.y, position: 'right', grid: { display: false }, border: { display: false }, title: { display: true, text: 'Leads', color: textColor, font: { size: 10 } }, max: 14 }
+    }
+  }
+});
+
+// CPA comparison
+new Chart(document.getElementById('cpaChart'), {
+  type: 'bar',
+  data: {
+    labels: ['General Remodeling', 'Kitchen Remodels', 'Bathroom'],
+    datasets: [
+      { label: 'April (previous)', data: [184, 98, null], backgroundColor: '#B5D4F4', borderColor: '#378ADD', borderWidth: 1 },
+      { label: 'May (current)', data: [132, 165, null], backgroundColor: '#378ADD', borderColor: '#185FA5', borderWidth: 1 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw === null ? 'No leads' : '$' + ctx.raw + ' per lead' } } },
+    scales: {
+      x: baseScales.x,
+      y: { ...baseScales.y, ticks: { callback: v => '$' + v, color: textColor, font: { size: 11 } } }
+    }
+  }
+});
+
+// Trend chart — per campaign stacked
+const labels = ['Apr 25','Apr 26','Apr 27','Apr 28','Apr 29','Apr 30','May 1','May 2','May 3','May 4','May 5','May 6','May 7','May 8','May 9','May 10','May 11','May 12','May 13','May 14','May 15','May 16','May 17','May 18','May 19','May 20','May 21','May 22','May 23','May 24'];
+const generalData = [75,118,451,198,378,416,257,63,142,244,403,164,128,74,50,134,765,133,102,126,87,39,34,197,513,266,388,107,22,39];
+const kitchenData = [23,11,72,23,62,53,32,7,33,23,29,15,7,10,6,15,94,13,6,5,2,6,5,22,46,17,21,8,6,7];
+const bathroomData = [12,12,49,20,24,49,26,6,26,38,47,22,15,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+new Chart(document.getElementById('trendChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { label: 'General Remodeling', data: generalData, backgroundColor: 'rgba(55,138,221,0.7)', borderColor: '#378ADD', borderWidth: 0, stack: 'stack' },
+      { label: 'Kitchen Remodels', data: kitchenData, backgroundColor: 'rgba(99,153,34,0.7)', borderColor: '#639922', borderWidth: 0, stack: 'stack' },
+      { label: 'Bathroom (paused)', data: bathroomData, backgroundColor: 'rgba(180,180,180,0.5)', borderColor: '#ccc', borderWidth: 0, stack: 'stack' }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+    scales: {
+      x: { ...baseScales.x, ticks: { color: textColor, font: { size: 10 }, maxTicksLimit: 10, maxRotation: 0 } },
+      y: { ...baseScales.y, stacked: true, title: { display: true, text: 'Impressions', color: textColor, font: { size: 10 } } }
+    }
+  }
+});
+</script>
+</body>
+</html>

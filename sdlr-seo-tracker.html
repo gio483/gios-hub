@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SDLR Local SEO Grid Tracker</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #e2e8f0; min-height: 100vh; }
+
+.header { padding: 20px 28px; border-bottom: 1px solid #1e2535; display: flex; justify-content: space-between; align-items: center; }
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo { width: 36px; height: 36px; border-radius: 8px; background: #1e3a5f; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.header-title { font-size: 17px; font-weight: 600; color: #f1f5f9; }
+.header-sub { font-size: 12px; color: #475569; margin-top: 1px; }
+.last-updated { font-size: 12px; color: #475569; text-align: right; }
+.last-updated span { display: block; color: #64748b; margin-top: 2px; }
+
+.keywords { padding: 14px 28px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; border-bottom: 1px solid #1e2535; background: #0a0f18; }
+.kw-tab { padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid #1e2535; background: transparent; color: #64748b; transition: all 0.15s; font-family: inherit; }
+.kw-tab:hover { border-color: #334155; color: #94a3b8; }
+.kw-tab.active { background: #1d4ed8; border-color: #3b82f6; color: #eff6ff; font-weight: 500; }
+.kw-del { margin-left: 4px; opacity: 0.5; font-size: 11px; cursor: pointer; }
+.kw-del:hover { opacity: 1; color: #ef4444; }
+.kw-add { padding: 6px 12px; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px dashed #1e2535; background: transparent; color: #475569; font-family: inherit; }
+.kw-add:hover { border-color: #334155; color: #64748b; }
+
+.stats { display: flex; gap: 0; border-bottom: 1px solid #1e2535; }
+.stat { flex: 1; text-align: center; padding: 14px 8px; border-right: 1px solid #1e2535; }
+.stat:last-child { border-right: none; }
+.stat-num { font-size: 24px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 4px; }
+.s-avg .stat-num { color: #f1f5f9; }
+.s-green .stat-num { color: #4ade80; }
+.s-ltgreen .stat-num { color: #86efac; }
+.s-yellow .stat-num { color: #fbbf24; }
+.s-orange .stat-num { color: #fb923c; }
+.s-red .stat-num { color: #f87171; }
+.s-gray .stat-num { color: #475569; }
+
+.grid-wrap { padding: 24px 28px; overflow-x: auto; }
+.grid-inner { max-width: 680px; margin: 0 auto; }
+.grid-label { font-size: 11px; color: #334155; text-align: center; margin-bottom: 12px; letter-spacing: 0.05em; text-transform: uppercase; }
+.grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+
+.cell { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.circle {
+  width: 68px; height: 68px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; font-weight: 700; cursor: pointer;
+  transition: transform 0.12s; border: 2px solid transparent;
+  position: relative; user-select: none;
+}
+.circle:hover { transform: scale(1.1); }
+.circle.unc   { background: #161c2a; border-color: #1e2d45; color: #334155; font-size: 15px; }
+.circle.r1    { background: #052e16; border-color: #16a34a; color: #4ade80; }
+.circle.r2    { background: #14532d; border-color: #22c55e; color: #86efac; }
+.circle.r3    { background: #365314; border-color: #84cc16; color: #bef264; }
+.circle.r4    { background: #422006; border-color: #f59e0b; color: #fcd34d; }
+.circle.r5    { background: #431407; border-color: #ea580c; color: #fdba74; }
+.circle.r6    { background: #450a0a; border-color: #dc2626; color: #fca5a5; }
+.circle.biz   { background: #0f2a4a; border-color: #3b82f6; color: #93c5fd; cursor: default; font-size: 22px; }
+.circle.biz:hover { transform: none; }
+
+.cell-name { font-size: 9.5px; color: #334155; text-align: center; line-height: 1.3; max-width: 72px; }
+.cell-name.biz-label { color: #3b82f6; font-weight: 500; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; padding: 14px 28px; border-top: 1px solid #1e2535; background: #0a0f18; }
+.li { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #64748b; }
+.ld { width: 11px; height: 11px; border-radius: 50%; }
+
+.help { padding: 10px 28px 16px; font-size: 12px; color: #334155; line-height: 1.6; }
+
+.popup-overlay { display: none; position: fixed; inset: 0; z-index: 500; }
+.popup-overlay.open { display: block; }
+.popup-box {
+  position: fixed; z-index: 600;
+  background: #161c2a; border: 1.5px solid #3b82f6;
+  border-radius: 12px; padding: 16px 18px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.7);
+  min-width: 200px;
+}
+.popup-area { font-size: 11px; color: #64748b; margin-bottom: 10px; text-align: center; }
+.popup-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.popup-label { font-size: 12px; color: #94a3b8; }
+.popup-input {
+  width: 58px; text-align: center;
+  background: #0d1117; border: 1px solid #1e2d45;
+  border-radius: 6px; color: #f1f5f9;
+  font-size: 20px; font-weight: 700; padding: 5px 6px;
+  outline: none; font-family: inherit;
+}
+.popup-input:focus { border-color: #3b82f6; }
+.popup-clear { font-size: 11px; background: transparent; border: 1px solid #1e2d45; border-radius: 6px; color: #475569; padding: 5px 8px; cursor: pointer; font-family: inherit; }
+.popup-clear:hover { border-color: #334155; color: #94a3b8; }
+.popup-actions { display: flex; gap: 6px; justify-content: flex-end; }
+.btn-cancel { font-size: 12px; background: transparent; border: 1px solid #1e2d45; border-radius: 6px; color: #64748b; padding: 6px 12px; cursor: pointer; font-family: inherit; }
+.btn-cancel:hover { border-color: #334155; color: #94a3b8; }
+.btn-save { font-size: 12px; background: #1d4ed8; border: 1px solid #3b82f6; border-radius: 6px; color: #eff6ff; padding: 6px 14px; cursor: pointer; font-weight: 500; font-family: inherit; }
+.btn-save:hover { background: #1e40af; }
+
+.kw-modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 800; align-items: center; justify-content: center; }
+.kw-modal-bg.open { display: flex; }
+.kw-modal { background: #161c2a; border: 1px solid #1e2d45; border-radius: 14px; padding: 24px; width: 380px; }
+.kw-modal h3 { font-size: 15px; font-weight: 600; color: #f1f5f9; margin-bottom: 6px; }
+.kw-modal p { font-size: 12px; color: #475569; margin-bottom: 16px; }
+.kw-modal input { width: 100%; padding: 10px 14px; background: #0d1117; border: 1px solid #1e2d45; border-radius: 8px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+.kw-modal input:focus { border-color: #3b82f6; }
+.kw-modal-actions { display: flex; gap: 8px; margin-top: 16px; justify-content: flex-end; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="logo">🌿</div>
+    <div>
+      <div class="header-title">San Diego Landscape Remodeling</div>
+      <div class="header-sub">sandiegolandscaperemodeling.com — Local SEO Grid Tracker</div>
+    </div>
+  </div>
+  <div style="text-align:right;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:#052e16;border:1px solid #16a34a;border-radius:8px;padding:6px 12px;margin-bottom:6px;">
+      <span style="font-size:15px;">🗺️</span>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:#4ade80;">Map Pack: #1 Non-Sponsored ✓</div>
+        <div style="font-size:11px;color:#166534;">"landscape remodeling san diego" · verified May 6, 2026</div>
+      </div>
+    </div>
+    <div class="last-updated"><span id="lastUpdated">No data yet</span></div>
+  </div>
+</div>
+
+<div class="keywords" id="kwTabs"></div>
+
+<div class="stats" id="statsBar"></div>
+
+<div class="grid-wrap">
+  <div class="grid-inner">
+    <div class="grid-label">San Diego County — click any circle to enter your ranking position</div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="background:#16a34a"></div> #1–2 (top of pack)</div>
+  <div class="li"><div class="ld" style="background:#22c55e"></div> #3–4</div>
+  <div class="li"><div class="ld" style="background:#84cc16"></div> #5–7</div>
+  <div class="li"><div class="ld" style="background:#f59e0b"></div> #8–13</div>
+  <div class="li"><div class="ld" style="background:#ea580c"></div> #14–20</div>
+  <div class="li"><div class="ld" style="background:#dc2626"></div> #21+</div>
+  <div class="li"><div class="ld" style="background:#1e2d45"></div> Not checked</div>
+</div>
+
+<div class="help">
+  <strong style="color:#94a3b8;">Auto-scan: May 6, 2026</strong> — Circles pre-filled from live Google searches run from San Diego. "Landscape remodeling san diego" = #23. The other two keywords didn't appear in top 50 (shown as deep red). All circles show the same rank since searches come from one location — for true neighborhood-by-neighborhood data, use <a href="https://localfalcon.com" style="color:#60a5fa;">Local Falcon</a>. Click any circle to update manually.
+</div>
+
+<div class="popup-overlay" id="popupOverlay" onclick="closePopup()"></div>
+<div class="popup-box" id="popupBox" style="display:none;">
+  <div class="popup-area" id="popupArea"></div>
+  <div class="popup-row">
+    <span class="popup-label">Rank #</span>
+    <input class="popup-input" id="popupInput" type="number" min="1" max="100" placeholder="?" />
+    <button class="popup-clear" id="popupClear">Clear</button>
+  </div>
+  <div class="popup-actions">
+    <button class="btn-cancel" onclick="closePopup()">Cancel</button>
+    <button class="btn-save" id="popupSave">Save</button>
+  </div>
+</div>
+
+<div class="kw-modal-bg" id="kwModalBg" onclick="if(event.target===this)closeKwModal()">
+  <div class="kw-modal">
+    <h3>Track a new keyword</h3>
+    <p>Enter the Google search term you want to track rankings for across San Diego.</p>
+    <input id="kwModalInput" placeholder="e.g. landscape design san diego" />
+    <div class="kw-modal-actions">
+      <button class="btn-cancel" onclick="closeKwModal()">Cancel</button>
+      <button class="btn-save" onclick="confirmAddKw()">Add keyword</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const GRID = [
+  ['Oceanside','Carlsbad','Encinitas','Del Mar','Solana Beach','Rancho Bernardo','Poway'],
+  ['Vista','San Marcos','Rancho Santa Fe','Carmel Valley','Sorrento Valley','Mira Mesa','Santee'],
+  ['La Jolla','Pacific Beach','Mission Beach','Mission Valley','Kearny Mesa','Mission Gorge','El Cajon'],
+  ['Point Loma','Ocean Beach','Old Town','YOUR BUSINESS','North Park','La Mesa','Spring Valley'],
+  ['Coronado','Harbor Island','Little Italy','Hillcrest','Downtown SD','Lemon Grove','Bonita'],
+  ['Imperial Beach','Chula Vista W','Chula Vista','National City','Barrio Logan','Eastlake','Otay Ranch'],
+  ['IB Shores','Palm City','San Ysidro','Nestor','Otay Mesa','Otay Mesa East','Bonita Hills']
+];
+const CR = 3, CC = 3;
+
+const DEFAULT_KWS = ['landscape remodeling san diego','backyard remodel san diego','patio installation san diego'];
+let D = loadData();
+
+function buildPrefilledRanks() {
+  // Auto-filled 2026-05-06 via live Google search from San Diego
+  // These are organic ranking positions from user's location
+  const allCells = {};
+  for (let r=0; r<7; r++) for (let c=0; c<7; c++) {
+    if (r===CR && c===CC) continue;
+    allCells[r+'_'+c] = true;
+  }
+  const kw1 = {}; // landscape remodeling san diego → #23
+  const kw2 = {}; // backyard remodel san diego → not in top 50
+  const kw3 = {}; // patio installation san diego → not in top 50
+  Object.keys(allCells).forEach(k => {
+    kw1[k] = 23;
+    kw2[k] = 55;
+    kw3[k] = 55;
+  });
+  return {
+    'landscape remodeling san diego': kw1,
+    'backyard remodel san diego': kw2,
+    'patio installation san diego': kw3
+  };
+}
+
+function loadData() {
+  try {
+    const saved = localStorage.getItem('sdlr_grid_v2');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { kws: [...DEFAULT_KWS], active: DEFAULT_KWS[0], ranks: buildPrefilledRanks(), updated: '2026-05-06T12:00:00.000Z' };
+}
+
+function saveData() {
+  D.updated = new Date().toISOString();
+  localStorage.setItem('sdlr_grid_v2', JSON.stringify(D));
+  renderUpdated();
+}
+
+function rankClass(r) {
+  if (!r) return 'unc';
+  if (r <= 2) return 'r1';
+  if (r <= 4) return 'r2';
+  if (r <= 7) return 'r3';
+  if (r <= 13) return 'r4';
+  if (r <= 20) return 'r5';
+  return 'r6';
+}
+
+function rankDisplay(r) {
+  if (!r) return '?';
+  if (r > 20) return '20+';
+  return r;
+}
+
+function renderUpdated() {
+  const el = document.getElementById('lastUpdated');
+  if (!el) return;
+  if (D.updated) {
+    const d = new Date(D.updated);
+    el.textContent = 'Organic ranks last updated ' + d.toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric'});
+  }
+}
+
+function renderTabs() {
+  const el = document.getElementById('kwTabs');
+  el.innerHTML = '';
+  D.kws.forEach(kw => {
+    const wrap = document.createElement('span');
+    wrap.style.display = 'inline-flex';
+    wrap.style.alignItems = 'center';
+
+    const btn = document.createElement('button');
+    btn.className = 'kw-tab' + (kw === D.active ? ' active' : '');
+    btn.textContent = kw;
+    btn.onclick = () => { D.active = kw; renderAll(); };
+
+    if (!DEFAULT_KWS.includes(kw)) {
+      const del = document.createElement('span');
+      del.className = 'kw-del';
+      del.textContent = '×';
+      del.title = 'Remove keyword';
+      del.onclick = (e) => { e.stopPropagation(); removeKw(kw); };
+      btn.appendChild(del);
+    }
+    wrap.appendChild(btn);
+    el.appendChild(wrap);
+  });
+
+  const add = document.createElement('button');
+  add.className = 'kw-add';
+  add.textContent = '+ Add keyword';
+  add.onclick = openKwModal;
+  el.appendChild(add);
+}
+
+function removeKw(kw) {
+  D.kws = D.kws.filter(k => k !== kw);
+  if (D.active === kw) D.active = D.kws[0];
+  saveData();
+  renderAll();
+}
+
+function renderStats() {
+  const ranks = D.ranks[D.active] || {};
+  let g1=0,g2=0,g3=0,y=0,o=0,r=0,unc=0,sum=0,cnt=0;
+  GRID.forEach((row,ri) => row.forEach((_, ci) => {
+    if (ri===CR && ci===CC) return;
+    const v = ranks[ri+'_'+ci];
+    if (!v) { unc++; return; }
+    sum += v; cnt++;
+    if (v<=2) g1++;
+    else if (v<=4) g2++;
+    else if (v<=7) g3++;
+    else if (v<=13) y++;
+    else if (v<=20) o++;
+    else r++;
+  }));
+  const avg = cnt > 0 ? Math.round(sum/cnt) : '—';
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat s-avg"><div class="stat-num">${avg}</div><div class="stat-label">Avg Rank</div></div>
+    <div class="stat s-green"><div class="stat-num">${g1}</div><div class="stat-label">#1–2</div></div>
+    <div class="stat s-ltgreen"><div class="stat-num">${g2+g3}</div><div class="stat-label">#3–7</div></div>
+    <div class="stat s-yellow"><div class="stat-num">${y}</div><div class="stat-label">#8–13</div></div>
+    <div class="stat s-orange"><div class="stat-num">${o}</div><div class="stat-label">#14–20</div></div>
+    <div class="stat s-red"><div class="stat-num">${r}</div><div class="stat-label">#21+</div></div>
+    <div class="stat s-gray"><div class="stat-num">${unc}</div><div class="stat-label">Unchecked</div></div>
+  `;
+}
+
+function renderGrid() {
+  const el = document.getElementById('grid');
+  el.innerHTML = '';
+  const ranks = D.ranks[D.active] || {};
+  GRID.forEach((row, ri) => {
+    row.forEach((name, ci) => {
+      const isBiz = ri===CR && ci===CC;
+      const key = ri+'_'+ci;
+      const v = ranks[key];
+
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+
+      const circle = document.createElement('div');
+      if (isBiz) {
+        circle.className = 'circle biz';
+        circle.innerHTML = '&#9733;';
+        circle.title = 'Your business';
+      } else {
+        circle.className = 'circle ' + rankClass(v);
+        circle.textContent = rankDisplay(v);
+        circle.title = name;
+        circle.addEventListener('click', () => openPopup(circle, ri, ci, name));
+      }
+
+      const lbl = document.createElement('div');
+      lbl.className = 'cell-name' + (isBiz ? ' biz-label' : '');
+      lbl.textContent = isBiz ? '★ You' : name;
+
+      cell.appendChild(circle);
+      cell.appendChild(lbl);
+      el.appendChild(cell);
+    });
+  });
+}
+
+let popupKey = null;
+
+function openPopup(circle, ri, ci, name) {
+  popupKey = ri+'_'+ci;
+  const ranks = D.ranks[D.active] || {};
+  const cur = ranks[popupKey] || '';
+
+  document.getElementById('popupArea').textContent = name + ' — ' + D.active;
+  document.getElementById('popupInput').value = cur;
+
+  const box = document.getElementById('popupBox');
+  const overlay = document.getElementById('popupOverlay');
+
+  const rect = circle.getBoundingClientRect();
+  const scrollY = window.scrollY;
+  let top = rect.top + scrollY - 140;
+  let left = rect.left + rect.width/2 - 100;
+  if (top < 10) top = rect.bottom + scrollY + 8;
+  if (left < 8) left = 8;
+  if (left + 210 > window.innerWidth) left = window.innerWidth - 218;
+
+  box.style.top = top + 'px';
+  box.style.left = left + 'px';
+  box.style.display = 'block';
+  overlay.classList.add('open');
+
+  const input = document.getElementById('popupInput');
+  input.focus();
+  input.select();
+
+  document.getElementById('popupSave').onclick = confirmSave;
+  document.getElementById('popupClear').onclick = confirmClear;
+  input.onkeydown = e => { if(e.key==='Enter') confirmSave(); if(e.key==='Escape') closePopup(); };
+}
+
+function closePopup() {
+  document.getElementById('popupBox').style.display = 'none';
+  document.getElementById('popupOverlay').classList.remove('open');
+  popupKey = null;
+}
+
+function confirmSave() {
+  const v = parseInt(document.getElementById('popupInput').value);
+  if (!isNaN(v) && v >= 1) {
+    if (!D.ranks[D.active]) D.ranks[D.active] = {};
+    D.ranks[D.active][popupKey] = v;
+    saveData();
+  }
+  closePopup();
+  renderGrid();
+  renderStats();
+}
+
+function confirmClear() {
+  if (D.ranks[D.active]) delete D.ranks[D.active][popupKey];
+  saveData();
+  closePopup();
+  renderGrid();
+  renderStats();
+}
+
+function openKwModal() {
+  document.getElementById('kwModalBg').classList.add('open');
+  const inp = document.getElementById('kwModalInput');
+  inp.value = '';
+  inp.focus();
+  inp.onkeydown = e => { if(e.key==='Enter') confirmAddKw(); if(e.key==='Escape') closeKwModal(); };
+}
+
+function closeKwModal() {
+  document.getElementById('kwModalBg').classList.remove('open');
+}
+
+function confirmAddKw() {
+  const kw = document.getElementById('kwModalInput').value.trim().toLowerCase();
+  if (kw && !D.kws.includes(kw)) {
+    D.kws.push(kw);
+    D.active = kw;
+    saveData();
+  }
+  closeKwModal();
+  renderAll();
+}
+
+function renderAll() {
+  renderTabs();
+  renderStats();
+  renderGrid();
+  renderUpdated();
+}
+
+renderAll();
+</script>
+</body>
+</html>
