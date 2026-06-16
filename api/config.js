@@ -1,6 +1,6 @@
 // Serves API keys to the app from Vercel's private environment variables.
 // Transcription key names accepted: ELEVENLABS_API_KEY, elevenlabs, ELEVENLABS.
-// Optional summaries key: OPENAI_API_KEY or openai.
+// Summaries key (Claude) names accepted: ANTHROPIC_API_KEY, anthropic, CLAUDE_API_KEY.
 
 module.exports = (req, res) => {
   const host = req.headers.host || '';
@@ -12,9 +12,9 @@ module.exports = (req, res) => {
     return res.end(JSON.stringify({ error: 'forbidden' }));
   }
   const elevenLabsKey = process.env.ELEVENLABS_API_KEY || process.env.elevenlabs || process.env.ELEVENLABS || '';
-  const openaiKey = process.env.OPENAI_API_KEY || process.env.openai || '';
+  const anthropicKey = process.env.ANTHROPIC_API_KEY || process.env.anthropic || process.env.CLAUDE_API_KEY || '';
   res.setHeader('Cache-Control', 'no-store');
   res.setHeader('Content-Type', 'application/json');
   res.statusCode = 200;
-  res.end(JSON.stringify({ elevenLabsKey, openaiKey, serverManaged: true }));
+  res.end(JSON.stringify({ elevenLabsKey, anthropicKey, serverManaged: true }));
 };
