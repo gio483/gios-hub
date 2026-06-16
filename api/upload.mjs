@@ -20,6 +20,7 @@ try {
 const jsonResponse = await handleUpload({
 body,
 request: req,
+  token: process.env.BLOB_READ_WRITE_TOKEN,
 onBeforeGenerateToken: async () => ({
 allowedContentTypes: ['audio/webm','audio/ogg','audio/mp4','audio/mpeg','audio/wav','audio/x-m4a','audio/m4a','application/octet-stream'],
 addRandomSuffix: true,
