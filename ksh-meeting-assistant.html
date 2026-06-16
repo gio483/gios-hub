@@ -806,6 +806,7 @@
 const state = {
   elevenLabsKey: '',
   openaiKey: '',
+  serverManaged: false,
   meetingTitle: '',
   meetingDate: '',
   meetingLocation: '',
@@ -825,20 +826,34 @@ const state = {
 // ===================================================
 // INIT
 // ===================================================
-document.addEventListener('DOMContentLoaded', () => {
-  state.elevenLabsKey = localStorage.getItem('ksh_elevenlabs_key') || '';
-  state.openaiKey = localStorage.getItem('ksh_openai_key') || '';
+document.addEventListener('DOMContentLoaded', initApp);
+
+async function initApp() {
+  // 1) Try keys provided by the server (Vercel env vars) so no one has to paste anything.
+  try {
+    const cfg = await fetch('/api/config', { cache: 'no-store' }).then(r => r.ok ? r.json() : null);
+    if (cfg) {
+      if (cfg.elevenLabsKey) state.elevenLabsKey = cfg.elevenLabsKey;
+      if (cfg.openaiKey) state.openaiKey = cfg.openaiKey;
+      state.serverManaged = !!cfg.serverManaged;
+    }
+  } catch (e) { /* offline or no function — fall back to local keys */ }
+
+  // 2) Fall back to keys saved on this device (manual setup).
+  if (!state.elevenLabsKey) state.elevenLabsKey = localStorage.getItem('ksh_elevenlabs_key') || '';
+  if (!state.openaiKey) state.openaiKey = localStorage.getItem('ksh_openai_key') || '';
 
   // Set today's date
   const today = new Date().toISOString().split('T')[0];
-  document.getElementById('meeting-date').value = today;
+  const dateEl = document.getElementById('meeting-date');
+  if (dateEl) dateEl.value = today;
 
   if (!state.elevenLabsKey) {
     showScreen('screen-settings');
   } else {
     showScreen('screen-setup');
   }
-});
+}
 
 // ===================================================
 // SCREEN NAVIGATION
