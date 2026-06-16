@@ -405,11 +405,23 @@
     <div class="settings-hero">
       <div style="font-size:40px;margin-bottom:10px;">🔑</div>
       <h1>Setup</h1>
-      <p>Enter your OpenAI API key to power both transcription and AI summaries. Saved on this device only.</p>
+      <p>Add your API keys to power transcription and AI summaries. Saved on this device only.</p>
     </div>
     <div class="content">
       <div class="card">
-        <div class="card-title">OpenAI API Key <span class="badge badge-info">Transcription + AI Summaries</span></div>
+        <div class="card-title">ElevenLabs API Key <span class="badge badge-info">Transcription</span></div>
+        <div class="form-group">
+          <div class="key-input-wrapper">
+            <input type="password" id="elevenlabs-key" placeholder="sk_..." autocomplete="off" />
+            <button class="key-toggle" onclick="toggleKeyVisibility('elevenlabs-key', this)" title="Show/hide">
+              <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+          <p class="form-hint">Get your key at <strong>elevenlabs.io</strong> → Profile → API Keys. Scribe speech-to-text powers the transcription.</p>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">OpenAI API Key <span class="badge badge-info">AI Summaries (optional)</span></div>
         <div class="form-group">
           <div class="key-input-wrapper">
             <input type="password" id="openai-key" placeholder="sk-..." autocomplete="off" />
@@ -417,12 +429,12 @@
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <p class="form-hint">Get your key at <strong>platform.openai.com</strong> → API Keys. Whisper transcription costs ~$0.006/min; GPT-4o summaries ~$0.02 per meeting.</p>
+          <p class="form-hint">Used only for the meeting summary. Get your key at <strong>platform.openai.com</strong> → API Keys. You can add this later.</p>
         </div>
       </div>
       <div class="notice notice-info">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>Your key is stored only on <strong>this device</strong> in browser storage. It is never sent to any server other than OpenAI directly.</span>
+        <span>Your keys are stored only on <strong>this device</strong> in browser storage. They are sent only to ElevenLabs (transcription) and OpenAI (summaries) directly.</span>
       </div>
     </div>
     <div class="footer-actions">
@@ -580,7 +592,7 @@
           <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
             <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
             <p style="margin-top:8px;"><strong>Tap to choose file</strong> or drag &amp; drop</p>
-            <p style="margin-top:4px;">MP3, M4A, WAV, OGG, WebM — up to 25 MB</p>
+            <p style="margin-top:4px;">MP3, M4A, WAV, OGG, WebM — up to 1 GB</p>
           </div>
           <input type="file" id="file-input" accept="audio/*,video/webm" onchange="handleFileSelect(event)" />
           <div id="upload-preview" style="display:none;margin-top:14px;">
@@ -597,7 +609,7 @@
             <audio id="audio-player-upload" controls style="width:100%;margin-top:10px;"></audio>
             <div id="upload-size-warning" class="notice notice-warning" style="display:none;margin-top:10px;">
               <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <span>File is larger than 25 MB. OpenAI Whisper has a 25 MB limit. Please trim or compress the audio first.</span>
+              <span>File is larger than 1 GB. Please trim or compress the audio first.</span>
             </div>
           </div>
         </div>
@@ -792,6 +804,7 @@
 // STATE
 // ===================================================
 const state = {
+  elevenLabsKey: '',
   openaiKey: '',
   meetingTitle: '',
   meetingDate: '',
@@ -813,13 +826,14 @@ const state = {
 // INIT
 // ===================================================
 document.addEventListener('DOMContentLoaded', () => {
+  state.elevenLabsKey = localStorage.getItem('ksh_elevenlabs_key') || '';
   state.openaiKey = localStorage.getItem('ksh_openai_key') || '';
 
   // Set today's date
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('meeting-date').value = today;
 
-  if (!state.openaiKey) {
+  if (!state.elevenLabsKey) {
     showScreen('screen-settings');
   } else {
     showScreen('screen-setup');
@@ -844,13 +858,18 @@ function goBack(screenId) {
 // SETTINGS
 // ===================================================
 function saveSettings() {
+  const elevenLabsKey = document.getElementById('elevenlabs-key').value.trim();
   const openaiKey = document.getElementById('openai-key').value.trim();
 
-  if (!openaiKey) {
-    alert('Please enter your OpenAI API key to continue.');
+  if (!elevenLabsKey) {
+    alert('Please enter your ElevenLabs API key to continue. It powers transcription.');
     return;
   }
 
+  localStorage.setItem('ksh_elevenlabs_key', elevenLabsKey);
+  state.elevenLabsKey = elevenLabsKey;
+
+  // OpenAI key is optional (used only for summaries)
   localStorage.setItem('ksh_openai_key', openaiKey);
   state.openaiKey = openaiKey;
 
@@ -858,6 +877,7 @@ function saveSettings() {
 }
 
 function showSettings() {
+  document.getElementById('elevenlabs-key').value = state.elevenLabsKey;
   document.getElementById('openai-key').value = state.openaiKey;
   showScreen('screen-settings');
 }
@@ -1059,7 +1079,7 @@ function processFile(file) {
   document.getElementById('upload-preview').style.display = 'block';
 
   const sizeWarning = document.getElementById('upload-size-warning');
-  sizeWarning.style.display = file.size > 25 * 1024 * 1024 ? 'flex' : 'none';
+  sizeWarning.style.display = file.size > 1024 * 1024 * 1024 ? 'flex' : 'none';
 }
 
 function clearUpload() {
@@ -1097,9 +1117,9 @@ async function goToTranscript() {
     return;
   }
 
-  // Check file size
-  if (state.audioBlob.size > 25 * 1024 * 1024) {
-    alert('The audio file is larger than 25 MB. Please trim it or use the Paste Transcript option instead.');
+  // Check file size (ElevenLabs supports up to 3 GB; we cap at 1 GB for browser uploads)
+  if (state.audioBlob.size > 1024 * 1024 * 1024) {
+    alert('The audio file is larger than 1 GB. Please trim it or use the Paste Transcript option instead.');
     return;
   }
 
@@ -1112,7 +1132,7 @@ async function goToTranscript() {
     showScreen('screen-transcript');
   } catch (err) {
     showScreen('screen-record');
-    alert('Transcription failed: ' + err.message + '\n\nCheck that your OpenAI API key is correct and has credits. You can also use the "Paste" tab to paste a transcript manually.');
+    alert('Transcription failed: ' + err.message + '\n\nCheck that your ElevenLabs API key is correct and has credits. You can also use the "Paste" tab to paste a transcript manually.');
   }
 }
 
@@ -1137,7 +1157,7 @@ function populateTranscriptScreen() {
 }
 
 // ===================================================
-// TRANSCRIBE (OpenAI Whisper)
+// TRANSCRIBE (ElevenLabs Scribe — speech-to-text)
 // ===================================================
 async function transcribeAudio(audioBlob) {
   const formData = new FormData();
@@ -1153,22 +1173,56 @@ async function transcribeAudio(audioBlob) {
   }
 
   formData.append('file', audioBlob, filename);
-  formData.append('model', 'whisper-1');
-  formData.append('language', 'en');
+  formData.append('model_id', 'scribe_v1');     // ElevenLabs speech-to-text model
+  formData.append('language_code', 'en');
+  formData.append('diarize', 'true');           // label who is speaking
+  formData.append('tag_audio_events', 'false'); // skip (laughter) etc. for clean meeting text
 
-  const resp = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+  const resp = await fetch('https://api.elevenlabs.io/v1/speech-to-text', {
     method: 'POST',
-    headers: { 'Authorization': `Bearer ${state.openaiKey}` },
+    headers: { 'xi-api-key': state.elevenLabsKey },
     body: formData
   });
 
   if (!resp.ok) {
-    const errData = await resp.json().catch(() => ({}));
-    throw new Error(errData.error?.message || `OpenAI error ${resp.status}`);
+    let msg = `ElevenLabs error ${resp.status}`;
+    try {
+      const errData = await resp.json();
+      msg = errData.detail?.message || errData.detail || errData.message || msg;
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+    } catch (e) {}
+    throw new Error(msg);
   }
 
   const data = await resp.json();
+
+  // If diarization is present, build a clean speaker-labeled transcript.
+  if (Array.isArray(data.words) && data.words.some(w => w.speaker_id)) {
+    return buildDiarizedTranscript(data.words);
+  }
   return data.text || '';
+}
+
+// Turn ElevenLabs word-level output into a readable "Speaker: text" transcript
+function buildDiarizedTranscript(words) {
+  const lines = [];
+  let current = null;
+  let buffer = '';
+  const label = (id) => {
+    const n = String(id).replace(/[^0-9]/g, '');
+    return n ? `Speaker ${parseInt(n, 10) + 1}` : 'Speaker';
+  };
+  for (const w of words) {
+    if (w.type === 'spacing') { buffer += (w.text || ' '); continue; }
+    if (w.speaker_id !== current) {
+      if (buffer.trim()) lines.push(`${label(current)}: ${buffer.trim()}`);
+      current = w.speaker_id;
+      buffer = '';
+    }
+    buffer += (w.text || '');
+  }
+  if (buffer.trim()) lines.push(`${label(current)}: ${buffer.trim()}`);
+  return lines.join('\n\n');
 }
 
 // ===================================================
@@ -1178,6 +1232,10 @@ async function generateSummary() {
   const transcript = document.getElementById('transcript-text').value.trim();
   if (!transcript) {
     alert('The transcript is empty. Please add content before generating a summary.');
+    return;
+  }
+  if (!state.openaiKey) {
+    alert('AI summaries need an OpenAI API key. Add one in Setup (the key icon), then try again. Your transcript is already saved here.');
     return;
   }
   state.transcript = transcript;
