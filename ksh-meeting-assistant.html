@@ -421,20 +421,20 @@
         </div>
       </div>
       <div class="card">
-        <div class="card-title">OpenAI API Key <span class="badge badge-info">AI Summaries (optional)</span></div>
+        <div class="card-title">Claude API Key <span class="badge badge-info">AI Summaries (optional)</span></div>
         <div class="form-group">
           <div class="key-input-wrapper">
-            <input type="password" id="openai-key" placeholder="sk-..." autocomplete="off" />
-            <button class="key-toggle" onclick="toggleKeyVisibility('openai-key', this)" title="Show/hide">
+            <input type="password" id="anthropic-key" placeholder="sk-ant-..." autocomplete="off" />
+            <button class="key-toggle" onclick="toggleKeyVisibility('anthropic-key', this)" title="Show/hide">
               <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
           </div>
-          <p class="form-hint">Used only for the meeting summary. Get your key at <strong>platform.openai.com</strong> → API Keys. You can add this later.</p>
+          <p class="form-hint">Used only for the meeting summary. Get your key at <strong>console.anthropic.com</strong> → API Keys. You can add this later.</p>
         </div>
       </div>
       <div class="notice notice-info">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>Your keys are stored only on <strong>this device</strong> in browser storage. They are sent only to ElevenLabs (transcription) and OpenAI (summaries) directly.</span>
+        <span>Your keys are stored only on <strong>this device</strong> in browser storage. They are sent only to ElevenLabs (transcription) and Anthropic / Claude (summaries) directly.</span>
       </div>
     </div>
     <div class="footer-actions">
@@ -805,7 +805,7 @@
 // ===================================================
 const state = {
   elevenLabsKey: '',
-  openaiKey: '',
+  anthropicKey: '',
   serverManaged: false,
   meetingTitle: '',
   meetingDate: '',
@@ -834,14 +834,14 @@ async function initApp() {
     const cfg = await fetch('/api/config', { cache: 'no-store' }).then(r => r.ok ? r.json() : null);
     if (cfg) {
       if (cfg.elevenLabsKey) state.elevenLabsKey = cfg.elevenLabsKey;
-      if (cfg.openaiKey) state.openaiKey = cfg.openaiKey;
+      if (cfg.anthropicKey) state.anthropicKey = cfg.anthropicKey;
       state.serverManaged = !!cfg.serverManaged;
     }
   } catch (e) { /* offline or no function — fall back to local keys */ }
 
   // 2) Fall back to keys saved on this device (manual setup).
   if (!state.elevenLabsKey) state.elevenLabsKey = localStorage.getItem('ksh_elevenlabs_key') || '';
-  if (!state.openaiKey) state.openaiKey = localStorage.getItem('ksh_openai_key') || '';
+  if (!state.anthropicKey) state.anthropicKey = localStorage.getItem('ksh_anthropic_key') || '';
 
   // Set today's date
   const today = new Date().toISOString().split('T')[0];
@@ -874,7 +874,7 @@ function goBack(screenId) {
 // ===================================================
 function saveSettings() {
   const elevenLabsKey = document.getElementById('elevenlabs-key').value.trim();
-  const openaiKey = document.getElementById('openai-key').value.trim();
+  const anthropicKey = document.getElementById('anthropic-key').value.trim();
 
   if (!elevenLabsKey) {
     alert('Please enter your ElevenLabs API key to continue. It powers transcription.');
@@ -884,16 +884,16 @@ function saveSettings() {
   localStorage.setItem('ksh_elevenlabs_key', elevenLabsKey);
   state.elevenLabsKey = elevenLabsKey;
 
-  // OpenAI key is optional (used only for summaries)
-  localStorage.setItem('ksh_openai_key', openaiKey);
-  state.openaiKey = openaiKey;
+  // Claude key is optional (used only for summaries)
+  localStorage.setItem('ksh_anthropic_key', anthropicKey);
+  state.anthropicKey = anthropicKey;
 
   showScreen('screen-setup');
 }
 
 function showSettings() {
   document.getElementById('elevenlabs-key').value = state.elevenLabsKey;
-  document.getElementById('openai-key').value = state.openaiKey;
+  document.getElementById('anthropic-key').value = state.anthropicKey;
   showScreen('screen-settings');
 }
 
@@ -1249,8 +1249,8 @@ async function generateSummary() {
     alert('The transcript is empty. Please add content before generating a summary.');
     return;
   }
-  if (!state.openaiKey) {
-    alert('AI summaries need an OpenAI API key. Add one in Setup (the key icon), then try again. Your transcript is already saved here.');
+  if (!state.anthropicKey) {
+    alert('AI summaries need a Claude API key. Add one in Setup (the key icon), then try again. Your transcript is already saved here.');
     return;
   }
   state.transcript = transcript;
@@ -1294,31 +1294,30 @@ TRANSCRIPT:
 ${transcript}`;
 
   try {
-    const summary = await callGPT(prompt);
+    const summary = await callClaude(prompt);
     state.summary = summary;
     populateSummaryScreen();
     showScreen('screen-summary');
   } catch (err) {
     showScreen('screen-transcript');
-    alert('Summary generation failed: ' + err.message + '\n\nCheck that your OpenAI API key is correct and has credits.');
+    alert('Summary generation failed: ' + err.message + '\n\nCheck that your Claude API key is correct and has credits.');
   }
 }
 
-async function callGPT(prompt) {
-  const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+async function callClaude(prompt) {
+  const resp = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${state.openaiKey}`,
+      'x-api-key': state.anthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
+      system: 'You are an expert meeting assistant for KSH Construction, a professional general contracting company. You produce clear, professional, contractor-focused meeting summaries in clean Markdown format.',
       messages: [
-        {
-          role: 'system',
-          content: 'You are an expert meeting assistant for KSH Construction, a professional general contracting company. You produce clear, professional, contractor-focused meeting summaries in clean Markdown format.'
-        },
         { role: 'user', content: prompt }
       ]
     })
@@ -1326,11 +1325,11 @@ async function callGPT(prompt) {
 
   if (!resp.ok) {
     const errData = await resp.json().catch(() => ({}));
-    throw new Error(errData.error?.message || `OpenAI error ${resp.status}`);
+    throw new Error(errData.error?.message || `Claude error ${resp.status}`);
   }
 
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content || '';
+  return (data.content && data.content[0] && data.content[0].text) || '';
 }
 
 function populateSummaryScreen() {
