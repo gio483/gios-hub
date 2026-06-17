@@ -49,36 +49,62 @@ export default async function handler(req, res) {
     try { body = JSON.parse(raw || '{}'); } catch { body = {}; }
   }
 
+  const mode = body.mode === 'dish' ? 'dish' : 'have';
   const ingredients = Array.isArray(body.ingredients)
     ? body.ingredients.map((s) => String(s).trim()).filter(Boolean)
     : [];
+  const dish = String(body.dish || '').trim();
   const cuisine = String(body.cuisine || 'Any');
   const highProtein = !!body.highProtein;
   const quick = !!body.quick;
 
-  if (ingredients.length === 0) {
+  if (mode === 'have' && ingredients.length === 0) {
     res.statusCode = 400;
     return res.end(JSON.stringify({ error: 'Add at least one ingredient.' }));
+  }
+  if (mode === 'dish' && !dish) {
+    res.statusCode = 400;
+    return res.end(JSON.stringify({ error: 'Type a dish to search for.' }));
   }
 
   const filters = [];
   if (cuisine && cuisine !== 'Any') filters.push(`Lean toward ${cuisine} flavors.`);
   if (highProtein) filters.push('Prioritize high-protein results (aim 35g+ per serving) and show the protein estimate.');
   if (quick) filters.push('Every recipe must be doable in 20 minutes or less.');
+  const filterLine = filters.length ? '- Extra constraints: ' + filters.join(' ') : '';
 
-  const system = `You are Gio's personal home cook. Gio is a confident beginner in San Diego cooking in a normal apartment kitchen. His equipment: stainless skillet, saucepan, Dutch oven, air fryer, blender, KitchenAid mixer. No smoker, no sous vide.
+  const EQUIP =
+    "Gio is a confident beginner in San Diego cooking in a normal apartment kitchen. His equipment: stainless skillet, saucepan, Dutch oven, air fryer, blender, KitchenAid mixer. No smoker, no sous vide.";
+
+  let system, userMsg;
+  if (mode === 'dish') {
+    system = `You are Gio's personal cook. ${EQUIP}
+
+Gio wants to make a SPECIFIC dish. Give him 3–4 versions of it: start with a solid classic/authentic version, then popular or regional variations. (For example, for "huevos rancheros": a classic version, a mole-style "huevos rancheros con mole", and a loaded/Tex-Mex style.) Name each variation clearly in its title.
+Rules:
+- Beginner-friendly, plain English. Steps short, numbered, in cooking order.
+- "ingredients" is the FULL ingredient list with rough amounts. Leave "uses" and "need" as empty arrays [].
+- Always include safe internal temps when relevant (chicken 165F, ground beef 160F, steak 130-135F).
+- difficulty is 1 (easy) to 5 (hard). time_minutes is a realistic total.
+${filterLine}
+
+Respond with ONLY a valid JSON object, no markdown, no commentary, in exactly this shape:
+{"recipes":[{"name":"string (name the variation clearly)","blurb":"one short appetizing sentence","cuisine":"string","time_minutes":number,"difficulty":number,"protein_g":number_or_null,"ingredients":["1 can ...","2 eggs ..."],"uses":[],"need":[],"steps":["step 1","step 2"]}]}`;
+    userMsg = `Dish I want to make: ${dish}.`;
+  } else {
+    system = `You are Gio's personal home cook. ${EQUIP}
 
 Given the ingredients he ALREADY HAS, suggest 3 simple, genuinely doable meals (sometimes scrappy is fine — eggs, cheese and white bread should still get a real answer). Rules:
 - Build mostly around what he has. You may assume basic pantry staples are on hand (salt, pepper, oil, butter, garlic/onion powder, common spices, flour). Anything beyond his listed items + basic staples goes in "need".
 - Keep steps short, numbered, and in cooking order. Beginner-friendly, plain English.
 - Always include safe internal temps when relevant (chicken 165F, ground beef 160F, etc.).
 - difficulty is 1 (easy) to 5 (hard). time_minutes is a realistic total.
-${filters.length ? '- Extra constraints: ' + filters.join(' ') : ''}
+${filterLine}
 
 Respond with ONLY a valid JSON object, no markdown, no commentary, in exactly this shape:
 {"recipes":[{"name":"string","blurb":"one short appetizing sentence","cuisine":"string","time_minutes":number,"difficulty":number,"protein_g":number_or_null,"uses":["ingredients he has that this uses"],"need":["anything extra to grab, [] if none"],"steps":["step 1","step 2"]}]}`;
-
-  const userMsg = `Ingredients I have: ${ingredients.join(', ')}.`;
+    userMsg = `Ingredients I have: ${ingredients.join(', ')}.`;
+  }
 
   async function callClaude(model) {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
@@ -90,7 +116,7 @@ Respond with ONLY a valid JSON object, no markdown, no commentary, in exactly th
       },
       body: JSON.stringify({
         model,
-        max_tokens: 2000,
+        max_tokens: 3000,
         system,
         messages: [{ role: 'user', content: userMsg }],
       }),
