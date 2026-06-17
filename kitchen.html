@@ -113,6 +113,13 @@
   .empty{text-align:center;color:var(--muted);padding:30px 16px}
   .empty .big{font-size:2.4rem;margin-bottom:8px}
 
+  .catfilter{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+  .catpill{background:var(--card2);border:1px solid var(--line);color:var(--muted);border-radius:18px;padding:7px 13px;font:inherit;font-size:.82rem;cursor:pointer;transition:.15s}
+  .catpill.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:transparent}
+  .catsec{margin-bottom:14px}
+  .cathead{font-family:Georgia,serif;font-size:1.12rem;color:var(--accent);margin:4px 2px 12px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line);padding-bottom:7px}
+  .cathead .cnt{font-size:.78rem;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:1px 9px}
+
   /* PDF tab */
   .pdfwrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
   .pdfwrap iframe{width:100%;height:72vh;border:1px solid var(--line);border-radius:12px;background:#fff}
@@ -219,6 +226,8 @@ const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 
 /* ---------- state ---------- */
 let mode = 'have';
+const REG = {};
+let savedFilter = '__all';
 let ingredients = [];
 let cuisine = 'Any';
 let highProtein = false, quick = false;
@@ -354,16 +363,21 @@ $('#goBtn').onclick=async()=>{
   }
 };
 
-function recipeCard(rc,idx,saved=false){
-  const id = saved ? rc._id : (rc.name+'|'+(rc.time_minutes||''));
-  const isFav = favs.some(f=>f._id===id);
-  const stars = '●'.repeat(Math.max(1,Math.min(5,rc.difficulty||1)))+'<span style="opacity:.25">'+'●'.repeat(5-Math.max(1,Math.min(5,rc.difficulty||1)))+'</span>';
-  const meta = [
+function metaHtml(rc){
+  const d = Math.max(1,Math.min(5,rc.difficulty||1));
+  const stars = '●'.repeat(d)+'<span style="opacity:.25">'+'●'.repeat(5-d)+'</span>';
+  return [
     rc.time_minutes?`<span class="pill"><b>${rc.time_minutes}</b> min</span>`:'',
     `<span class="pill"><b>Difficulty</b> ${stars}</span>`,
     rc.cuisine?`<span class="pill">${esc(rc.cuisine)}</span>`:'',
     (rc.protein_g)?`<span class="pill pro"><b>${rc.protein_g}g</b> protein</span>`:''
   ].join('');
+}
+function recipeCard(rc,idx,saved=false){
+  const id = saved ? rc._id : (rc.name+'|'+(rc.time_minutes||''));
+  const isFav = favs.some(f=>f._id===id);
+  if(!saved) REG[id] = rc;
+  const meta = metaHtml(rc);
   const have = (rc.uses||[]).map(u=>`<span class="tag have">✓ ${esc(u)}</span>`).join('');
   const need = (rc.need||[]).filter(Boolean).map(u=>`<span class="tag need">+ ${esc(u)}</span>`).join('');
   const ingList = (rc.ingredients&&rc.ingredients.length)?`<div class="seclbl">Ingredients</div><ul class="ingl">${rc.ingredients.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
@@ -388,7 +402,9 @@ function wireFavs(scope){
       const exists = favs.findIndex(f=>f._id===id);
       if(exists>=0){ favs.splice(exists,1); btn.classList.remove('on'); }
       else{
-        const rc = scrapeCard(card); rc._id=id; favs.unshift(rc); btn.classList.add('on');
+        const src = REG[id] || scrapeCard(card);
+        const rc = Object.assign({}, src, {_id:id});
+        favs.unshift(rc); btn.classList.add('on');
       }
       save(SAVE_KEY,favs);
     };
@@ -410,10 +426,29 @@ function scrapeCard(card){
 }
 
 /* ---------- saved ---------- */
+function catOf(rc){ return (rc.cuisine && String(rc.cuisine).trim()) ? String(rc.cuisine).trim() : 'Other'; }
 function renderSaved(){
   const list = $('#savedList');
   if(!favs.length){ list.innerHTML=`<div class="empty"><div class="big">🤍</div>No saved recipes yet.<br>Tap the heart on any recipe to keep it here.</div>`; return; }
-  list.innerHTML = favs.map(rc=>savedCard(rc)).join('');
+  // group by category
+  const groups = {};
+  favs.forEach(rc=>{ const c=catOf(rc); (groups[c]=groups[c]||[]).push(rc); });
+  const cats = Object.keys(groups).sort((a,b)=> a==='Other'?1 : b==='Other'?-1 : a.localeCompare(b));
+  if(savedFilter!=='__all' && !groups[savedFilter]) savedFilter='__all';
+  // filter chips
+  const pills = `<div class="catfilter">`+
+    `<button class="catpill ${savedFilter==='__all'?'on':''}" data-cat="__all">All (${favs.length})</button>`+
+    cats.map(c=>`<button class="catpill ${savedFilter===c?'on':''}" data-cat="${esc(c)}">${esc(c)} (${groups[c].length})</button>`).join('')+
+    `</div>`;
+  // sections (respecting filter)
+  const shown = savedFilter==='__all' ? cats : cats.filter(c=>c===savedFilter);
+  const sections = shown.map(c=>
+    `<div class="catsec"><div class="cathead">${esc(c)} <span class="cnt">${groups[c].length}</span></div>`+
+    groups[c].map(rc=>savedCard(rc)).join('')+`</div>`).join('');
+  list.innerHTML = pills + sections;
+  // wire filter chips
+  $$('.catpill',list).forEach(b=>b.onclick=()=>{ savedFilter=b.dataset.cat; renderSaved(); });
+  // wire remove hearts
   $$('.fav',list).forEach(btn=>btn.onclick=()=>{
     const card=btn.closest('.recipe'); const id=card.dataset.id;
     favs = favs.filter(f=>f._id!==id); save(SAVE_KEY,favs); renderSaved();
@@ -427,7 +462,7 @@ function savedCard(rc){
   return `<div class="recipe" data-id="${esc(rc._id)}">
     <div class="rhead"><div><h3>${esc(rc.name)}</h3><p class="rblurb">${esc(rc.blurb||'')}</p></div>
     <button class="fav on" title="Remove">❤</button></div>
-    ${rc._meta?`<div class="meta">${rc._meta}</div>`:''}
+    <div class="meta">${metaHtml(rc)}</div>
     ${(have||need)?`<div class="uses">${have}${need}</div>`:''}
     ${ingList}
     <div class="seclbl">Steps</div><ol class="steps">${steps}</ol>
