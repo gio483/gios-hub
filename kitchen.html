@@ -170,6 +170,10 @@
         <input id="dishInput" type="text" placeholder="e.g. huevos rancheros, birria tacos, carbonara" autocomplete="off" enterkeyhint="search">
         <button class="btn micbtn" id="dishMic" title="Speak the dish">🎤</button>
       </div>
+      <div class="quick">
+        <div class="lbl">Try one</div>
+        <div class="qadd" id="dishExamples"></div>
+      </div>
     </div>
 
     <div class="box">
@@ -239,6 +243,13 @@ const QUICK = ['Eggs','Chicken','Ground beef','Rice','Pasta','Tortillas','Cheese
 function renderQuick(){
   $('#qadd').innerHTML = QUICK.map(q=>`<button data-q="${q}">+ ${q}</button>`).join('');
   $$('#qadd button').forEach(b=>b.onclick=()=>addIng(b.dataset.q));
+}
+const DISH_EXAMPLES = ['Birria tacos','Huevos rancheros','Carbonara','Pad thai','Chicken tikka masala','Shakshuka','Street tacos','Ramen'];
+function renderDishExamples(){
+  $('#dishExamples').innerHTML = DISH_EXAMPLES.map(d=>`<button data-d="${d}">${d}</button>`).join('');
+  $$('#dishExamples button').forEach(b=>b.onclick=()=>{
+    $('#dishInput').value=b.dataset.d; updateGo(); $('#goBtn').click();
+  });
 }
 function addIng(raw){
   // allow comma/"and" separated bulk entry (great for voice)
@@ -424,7 +435,7 @@ function savedCard(rc){
 }
 
 /* ---------- init ---------- */
-renderQuick(); renderChips();
+renderQuick(); renderDishExamples(); renderChips();
 </script>
 </body>
 </html>
