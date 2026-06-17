@@ -3,22 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#1a1310">
+<meta name="theme-color" content="#fbf8f5">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Gio's Kitchen">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <title>Gio's Kitchen — What Can I Make?</title>
 <style>
   :root{
-    --bg:#140f0c; --bg2:#1f1612; --card:#241a15; --card2:#2c211a; --line:#3a2b22;
-    --text:#f6ece4; --muted:#b69e8f; --accent:#e07a52; --accent2:#b5482e; --good:#7bb86a;
+    --bg:#fbf8f5; --bg2:#f3ede5; --card:#ffffff; --card2:#f7f1ea; --line:#e8ded2;
+    --text:#2c2620; --muted:#857668; --accent:#d8623c; --accent2:#b5482e; --good:#4f9a45;
+    --shadow:0 1px 3px rgba(80,50,30,.06),0 1px 2px rgba(80,50,30,.04);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{
     margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1100px 540px at 50% -8%, #2a1c14 0%, var(--bg) 55%) fixed;
+    background:radial-gradient(1100px 560px at 50% -8%, #fdeadf 0%, var(--bg) 58%) fixed;
     color:var(--text);min-height:100vh;
     padding:max(18px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
   }
@@ -31,11 +32,11 @@
   .sub{color:var(--muted);font-size:.92rem;margin:0}
 
   /* tabs */
-  .tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 18px;max-width:430px}
+  .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 18px;max-width:430px;box-shadow:var(--shadow)}
   .tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.88rem;padding:9px 6px;border-radius:10px;cursor:pointer;transition:.15s}
   .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 
-  .modeseg{display:flex;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px}
+  .modeseg{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px;box-shadow:var(--shadow)}
   .modeseg button{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.9rem;padding:11px 8px;border-radius:10px;cursor:pointer;transition:.15s}
   .modeseg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
   ul.ingl{margin:0 0 4px;padding-left:20px}
@@ -45,7 +46,7 @@
   .panel.active{display:block}
 
   /* input area */
-  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
   .box h2{font-family:Georgia,serif;font-size:1.05rem;margin:0 0 4px;color:var(--accent)}
   .box .hint{color:var(--muted);font-size:.82rem;margin:0 0 12px}
   .inrow{display:flex;gap:8px}
@@ -61,7 +62,7 @@
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;min-height:4px}
   .chip{display:inline-flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:20px;padding:7px 8px 7px 13px;font-size:.9rem}
   .chip b{font-weight:600}
-  .chip button{border:0;background:rgba(255,255,255,.08);color:var(--muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.95rem;line-height:1;display:flex;align-items:center;justify-content:center}
+  .chip button{border:0;background:rgba(0,0,0,.06);color:var(--muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.95rem;line-height:1;display:flex;align-items:center;justify-content:center}
   .chip button:hover{background:var(--accent2);color:#fff}
 
   .quick{margin-top:14px}
@@ -90,12 +91,12 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .cooktips{color:var(--muted);font-size:.82rem;font-style:italic;margin-top:6px}
 
-  .recipe{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;animation:rise .35s ease both}
+  .recipe{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);animation:rise .35s ease both}
   @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
   .rhead h3{font-family:Georgia,serif;font-size:1.25rem;margin:0 0 3px;color:var(--text)}
   .rblurb{color:var(--muted);font-size:.88rem;font-style:italic;margin:0 0 11px}
-  .fav{border:0;background:none;cursor:pointer;font-size:1.4rem;line-height:1;color:var(--line);flex:0 0 auto;transition:.15s}
+  .fav{border:0;background:none;cursor:pointer;font-size:1.4rem;line-height:1;color:#d8ccbe;flex:0 0 auto;transition:.15s}
   .fav.on{color:var(--accent)}
   .fav:active{transform:scale(.8)}
   .meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px}
@@ -104,8 +105,8 @@
   .pill.pro b{color:var(--good)}
   .uses{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
   .tag{font-size:.76rem;padding:3px 9px;border-radius:14px}
-  .tag.have{background:rgba(123,184,106,.14);color:#a6d398;border:1px solid rgba(123,184,106,.3)}
-  .tag.need{background:rgba(224,122,82,.12);color:#e6a382;border:1px solid rgba(224,122,82,.3)}
+  .tag.have{background:#eaf5e6;color:#3c7a30;border:1px solid #cfe6c6}
+  .tag.need{background:#fdeee7;color:#b5482e;border:1px solid #f1d4c6}
   .seclbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:12px 0 6px}
   ol.steps{margin:0;padding-left:20px}
   ol.steps li{margin-bottom:7px;font-size:.94rem;line-height:1.5}
