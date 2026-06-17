@@ -70,6 +70,7 @@
   .qadd{display:flex;flex-wrap:wrap;gap:7px}
   .qadd button{background:none;border:1px dashed var(--line);color:var(--muted);border-radius:18px;padding:6px 12px;font:inherit;font-size:.84rem;cursor:pointer}
   .qadd button:hover{border-color:var(--accent);color:var(--text)}
+  .qadd button.on{border-style:solid;border-color:var(--accent2);background:var(--accent2);color:#fff}
 
   .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
   .seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:11px;overflow:hidden}
@@ -252,10 +253,23 @@
 
   <!-- COOKBOOK -->
   <section class="panel" id="panel-book">
-    <div class="pdfwrap">
-      <iframe src="cookbook.pdf#view=FitH" title="Gio's First Apartment Cookbook"></iframe>
-      <a class="btn openpdf" href="cookbook.pdf" target="_blank" rel="noopener">Open full cookbook ↗</a>
-      <p class="note">74 recipes, foundations, shopping lists & the meal-prep formula. If the preview is blank on your phone, tap “Open full cookbook”.</p>
+    <div class="box">
+      <h2>Your cookbook <span style="font-weight:400;color:var(--muted);font-size:.85rem">(74 recipes)</span></h2>
+      <p class="hint">Search by name or ingredient, or filter by type. Every recipe has Cook Mode, scaling & add-to-list.</p>
+      <div class="inrow">
+        <input id="bookSearch" type="text" placeholder="Search recipes… e.g. carne asada, chili, broccoli" autocomplete="off" enterkeyhint="search">
+        <button class="btn addbtn" id="bookClear">Clear</button>
+      </div>
+      <div class="quick">
+        <div class="lbl">Type</div>
+        <div class="qadd" id="bookCats"></div>
+      </div>
+    </div>
+    <div id="bookCount" class="cooktips" style="margin:0 2px 10px"></div>
+    <div id="bookList"></div>
+    <div class="pdfwrap" style="margin-top:8px">
+      <a class="btn openpdf" href="cookbook.pdf" target="_blank" rel="noopener">Open full designed PDF ↗</a>
+      <p class="note">The full cookbook with foundations, master guides, shopping lists & the meal-prep formula.</p>
     </div>
   </section>
 
@@ -285,6 +299,8 @@ const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 let mode = 'have';
 const REG = {};
 let savedFilter = '__all';
+let COOKBOOK = [];
+let bookCat = '__all';
 let ingredients = [];
 let cuisine = 'Any';
 let highProtein = false, quick = false;
@@ -305,6 +321,7 @@ $$('.tab').forEach(t=>t.onclick=()=>{
   $('#panel-'+t.dataset.tab).classList.add('active');
   if(t.dataset.tab==='saved') renderSaved();
   if(t.dataset.tab==='shop') renderShop();
+  if(t.dataset.tab==='book') renderBook();
   window.scrollTo(0,0);
 });
 
@@ -414,8 +431,13 @@ $('#goBtn').onclick=async()=>{
     const data = await r.json();
     if(!r.ok){ throw new Error(data.error + (data.detail?(' — '+data.detail):'')); }
     $('#status').innerHTML='';
-    if(!data.recipes || !data.recipes.length){ results.innerHTML=`<div class="empty"><div class="big">🤔</div>${mode==='have'?'No ideas came back. Try adding one or two more ingredients.':'No recipes came back. Try rephrasing the dish.'}</div>`; return; }
-    results.innerHTML = data.recipes.map((rc,i)=>recipeCard(rc,i)).join('');
+    const cb = (mode==='dish') ? cookbookMatches(payload.dish) : [];
+    const ai = data.recipes || [];
+    if(!ai.length && !cb.length){ results.innerHTML=`<div class="empty"><div class="big">🤔</div>${mode==='have'?'No ideas came back. Try adding one or two more ingredients.':'No recipes came back. Try rephrasing the dish.'}</div>`; return; }
+    let html='';
+    if(cb.length){ html += `<div class="seclbl" style="margin:2px 2px 11px;font-size:.8rem">📖 From your cookbook</div>` + cb.map((rc,i)=>recipeCard(rc,'cb'+i)).join(''); }
+    if(ai.length){ html += (cb.length?`<div class="seclbl" style="margin:18px 2px 11px;font-size:.8rem">✨ More ideas</div>`:'') + ai.map((rc,i)=>recipeCard(rc,i)).join(''); }
+    results.innerHTML = html;
     wireFavs(results); wireCards(results);
   }catch(err){
     $('#status').innerHTML = `<div class="empty"><div class="big">⚠️</div><div>${esc(err.message||'Something went wrong.')}</div><div class="cooktips" style="margin-top:8px">If this is the first run, make sure ANTHROPIC_API_KEY is set in Vercel.</div></div>`;
@@ -648,8 +670,47 @@ function savedCard(rc){
   </div>`;
 }
 
+/* ---------- cookbook browser ---------- */
+function loadCookbook(){
+  fetch('cookbook-recipes.json').then(r=>r.json()).then(d=>{
+    COOKBOOK=(d.recipes||[]); renderBookCats();
+    if($('#panel-book').classList.contains('active')) renderBook();
+  }).catch(()=>{ COOKBOOK=[]; });
+}
+function renderBookCats(){
+  const cats=[...new Set(COOKBOOK.map(r=>r.cuisine))];
+  $('#bookCats').innerHTML=`<button data-c="__all" class="${bookCat==='__all'?'on':''}">All</button>`+
+    cats.map(c=>`<button data-c="${esc(c)}" class="${bookCat===c?'on':''}">${esc(c)}</button>`).join('');
+  $$('#bookCats button').forEach(b=>b.onclick=()=>{ bookCat=b.dataset.c; renderBookCats(); renderBook(); });
+}
+function renderBook(){
+  const q=($('#bookSearch').value||'').trim().toLowerCase();
+  let list=COOKBOOK.slice();
+  if(bookCat!=='__all') list=list.filter(r=>r.cuisine===bookCat);
+  if(q){ const toks=q.split(/\s+/); list=list.filter(r=>{
+    const hay=(r.name+' '+r.cuisine+' '+(r.ingredients||[]).join(' ')+' '+(r.blurb||'')).toLowerCase();
+    return toks.every(t=>hay.includes(t));
+  }); }
+  $('#bookCount').textContent=`${list.length} recipe${list.length!==1?'s':''}`;
+  const el=$('#bookList');
+  if(!COOKBOOK.length){ el.innerHTML=`<div class="empty"><div class="big">📖</div>Loading your cookbook…</div>`; return; }
+  if(!list.length){ el.innerHTML=`<div class="empty"><div class="big">🔍</div>No matches. Try another word or type.</div>`; return; }
+  el.innerHTML=list.map((rc,i)=>recipeCard(rc,i)).join('');
+  wireFavs(el); wireCards(el);
+}
+function cookbookMatches(q){
+  if(!COOKBOOK.length) return [];
+  const ql=q.toLowerCase(), toks=ql.split(/\s+/).filter(t=>t.length>=3);
+  return COOKBOOK.map(r=>{ const n=r.name.toLowerCase(); let s=0;
+      if(n.includes(ql)) s+=5; toks.forEach(t=>{ if(n.includes(t)) s+=2; });
+      return {r,s}; })
+    .filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,3).map(x=>x.r);
+}
+$('#bookSearch').addEventListener('input', renderBook);
+$('#bookClear').onclick=()=>{ $('#bookSearch').value=''; renderBook(); };
+
 /* ---------- init ---------- */
-renderQuick(); renderDishExamples(); renderChips();
+renderQuick(); renderDishExamples(); renderChips(); loadCookbook();
 </script>
 </body>
 </html>
