@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1a1310">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gio's Kitchen">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>Gio's Kitchen — What Can I Make?</title>
+<style>
+  :root{
+    --bg:#140f0c; --bg2:#1f1612; --card:#241a15; --card2:#2c211a; --line:#3a2b22;
+    --text:#f6ece4; --muted:#b69e8f; --accent:#e07a52; --accent2:#b5482e; --good:#7bb86a;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1100px 540px at 50% -8%, #2a1c14 0%, var(--bg) 55%) fixed;
+    color:var(--text);min-height:100vh;
+    padding:max(18px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+  }
+  .wrap{max-width:760px;margin:0 auto}
+  a.back{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:600;margin-bottom:12px}
+  a.back:hover{color:var(--text)}
+  header.top{text-align:center;margin-bottom:18px}
+  .logo{width:56px;height:56px;border-radius:17px;margin:0 auto 12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 10px 30px rgba(224,122,82,.35)}
+  h1{font-family:Georgia,serif;font-size:1.55rem;margin:0 0 3px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:.92rem;margin:0}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 18px;max-width:430px}
+  .tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.88rem;padding:9px 6px;border-radius:10px;cursor:pointer;transition:.15s}
+  .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+
+  .panel{display:none}
+  .panel.active{display:block}
+
+  /* input area */
+  .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+  .box h2{font-family:Georgia,serif;font-size:1.05rem;margin:0 0 4px;color:var(--accent)}
+  .box .hint{color:var(--muted);font-size:.82rem;margin:0 0 12px}
+  .inrow{display:flex;gap:8px}
+  #ingInput{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;color:var(--text);font:inherit;font-size:1rem;padding:12px 14px;outline:none}
+  #ingInput:focus{border-color:var(--accent)}
+  .btn{border:0;border-radius:12px;font:inherit;font-weight:700;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+  .btn:active{transform:scale(.96)}
+  .addbtn{background:var(--card2);color:var(--text);border:1px solid var(--line);padding:0 16px}
+  .micbtn{background:var(--card2);color:var(--text);border:1px solid var(--line);width:48px;flex:0 0 48px;font-size:1.15rem}
+  .micbtn.listening{background:var(--accent2);border-color:var(--accent);color:#fff;animation:pulse 1.1s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(224,122,82,.5)}50%{box-shadow:0 0 0 9px rgba(224,122,82,0)}}
+
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px;min-height:4px}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:20px;padding:7px 8px 7px 13px;font-size:.9rem}
+  .chip b{font-weight:600}
+  .chip button{border:0;background:rgba(255,255,255,.08);color:var(--muted);width:20px;height:20px;border-radius:50%;cursor:pointer;font-size:.95rem;line-height:1;display:flex;align-items:center;justify-content:center}
+  .chip button:hover{background:var(--accent2);color:#fff}
+
+  .quick{margin-top:14px}
+  .quick .lbl{font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}
+  .qadd{display:flex;flex-wrap:wrap;gap:7px}
+  .qadd button{background:none;border:1px dashed var(--line);color:var(--muted);border-radius:18px;padding:6px 12px;font:inherit;font-size:.84rem;cursor:pointer}
+  .qadd button:hover{border-color:var(--accent);color:var(--text)}
+
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .seg{display:flex;background:var(--bg2);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .seg button{border:0;background:none;color:var(--muted);font:inherit;font-size:.82rem;padding:8px 11px;cursor:pointer}
+  .seg button.on{background:var(--accent2);color:#fff}
+  .toggle{display:inline-flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:8px 12px;font-size:.82rem;color:var(--muted);cursor:pointer;user-select:none}
+  .toggle.on{border-color:var(--accent);color:var(--text)}
+  .toggle .dot{width:30px;height:18px;border-radius:10px;background:var(--line);position:relative;transition:.15s}
+  .toggle.on .dot{background:var(--good)}
+  .toggle .dot::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s}
+  .toggle.on .dot::after{left:14px}
+
+  .gobtn{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1.02rem;padding:15px;margin-top:16px;box-shadow:0 8px 24px rgba(181,72,46,.4)}
+  .gobtn:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none}
+
+  /* results */
+  #status{text-align:center;color:var(--muted);font-size:.9rem;padding:8px 0}
+  .spinner{display:inline-block;width:34px;height:34px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .cooktips{color:var(--muted);font-size:.82rem;font-style:italic;margin-top:6px}
+
+  .recipe{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;animation:rise .35s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .rhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .rhead h3{font-family:Georgia,serif;font-size:1.25rem;margin:0 0 3px;color:var(--text)}
+  .rblurb{color:var(--muted);font-size:.88rem;font-style:italic;margin:0 0 11px}
+  .fav{border:0;background:none;cursor:pointer;font-size:1.4rem;line-height:1;color:var(--line);flex:0 0 auto;transition:.15s}
+  .fav.on{color:var(--accent)}
+  .fav:active{transform:scale(.8)}
+  .meta{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:13px}
+  .pill{font-size:.74rem;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:4px 10px;color:var(--muted)}
+  .pill b{color:var(--accent);font-weight:700}
+  .pill.pro b{color:var(--good)}
+  .uses{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px}
+  .tag{font-size:.76rem;padding:3px 9px;border-radius:14px}
+  .tag.have{background:rgba(123,184,106,.14);color:#a6d398;border:1px solid rgba(123,184,106,.3)}
+  .tag.need{background:rgba(224,122,82,.12);color:#e6a382;border:1px solid rgba(224,122,82,.3)}
+  .seclbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin:12px 0 6px}
+  ol.steps{margin:0;padding-left:20px}
+  ol.steps li{margin-bottom:7px;font-size:.94rem;line-height:1.5}
+
+  .empty{text-align:center;color:var(--muted);padding:30px 16px}
+  .empty .big{font-size:2.4rem;margin-bottom:8px}
+
+  /* PDF tab */
+  .pdfwrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;text-align:center}
+  .pdfwrap iframe{width:100%;height:72vh;border:1px solid var(--line);border-radius:12px;background:#fff}
+  .pdfwrap .openpdf{display:inline-flex;margin-top:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:12px 20px;text-decoration:none}
+  .note{color:var(--muted);font-size:.8rem;margin-top:8px}
+  footer{text-align:center;color:var(--muted);font-size:.76rem;margin-top:26px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html#personal">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    Gio's Hub
+  </a>
+
+  <header class="top">
+    <div class="logo">🍳</div>
+    <h1>What Can I Make?</h1>
+    <p class="sub">Tell me what's in your kitchen — get real meals back, live.</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="make">🔥 Make Something</button>
+    <button class="tab" data-tab="saved">❤️ Saved</button>
+    <button class="tab" data-tab="book">📖 Cookbook</button>
+  </div>
+
+  <!-- MAKE -->
+  <section class="panel active" id="panel-make">
+    <div class="box">
+      <h2>What do you have?</h2>
+      <p class="hint">Type an ingredient and hit add, tap the mic and say them out loud, or use the quick buttons.</p>
+      <div class="inrow">
+        <input id="ingInput" type="text" placeholder="e.g. chicken, tortillas, enchilada sauce" autocomplete="off" enterkeyhint="done">
+        <button class="btn micbtn" id="micBtn" title="Speak your ingredients">🎤</button>
+        <button class="btn addbtn" id="addBtn">Add</button>
+      </div>
+      <div class="chips" id="chips"></div>
+
+      <div class="quick">
+        <div class="lbl">Quick add</div>
+        <div class="qadd" id="qadd"></div>
+      </div>
+    </div>
+
+    <div class="box">
+      <h2>Dial it in <span style="font-weight:400;color:var(--muted);font-size:.85rem">(optional)</span></h2>
+      <div class="filters">
+        <div class="seg" id="cuisineSeg">
+          <button class="on" data-c="Any">Any</button>
+          <button data-c="Mexican">Mexican</button>
+          <button data-c="Italian">Italian</button>
+          <button data-c="Asian">Asian</button>
+          <button data-c="American">American</button>
+        </div>
+        <div class="toggle" id="proToggle"><span class="dot"></span> High protein</div>
+        <div class="toggle" id="quickToggle"><span class="dot"></span> Under 20 min</div>
+      </div>
+      <button class="btn gobtn" id="goBtn" disabled>Find me recipes →</button>
+    </div>
+
+    <div id="status"></div>
+    <div id="results"></div>
+  </section>
+
+  <!-- SAVED -->
+  <section class="panel" id="panel-saved">
+    <div id="savedList"></div>
+  </section>
+
+  <!-- COOKBOOK -->
+  <section class="panel" id="panel-book">
+    <div class="pdfwrap">
+      <iframe src="cookbook.pdf#view=FitH" title="Gio's First Apartment Cookbook"></iframe>
+      <a class="btn openpdf" href="cookbook.pdf" target="_blank" rel="noopener">Open full cookbook ↗</a>
+      <p class="note">74 recipes, foundations, shopping lists & the meal-prep formula. If the preview is blank on your phone, tap “Open full cookbook”.</p>
+    </div>
+  </section>
+
+  <footer>Powered live by Claude · Your saved recipes stay on this device.</footer>
+</div>
+
+<script>
+const $ = (s,el=document)=>el.querySelector(s);
+const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
+
+/* ---------- state ---------- */
+let ingredients = [];
+let cuisine = 'Any';
+let highProtein = false, quick = false;
+const SAVE_KEY = 'gio_kitchen_favs';
+let favs = load(SAVE_KEY, []);
+
+function load(k,d){ try{return JSON.parse(localStorage.getItem(k))??d}catch{return d} }
+function save(k,v){ try{localStorage.setItem(k,JSON.stringify(v))}catch{} }
+
+/* ---------- tabs ---------- */
+$$('.tab').forEach(t=>t.onclick=()=>{
+  $$('.tab').forEach(x=>x.classList.remove('active'));
+  $$('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  $('#panel-'+t.dataset.tab).classList.add('active');
+  if(t.dataset.tab==='saved') renderSaved();
+  window.scrollTo(0,0);
+});
+
+/* ---------- ingredients ---------- */
+const QUICK = ['Eggs','Chicken','Ground beef','Rice','Pasta','Tortillas','Cheese','Bread','Onion','Garlic','Tomatoes','Beans','Broccoli','Potatoes','Bacon','Milk','Butter','Salsa'];
+function renderQuick(){
+  $('#qadd').innerHTML = QUICK.map(q=>`<button data-q="${q}">+ ${q}</button>`).join('');
+  $$('#qadd button').forEach(b=>b.onclick=()=>addIng(b.dataset.q));
+}
+function addIng(raw){
+  // allow comma/"and" separated bulk entry (great for voice)
+  String(raw).split(/,| and /i).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+    const v = s.replace(/\.$/,'').toLowerCase();
+    if(v && !ingredients.some(x=>x.toLowerCase()===v)) ingredients.push(s.replace(/\.$/,''));
+  });
+  renderChips();
+}
+function removeIng(i){ ingredients.splice(i,1); renderChips(); }
+function renderChips(){
+  $('#chips').innerHTML = ingredients.map((g,i)=>`<span class="chip"><b>${esc(g)}</b><button data-i="${i}" aria-label="remove">×</button></span>`).join('');
+  $$('#chips button').forEach(b=>b.onclick=()=>removeIng(+b.dataset.i));
+  $('#goBtn').disabled = ingredients.length===0;
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+
+$('#addBtn').onclick=()=>{ if($('#ingInput').value.trim()){addIng($('#ingInput').value);$('#ingInput').value=''} $('#ingInput').focus(); };
+$('#ingInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();$('#addBtn').click()} });
+
+/* ---------- filters ---------- */
+$$('#cuisineSeg button').forEach(b=>b.onclick=()=>{
+  $$('#cuisineSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); cuisine=b.dataset.c;
+});
+$('#proToggle').onclick=function(){ highProtein=!highProtein; this.classList.toggle('on',highProtein); };
+$('#quickToggle').onclick=function(){ quick=!quick; this.classList.toggle('on',quick); };
+
+/* ---------- voice (Web Speech API) ---------- */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const micBtn = $('#micBtn');
+if(!SR){ micBtn.style.display='none'; }
+else {
+  let rec, listening=false;
+  micBtn.onclick=()=>{
+    if(listening){ rec && rec.stop(); return; }
+    rec = new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
+    let finalText='';
+    rec.onstart=()=>{ listening=true; micBtn.classList.add('listening'); $('#ingInput').placeholder='Listening… say your ingredients'; };
+    rec.onresult=(e)=>{
+      let interim='';
+      for(let i=e.resultIndex;i<e.results.length;i++){
+        const t=e.results[i][0].transcript;
+        if(e.results[i].isFinal) finalText+=t; else interim+=t;
+      }
+      $('#ingInput').value = (finalText+' '+interim).trim();
+    };
+    rec.onerror=()=>{ stopMic(); };
+    rec.onend=()=>{
+      stopMic();
+      if(finalText.trim()){ addIng(finalText); $('#ingInput').value=''; }
+    };
+    function stopMic(){ listening=false; micBtn.classList.remove('listening'); $('#ingInput').placeholder='e.g. chicken, tortillas, enchilada sauce'; }
+    rec.start();
+  };
+}
+
+/* ---------- generate ---------- */
+const TIPS = ['Heating the pan first…','Checking what pairs well…','Thinking like a hungry San Diegan…','Keeping it simple…','Pulling 3 ideas together…'];
+$('#goBtn').onclick=async()=>{
+  if(ingredients.length===0) return;
+  const results = $('#results'); results.innerHTML='';
+  $('#status').innerHTML = `<div class="spinner"></div><div>Cooking up ideas…</div><div class="cooktips">${TIPS[Math.floor(Math.random()*TIPS.length)]}</div>`;
+  $('#goBtn').disabled=true;
+  try{
+    const r = await fetch('/api/recipes',{
+      method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({ingredients,cuisine,highProtein,quick})
+    });
+    const data = await r.json();
+    if(!r.ok){ throw new Error(data.error + (data.detail?(' — '+data.detail):'')); }
+    $('#status').innerHTML='';
+    if(!data.recipes || !data.recipes.length){ results.innerHTML=`<div class="empty"><div class="big">🤔</div>No ideas came back. Try adding one or two more ingredients.</div>`; return; }
+    results.innerHTML = data.recipes.map((rc,i)=>recipeCard(rc,i)).join('');
+    wireFavs(results);
+  }catch(err){
+    $('#status').innerHTML = `<div class="empty"><div class="big">⚠️</div><div>${esc(err.message||'Something went wrong.')}</div><div class="cooktips" style="margin-top:8px">If this is the first run, make sure ANTHROPIC_API_KEY is set in Vercel.</div></div>`;
+  }finally{
+    $('#goBtn').disabled=false;
+  }
+};
+
+function recipeCard(rc,idx,saved=false){
+  const id = saved ? rc._id : (rc.name+'|'+(rc.time_minutes||''));
+  const isFav = favs.some(f=>f._id===id);
+  const stars = '●'.repeat(Math.max(1,Math.min(5,rc.difficulty||1)))+'<span style="opacity:.25">'+'●'.repeat(5-Math.max(1,Math.min(5,rc.difficulty||1)))+'</span>';
+  const meta = [
+    rc.time_minutes?`<span class="pill"><b>${rc.time_minutes}</b> min</span>`:'',
+    `<span class="pill"><b>Difficulty</b> ${stars}</span>`,
+    rc.cuisine?`<span class="pill">${esc(rc.cuisine)}</span>`:'',
+    (rc.protein_g)?`<span class="pill pro"><b>${rc.protein_g}g</b> protein</span>`:''
+  ].join('');
+  const have = (rc.uses||[]).map(u=>`<span class="tag have">✓ ${esc(u)}</span>`).join('');
+  const need = (rc.need||[]).filter(Boolean).map(u=>`<span class="tag need">+ ${esc(u)}</span>`).join('');
+  const steps = (rc.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  return `<div class="recipe" data-id="${esc(id)}">
+    <div class="rhead">
+      <div><h3>${esc(rc.name)}</h3><p class="rblurb">${esc(rc.blurb||'')}</p></div>
+      <button class="fav ${isFav?'on':''}" title="Save">❤</button>
+    </div>
+    <div class="meta">${meta}</div>
+    ${(have||need)?`<div class="uses">${have}${need}</div>`:''}
+    <div class="seclbl">Steps</div>
+    <ol class="steps">${steps}</ol>
+  </div>`;
+}
+
+function wireFavs(scope){
+  $$('.fav',scope).forEach(btn=>{
+    btn.onclick=()=>{
+      const card = btn.closest('.recipe'); const id=card.dataset.id;
+      const exists = favs.findIndex(f=>f._id===id);
+      if(exists>=0){ favs.splice(exists,1); btn.classList.remove('on'); }
+      else{
+        const rc = scrapeCard(card); rc._id=id; favs.unshift(rc); btn.classList.add('on');
+      }
+      save(SAVE_KEY,favs);
+    };
+  });
+}
+// rebuild a recipe object from the rendered card (so Saved works from any tab)
+function scrapeCard(card){
+  return {
+    name: $('h3',card).textContent,
+    blurb: ($('.rblurb',card)||{}).textContent||'',
+    cuisine: '',
+    time_minutes: null, difficulty: null,
+    uses: $$('.tag.have',card).map(t=>t.textContent.replace(/^✓\s*/,'')),
+    need: $$('.tag.need',card).map(t=>t.textContent.replace(/^\+\s*/,'')),
+    steps: $$('.steps li',card).map(li=>li.textContent),
+    _meta: $('.meta',card).innerHTML
+  };
+}
+
+/* ---------- saved ---------- */
+function renderSaved(){
+  const list = $('#savedList');
+  if(!favs.length){ list.innerHTML=`<div class="empty"><div class="big">🤍</div>No saved recipes yet.<br>Tap the heart on any recipe to keep it here.</div>`; return; }
+  list.innerHTML = favs.map(rc=>savedCard(rc)).join('');
+  $$('.fav',list).forEach(btn=>btn.onclick=()=>{
+    const card=btn.closest('.recipe'); const id=card.dataset.id;
+    favs = favs.filter(f=>f._id!==id); save(SAVE_KEY,favs); renderSaved();
+  });
+}
+function savedCard(rc){
+  const have=(rc.uses||[]).map(u=>`<span class="tag have">✓ ${esc(u)}</span>`).join('');
+  const need=(rc.need||[]).map(u=>`<span class="tag need">+ ${esc(u)}</span>`).join('');
+  const steps=(rc.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('');
+  return `<div class="recipe" data-id="${esc(rc._id)}">
+    <div class="rhead"><div><h3>${esc(rc.name)}</h3><p class="rblurb">${esc(rc.blurb||'')}</p></div>
+    <button class="fav on" title="Remove">❤</button></div>
+    ${rc._meta?`<div class="meta">${rc._meta}</div>`:''}
+    ${(have||need)?`<div class="uses">${have}${need}</div>`:''}
+    <div class="seclbl">Steps</div><ol class="steps">${steps}</ol>
+  </div>`;
+}
+
+/* ---------- init ---------- */
+renderQuick(); renderChips();
+</script>
+</body>
+</html>
