@@ -35,6 +35,12 @@
   .tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.88rem;padding:9px 6px;border-radius:10px;cursor:pointer;transition:.15s}
   .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 
+  .modeseg{display:flex;gap:8px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px}
+  .modeseg button{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.9rem;padding:11px 8px;border-radius:10px;cursor:pointer;transition:.15s}
+  .modeseg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  ul.ingl{margin:0 0 4px;padding-left:20px}
+  ul.ingl li{margin-bottom:5px;font-size:.92rem;line-height:1.45}
+
   .panel{display:none}
   .panel.active{display:block}
 
@@ -136,7 +142,12 @@
 
   <!-- MAKE -->
   <section class="panel active" id="panel-make">
-    <div class="box">
+    <div class="modeseg" id="modeSeg">
+      <button class="on" data-mode="have">🧊 What I have</button>
+      <button data-mode="dish">🔍 Find a dish</button>
+    </div>
+
+    <div class="box" id="haveBox">
       <h2>What do you have?</h2>
       <p class="hint">Type an ingredient and hit add, tap the mic and say them out loud, or use the quick buttons.</p>
       <div class="inrow">
@@ -149,6 +160,15 @@
       <div class="quick">
         <div class="lbl">Quick add</div>
         <div class="qadd" id="qadd"></div>
+      </div>
+    </div>
+
+    <div class="box" id="dishBox" hidden>
+      <h2>What do you want to make?</h2>
+      <p class="hint">Name a dish and I'll show you a few ways to make it — classic plus popular variations.</p>
+      <div class="inrow">
+        <input id="dishInput" type="text" placeholder="e.g. huevos rancheros, birria tacos, carbonara" autocomplete="off" enterkeyhint="search">
+        <button class="btn micbtn" id="dishMic" title="Speak the dish">🎤</button>
       </div>
     </div>
 
@@ -194,6 +214,7 @@ const $ = (s,el=document)=>el.querySelector(s);
 const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
 
 /* ---------- state ---------- */
+let mode = 'have';
 let ingredients = [];
 let cuisine = 'Any';
 let highProtein = false, quick = false;
@@ -231,12 +252,27 @@ function removeIng(i){ ingredients.splice(i,1); renderChips(); }
 function renderChips(){
   $('#chips').innerHTML = ingredients.map((g,i)=>`<span class="chip"><b>${esc(g)}</b><button data-i="${i}" aria-label="remove">×</button></span>`).join('');
   $$('#chips button').forEach(b=>b.onclick=()=>removeIng(+b.dataset.i));
-  $('#goBtn').disabled = ingredients.length===0;
+  updateGo();
 }
+function updateGo(){
+  $('#goBtn').disabled = (mode==='have') ? ingredients.length===0 : !$('#dishInput').value.trim();
+}
+
+/* ---------- mode toggle ---------- */
+$$('#modeSeg button').forEach(b=>b.onclick=()=>{
+  $$('#modeSeg button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); mode=b.dataset.mode;
+  $('#haveBox').hidden = mode!=='have';
+  $('#dishBox').hidden = mode!=='dish';
+  $('#goBtn').textContent = mode==='have' ? 'Find me recipes →' : 'Show me recipes →';
+  updateGo();
+});
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 
 $('#addBtn').onclick=()=>{ if($('#ingInput').value.trim()){addIng($('#ingInput').value);$('#ingInput').value=''} $('#ingInput').focus(); };
 $('#ingInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();$('#addBtn').click()} });
+$('#dishInput').addEventListener('input', updateGo);
+$('#dishInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault(); if(!$('#goBtn').disabled)$('#goBtn').click();} });
 
 /* ---------- filters ---------- */
 $$('#cuisineSeg button').forEach(b=>b.onclick=()=>{
@@ -248,55 +284,62 @@ $('#quickToggle').onclick=function(){ quick=!quick; this.classList.toggle('on',q
 
 /* ---------- voice (Web Speech API) ---------- */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-const micBtn = $('#micBtn');
-if(!SR){ micBtn.style.display='none'; }
-else {
+function attachMic(btn, input, onFinal){
+  if(!btn) return;
+  if(!SR){ btn.style.display='none'; return; }
   let rec, listening=false;
-  micBtn.onclick=()=>{
+  btn.onclick=()=>{
     if(listening){ rec && rec.stop(); return; }
     rec = new SR(); rec.lang='en-US'; rec.interimResults=true; rec.continuous=false;
-    let finalText='';
-    rec.onstart=()=>{ listening=true; micBtn.classList.add('listening'); $('#ingInput').placeholder='Listening… say your ingredients'; };
+    let finalText=''; const ph=input.placeholder;
+    rec.onstart=()=>{ listening=true; btn.classList.add('listening'); input.placeholder='Listening…'; };
     rec.onresult=(e)=>{
       let interim='';
       for(let i=e.resultIndex;i<e.results.length;i++){
         const t=e.results[i][0].transcript;
         if(e.results[i].isFinal) finalText+=t; else interim+=t;
       }
-      $('#ingInput').value = (finalText+' '+interim).trim();
+      input.value=(finalText+' '+interim).trim();
     };
-    rec.onerror=()=>{ stopMic(); };
-    rec.onend=()=>{
-      stopMic();
-      if(finalText.trim()){ addIng(finalText); $('#ingInput').value=''; }
-    };
-    function stopMic(){ listening=false; micBtn.classList.remove('listening'); $('#ingInput').placeholder='e.g. chicken, tortillas, enchilada sauce'; }
+    rec.onerror=()=>stop();
+    rec.onend=()=>{ stop(); if(finalText.trim()) onFinal(finalText.trim()); };
+    function stop(){ listening=false; btn.classList.remove('listening'); input.placeholder=ph; }
     rec.start();
   };
 }
+attachMic($('#micBtn'), $('#ingInput'), (t)=>{ addIng(t); $('#ingInput').value=''; });
+attachMic($('#dishMic'), $('#dishInput'), (t)=>{ $('#dishInput').value=t; updateGo(); if(!$('#goBtn').disabled) $('#goBtn').click(); });
 
 /* ---------- generate ---------- */
 const TIPS = ['Heating the pan first…','Checking what pairs well…','Thinking like a hungry San Diegan…','Keeping it simple…','Pulling 3 ideas together…'];
 $('#goBtn').onclick=async()=>{
-  if(ingredients.length===0) return;
+  let payload;
+  if(mode==='have'){
+    if(ingredients.length===0) return;
+    payload={mode:'have',ingredients,cuisine,highProtein,quick};
+  } else {
+    const dish=$('#dishInput').value.trim();
+    if(!dish) return;
+    payload={mode:'dish',dish,cuisine,highProtein,quick};
+  }
   const results = $('#results'); results.innerHTML='';
-  $('#status').innerHTML = `<div class="spinner"></div><div>Cooking up ideas…</div><div class="cooktips">${TIPS[Math.floor(Math.random()*TIPS.length)]}</div>`;
+  $('#status').innerHTML = `<div class="spinner"></div><div>${mode==='have'?'Cooking up ideas…':'Finding recipes & variations…'}</div><div class="cooktips">${TIPS[Math.floor(Math.random()*TIPS.length)]}</div>`;
   $('#goBtn').disabled=true;
   try{
     const r = await fetch('/api/recipes',{
       method:'POST',headers:{'content-type':'application/json'},
-      body:JSON.stringify({ingredients,cuisine,highProtein,quick})
+      body:JSON.stringify(payload)
     });
     const data = await r.json();
     if(!r.ok){ throw new Error(data.error + (data.detail?(' — '+data.detail):'')); }
     $('#status').innerHTML='';
-    if(!data.recipes || !data.recipes.length){ results.innerHTML=`<div class="empty"><div class="big">🤔</div>No ideas came back. Try adding one or two more ingredients.</div>`; return; }
+    if(!data.recipes || !data.recipes.length){ results.innerHTML=`<div class="empty"><div class="big">🤔</div>${mode==='have'?'No ideas came back. Try adding one or two more ingredients.':'No recipes came back. Try rephrasing the dish.'}</div>`; return; }
     results.innerHTML = data.recipes.map((rc,i)=>recipeCard(rc,i)).join('');
     wireFavs(results);
   }catch(err){
     $('#status').innerHTML = `<div class="empty"><div class="big">⚠️</div><div>${esc(err.message||'Something went wrong.')}</div><div class="cooktips" style="margin-top:8px">If this is the first run, make sure ANTHROPIC_API_KEY is set in Vercel.</div></div>`;
   }finally{
-    $('#goBtn').disabled=false;
+    updateGo();
   }
 };
 
@@ -312,6 +355,7 @@ function recipeCard(rc,idx,saved=false){
   ].join('');
   const have = (rc.uses||[]).map(u=>`<span class="tag have">✓ ${esc(u)}</span>`).join('');
   const need = (rc.need||[]).filter(Boolean).map(u=>`<span class="tag need">+ ${esc(u)}</span>`).join('');
+  const ingList = (rc.ingredients&&rc.ingredients.length)?`<div class="seclbl">Ingredients</div><ul class="ingl">${rc.ingredients.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
   const steps = (rc.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('');
   return `<div class="recipe" data-id="${esc(id)}">
     <div class="rhead">
@@ -320,6 +364,7 @@ function recipeCard(rc,idx,saved=false){
     </div>
     <div class="meta">${meta}</div>
     ${(have||need)?`<div class="uses">${have}${need}</div>`:''}
+    ${ingList}
     <div class="seclbl">Steps</div>
     <ol class="steps">${steps}</ol>
   </div>`;
@@ -347,6 +392,7 @@ function scrapeCard(card){
     time_minutes: null, difficulty: null,
     uses: $$('.tag.have',card).map(t=>t.textContent.replace(/^✓\s*/,'')),
     need: $$('.tag.need',card).map(t=>t.textContent.replace(/^\+\s*/,'')),
+    ingredients: $$('.ingl li',card).map(li=>li.textContent),
     steps: $$('.steps li',card).map(li=>li.textContent),
     _meta: $('.meta',card).innerHTML
   };
@@ -365,12 +411,14 @@ function renderSaved(){
 function savedCard(rc){
   const have=(rc.uses||[]).map(u=>`<span class="tag have">✓ ${esc(u)}</span>`).join('');
   const need=(rc.need||[]).map(u=>`<span class="tag need">+ ${esc(u)}</span>`).join('');
+  const ingList=(rc.ingredients&&rc.ingredients.length)?`<div class="seclbl">Ingredients</div><ul class="ingl">${rc.ingredients.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>`:'';
   const steps=(rc.steps||[]).map(s=>`<li>${esc(s)}</li>`).join('');
   return `<div class="recipe" data-id="${esc(rc._id)}">
     <div class="rhead"><div><h3>${esc(rc.name)}</h3><p class="rblurb">${esc(rc.blurb||'')}</p></div>
     <button class="fav on" title="Remove">❤</button></div>
     ${rc._meta?`<div class="meta">${rc._meta}</div>`:''}
     ${(have||need)?`<div class="uses">${have}${need}</div>`:''}
+    ${ingList}
     <div class="seclbl">Steps</div><ol class="steps">${steps}</ol>
   </div>`;
 }
