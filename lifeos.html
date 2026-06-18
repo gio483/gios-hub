@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Life OS">
+<title>Daily Life OS</title>
+<style>
+  :root{--bg:#0b1220;--card:#151f33;--card2:#1b2a44;--text:#f1f5f9;--muted:#94a3b8;--line:#26344f;--accent:#a78bfa;--good:#34d399;--warn:#fbbf24}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1100px 560px at 50% -10%,#1a1733 0%,var(--bg) 55%) fixed;color:var(--text);min-height:100vh;padding:max(18px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom))}
+  .wrap{max-width:640px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .home{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:.85rem;font-weight:600}
+  .home:hover{color:var(--text)}
+  .save{margin-left:auto;font-size:.74rem;font-weight:600;color:var(--muted);padding:4px 10px;border:1px solid var(--line);border-radius:999px}
+  .save.ok{color:var(--good);border-color:rgba(52,211,153,.4)}
+  .save.saving{color:var(--warn);border-color:rgba(251,191,36,.4)}
+  h1{font-size:1.4rem;margin:0;letter-spacing:-.02em}
+  .datebar{display:flex;align-items:center;gap:8px;margin:4px 0 16px;color:var(--muted)}
+  .datebar button{background:var(--card);border:1px solid var(--line);color:var(--text);width:32px;height:32px;border-radius:9px;cursor:pointer;font-size:15px}
+  .datebar .d{font-weight:600;color:var(--text)}
+  .datebar .today{margin-left:auto;font-size:.78rem;color:var(--accent);background:none;border:0;cursor:pointer;font-weight:600;width:auto}
+
+  .trends{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+  .stat .lab{font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .stat .val{font-size:1.5rem;font-weight:700;margin-top:3px}
+  .stat .val small{font-size:.8rem;color:var(--muted);font-weight:600}
+  .spark{display:flex;align-items:flex-end;gap:3px;height:34px;margin-top:8px}
+  .spark span{flex:1;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;opacity:.85}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:14px}
+  .card h2{font-size:.95rem;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+  .card h2 .ic{font-size:1.05rem}
+  .field{margin-bottom:13px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:6px}
+  input[type=text],input[type=number],textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px 12px;font:inherit;font-size:.92rem}
+  textarea{min-height:64px;resize:vertical;line-height:1.5}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent)}
+  .scale{display:flex;gap:5px;flex-wrap:wrap}
+  .scale button{flex:1;min-width:26px;background:var(--bg);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:8px 0;cursor:pointer;font-weight:600;font-size:.86rem}
+  .scale button.on{background:var(--accent);border-color:var(--accent);color:#0b1220}
+  .row{display:flex;gap:10px}
+  .row .field{flex:1}
+  .counter{display:flex;align-items:center;gap:12px}
+  .counter button{width:38px;height:38px;border-radius:10px;background:var(--bg);border:1px solid var(--line);color:var(--text);font-size:18px;cursor:pointer}
+  .counter .n{font-size:1.3rem;font-weight:700;min-width:30px;text-align:center}
+  .counter .u{color:var(--muted);font-size:.82rem}
+  .toggle{display:inline-flex;align-items:center;gap:10px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer;font-weight:600}
+  .toggle.on{background:rgba(52,211,153,.14);border-color:rgba(52,211,153,.5);color:var(--good)}
+  .pri{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .pri .num{width:22px;height:22px;border-radius:6px;background:var(--card2);color:var(--muted);font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <a class="home" href="index.html#personal">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg> Hub
+    </a>
+    <span class="save" id="save">Loading…</span>
+  </div>
+  <h1>Daily Life OS</h1>
+  <div class="datebar">
+    <button id="prev" title="Previous day">‹</button>
+    <span class="d" id="dateLabel">—</span>
+    <button id="next" title="Next day">›</button>
+    <button class="today" id="todayBtn">Today</button>
+  </div>
+
+  <div class="trends" id="trends"></div>
+
+  <div class="card">
+    <h2><span class="ic">🌅</span> Morning</h2>
+    <div class="field">
+      <label>Top 3 priorities</label>
+      <div class="pri"><span class="num">1</span><input type="text" id="p0" placeholder="Most important thing today"></div>
+      <div class="pri"><span class="num">2</span><input type="text" id="p1" placeholder="Second"></div>
+      <div class="pri"><span class="num">3</span><input type="text" id="p2" placeholder="Third"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Sleep (hours)</label><input type="number" id="sleep" step="0.5" min="0" max="14" placeholder="7.5"></div>
+      <div class="field"><label>Water (glasses)</label>
+        <div class="counter"><button id="waterMinus">–</button><span class="n" id="waterN">0</span><button id="waterPlus">+</button><span class="u">glasses</span></div>
+      </div>
+    </div>
+    <div class="field"><label>Energy right now (1–10)</label><div class="scale" id="energy"></div></div>
+    <div class="field"><label>Movement</label><div class="toggle" id="workout"><span id="workoutMark">○</span> Worked out today</div></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="ic">🙏</span> Faith & Gratitude</h2>
+    <div class="field"><label>Grateful for</label><textarea id="gratitude" placeholder="One to three things…"></textarea></div>
+    <div class="field"><label>Scripture / prayer / verse on my mind</label><textarea id="faith" placeholder="A verse, a prayer, who you're praying for…"></textarea></div>
+  </div>
+
+  <div class="card">
+    <h2><span class="ic">🌙</span> Evening reflection</h2>
+    <div class="field"><label>Biggest win today</label><input type="text" id="win" placeholder="What went well"></div>
+    <div class="field"><label>Mood (1–10)</label><div class="scale" id="mood"></div></div>
+    <div class="field"><label>Reflection</label><textarea id="reflection" placeholder="What happened, what I learned, what to adjust tomorrow…"></textarea></div>
+  </div>
+</div>
+
+<script>
+const API = '/api/lifeos';
+const state = { data: {}, date: todayStr() };
+let saveTimer = null;
+
+function todayStr(){ const d=new Date(); return fmt(d); }
+function fmt(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function addDays(str,n){ const d=new Date(str+'T12:00:00'); d.setDate(d.getDate()+n); return fmt(d); }
+function prettyDate(str){ const d=new Date(str+'T12:00:00'); const t=todayStr(); if(str===t) return 'Today · '+d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); if(str===addDays(t,-1)) return 'Yesterday · '+d.toLocaleDateString(undefined,{month:'short',day:'numeric'}); return d.toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'}); }
+
+function entry(date){ if(!state.data[date]) state.data[date]={}; return state.data[date]; }
+function setSave(s){ const el=document.getElementById('save'); el.className='save '+(s==='Saved ✓'?'ok':(s==='Saving…'?'saving':'')); el.textContent=s; }
+
+async function loadData(){
+  setSave('Loading…');
+  try{ const r=await fetch(API,{cache:'no-store'}); const j=await r.json(); state.data=j.data||{}; setSave('Saved ✓'); }
+  catch(e){ setSave('Offline'); }
+  render();
+}
+function scheduleSave(){
+  setSave('Saving…');
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    try{ await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:state.data})}); setSave('Saved ✓'); }
+    catch(e){ setSave('Save failed'); }
+    renderTrends();
+  },700);
+}
+
+// build 1-10 scales
+function buildScale(id,onPick){
+  const c=document.getElementById(id); c.innerHTML='';
+  for(let i=1;i<=10;i++){ const b=document.createElement('button'); b.textContent=i; b.onclick=()=>{ onPick(i); }; c.appendChild(b); }
+}
+function paintScale(id,val){ [...document.getElementById(id).children].forEach((b,idx)=>b.classList.toggle('on',idx+1<=val&&val>0?false:false)); // reset
+  [...document.getElementById(id).children].forEach((b,idx)=>b.classList.toggle('on', (idx+1)===val)); }
+
+function render(){
+  document.getElementById('dateLabel').textContent=prettyDate(state.date);
+  const e=entry(state.date);
+  document.getElementById('p0').value=(e.priorities&&e.priorities[0])||'';
+  document.getElementById('p1').value=(e.priorities&&e.priorities[1])||'';
+  document.getElementById('p2').value=(e.priorities&&e.priorities[2])||'';
+  document.getElementById('sleep').value=e.sleep??'';
+  document.getElementById('waterN').textContent=e.water||0;
+  paintScale('energy',e.energy||0);
+  paintScale('mood',e.mood||0);
+  document.getElementById('workout').classList.toggle('on',!!e.workout);
+  document.getElementById('workoutMark').textContent=e.workout?'●':'○';
+  document.getElementById('gratitude').value=e.gratitude||'';
+  document.getElementById('faith').value=e.faith||'';
+  document.getElementById('win').value=e.win||'';
+  document.getElementById('reflection').value=e.reflection||'';
+  renderTrends();
+}
+
+function hasEntry(e){ if(!e) return false; return !!(e.energy||e.mood||e.sleep||e.water||e.workout||e.gratitude||e.faith||e.win||e.reflection||(e.priorities&&e.priorities.some(x=>x))); }
+function streak(pred){ let n=0,d=todayStr(); for(let i=0;i<400;i++){ const e=state.data[d]; if(pred(e)) n++; else if(i>0) break; else break; d=addDays(d,-1);} return n; }
+
+function renderTrends(){
+  // check-in streak (consecutive days up to today with any entry)
+  let ci=0,d=todayStr(); for(let i=0;i<400;i++){ if(hasEntry(state.data[d])){ci++;} else {break;} d=addDays(d,-1); }
+  // workout streak
+  let ws=0; d=todayStr(); for(let i=0;i<400;i++){ const e=state.data[d]; if(e&&e.workout){ws++;} else {break;} d=addDays(d,-1); }
+  // avg sleep last 7
+  let ss=0,sc=0; d=todayStr(); for(let i=0;i<7;i++){ const e=state.data[d]; if(e&&e.sleep){ss+=parseFloat(e.sleep)||0;sc++;} d=addDays(d,-1); }
+  const avgSleep= sc? (ss/sc).toFixed(1):'—';
+  // energy sparkline last 14
+  const days=[]; d=addDays(todayStr(),-13); for(let i=0;i<14;i++){ days.push(state.data[d]); d=addDays(d,1); }
+  const spark=days.map(e=>{ const v=(e&&e.energy)||0; return '<span style="height:'+(v?Math.max(8,v*10):2)+'%"></span>'; }).join('');
+  document.getElementById('trends').innerHTML=
+    '<div class="stat"><div class="lab">Check-in streak</div><div class="val">'+ci+' <small>day'+(ci===1?'':'s')+'</small></div></div>'+
+    '<div class="stat"><div class="lab">Workout streak</div><div class="val">'+ws+' <small>day'+(ws===1?'':'s')+'</small></div></div>'+
+    '<div class="stat"><div class="lab">Avg sleep · 7d</div><div class="val">'+avgSleep+' <small>hrs</small></div></div>'+
+    '<div class="stat"><div class="lab">Energy · 14d</div><div class="spark">'+spark+'</div></div>';
+}
+
+// wire up
+buildScale('energy',v=>{ entry(state.date).energy=v; paintScale('energy',v); scheduleSave(); });
+buildScale('mood',v=>{ entry(state.date).mood=v; paintScale('mood',v); scheduleSave(); });
+function bindText(id,key){ document.getElementById(id).addEventListener('input',ev=>{ entry(state.date)[key]=ev.target.value; scheduleSave(); }); }
+function bindPriority(id,idx){ document.getElementById(id).addEventListener('input',ev=>{ const e=entry(state.date); if(!e.priorities) e.priorities=['','','']; e.priorities[idx]=ev.target.value; scheduleSave(); }); }
+bindPriority('p0',0); bindPriority('p1',1); bindPriority('p2',2);
+bindText('sleep','sleep'); bindText('gratitude','gratitude'); bindText('faith','faith'); bindText('win','win'); bindText('reflection','reflection');
+document.getElementById('sleep').addEventListener('input',ev=>{ entry(state.date).sleep=ev.target.value; });
+document.getElementById('waterPlus').onclick=()=>{ const e=entry(state.date); e.water=(e.water||0)+1; document.getElementById('waterN').textContent=e.water; scheduleSave(); };
+document.getElementById('waterMinus').onclick=()=>{ const e=entry(state.date); e.water=Math.max(0,(e.water||0)-1); document.getElementById('waterN').textContent=e.water; scheduleSave(); };
+document.getElementById('workout').onclick=()=>{ const e=entry(state.date); e.workout=!e.workout; document.getElementById('workout').classList.toggle('on',e.workout); document.getElementById('workoutMark').textContent=e.workout?'●':'○'; scheduleSave(); };
+document.getElementById('prev').onclick=()=>{ state.date=addDays(state.date,-1); render(); };
+document.getElementById('next').onclick=()=>{ if(state.date<todayStr()){ state.date=addDays(state.date,1); render(); } };
+document.getElementById('todayBtn').onclick=()=>{ state.date=todayStr(); render(); };
+
+loadData();
+</script>
+</body>
+</html>
