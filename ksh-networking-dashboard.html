@@ -303,7 +303,7 @@ That North Pacific Beach spa retreat project of yours is something else. The way
 
 I've been building a list of designers I genuinely want to work alongside, and you've been on it for a while. Our clients ask us who we'd trust and recommend â and I want to be able to send them somewhere excellent. I'd love for that to go both ways.
 
-Want to grab lunch sometime, or come walk one of our active jobs? We've got some really interesting projects going in Coronado and La Jolla right now. Happy to come visit one of yours&ôoo.
+Want to grab lunch sometime, or come walk one of our active jobs? We've got some really interesting projects going in Coronado and La Jolla right now. Happy to come visit one of yours too.
 
 Kyle Harrell â KSH Construction â (619) 987-2700`, emailSubj: `North Pacific Beach spa retreat â huge fan. Kyle Harrell, KSH Construction`, emailBody: `Hi Brian,
 
@@ -473,7 +473,7 @@ Being named to Modern Luxury's California Faces of Design is legitimately impres
 
 I've been building relationships with designers I genuinely admire and want to be in the field with, and you're someone I've had on my radar for a while. Our clients trust us to recommend the right people â and I'd love for us to get to know each other well enough to refer each other with confidence.
 
-Want to grab lunch sometime? Or come walk one of our active jobs â we've got some great projects going in Coronado and La Jolla right now. Happy to visit one of yours&ôoo.
+Want to grab lunch sometime? Or come walk one of our active jobs â we've got some great projects going in Coronado and La Jolla right now. Happy to visit one of yours too.
 
 Kyle Harrell â KSH Construction â (619) 987-2700`, emailSubj: `Faces of Design â well earned. Kyle Harrell, KSH Construction`, emailBody: `Hi Sarah,
 
@@ -483,7 +483,7 @@ Being named to Modern Luxury's California Faces of Design is a real honor â
 
 I've been building relationships with designers who are doing excellent work in the coastal San Diego markets we're most active in. You're someone I genuinely admire and have wanted to connect with for a while. Our clients trust us to recommend people we'd stake our own reputation on, and I'd love for us to get to know each other well enough to refer each other with confidence.
 
-Would you be open to getting together? Lunch works great, or come walk one of our active jobs â I'd love to show you what we're building in Coronado or La Jolla. Happy to come see one of yours&ôoo.
+Would you be open to getting together? Lunch works great, or come walk one of our active jobs â I'd love to show you what we're building in Coronado or La Jolla. Happy to come see one of yours too.
 
 Kyle Harrell
 KSH Construction
@@ -668,9 +668,9 @@ Kyle Harrell â KSH Construction â (619) 987-2700`, emailSubj: `The Pro
 
 I'm Kyle Harrell, owner of KSH Construction. We focus on high-end custom builds and renovations in Coronado, La Jolla, Solana Beach, and Rancho Santa Fe.
 
-The Prospect being included in Dwell's top 100 homes ever built is a global architectural statement. To be recognized alongside buildings from around the world, in a publication that covers the finest modern residential architecture internationally - that's something almost no architect anywhere ever achieves. And FAIA reflects the profession's recognition of a lifetime of work that belongs in any serious conversation about American residential architecture. The body of work you've built in San Diego specifically has raised the bar for what's possible here.
+The Prospect being included in Dwell's top 100 homes ever built is a global architectural statement. To be recognized alongside buildings from around the world, in a publication that covers the finest modern residential architecture internationally â that's something almost no architect anywhere ever achieves. And FAIA reflects the profession's recognition of a lifetime of work that belongs in any serious conversation about American residential architecture. The body of work you've built in San Diego specifically has raised the bar for what's possible here.
 
-I have enormous respect for what you've created and I've wanted to reach out for a long time. I'm building a very short list of architects I'd love to be in âtthe field with on exceptional projects. When the architecture is at that level, the construction needs to match â that's what we strive for on every job we take.
+I have enormous respect for what you've created and I've wanted to reach out for a long time. I'm building a very short list of architects I'd love to be inthe field with on exceptional projects. When the architecture is at that level, the construction needs to match â that's what we strive for on every job we take.
 
 Would you be open to getting together? Happy to grab lunch, or come walk one of our active projects â I'd love to show you the quality of what we build. I'm also happy to come see one of your jobs.
 
@@ -1182,7 +1182,7 @@ function renderTable() {
       <td class="td-met">
         <label class="met-toggle">
           <input type="checkbox" ${d.met||d.status==='Met In Person'?'checked':''} onchange="updateFirm(${firm.num},'met',this.checked)">
-          <span class="met-label">${d.met||d.status==='Met In Person'?'â Yes':'No'}</span>
+          <span class="met-label">${d.met||d.status==='Met In Person'?'â Yes':'No'=</span>
         </label>
       </td>
       <td class="td-date">
@@ -1296,15 +1296,25 @@ renderTable();
 
 function sendEmail(num, e) {
   if(e) e.preventDefault();
-  const subj = document.getElementById('email-subj-'+num)?.value || '';
-  const body = document.getElementById('email-body-'+num)?.value || '';
+  // Use preview textareas if already populated, otherwise load from getMsgs directly
+  let subj = document.getElementById('email-subj-'+num)?.value || '';
+  let body = document.getElementById('email-body-'+num)?.value || '';
+  if (!subj && !body) {
+    const firm = FIRMS.find(f => f.num === num);
+    if (firm) { const msgs = getMsgs(firm); subj = msgs.emailSubj || ''; body = msgs.emailBody || ''; }
+  }
+  if (!subj && !body) { alert('No email content found for this firm.'); return; }
   const url = 'https://mail.google.com/mail/?view=cm&fs=1&su=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
   window.open(url, '_blank');
 }
 
 function copyDM(num, e) {
   if(e) { e.preventDefault(); e.stopPropagation(); }
-  const text = document.getElementById('dm-text-'+num)?.value || '';
+  let text = document.getElementById('dm-text-'+num)?.value || '';
+  if (!text) {
+    const firm = FIRMS.find(f => f.num === num);
+    if (firm) { const msgs = getMsgs(firm); text = msgs.dm || ''; }
+  }
   if (!text) return;
   navigator.clipboard.writeText(text).then(() => {
     const badge = document.getElementById('copied-'+num);
