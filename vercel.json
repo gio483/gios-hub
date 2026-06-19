@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/ksh-summarize.js": { "maxDuration": 60 },
+    "api/ksh-email.js":     { "maxDuration": 30 }
+  }
+}
