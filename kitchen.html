@@ -32,8 +32,8 @@
   .sub{color:var(--muted);font-size:.92rem;margin:0}
 
   /* tabs */
-  .tabs{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 18px;max-width:430px;box-shadow:var(--shadow)}
-  .tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.88rem;padding:9px 6px;border-radius:10px;cursor:pointer;transition:.15s}
+  .tabs{display:flex;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 18px;max-width:540px;box-shadow:var(--shadow)}
+  .tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;font-size:.82rem;padding:9px 5px;border-radius:10px;cursor:pointer;transition:.15s;white-space:nowrap}
   .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
 
   .modeseg{display:flex;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin-bottom:14px;box-shadow:var(--shadow)}
@@ -183,6 +183,7 @@
     <button class="tab" data-tab="saved">❤️ Saved</button>
     <button class="tab" data-tab="shop">🛒 List</button>
     <button class="tab" data-tab="book">📖 Book</button>
+    <button class="tab" data-tab="ff">🍔 Fast Food</button>
   </div>
 
   <!-- MAKE -->
@@ -273,6 +274,11 @@
     </div>
   </section>
 
+  <!-- FAST FOOD -->
+  <section class="panel" id="panel-ff">
+    <div id="ffList"></div>
+  </section>
+
   <footer>Powered live by Claude · Your saved recipes stay on this device.</footer>
 </div>
 
@@ -322,6 +328,7 @@ $$('.tab').forEach(t=>t.onclick=()=>{
   if(t.dataset.tab==='saved') renderSaved();
   if(t.dataset.tab==='shop') renderShop();
   if(t.dataset.tab==='book') renderBook();
+  if(t.dataset.tab==='ff') renderFF();
   window.scrollTo(0,0);
 });
 
@@ -709,8 +716,139 @@ function cookbookMatches(q){
 $('#bookSearch').addEventListener('input', renderBook);
 $('#bookClear').onclick=()=>{ $('#bookSearch').value=''; renderBook(); };
 
+/* ---------- fast food (smart orders) ---------- */
+const FF_RULES = [
+  "Protein first: anchor every order on grilled chicken, a burger patty, beans, or chili — protein is what keeps you full.",
+  "The drink and the fries do most of the damage. Fix those first: water, Diet, or unsweetened tea, and skip or downsize the fries.",
+  "Grilled beats fried every time — usually saves 100–150 cal and a lot of fat.",
+  "A “bowl” or “protein style” beats bread/tortilla when you want to cut refined carbs.",
+  "Watch hidden sauces, cheese, and anything labeled “loaded,” “supreme,” or “deluxe.”",
+  "One meal won't make or break you. Consistency across the week is what counts."
+];
+const FASTFOOD = [
+  { name:"McDonald's", emoji:"🍟",
+    goto:"2 McDoubles, no fries, water",
+    protein:"44g", cals:"~800",
+    picks:[
+      ["McDouble","400 cal · 22g protein · 920mg sodium"],
+      ["McChicken","400 cal · 14g protein"],
+      ["Egg McMuffin (breakfast)","310 cal · 17g protein"],
+      ["Hamburger","250 cal · 12g protein"],
+      ["Side Salad / Apple Slices","instead of fries"]
+    ],
+    tips:[
+      "Order the McDouble over the Double Cheeseburger — one less cheese slice saves ~50 cal and 4–5g fat each.",
+      "Lighter option: 1 McDouble + side salad lands around 450 cal.",
+      "Skip the large fries and soda — that's where most of the damage is.",
+      "Breakfast: the Egg McMuffin is the standout. Skip the hash brown.",
+      "Sodium is high — two sandwiches is most of a day's salt, so drink water and go lighter on salt elsewhere that day."
+    ]},
+  { name:"Chick-fil-A", emoji:"🐔",
+    goto:"12-ct Grilled Nuggets + fruit cup",
+    protein:"~39g", cals:"~330",
+    picks:[
+      ["Grilled Nuggets, 8-ct","130 cal · 25g protein"],
+      ["Grilled Nuggets, 12-ct","~200 cal · 38g protein"],
+      ["Grilled Chicken Sandwich","~390 cal · 29g protein"],
+      ["Fruit Cup / kale Superfood Side","instead of waffle fries"]
+    ],
+    tips:[
+      "Always pick grilled over fried — saves ~120 cal and most of the fat.",
+      "Sauces add up fast (CFA sauce ~140 cal). Use BBQ, mustard, light, or skip.",
+      "Swap waffle fries for the fruit cup or kale Superfood side.",
+      "Unsweetened tea, Diet Lemonade, or water — regular lemonade is heavy sugar."
+    ]},
+  { name:"Taco Bell", emoji:"🌮",
+    goto:"Chicken Power Bowl, Fresco Style",
+    protein:"27g", cals:"470",
+    picks:[
+      ["Chicken Power Bowl","470 cal · 27g protein"],
+      ["Grilled Chicken Soft Taco","~170 cal · 11g protein"],
+      ["Add “Fresco Style”","swaps creamy stuff for pico"]
+    ],
+    tips:[
+      "“Fresco Style” on anything swaps cheese/sour cream/sauce for pico — saves 45–200 cal per item.",
+      "Add extra grilled chicken for more protein if you're training hard.",
+      "Build grilled chicken soft tacos instead of anything “Supreme,” “Crunchwrap,” or “Deluxe.”",
+      "Skip the nacho fries, quesadillas, and anything cheesy or loaded.",
+      "Water or a Diet drink instead of a regular Baja Blast."
+    ]},
+  { name:"Chipotle", emoji:"🥗",
+    goto:"Bowl: double chicken, ½ rice, beans, veg, salsa",
+    protein:"55g+", cals:"~600",
+    picks:[
+      ["Burrito Bowl (skip the tortilla)","your base"],
+      ["Double Chicken","single = ~32g protein"],
+      ["Black or pinto beans","+ fajita veg + extra romaine"],
+      ["Fresh tomato / green salsa","basically free flavor"],
+      ["Double High Protein Bowl","~760 cal · 81g protein (ask for it)"]
+    ],
+    tips:[
+      "Calorie savers: skip the tortilla and chips, go half rice or none, skip queso and sour cream.",
+      "Load up the salsas — they're low-cal flavor.",
+      "Guac is healthy fat but ~230 cal — fine if tracking, skip if cutting.",
+      "Chips + queso/guac is where bowls blow up. Leave them off."
+    ]},
+  { name:"In-N-Out", emoji:"🍔",
+    goto:"Double-Double, Protein Style (lettuce wrap)",
+    protein:"~33g", cals:"~520",
+    picks:[
+      ["Double-Double, Protein Style","~520 cal · ~33g protein"],
+      ["Cheeseburger, Protein Style","~330 cal"],
+      ["Hamburger, Protein Style, no spread","the lightest option"],
+      ["Flying Dutchman (off-menu)","2 patties + cheese, no bun"]
+    ],
+    tips:[
+      "Protein Style removes the bun = ~150 fewer cal and less refined carb.",
+      "Order “with mustard and ketchup instead of spread” to cut fat.",
+      "The fries are the calorie trap — skip them or split with someone.",
+      "Skip the milkshake (~600+ cal) — water or a Diet drink."
+    ]},
+  { name:"Wendy's", emoji:"🥪",
+    goto:"Grilled Chicken Sandwich + small chili",
+    protein:"~49g", cals:"~540",
+    picks:[
+      ["Grilled Chicken Sandwich","~370 cal · ~34g protein · 10g fat"],
+      ["Small Chili","~170 cal · 15g protein · high fiber"],
+      ["Medium Chili","~250 cal · ~23g protein"],
+      ["Apple Bites / side salad","instead of fries"]
+    ],
+    tips:[
+      "Chili is the secret weapon — high protein, high fiber, low cal. Great on its own or as a side.",
+      "Pick grilled over the Spicy/Homestyle (breaded) sandwiches to cut fat and calories.",
+      "Skip the Frosty (~340+ cal) or get the smallest as an occasional treat.",
+      "Water or unsweetened tea over soda."
+    ]}
+];
+function renderFF(){
+  const el=$('#ffList'); if(!el || el.dataset.done) return;
+  const rules = `<div class="box">
+    <h2>🍔 Fast Food — Smart Orders</h2>
+    <p class="hint">High-protein, leaner picks for when you're eating out. Macros are approximate and vary by location.</p>
+    <div class="seclbl">Game plan (works anywhere)</div>
+    <ol class="steps">${FF_RULES.map(r=>`<li>${esc(r)}</li>`).join('')}</ol>
+  </div>`;
+  const cards = FASTFOOD.map(c=>`
+    <div class="recipe">
+      <div class="rhead"><div>
+        <h3>${esc(c.emoji)} ${esc(c.name)}</h3>
+        <p class="rblurb">Go-to: ${esc(c.goto)}</p>
+      </div></div>
+      <div class="meta">
+        <span class="pill pro"><b>${esc(c.protein)}</b> protein</span>
+        <span class="pill"><b>${esc(c.cals)}</b> cal</span>
+      </div>
+      <div class="seclbl">Best picks</div>
+      <ul class="ingl">${c.picks.map(p=>`<li><b>${esc(p[0])}</b> — ${esc(p[1])}</li>`).join('')}</ul>
+      <div class="seclbl">Swaps &amp; tips</div>
+      <ol class="steps">${c.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ol>
+    </div>`).join('');
+  el.innerHTML = rules + cards;
+  el.dataset.done='1';
+}
+
 /* ---------- init ---------- */
-renderQuick(); renderDishExamples(); renderChips(); loadCookbook();
+renderQuick(); renderDishExamples(); renderChips(); loadCookbook(); renderFF();
 </script>
 </body>
 </html>
