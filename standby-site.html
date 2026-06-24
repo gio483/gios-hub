@@ -25,6 +25,23 @@
   .logo{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;display:flex;align-items:center;gap:8px}
   .logo .dot{width:8px;height:8px;border-radius:50%;background:var(--champ);margin-bottom:3px}
   .nav .r{display:flex;align-items:center;gap:14px}
+  html{scroll-behavior:smooth}
+  section[id]{scroll-margin-top:84px}
+  .navmenu{display:flex;align-items:center;gap:24px}
+  .navmenu a.lnk{font-size:14.5px;font-weight:500;color:var(--ink-soft);cursor:pointer;text-decoration:none}
+  .navmenu a.lnk:hover{color:var(--ink)}
+  .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:42px;height:42px;border:1px solid var(--line);border-radius:11px;background:var(--white);cursor:pointer;padding:0 11px}
+  .hamburger span{display:block;height:2px;background:var(--ink);border-radius:2px;transition:.25s}
+  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .hamburger.open span:nth-child(2){opacity:0}
+  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .faq{max-width:760px;margin:0 auto}
+  .qa{background:var(--white);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  .qa summary{cursor:pointer;padding:18px 22px;font-weight:600;font-size:16.5px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .qa summary::-webkit-details-marker{display:none}
+  .qa summary:after{content:"+";font-size:23px;color:var(--champ);font-weight:400;flex-shrink:0}
+  .qa[open] summary:after{content:"\2212"}
+  .qa p{padding:0 22px 20px;color:var(--ink-soft);font-size:15px}
 
   .hero{text-align:center;padding:72px 0 60px;position:relative;overflow:hidden}
   .hero:before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(189,154,95,.14),transparent 60%)}
@@ -83,13 +100,28 @@
   .success .check{width:60px;height:60px;border-radius:50%;background:#e8f3ec;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
   .success .check svg{width:30px;height:30px;stroke:var(--green);fill:none;stroke-width:2.4}
 
-  @media(max-width:820px){.hero h1{font-size:42px}.sec-head h2{font-size:32px}.steps,.tiers{grid-template-columns:1fr}.nav .r .btn:first-child{display:none}}
+  @media(max-width:820px){
+    .hero h1{font-size:42px}.sec-head h2{font-size:32px}.steps,.tiers{grid-template-columns:1fr}
+    .hamburger{display:flex}
+    .navmenu{position:absolute;top:68px;left:0;right:0;background:var(--cream);border-bottom:1px solid var(--line);flex-direction:column;align-items:stretch;gap:2px;padding:12px 24px 20px;box-shadow:0 18px 30px rgba(27,27,33,.1);transform:translateY(-12px);opacity:0;pointer-events:none;transition:.2s}
+    .navmenu.show{transform:none;opacity:1;pointer-events:auto}
+    .navmenu a.lnk{padding:13px 2px;border-bottom:1px solid var(--line);font-size:16px}
+    .navmenu .btn{width:100%;justify-content:center;margin-top:8px}
+  }
 </style>
 </head>
 <body>
 <header><div class="wrap nav">
   <div class="logo">Standby<span class="dot"></span></div>
-  <div class="r"><a onclick="openBackupSignup()" style="cursor:pointer;font-size:14.5px;font-weight:500;color:var(--ink-soft)">Become a backup</a><a class="btn" href="standby-app.html">Log in</a><button class="btn btn-gold" onclick="openSignup('Premium')">Get covered</button></div>
+  <button class="hamburger" id="hamb" aria-label="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  <nav class="navmenu" id="navmenu">
+    <a class="lnk" href="#how" onclick="closeMenu()">How it works</a>
+    <a class="lnk" href="#pricing" onclick="closeMenu()">Pricing</a>
+    <a class="lnk" href="#backups" onclick="closeMenu()">For backups</a>
+    <a class="lnk" href="#faq" onclick="closeMenu()">FAQ</a>
+    <a class="btn" href="standby-app.html">Log in</a>
+    <button class="btn btn-gold" onclick="closeMenu();openSignup('Premium')">Get covered</button>
+  </nav>
 </div></header>
 
 <section class="hero"><div class="wrap">
@@ -99,7 +131,7 @@
   <div class="cta"><button class="btn btn-pri" onclick="openSignup('Premium')">Get covered</button><a class="btn" href="#pricing">See pricing</a></div>
 </div></section>
 
-<section class="alt"><div class="wrap">
+<section class="alt" id="how"><div class="wrap">
   <div class="sec-head"><span class="eyebrow">How it works</span><h2>Peace of mind in three steps</h2></div>
   <div class="steps">
     <div class="step"><div class="n">1</div><h3>Cover a wedding</h3><p>Add backup coverage to any booked date for a flat per-wedding fee. Two minutes at sign-up.</p></div>
@@ -120,7 +152,7 @@
   </div>
 </div></section>
 
-<section class="alt"><div class="wrap">
+<section class="alt" id="backups"><div class="wrap">
   <div class="steps" style="grid-template-columns:1.2fr .8fr;align-items:center;gap:40px">
     <div>
       <span class="eyebrow">For photographers with an open weekend</span>
@@ -134,6 +166,17 @@
       <div style="font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:700;margin:6px 0 2px">~$3,000<span style="font-family:'Inter';font-size:16px;color:#c7c2b8">/yr</span></div>
       <div style="font-size:13px;color:#c7c2b8">passive, sitting on ~6 benches —<br>plus ~$2,400+ each time you actually shoot</div>
     </div>
+  </div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Questions</span><h2>The honest answers</h2></div>
+  <div class="faq">
+    <details class="qa" open><summary>Is this insurance?</summary><p>No — and we're careful never to call it that. Standby is a vetted backup network. You're paying for access to a ready bench of pros and a guarantee that someone steps in, not a cash payout. That keeps it simple and clean.</p></details>
+    <details class="qa"><summary>Who pays the backup photographer?</summary><p>You do — directly — and only if you actually activate one. It's about 80% of your normal shoot fee, agreed up front in a contract between you and the backup. Standby never touches that money, which protects everyone.</p></details>
+    <details class="qa"><summary>How do you know the backups are any good?</summary><p>Every backup is hand-screened before they join the bench: 5+ years shooting weddings, a reviewed portfolio, references, and a reliability score that drops if they ever miss a check-in. Good people first, great shooters second.</p></details>
+    <details class="qa"><summary>What are you actually guaranteeing?</summary><p>That a qualified, vetted professional is available and ready to step in. We don't guarantee a specific style or a certain number of photos — that's between you and your backup. We're the safety net, not the artist.</p></details>
+    <details class="qa"><summary>What if I never use it?</summary><p>Most people never will — that's the whole point. You pay a small fee for peace of mind, the backups earn a little for being ready, and the wedding goes off without a hitch. Like a spare tire you're glad you never needed.</p></details>
   </div>
 </div></section>
 
@@ -156,6 +199,8 @@
 
 <script>
 var plan='Premium', disc='Photographer';
+function toggleMenu(){document.getElementById('navmenu').classList.toggle('show');document.getElementById('hamb').classList.toggle('open');}
+function closeMenu(){document.getElementById('navmenu').classList.remove('show');document.getElementById('hamb').classList.remove('open');}
 function formHTML(){return `<button class="x" onclick="closeSignup()">&times;</button>
   <h2>Create your account</h2><p class="msub">Start covering your weddings today.</p>
   <label>I'm a *</label>
