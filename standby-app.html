@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Standby — App</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1b21; --ink-2:#23232b; --champ:#bd9a5f; --champ-dk:#9a7c45;
+    --cream:#faf7f2; --cream-2:#f3ede3; --line:#e8e2d6; --white:#fff;
+    --muted:#827c72; --green:#3f7d5a; --green-bg:#e8f3ec; --amber:#b8860b; --amber-bg:#fbf3e0;
+    --rose:#c2705f; --rose-bg:#f7e9e4; --gray-bg:#efece4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--cream-2);-webkit-font-smoothing:antialiased;line-height:1.5}
+  .serif{font-family:'Cormorant Garamond',Georgia,serif}
+  h1,h2,h3{font-family:'Cormorant Garamond',serif;font-weight:600;line-height:1.1}
+  button{font-family:'Inter',sans-serif;cursor:pointer}
+  svg{display:block}
+
+  /* ---------- APP SHELL ---------- */
+  .shell{height:100vh;display:flex;overflow:hidden}
+  .sidebar{width:248px;flex-shrink:0;background:var(--ink);color:#cfc9bf;display:flex;flex-direction:column;padding:22px 16px}
+  .brand{font-family:'Cormorant Garamond',serif;font-size:25px;font-weight:700;color:var(--cream);display:flex;align-items:center;gap:8px;padding:6px 12px 22px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--champ);margin-bottom:3px}
+  .nav-i{display:flex;align-items:center;gap:13px;padding:12px 14px;border-radius:12px;color:#cfc9bf;font-size:14.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;transition:.15s}
+  .nav-i svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+  .nav-i:hover{background:rgba(255,255,255,.06);color:var(--cream)}
+  .nav-i.on{background:var(--champ);color:#fff}
+  .side-foot{margin-top:auto;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;display:flex;align-items:center;gap:11px}
+  .av{border-radius:50%;background:var(--champ);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-weight:600;flex-shrink:0}
+  .side-foot .av{width:38px;height:38px;font-size:16px}
+  .side-foot b{font-size:14px;color:var(--cream);font-weight:500;display:block}
+  .side-foot span{font-size:12px;color:var(--muted)}
+
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{height:64px;flex-shrink:0;background:var(--cream);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 26px}
+  .topbar h2{font-size:24px}
+  .topbar .brand-m{display:none}
+  .top-r{display:flex;align-items:center;gap:14px}
+  .bell{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--white);display:flex;align-items:center;justify-content:center;position:relative}
+  .bell svg{width:19px;height:19px;stroke:var(--ink);fill:none;stroke-width:1.8}
+  .bell .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--rose)}
+  .top-r .av{width:38px;height:38px;font-size:15px}
+
+  .content{flex:1;overflow-y:auto;padding:26px}
+  .wrap{max-width:1000px;margin:0 auto}
+  .screen{display:none;animation:fade .3s ease}
+  .screen.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+  /* bottom nav (mobile) */
+  .botnav{display:none}
+
+  /* ---------- COMPONENTS ---------- */
+  .eyebrow{font-size:11.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;color:var(--champ-dk)}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:22px 24px}
+  .row{display:flex;gap:18px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:14.5px;font-weight:600;padding:12px 22px;border-radius:999px;border:1.5px solid var(--ink);background:none;color:var(--ink);transition:.15s}
+  .btn:hover{background:var(--cream-2)}
+  .btn-pri{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+  .btn-pri:hover{background:#000;color:var(--cream)}
+  .btn-gold{background:var(--champ);border-color:var(--champ);color:#fff}
+  .btn-gold:hover{background:var(--champ-dk);border-color:var(--champ-dk)}
+  .btn-sm{padding:9px 16px;font-size:13.5px}
+
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px}
+  .chip.ok{background:var(--green-bg);color:var(--green)}
+  .chip.due{background:var(--amber-bg);color:var(--amber)}
+  .chip.up{background:var(--gray-bg);color:var(--muted)}
+  .chip.act{background:var(--rose-bg);color:var(--rose)}
+  .chip.tier{background:var(--ink);color:var(--cream)}
+
+  /* hero coverage card on dashboard */
+  .hero-cov{background:var(--ink);color:var(--cream);border-radius:20px;padding:26px 28px;position:relative;overflow:hidden}
+  .hero-cov:before{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(189,154,95,.14)}
+  .hero-cov .eyebrow{color:var(--champ)}
+  .hero-cov h2{color:var(--cream);font-size:32px;margin:6px 0 4px}
+  .hero-cov .when{color:#c7c2b8;font-size:14px}
+  .hero-cov .prog{display:flex;gap:8px;margin:20px 0 22px}
+  .seg{flex:1;height:6px;border-radius:4px;background:rgba(255,255,255,.16)}
+  .seg.done{background:var(--green)}
+  .seg.now{background:var(--amber)}
+
+  .stat{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px 20px}
+  .stat .k{font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat .v{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:600;margin-top:2px}
+  .stat .s{font-size:12.5px;color:var(--champ-dk)}
+
+  .sec-h{display:flex;align-items:center;justify-content:space-between;margin:26px 4px 14px}
+  .sec-h h3{font-size:21px}
+  .sec-h a{font-size:13px;color:var(--champ-dk);font-weight:600;cursor:pointer}
+
+  /* alerts / feed */
+  .alert{display:flex;gap:13px;align-items:flex-start;padding:15px 0;border-bottom:1px solid var(--line)}
+  .alert:last-child{border-bottom:none}
+  .alert .ic{width:38px;height:38px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--green-bg)}
+  .alert .ic svg{width:19px;height:19px;stroke:var(--green);fill:none;stroke-width:1.9}
+  .alert .ic.amber{background:var(--amber-bg)} .alert .ic.amber svg{stroke:var(--amber)}
+  .alert b{font-size:14.5px;font-weight:600}
+  .alert p{font-size:13px;color:var(--muted)}
+  .alert .t{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+
+  /* check-in timeline with location */
+  .tl{display:flex;gap:15px;padding:18px 0;border-bottom:1px solid var(--line)}
+  .tl:last-child{border-bottom:none}
+  .ring{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600}
+  .ring.done{background:var(--green);color:#fff}
+  .ring.now{background:var(--amber);color:#fff}
+  .ring.up{background:var(--gray-bg);color:var(--muted);border:1px solid var(--line)}
+  .tl-b{flex:1;min-width:0}
+  .tl-b .h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .tl-b b{font-size:15px}
+  .tl-b .sub{font-size:13px;color:var(--muted);margin-top:2px}
+  .loc{display:inline-flex;align-items:center;gap:6px;background:var(--cream-2);border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12.5px;color:var(--ink);font-weight:500;margin-top:9px}
+  .loc svg{width:13px;height:13px;stroke:var(--champ-dk);fill:none;stroke-width:2}
+  .privacy{font-size:12px;color:var(--muted);background:var(--cream-2);border-radius:12px;padding:12px 15px;margin-top:16px;display:flex;gap:9px;align-items:flex-start}
+  .privacy svg{width:15px;height:15px;stroke:var(--champ-dk);fill:none;stroke-width:1.9;flex-shrink:0;margin-top:1px}
+
+  /* bench */
+  .bench-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+  .pcard{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:.15s}
+  .pcard:hover{border-color:var(--champ);transform:translateY(-3px);box-shadow:0 12px 26px rgba(27,27,33,.08)}
+  .pcard .top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .pcard .av{width:46px;height:46px;font-size:18px}
+  .pcard b{font-size:15.5px}
+  .pcard .loc2{font-size:12.5px;color:var(--muted)}
+  .pcard .meta{display:flex;justify-content:space-between;font-size:13px;color:var(--ink);border-top:1px solid var(--line);padding-top:11px}
+  .pcard .stars{color:var(--champ)}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 12px}
+  .tag{font-size:11px;background:var(--cream-2);color:var(--ink);padding:3px 9px;border-radius:999px}
+
+  /* messages */
+  .msg-wrap{display:grid;grid-template-columns:260px 1fr;gap:18px;height:560px}
+  .threads{background:var(--white);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .thread{display:flex;gap:11px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+  .thread.on{background:var(--cream-2)}
+  .thread .av{width:40px;height:40px;font-size:15px}
+  .thread b{font-size:14px}
+  .thread .last{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+  .chat{background:var(--white);border:1px solid var(--line);border-radius:16px;display:flex;flex-direction:column}
+  .chat-h{padding:15px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:11px}
+  .chat-b{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px}
+  .bub{max-width:74%;padding:11px 15px;border-radius:16px;font-size:14px}
+  .bub.them{background:var(--cream-2);align-self:flex-start;border-bottom-left-radius:5px}
+  .bub.me{background:var(--ink);color:var(--cream);align-self:flex-end;border-bottom-right-radius:5px}
+  .chat-f{padding:13px 16px;border-top:1px solid var(--line);display:flex;gap:10px}
+  .chat-f input{flex:1;border:1px solid var(--line);border-radius:999px;padding:11px 16px;font-family:inherit;font-size:14px;background:var(--cream-2)}
+  .chat-f input:focus{outline:none;border-color:var(--champ)}
+
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--ink);color:var(--cream);padding:14px 24px;border-radius:999px;font-size:14px;font-weight:500;z-index:200;transition:.4s;box-shadow:0 12px 30px rgba(0,0,0,.3)}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  /* login */
+  .loginscreen{position:fixed;inset:0;z-index:300;background:radial-gradient(ellipse at 50% -10%,rgba(189,154,95,.16),var(--cream) 60%);display:flex;align-items:center;justify-content:center;padding:24px}
+  .logincard{background:var(--white);border:1px solid var(--line);border-radius:22px;max-width:400px;width:100%;padding:42px 36px;text-align:center;box-shadow:0 30px 70px rgba(27,27,33,.12)}
+  .brand2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;display:inline-flex;align-items:center;gap:8px;margin-bottom:22px}
+  .brand2 .dot{width:8px;height:8px;border-radius:50%;background:var(--champ);margin-bottom:3px}
+  .logincard h2{font-size:27px;margin-bottom:5px}
+  .logincard .lsub{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .logincard input{width:100%;font-size:15px;padding:13px 15px;border:1px solid var(--line);border-radius:12px;background:var(--cream-2);margin-bottom:11px;font-family:inherit}
+  .logincard input:focus{outline:none;border-color:var(--champ);background:var(--white)}
+  .lierr{color:var(--rose);font-size:13px;min-height:18px;margin-top:9px;font-weight:500}
+  .lfoot{font-size:13.5px;color:var(--muted);margin-top:18px}
+  .lfoot a{color:var(--champ-dk);font-weight:600;text-decoration:none}
+
+  /* role-based nav visibility */
+  .nav-i.r-backup,.botnav button.r-backup{display:none}
+  body.as-backup .nav-i.r-photog,body.as-backup .botnav button.r-photog{display:none}
+  body.as-backup .nav-i.r-backup{display:flex}
+  body.as-backup .botnav button.r-backup{display:flex}
+  /* check-in CTA card (backup side) */
+  .checkin-cta{background:var(--amber-bg);border:1px solid #ecd9a8;border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:16px}
+  .checkin-cta .txt{flex:1;min-width:180px}
+  .checkin-cta b{font-size:15.5px}
+  .checkin-cta p{font-size:13px;color:var(--ink-soft)}
+  .checkin-done{background:var(--green-bg);border-color:#bfe0cb}
+  /* account / settings */
+  .acct-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .acct-head .av{width:64px;height:64px;font-size:25px}
+  .acct-head h2{font-size:27px}
+  .acct-head .role{font-size:13.5px;color:var(--muted)}
+  .set-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+  .set-field{display:flex;flex-direction:column}
+  .set-field.full{grid-column:1/-1}
+  .set-field label{font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .set-field input{width:100%;font-size:14.5px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--cream-2);font-family:inherit;color:var(--ink)}
+  .set-field input:focus{outline:none;border-color:var(--champ);background:#fff}
+  .set-field input:disabled{color:var(--muted);background:var(--gray-bg);border-color:transparent}
+  @media(max-width:900px){.set-grid{grid-template-columns:1fr}}
+
+  /* ---------- RESPONSIVE: PHONE ---------- */
+  @media(max-width:900px){
+    .sidebar{display:none}
+    .topbar{padding:0 18px}
+    .topbar h2{display:none}
+    .topbar .brand-m{display:flex;font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:700;align-items:center;gap:7px}
+    .topbar .brand-m .dot{width:7px;height:7px;border-radius:50%;background:var(--champ);margin-bottom:3px}
+    .content{padding:18px 16px 92px}
+    .grid-2,.grid-3,.msg-wrap{grid-template-columns:1fr}
+    .msg-wrap{height:auto;display:block}
+    .threads{margin-bottom:16px}
+    .chat{height:460px}
+    .botnav{display:flex;position:fixed;bottom:0;left:0;right:0;height:70px;background:var(--white);border-top:1px solid var(--line);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+    .botnav button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;color:var(--muted);font-size:11px;font-weight:600}
+    .botnav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.8}
+    .botnav button.on{color:var(--champ-dk)}
+  }
+</style>
+</head>
+<body>
+<div id="login" class="loginscreen">
+  <div class="logincard">
+    <div class="brand2">Standby<span class="dot"></span></div>
+    <h2>Welcome back</h2>
+    <p class="lsub">Log in to your photographer dashboard.</p>
+    <input id="liEmail" type="email" placeholder="Email" autocomplete="username" />
+    <input id="liPass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()" />
+    <button class="btn btn-pri" style="width:100%;margin-top:4px" onclick="login()">Log in</button>
+    <div class="lierr" id="liErr"></div>
+    <p class="lfoot">New here? <a href="standby-site.html">Create an account &rarr;</a></p>
+  </div>
+</div>
+<div class="shell" id="appShell" style="display:none">
+  <!-- SIDEBAR (desktop) -->
+  <aside class="sidebar">
+    <div class="brand">Standby<span class="dot"></span></div>
+    <button class="nav-i on r-photog" data-go="home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg> Home</button>
+    <button class="nav-i r-photog" data-go="coverage" onclick="go('coverage')"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg> Coverage</button>
+    <button class="nav-i r-photog" data-go="bench" onclick="go('bench')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8M17.5 19a5.5 5.5 0 0 0-2.5-4.6"/></svg> The bench</button>
+    <button class="nav-i r-backup" data-go="bhome" onclick="go('bhome')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg> Home</button>
+    <button class="nav-i r-backup" data-go="bassign" onclick="go('bassign')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg> Standby dates</button>
+    <button class="nav-i r-backup" data-go="bearn" onclick="go('bearn')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg> Earnings</button>
+    <button class="nav-i" data-go="messages" onclick="go('messages')"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg> Messages</button>
+    <div class="side-foot"><div onclick="go('account')" style="display:flex;align-items:center;gap:11px;flex:1;cursor:pointer"><div class="av" id="sfAv">AR</div><div><b id="sfName">Alex Rivera</b><span id="sfPlan">Premium plan</span></div></div><button onclick="logout()" title="Log out" style="background:none;border:none;color:#cfc9bf;cursor:pointer;padding:4px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></button></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="brand-m">Standby<span class="dot"></span></div>
+      <h2 id="pageTitle">Home</h2>
+      <div class="top-r">
+        <button class="bell" onclick="toast('3 new updates')"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg><span class="dot"></span></button>
+        <div class="av" id="tbAv" onclick="go('account')" style="cursor:pointer" title="Account">AR</div>
+      </div>
+    </header>
+
+    <div class="content">
+      <!-- ===== HOME ===== -->
+      <div class="screen on" id="home"><div class="wrap">
+        <div style="margin-bottom:18px"><span class="eyebrow">Tuesday, June 23</span><h1 style="font-size:30px;margin-top:4px" id="greeting">Good morning, Alex.</h1></div>
+
+        <div class="hero-cov">
+          <span class="eyebrow">Your next covered wedding</span>
+          <h2>Sarah &amp; Michael</h2>
+          <div class="when">Sat, Oct 18 2026 · The Inn at Rancho Santa Fe</div>
+          <div class="prog"><span class="seg done"></span><span class="seg done"></span><span class="seg now"></span></div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <span class="chip ok">2 of 3 check-ins done</span>
+            <button class="btn btn-gold btn-sm" onclick="go('coverage')">Open coverage</button>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:18px">
+          <div class="stat"><div class="k">Covered weddings</div><div class="v">3</div><div class="s">this season</div></div>
+          <div class="stat"><div class="k">Backups on call</div><div class="v">7</div><div class="s">across your dates</div></div>
+          <div class="stat"><div class="k">Activations</div><div class="v">0</div><div class="s">all clear</div></div>
+        </div>
+
+        <div class="sec-h"><h3>Recent activity</h3><a onclick="go('coverage')">View all</a></div>
+        <div class="card" style="padding:6px 22px">
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <div><b>Elena Torres checked in</b><p>48-hour check-in · within 5 mi of La Mesa</p></div><span class="t">7:47 AM</span></div>
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+            <div><b>Marcus Reed confirmed availability</b><p>Standing by for Sarah &amp; Michael</p></div><span class="t">7:51 AM</span></div>
+          <div class="alert"><div class="ic amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+            <div><b>Next check-in scheduled</b><p>Morning-of · Oct 18, 6:00 AM</p></div><span class="t">in 2 days</span></div>
+        </div>
+      </div></div>
+
+      <!-- ===== COVERAGE ===== -->
+      <div class="screen" id="coverage"><div class="wrap">
+        <div class="card" style="margin-bottom:18px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+            <div><span class="eyebrow">Covered date</span><h2 style="font-size:28px;margin:4px 0 2px">Sarah &amp; Michael</h2>
+              <div style="color:var(--muted);font-size:14px">Sat, Oct 18 2026 · The Inn at Rancho Santa Fe, San Diego County</div></div>
+            <div style="display:flex;gap:8px"><span class="chip tier">Premium</span><span class="chip ok" id="covStatus">Covered &amp; confirmed</span></div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 style="font-size:19px;margin-bottom:6px">Standby check-ins</h3>
+            <div id="contactSlot"></div>
+
+            <div id="dayOf" style="display:none;background:var(--cream-2);border-radius:14px;padding:4px 16px 14px;margin-bottom:18px">
+              <div class="eyebrow" style="display:block;padding-top:13px;margin-bottom:2px">Live day-of coverage</div>
+              <div class="tl"><div class="ring done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+                <div class="tl-b"><div class="h"><b>Arrived at venue</b><span class="chip ok">Checked in</span></div>
+                  <div class="sub">Elena Torres · 2:14 PM</div>
+                  <span class="loc"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/></svg> At The Inn at Rancho Santa Fe</span></div></div>
+              <div class="tl" id="departRow" style="border-bottom:none"><div class="ring now"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+                <div class="tl-b"><div class="h"><b>Departs venue</b><span class="chip due">Awaiting check-out</span></div>
+                  <div class="sub">Elena checks out when she leaves the venue</div>
+                  <button class="btn btn-sm" style="margin-top:9px" onclick="checkout()">Simulate check-out</button></div></div>
+            </div>
+
+            <div class="tl"><div class="ring done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <div class="tl-b"><div class="h"><b>7 days out</b><span class="chip ok">Confirmed</span></div>
+                <div class="sub">Elena Torres confirmed availability · 6:42 PM</div>
+                <span class="loc"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/></svg> Within 8 mi of La Mesa</span></div></div>
+
+            <div class="tl"><div class="ring done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+              <div class="tl-b"><div class="h"><b>48 hours out</b><span class="chip ok">Confirmed</span></div>
+                <div class="sub">Elena Torres checked in · 7:47 AM</div>
+                <span class="loc"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/></svg> Within 5 mi of La Mesa</span></div></div>
+
+            <div class="tl"><div class="ring up">3</div>
+              <div class="tl-b"><div class="h"><b>Morning of</b><span class="chip up">Oct 18, 6:00 AM</span></div>
+                <div class="sub">Final check-in · gear ready, on standby, location confirmed</div></div></div>
+
+            <div class="privacy"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              <span>Location is captured <b>once per check-in</b>, approximate only (a radius, never an address). Backups are never tracked between check-ins — and they opt in to share it.</span></div>
+
+            <button class="btn btn-pri" style="width:100%;margin-top:18px" onclick="activate()" id="actBtn">Activate a backup now</button>
+            <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:9px">Only if you can't make the shoot.</p>
+          </div>
+
+          <div class="card">
+            <h3 style="font-size:19px;margin-bottom:14px">Your bench for this date</h3>
+            <div class="tl" style="padding-top:0"><div class="av" style="width:44px;height:44px;font-size:17px">ET</div>
+              <div class="tl-b"><b>Elena Torres</b><div class="sub">San Diego · Fine art · ★ 4.9</div></div>
+              <span class="chip ok" style="align-self:center">Primary</span></div>
+            <div class="tl"><div class="av" style="width:44px;height:44px;font-size:17px">MR</div>
+              <div class="tl-b"><b>Marcus Reed</b><div class="sub">Carlsbad · Documentary · ★ 4.8</div></div>
+              <span class="chip ok" style="align-self:center">Second</span></div>
+            <div class="tl"><div class="av" style="width:44px;height:44px;font-size:17px">JL</div>
+              <div class="tl-b"><b>Jordan Lee</b><div class="sub">Oceanside · Editorial · ★ 5.0</div></div>
+              <span class="chip up" style="align-self:center">Add-on</span></div>
+            <button class="btn" style="width:100%;margin-top:16px" onclick="go('bench')">Browse the bench</button>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- ===== BENCH ===== -->
+      <div class="screen" id="bench"><div class="wrap">
+        <div class="sec-h" style="margin-top:0"><h3>The bench · vetted pros on standby</h3></div>
+        <div class="bench-grid" id="benchGrid"></div>
+      </div></div>
+
+      <!-- ===== MESSAGES ===== -->
+      <div class="screen" id="messages"><div class="wrap">
+        <div class="msg-wrap">
+          <div class="threads">
+            <div class="thread on"><div class="av">ET</div><div><b>Elena Torres</b><div class="last">See you're set for the 18th!</div></div></div>
+            <div class="thread"><div class="av">MR</div><div><b>Marcus Reed</b><div class="last">Standing by 👍</div></div></div>
+            <div class="thread"><div class="av">JL</div><div><b>Jordan Lee</b><div class="last">Thanks for the add!</div></div></div>
+          </div>
+          <div class="chat">
+            <div class="chat-h"><div class="av" style="width:38px;height:38px;font-size:15px">ET</div><div><b style="font-size:15px">Elena Torres</b><div style="font-size:12px;color:var(--green)">● On standby for Oct 18</div></div></div>
+            <div class="chat-b" id="chatB">
+              <div class="bub them">Hi Alex! Confirmed for Sarah &amp; Michael on the 18th. I'm local to La Mesa so I'm close by.</div>
+              <div class="bub me">Perfect, thank you Elena. Hopefully you never have to lift a finger 🙏</div>
+              <div class="bub them">Ha, exactly. I just did my 48-hour check-in — all set on my end, gear's ready.</div>
+            </div>
+            <div class="chat-f"><input id="chatIn" placeholder="Message Elena…" onkeydown="if(event.key==='Enter')sendMsg()" /><button class="btn btn-gold btn-sm" onclick="sendMsg()">Send</button></div>
+          </div>
+        </div>
+      </div></div>
+
+      <!-- ===== BACKUP: HOME ===== -->
+      <div class="screen" id="bhome"><div class="wrap">
+        <div style="margin-bottom:18px"><span class="eyebrow">Tuesday, June 23</span><h1 style="font-size:30px;margin-top:4px" id="bgreeting">Good to see you.</h1></div>
+        <div class="hero-cov">
+          <span class="eyebrow">You're on standby</span>
+          <h2>Sarah &amp; Michael</h2>
+          <div class="when">Sat, Oct 18 2026 · San Diego County · You're the primary backup</div>
+          <div class="prog"><span class="seg done"></span><span class="seg done"></span><span class="seg now"></span></div>
+          <span class="chip ok">Retainer earned — you only shoot if activated</span>
+        </div>
+
+        <div class="card" style="margin-top:18px">
+          <h3 style="font-size:19px;margin-bottom:4px">Your check-in</h3>
+          <p style="font-size:13.5px;color:var(--muted)">Confirm you're available and share your location once. You're never tracked between check-ins.</p>
+          <div class="checkin-cta" id="ciBox">
+            <div class="txt"><b>48-hour check-in due</b><p>For Sarah &amp; Michael · before Oct 16, 7:00 PM</p></div>
+            <button class="btn btn-gold btn-sm" onclick="backupCheckin()">Check in &amp; share location</button>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top:18px">
+          <div class="stat"><div class="k">On benches</div><div class="v">6</div><div class="s">photographers</div></div>
+          <div class="stat"><div class="k">Earned this season</div><div class="v">$2.9k</div><div class="s">passive retainers</div></div>
+          <div class="stat"><div class="k">Shoots</div><div class="v">1</div><div class="s">+ $2,400</div></div>
+        </div>
+
+        <div class="sec-h"><h3>Recent activity</h3></div>
+        <div class="card" style="padding:6px 22px">
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><b>Retainer paid</b><p>Standby for the Reyes wedding · $35</p></div><span class="t">Sat</span></div>
+          <div class="alert"><div class="ic amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><b>Check-in due now</b><p>48-hour check-in for Sarah &amp; Michael</p></div><span class="t">today</span></div>
+        </div>
+      </div></div>
+
+      <!-- ===== BACKUP: STANDBY DATES ===== -->
+      <div class="screen" id="bassign"><div class="wrap">
+        <div class="sec-h" style="margin-top:0"><h3>Your standby dates</h3></div>
+        <div class="card" style="padding:6px 22px">
+          <div class="alert"><div class="ic amber"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><b>Sarah &amp; Michael · Oct 18</b><p>Primary backup · check-in due</p></div><button class="btn btn-sm" onclick="go('bhome')" style="margin-left:auto">Check in</button></div>
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><b>The Reyes wedding · Nov 2</b><p>Second backup · confirmed</p></div><span class="t">retainer paid</span></div>
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><b>Okafor &amp; Lane · Nov 15</b><p>Primary backup · confirmed</p></div><span class="t">retainer paid</span></div>
+        </div>
+      </div></div>
+
+      <!-- ===== BACKUP: EARNINGS ===== -->
+      <div class="screen" id="bearn"><div class="wrap">
+        <div class="card" style="margin-bottom:18px;text-align:center">
+          <span class="eyebrow">Earned this season</span>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:52px;font-weight:600;line-height:1.1;margin-top:4px">$5,300</div>
+          <p style="color:var(--muted);font-size:14px;max-width:420px;margin:6px auto 0">$2,900 in passive standby retainers, plus $2,400 from one activation. You get paid to be reachable — shooting is the bonus.</p>
+        </div>
+        <div class="sec-h" style="margin-top:0"><h3>Standby retainers</h3></div>
+        <div class="card" style="padding:6px 22px">
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><div><b>Sarah &amp; Michael · Oct 18</b><p>Primary backup retainer</p></div><span class="t">$35</span></div>
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><div><b>The Reyes wedding · Nov 2</b><p>Second backup retainer</p></div><span class="t">$35</span></div>
+          <div class="alert"><div class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><div><b>Okafor &amp; Lane · Nov 15</b><p>Primary backup retainer</p></div><span class="t">$45</span></div>
+        </div>
+      </div></div>
+
+      <!-- ===== ACCOUNT / SETTINGS (both roles) ===== -->
+      <div class="screen" id="account"><div class="wrap" id="accountBody"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="botnav">
+  <button class="on r-photog" data-go="home" onclick="go('home')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</button>
+  <button class="r-photog" data-go="coverage" onclick="go('coverage')"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg>Coverage</button>
+  <button class="r-photog" data-go="bench" onclick="go('bench')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 6.5a3 3 0 0 1 0 5.8M17.5 19a5.5 5.5 0 0 0-2.5-4.6"/></svg>Bench</button>
+  <button class="r-backup" data-go="bhome" onclick="go('bhome')"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h14V10"/></svg>Home</button>
+  <button class="r-backup" data-go="bassign" onclick="go('bassign')"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>Dates</button>
+  <button class="r-backup" data-go="bearn" onclick="go('bearn')"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>Earnings</button>
+  <button data-go="messages" onclick="go('messages')"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>Messages</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TITLES={home:'Home',coverage:'Coverage',bench:'The bench',messages:'Messages',bhome:'Home',bassign:'Standby dates',bearn:'Earnings',account:'Account'};
+function backupCheckin(){
+  var t=new Date(),hh=t.getHours(),mm=String(t.getMinutes()).padStart(2,'0'),ap=hh>=12?'PM':'AM',h12=((hh+11)%12)+1;
+  var box=document.getElementById('ciBox');box.className='checkin-cta checkin-done';
+  box.innerHTML='<div class="txt"><b>✓ Checked in for Sarah &amp; Michael</b><p>'+h12+':'+mm+' '+ap+' · within 5 mi of La Mesa · shared once</p></div>'+
+    '<span class="loc"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/></svg> La Mesa, CA</span>';
+  toast('Checked in — the photographer can see you’re in the area');
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  document.querySelectorAll('[data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
+  document.getElementById('pageTitle').textContent=TITLES[id];
+  document.querySelector('.content').scrollTop=0;
+}
+
+let tmr;
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(tmr);tmr=setTimeout(()=>t.classList.remove('show'),2600);}
+
+function activate(){
+  document.getElementById('covStatus').textContent='Backup activated';
+  document.getElementById('covStatus').className='chip act';
+  document.getElementById('actBtn').textContent='Elena is on the way';
+  document.getElementById('actBtn').disabled=true;
+  document.getElementById('contactSlot').innerHTML=`<div style="background:var(--ink);color:var(--cream);border-radius:14px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <div class="av" style="width:42px;height:42px;font-size:17px;background:var(--champ)">ET</div>
+    <div style="flex:1;min-width:140px"><b style="font-size:15px;color:var(--cream)">Elena is stepping in</b><div style="font-size:12.5px;color:#c7c2b8">Contact unlocked</div></div>
+    <span style="font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--champ);font-weight:600">(619) 555-0148</span>
+    <button class="btn btn-gold btn-sm" onclick="go('messages')">Message</button></div>`;
+  document.getElementById('dayOf').style.display='';
+  toast('Backup activated — Elena notified, contact unlocked');
+}
+function checkout(){
+  document.getElementById('departRow').innerHTML=`<div class="ring done"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg></div>
+    <div class="tl-b"><div class="h"><b>Departed venue</b><span class="chip ok">Checked out</span></div>
+      <div class="sub">Elena Torres · 11:32 PM · 9 hrs on site</div>
+      <span class="loc"><svg viewBox="0 0 24 24"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.3"/></svg> Left The Inn at Rancho Santa Fe</span></div>`;
+  document.getElementById('departRow').style.borderBottom='none';
+  toast('Check-out logged — coverage complete');
+}
+
+function sendMsg(){const i=document.getElementById('chatIn');if(!i.value.trim())return;
+  const b=document.getElementById('chatB');const d=document.createElement('div');d.className='bub me';d.textContent=i.value;b.appendChild(d);i.value='';b.scrollTop=b.scrollHeight;}
+
+const BENCH=[
+ ['Elena Torres','San Diego','Fine art',4.9,9,['Fine art','Film']],
+ ['Marcus Reed','Carlsbad','Documentary',4.8,7,['Documentary','Moody']],
+ ['Jordan Lee','Oceanside','Editorial',5.0,11,['Editorial','Airy']],
+ ['Priya Nair','La Jolla','Fine art',4.9,8,['Fine art','Airy']],
+ ['Diego Salazar','Chula Vista','Moody',4.7,6,['Moody','Doc']],
+ ['Hannah Brooks','Encinitas','Light & airy',4.9,10,['Airy','Editorial']],
+ ['Grace Kim','La Mesa','Light & airy',4.9,8,['Airy','Fine art']],
+ ['Andre Coleman','San Diego','Documentary',4.8,12,['Doc','Film']]
+];
+const BAN=['#3a4a5a','#7a5a4a','#4a5a4a','#5a4a5a','#6b4a3a','#3a5a5a','#5a3a4a','#4a4a5a'];
+function ini(n){return n.split(' ').map(w=>w[0]).join('').slice(0,2)}
+function stars(r){return '★'.repeat(Math.round(r))+'☆'.repeat(5-Math.round(r))}
+document.getElementById('benchGrid').innerHTML=BENCH.map((p,i)=>`<div class="pcard" onclick="toast('${p[0].split(' ')[0]} added to your bench')">
+  <div class="top"><div class="av" style="background:${BAN[i%BAN.length]}">${ini(p[0])}</div><div><b>${p[0]}</b><div class="loc2">${p[1]}</div></div></div>
+  <div class="tags">${p[5].map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+  <div class="meta"><span class="stars">${stars(p[3])} <span style="color:var(--ink)">${p[3].toFixed(1)}</span></span><span>${p[4]} yrs</span></div>
+</div>`).join('');
+
+/* ---- accounts / auth (localStorage-backed; a real build swaps this for a server) ---- */
+function initials(n){return (n||'').trim().split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase()||'PH';}
+function curAccount(){try{return JSON.parse(localStorage.getItem('standby_account')||'null');}catch(e){return null;}}
+function applyAccount(a){
+  var ini=initials(a.name), first=a.name.split(' ')[0];
+  document.getElementById('sfName').textContent=a.name;
+  document.getElementById('sfAv').textContent=ini;
+  document.getElementById('tbAv').textContent=ini;
+  if(a.role==='backup'){
+    document.body.classList.add('as-backup');
+    document.getElementById('sfPlan').textContent='On the bench';
+    document.getElementById('bgreeting').textContent='Good to see you, '+first+'.';
+  } else {
+    document.body.classList.remove('as-backup');
+    document.getElementById('sfPlan').textContent=(a.plan||'Premium')+' plan';
+    document.getElementById('greeting').textContent='Good to see you, '+first+'.';
+  }
+  renderAccount(a);
+}
+function showApp(){document.getElementById('login').style.display='none';document.getElementById('appShell').style.display='flex';var a=curAccount();go(a&&a.role==='backup'?'bhome':'home');}
+function esc(s){return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function renderAccount(a){
+  var ini=initials(a.name);
+  var roleLabel=a.role==='backup'?('Backup · '+(a.discipline||'Photographer')):((a.discipline||'Photographer')+' · '+(a.plan||'Premium')+' plan');
+  var roleFields=a.role==='backup'
+    ? '<div class="set-field"><label>Years shooting</label><input id="acYears" value="'+esc(a.years)+'"></div>'+
+      '<div class="set-field"><label>Style</label><input id="acStyle" value="'+esc(a.style)+'"></div>'+
+      '<div class="set-field full"><label>Portfolio</label><input id="acPortfolio" value="'+esc(a.portfolio)+'"></div>'
+    : '<div class="set-field full"><label>Business / studio</label><input id="acBiz" value="'+esc(a.business)+'"></div>'+
+      '<div class="set-field full"><label>Website / Instagram</label><input id="acSite" value="'+esc(a.website)+'"></div>';
+  document.getElementById('accountBody').innerHTML=
+    '<div class="acct-head"><div class="av">'+ini+'</div><div><h2>'+esc(a.name)+'</h2><div class="role">'+roleLabel+'</div></div></div>'+
+    '<div class="card"><h3 style="font-size:19px;margin-bottom:14px">Your details</h3><div class="set-grid">'+
+      '<div class="set-field"><label>Full name</label><input id="acName" value="'+esc(a.name)+'"></div>'+
+      '<div class="set-field"><label>Phone</label><input id="acPhone" value="'+esc(a.phone)+'"></div>'+
+      '<div class="set-field"><label>City / metro</label><input id="acCity" value="'+esc(a.city)+'"></div>'+
+      '<div class="set-field"><label>Email (your login)</label><input id="acEmail" value="'+esc(a.email)+'" disabled></div>'+
+      '<div class="set-field"><label>Primary role</label><input id="acDisc" value="'+esc(a.discipline||'Photographer')+'" disabled></div>'+
+      '<div class="set-field"><label>Plan</label><input value="'+esc(a.plan||'')+'" disabled></div>'+
+      roleFields+
+    '</div><button class="btn btn-pri" style="margin-top:18px" onclick="saveAccount()">Save changes</button></div>'+
+    '<div class="card" style="margin-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px"><div><b style="font-size:15px">Sign out</b><div style="font-size:13px;color:var(--muted)">Log out of Standby on this device.</div></div><button class="btn" onclick="logout()">Log out</button></div>';
+}
+function saveAccount(){
+  var a=curAccount(); if(!a)return;
+  a.name=document.getElementById('acName').value.trim()||a.name;
+  a.phone=document.getElementById('acPhone').value.trim();
+  a.city=document.getElementById('acCity').value.trim();
+  if(a.role==='backup'){a.years=document.getElementById('acYears').value.trim();a.style=document.getElementById('acStyle').value.trim();a.portfolio=document.getElementById('acPortfolio').value.trim();}
+  else{a.business=document.getElementById('acBiz').value.trim();a.website=document.getElementById('acSite').value.trim();}
+  localStorage.setItem('standby_account',JSON.stringify(a));
+  applyAccount(a);
+  toast('Changes saved');
+}
+function login(){
+  var em=document.getElementById('liEmail').value.trim().toLowerCase();
+  var pw=document.getElementById('liPass').value;
+  var a=curAccount();
+  if(a && a.email.toLowerCase()===em && a.password===pw){
+    localStorage.setItem('standby_session',a.email); applyAccount(a); showApp();
+  } else if(!a){
+    document.getElementById('liErr').textContent='No account yet — create one on the website first.';
+  } else {
+    document.getElementById('liErr').textContent='Email or password is incorrect.';
+  }
+}
+function logout(){localStorage.removeItem('standby_session');document.body.classList.remove('as-backup');document.getElementById('appShell').style.display='none';document.getElementById('login').style.display='flex';document.getElementById('liPass').value='';}
+(function boot(){
+  var a=curAccount(), s=localStorage.getItem('standby_session');
+  if(a && s && s===a.email){applyAccount(a);showApp();}
+  else {if(a)document.getElementById('liEmail').value=a.email;document.getElementById('login').style.display='flex';}
+})();
+</script>
+</body>
+</html>
