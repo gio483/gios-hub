@@ -49,7 +49,7 @@
 </head>
 <body>
   <header>
-    <div class="logo">G</div>
+    <div class="logo" onclick="location.hash=''" style="cursor:pointer" title="Back to home">G</div>
     <h1 id="title">Gio's Hub</h1>
     <p class="sub" id="subtitle">Pick a company to see its apps.</p>
   </header>
@@ -91,9 +91,13 @@ const GROUPS = [
     { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'📍', tag:'Tracker' },
     { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'🎨', tag:'Gallery' }
   ]},
+  { id:'svm', name:'Shift Vision Media', color:'#fb7a3c', icon:'◢', desc:'Client content & delivery', apps:[
+    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'⚡', tag:'Generator' }
+  ]},
   { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'🛟', desc:'Wedding backup network — new venture', apps:[
-    { name:'Product Demo', desc:'Clickable app: book, check-ins, activate', href:'standby-prototype.html', icon:'📱', tag:'Prototype' },
-    { name:'Demo Reel', desc:'Self-playing product tour', href:'standby-demo.html', icon:'🎬', tag:'Video' }
+    { name:'Website', desc:'Public site — where photographers buy', href:'standby-site.html', icon:'🌐', tag:'Site' },
+    { name:'The app', desc:'Login — dashboard, check-ins, messaging', href:'standby-app.html', icon:'📱', tag:'App' },
+    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'🎬', tag:'Demo' }
   ]}
 ];
 
