@@ -37,6 +37,12 @@
   nav.links button{background:none;border:none;font-family:'Inter',sans-serif;font-size:14.5px;font-weight:500;color:var(--ink-soft);cursor:pointer;padding:6px 0;border-bottom:2px solid transparent;transition:.15s}
   nav.links button:hover,nav.links button.active{color:var(--ink);border-bottom-color:var(--champ)}
   .nav-cta{display:flex;gap:12px;align-items:center}
+  .nav-menu{display:contents}
+  .hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;width:44px;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--white);cursor:pointer;padding:0 11px}
+  .hamburger span{display:block;height:2px;background:var(--ink);border-radius:2px;transition:.25s}
+  .hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .hamburger.open span:nth-child(2){opacity:0}
+  .hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 
   .screen{display:none;animation:fade .35s ease}
   .screen.on{display:block}
@@ -249,7 +255,14 @@
 
   @media(max-width:880px){
     .access,.proof-grid{grid-template-columns:1fr}
-    nav.links{display:none}
+    .hamburger{display:flex}
+    .nav-menu{display:flex;flex-direction:column;gap:4px;position:absolute;top:70px;left:0;right:0;background:var(--cream);border-bottom:1px solid var(--line);padding:12px 22px 20px;box-shadow:0 20px 34px rgba(27,27,33,.12);transform:translateY(-14px);opacity:0;pointer-events:none;transition:.22s}
+    .nav-menu.show{transform:none;opacity:1;pointer-events:auto}
+    nav.links{flex-direction:column;align-items:stretch;gap:0}
+    nav.links button{text-align:left;padding:14px 4px;border-bottom:1px solid var(--line);font-size:16.5px}
+    nav.links button.active{border-bottom-color:var(--line);color:var(--champ-dk)}
+    .nav-cta{flex-direction:column;align-items:stretch;gap:10px;margin-top:14px}
+    .nav-cta .btn{justify-content:center;width:100%}
     .hero h1{font-size:46px}.sec-head h2{font-size:34px}.final h2{font-size:36px}
     .steps,.grid,.tiers,.dash,.portfolio{grid-template-columns:1fr}
     .problem{grid-template-columns:1fr}
@@ -299,17 +312,20 @@
 
 <header class="nav">
   <div class="wrap nav-in">
-    <div class="logo">Standby<span class="dot"></span></div>
-    <nav class="links">
-      <button data-go="home" class="active">Home</button>
-      <button data-go="how">How it works</button>
-      <button data-go="bench">Browse the bench</button>
-      <button data-go="coverage">My coverage</button>
-      <button data-go="pricing">Pricing</button>
-    </nav>
-    <div class="nav-cta">
-      <button class="btn btn-ghost" onclick="waitlist()">Join the waitlist</button>
-      <button class="btn btn-gold" onclick="openBooking()">Cover a wedding</button>
+    <div class="logo" onclick="go('home')" style="cursor:pointer" title="Back to home">Standby<span class="dot"></span></div>
+    <button class="hamburger" id="hamb" aria-label="Menu" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+    <div class="nav-menu" id="navMenu">
+      <nav class="links">
+        <button data-go="home" class="active">Home</button>
+        <button data-go="how">How it works</button>
+        <button data-go="bench">Browse the bench</button>
+        <button data-go="coverage">My coverage</button>
+        <button data-go="pricing">Pricing</button>
+      </nav>
+      <div class="nav-cta">
+        <button class="btn btn-ghost" onclick="closeMenu();waitlist()">Join the waitlist</button>
+        <button class="btn btn-gold" onclick="closeMenu();openBooking()">Cover a wedding</button>
+      </div>
     </div>
   </div>
 </header>
@@ -628,8 +644,10 @@ function go(id){
   document.getElementById(id).classList.add('on');
   document.querySelectorAll('nav.links button').forEach(b=>b.classList.toggle('active',b.dataset.go===id));
   window.scrollTo({top:0,behavior:'smooth'});
-  current=id;
+  current=id; closeMenu();
 }
+function toggleMenu(){document.getElementById('navMenu').classList.toggle('show');document.getElementById('hamb').classList.toggle('open');}
+function closeMenu(){var m=document.getElementById('navMenu');if(m){m.classList.remove('show');document.getElementById('hamb').classList.remove('open');}}
 document.querySelectorAll('nav.links button').forEach(b=>b.onclick=()=>go(b.dataset.go));
 
 const TIERS=[
