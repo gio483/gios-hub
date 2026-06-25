@@ -477,9 +477,18 @@ function applyParsed(p){
   if(p.project){['client','project','type'].forEach(k=>{if(p.project[k])cur.project[k]=p.project[k];});
     if(p.project.sqft)cur.project.sqft=p.project.sqft;}
   if(Array.isArray(p.buckets)&&p.buckets.length)cur.buckets=p.buckets.map(b=>({name:b.name||'',amount:num(b.amount)}));
-  if(Array.isArray(p.allowances)&&p.allowances.length)cur.allow=p.allowances.map(b=>({name:b.name||'',amount:num(b.amount)}));
-  if(p.contingencyPct!=null)cur.cont=num(p.contingencyPct);
+  cur.allow=(Array.isArray(p.allowances)?p.allowances:[]).map(b=>({name:b.name||'',amount:num(b.amount)}));
+  cur.cont=(p.contingencyPct!=null)?num(p.contingencyPct):0;
+  cur.markup=0; // KSH's line amounts already include the cost-plus fee — never re-add it
+  const stated=(p.statedTotal!=null)?num(p.statedTotal):null;
   bindEditor();persistDraft();
+  const sum=cur.buckets.reduce((a,b)=>a+num(b.amount),0)+cur.allow.reduce((a,b)=>a+num(b.amount),0);
+  if(stated){
+    return Math.abs(sum-stated)<=Math.max(2,stated*0.001)
+      ? `✓ Imported — total ${money(sum)} matches the document.`
+      : `⚠ Imported lines total ${money(sum)}, but the document's printed total is ${money(stated)}. Check for a missing or doubled line before sending.`;
+  }
+  return `Imported ${cur.buckets.length} lines · total ${money(sum)}.`;
 }
 function clientTabular(text){
   const buckets=[],allow=[];
@@ -499,9 +508,9 @@ function parsePaste(){
   $('parseMsg').textContent='Formatting…';
   fetch('/api/parse-estimate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text})})
     .then(r=>{if(!r.ok)throw 0;return r.json();})
-    .then(p=>{applyParsed(p);$('parseMsg').textContent='Formatted with AI ✓';toast('Numbers imported ✓');})
+    .then(p=>{$('parseMsg').textContent=applyParsed(p);toast('Numbers imported ✓');})
     .catch(()=>{const p=clientTabular(text);if(!p.buckets.length&&!p.allowances.length){$('parseMsg').textContent='Couldn\'t find line items. Try "Name  amount" per line.';return;}
-      applyParsed(p);$('parseMsg').textContent='Imported '+(p.buckets.length+p.allowances.length)+' lines (offline mode).';toast('Numbers imported ✓');});
+      $('parseMsg').textContent=applyParsed(p)+' (offline mode)';toast('Numbers imported ✓');});
 }
 function parseFile(file){
   if(!file)return;$('parseMsg').textContent='Reading '+file.name+'…';
@@ -510,7 +519,7 @@ function parseFile(file){
     const b64=String(r.result).split(',')[1];
     fetch('/api/parse-estimate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({fileBase64:b64,mimeType:file.type})})
       .then(x=>{if(!x.ok)throw 0;return x.json();})
-      .then(p=>{applyParsed(p);$('parseMsg').textContent='Read '+file.name+' with AI ✓';toast('Estimate imported ✓');})
+      .then(p=>{$('parseMsg').textContent=applyParsed(p);toast('Estimate imported ✓');})
       .catch(()=>{$('parseMsg').textContent='File reading needs the app deployed (AI endpoint). For now, paste the text instead.';});
   };
   r.readAsDataURL(file);

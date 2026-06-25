@@ -5,21 +5,24 @@
 
 const MODEL = "claude-sonnet-4-6";
 
-const SYSTEM = `You convert a contractor's raw construction estimate into clean structured JSON for KSH Construction, a luxury residential GC.
+const SYSTEM = `You convert a contractor's construction estimate into clean structured JSON for KSH Construction, a luxury residential GC. KSH estimates are cost-plus, organized by trade DIVISION.
 Return ONLY a JSON object, no prose, matching exactly:
 {
   "project": { "client": "", "project": "", "type": "", "sqft": null },
-  "buckets": [ { "name": "Trade or scope name", "amount": 0 } ],
+  "buckets": [ { "name": "Trade division name", "amount": 0 } ],
   "allowances": [ { "name": "Selection name", "amount": 0 } ],
+  "markupPct": null,
+  "statedTotal": null,
   "contingencyPct": null,
   "notes": ""
 }
-Rules:
-- "buckets" are construction/trade line items (demolition, framing, plumbing, electrical, drywall, etc.). Group sensibly; keep the contractor's own labels when clear.
-- "allowances" are client finish selections carried as allowances (cabinetry, countertops, tile material, plumbing fixtures, appliances, lighting, flooring material, hardware). Only put items here if the source clearly marks them as allowances or finishes; otherwise treat as a bucket.
-- amount = a whole-dollar number (no $ or commas).
-- If a value is unknown, use null (for project fields/contingency) or omit the item.
-- Do not invent line items or numbers that aren't in the source. Echo what's there, cleaned up.`;
+CRITICAL RULES — getting the total right matters most:
+- "buckets" = EVERY priced trade-division line that adds up to the contract total (Demolition, Project Management, Rough Carpentry, Plumbing, Electrical, Drywall, Cabinetry & Hardware, etc.). Keep the document's own division names. The SUM of all bucket amounts must equal the document's printed grand total.
+- Use the division's TOTAL amount for each bucket. If a division shows sub-allowances or cost detail inside it (e.g. "$64,380 cabinetry material" shown within the Cabinetry & Hardware division), that detail is ALREADY INCLUDED in the division amount — do NOT also list it under "allowances" and do NOT add it again. This double-counting is the #1 error to avoid.
+- "allowances" = ONLY items the document adds ON TOP of the division subtotal as a separate additive allowance. This is rare. Do NOT put owner-provided/$0 selection items here (plumbing fixtures, electrical fixtures, tile/slab, appliances provided by homeowner/designer) — instead note them in "notes". When unsure, put a line in "buckets", never "allowances".
+- "markupPct" = the cost-plus markup percent if stated (e.g. 23 or 25). This is INFORMATIONAL ONLY — the bucket amounts already include it; never instruct adding it again.
+- "statedTotal" = the document's printed grand/contract total as a whole-dollar number (no $ or commas). This is the source of truth.
+- amount = whole-dollar number. Unknown values = null (or omit the item). Never invent numbers; echo what's in the source, cleaned up.`;
 
 module.exports = async (req, res) => {
   if (req.method !== "POST") { res.status(405).json({ error: "POST only" }); return; }
