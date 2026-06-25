@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SDLR — This Week's Posts</title>
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#0e0f0d; --panel:#16170f; --panel2:#1c1d15; --ink:#f3efe4; --muted:#a7a290;
+    --line:#2c2d22; --gold:#c8a96a; --gold2:#e4cf9a; --green:#7d8a5c;
+    --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+    --sans:'Helvetica Neue',Arial,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+  .wrap{max-width:680px;margin:0 auto;padding:0 16px}
+  header.top{padding:26px 0 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:linear-gradient(180deg,var(--bg) 80%,rgba(14,15,13,.92));z-index:20;backdrop-filter:blur(4px)}
+  .kicker{letter-spacing:.3em;text-transform:uppercase;font-size:10px;color:var(--gold);margin-bottom:6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.05;margin:0}
+  .weeksub{font-size:13px;color:var(--muted);margin-top:5px}
+  .progwrap{margin:14px 0 2px}
+  .progbar{height:8px;background:var(--panel2);border:1px solid var(--line);border-radius:99px;overflow:hidden}
+  .progfill{height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--gold));transition:width .3s}
+  .progtext{font-size:12px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;align-items:center}
+  .reload{background:var(--panel2);border:1px solid var(--line);color:var(--gold2);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer}
+  .reload:active{transform:scale(.97)}
+  details.how{margin:16px 0 4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  details.how summary{padding:13px 15px;cursor:pointer;font-size:13px;color:var(--gold2);font-weight:600;list-style:none}
+  details.how summary::-webkit-details-marker{display:none}
+  details.how summary::before{content:"▸ ";color:var(--gold)}
+  details.how[open] summary::before{content:"▾ "}
+  details.how .howbody{padding:0 16px 16px;font-size:13.5px;color:var(--muted)}
+  details.how ol{margin:6px 0 0;padding-left:20px}
+  details.how li{margin-bottom:7px}
+  main{padding:18px 0 30px}
+  .post{background:var(--panel);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:22px;transition:.2s}
+  .post.done{border-color:var(--green);box-shadow:0 0 0 1px var(--green) inset}
+  .imgwrap{position:relative;background:#000;aspect-ratio:4/5}
+  .imgwrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .chips{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap}
+  .chip{font-size:10.5px;letter-spacing:.04em;padding:4px 9px;border-radius:99px;background:rgba(14,15,13,.78);border:1px solid var(--line);color:var(--ink);backdrop-filter:blur(3px)}
+  .chip.day{background:var(--gold);color:#1a1a14;border-color:var(--gold);font-weight:700}
+  .donestamp{position:absolute;bottom:10px;right:10px;background:var(--green);color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:99px;display:none}
+  .post.done .donestamp{display:block}
+  .pbody{padding:15px 15px 17px}
+  .meta{display:flex;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-bottom:11px}
+  .meta b{color:var(--gold2);font-weight:600}
+  .hook{font-family:var(--serif);font-size:21px;color:var(--ink);line-height:1.2;margin:0 0 9px}
+  .caption{font-size:14px;color:#d9d3c2;white-space:pre-wrap;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 13px;max-height:150px;overflow:auto}
+  .tags{font-size:12.5px;color:var(--gold2);word-spacing:2px;margin-top:9px;line-height:1.6}
+  .btnrow{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}
+  .btnrow .full{grid-column:1 / -1}
+  button.act{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:10px;padding:12px 10px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:.15s;min-height:46px}
+  button.act:active{transform:scale(.98)}
+  button.act.primary{background:var(--gold);color:#1a1a14;border-color:var(--gold)}
+  button.act.dl{background:linear-gradient(180deg,#20231a,#181a12);border-color:var(--gold)}
+  button.act.copied{background:var(--green);color:#fff;border-color:var(--green)}
+  button.act.sched{background:transparent}
+  button.act.sched.on{background:var(--green);color:#fff;border-color:var(--green)}
+  .ioshelp{font-size:11.5px;color:var(--muted);margin-top:8px;text-align:center;line-height:1.4}
+  .footer{border-top:1px solid var(--line);padding:20px 0 30px;color:var(--muted);font-size:11.5px;text-align:center;line-height:1.6}
+  .footer a{color:var(--gold2)}
+  .err{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;color:var(--muted);font-size:14px;text-align:center;margin-top:20px}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:11px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <div class="kicker">San Diego Landscape Remodeling</div>
+  <h1>This Week's Posts</h1>
+  <div class="weeksub" id="weekLabel">Loading…</div>
+  <div class="progwrap">
+    <div class="progbar"><div class="progfill" id="progFill"></div></div>
+    <div class="progtext"><span id="progText">0 of 0 scheduled</span><button class="reload" onclick="location.reload()">↻ Reload</button></div>
+  </div>
+  <details class="how">
+    <summary>How to post (60-second guide)</summary>
+    <div class="howbody">
+      <ol>
+        <li><b>Download</b> the image — tap the gold <b>Download</b> button. On iPhone: if it opens the photo, press &amp; hold it → <b>Save to Photos</b>.</li>
+        <li><b>Copy</b> the caption — tap <b>Copy caption + tags</b>. It's now on your clipboard.</li>
+        <li>Open <b>Instagram</b> → new post → pick the saved photo → paste the caption.</li>
+        <li>Tap <b>…</b> / <b>Advanced settings</b> → <b>Schedule</b> and set the day &amp; time shown on the card.</li>
+        <li>Come back here and tap <b>Mark scheduled ✓</b> so we know it's done.</li>
+      </ol>
+      <div style="margin-top:8px;font-size:12.5px">Do all 5 in one sitting and the whole week is scheduled. New posts appear here automatically every Sunday evening.</div>
+    </div>
+  </details>
+</div></header>
+
+<main class="wrap" id="main"></main>
+
+<div class="footer"><div class="wrap">
+  San Diego Landscape Remodeling · Weekly content · <span id="genDate"></span><br>
+  Images are AI concept visualizations — each caption carries the required label. <em>Sell the experience, not the product.</em>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const FALLBACK = {"week_label":"Week of Jun 29 – Jul 3, 2026","generated":"2026-06-25","folder":"week-2026-06-29","posts":[]};
+const $=s=>document.querySelector(s);
+let DATA=null;
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1600);}
+
+async function copyText(txt,btn,label){
+  const ok=()=>{const o=btn.innerHTML;btn.innerHTML='Copied ✓';btn.classList.add('copied');toast(label+' copied');setTimeout(()=>{btn.innerHTML=o;btn.classList.remove('copied');},1600);};
+  try{await navigator.clipboard.writeText(txt);ok();}
+  catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity=0;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(_){prompt('Copy this:',txt);}document.body.removeChild(ta);}
+}
+async function download(url,filename,btn){
+  const o=btn.innerHTML;btn.innerHTML='Downloading…';
+  try{
+    const r=await fetch(url,{cache:'no-store'});const b=await r.blob();const u=URL.createObjectURL(b);
+    const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),4000);
+    btn.innerHTML='Saved ✓';toast('Image downloaded');setTimeout(()=>btn.innerHTML=o,1600);
+  }catch(e){window.open(url,'_blank');btn.innerHTML=o;toast('Opened image — press & hold to save');}
+}
+
+/* scheduled state in localStorage */
+function schedKey(){return 'sdlr_sched_'+(DATA?DATA.folder:'x');}
+function getSched(){try{return JSON.parse(localStorage.getItem(schedKey())||'{}');}catch(e){return {};}}
+function setSched(id,v){const s=getSched();if(v)s[id]=1;else delete s[id];localStorage.setItem(schedKey(),JSON.stringify(s));updateProgress();}
+function updateProgress(){
+  const total=DATA?DATA.posts.length:0;const done=Object.keys(getSched()).length;
+  $('#progFill').style.width=total?(done/total*100)+'%':'0';
+  $('#progText').textContent=done+' of '+total+' scheduled'+(total&&done===total?' — week done 🎉':'');
+}
+
+function postCard(p){
+  const card=document.createElement('div');card.className='post';card.id='card-'+p.id;
+  const captionFull=p.caption+'\n\n'+p.hashtags;
+  card.innerHTML=`
+    <div class="imgwrap">
+      <img src="${p.image}" alt="${(p.alt||'').replace(/"/g,'&quot;')}" loading="lazy">
+      <div class="chips">
+        <span class="chip day">${p.day} · ${p.date}</span>
+        <span class="chip">${p.time}</span>
+        <span class="chip">${p.style}</span>
+      </div>
+      <div class="donestamp">Scheduled ✓</div>
+    </div>
+    <div class="pbody">
+      <div class="meta"><span><b>Post on:</b> ${p.platform}</span></div>
+      <p class="hook">${p.hook}</p>
+      <div class="caption">${p.caption}</div>
+      <div class="tags">${p.hashtags}</div>
+      <div class="btnrow">
+        <button class="act dl full" data-act="dl">⬇ Download image</button>
+        <button class="act primary" data-act="capall">⧉ Copy caption + tags</button>
+        <button class="act" data-act="cap">Copy caption</button>
+        <button class="act sched full" data-act="sched">Mark scheduled ✓</button>
+      </div>
+      <div class="ioshelp">iPhone: if Download opens the photo, press &amp; hold → Save to Photos.</div>
+    </div>`;
+  const fn=(p.image.split('/').pop())||(p.id+'.jpg');
+  card.querySelector('[data-act=dl]').onclick=e=>download(p.image,fn,e.currentTarget);
+  card.querySelector('[data-act=capall]').onclick=e=>copyText(captionFull,e.currentTarget,'Caption + tags');
+  card.querySelector('[data-act=cap]').onclick=e=>copyText(p.caption,e.currentTarget,'Caption');
+  const sb=card.querySelector('[data-act=sched]');
+  const sync=()=>{const on=!!getSched()[p.id];sb.classList.toggle('on',on);card.classList.toggle('done',on);sb.textContent=on?'Scheduled ✓ (tap to undo)':'Mark scheduled ✓';};
+  sb.onclick=()=>{setSched(p.id,!getSched()[p.id]);sync();};
+  sync();
+  return card;
+}
+
+function render(){
+  $('#weekLabel').textContent=DATA.week_label||'';
+  $('#genDate').textContent=DATA.generated?('generated '+DATA.generated):'';
+  const main=$('#main');main.innerHTML='';
+  if(!DATA.posts||!DATA.posts.length){main.innerHTML='<div class="err">No posts loaded yet for this week. Tap ↻ Reload, or check back Sunday evening when the next batch is generated.</div>';updateProgress();return;}
+  DATA.posts.forEach(p=>main.appendChild(postCard(p)));
+  updateProgress();
+}
+
+(async function(){
+  try{
+    const r=await fetch('sdlr-content/manifest.json?cb='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw new Error('no manifest');
+    DATA=await r.json();
+  }catch(e){ DATA=FALLBACK; }
+  render();
+})();
+</script>
+</body>
+</html>
