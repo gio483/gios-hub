@@ -31,7 +31,8 @@ module.exports = async (req, res) => {
 
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch (e) { body = {}; } }
-  const { text, fileBase64, mimeType } = body || {};
+  const { text, fileBase64, mimeType, mode } = body || {};
+  const transcribe = mode === "transcribe";
 
   // build the user content: text and/or a document (PDF/image)
   const content = [];
@@ -42,9 +43,9 @@ module.exports = async (req, res) => {
       content.push({ type: "image", source: { type: "base64", media_type: mimeType, data: fileBase64 } });
     }
   }
-  content.push({ type: "text", text: (text && text.trim())
-    ? `Here is the raw estimate to convert:\n\n${text}`
-    : `Convert the attached estimate document into the JSON structure.` });
+  content.push({ type: "text", text: transcribe
+    ? `Transcribe this entire document to clean Markdown, verbatim. Preserve EVERY heading and paragraph in order — especially all narrative, scope-of-work, terms, exclusions, payment, warranty, and contract language that comes after the pricing/number tables. Do not summarize, shorten, or skip anything. For pricing tables you may write "[pricing table]" in place of the numbers, but reproduce ALL prose word-for-word. Output only the Markdown.`
+    : (text && text.trim() ? `Here is the raw estimate to convert:\n\n${text}` : `Convert the attached estimate document into the JSON structure.`) });
 
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -56,14 +57,15 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 4096,
-        system: SYSTEM,
+        max_tokens: transcribe ? 16000 : 4096,
+        system: transcribe ? "You are a precise document transcriber. Output the requested Markdown only, with no preamble." : SYSTEM,
         messages: [{ role: "user", content }]
       })
     });
     const data = await r.json();
     if (!r.ok) { res.status(502).json({ error: "Claude API error", detail: data }); return; }
     const out = (data.content || []).map(c => c.text || "").join("").trim();
+    if (transcribe) { res.status(200).json({ markdown: out }); return; }
     // pull the JSON object out of the response
     const m = out.match(/\{[\s\S]*\}/);
     let parsed;
