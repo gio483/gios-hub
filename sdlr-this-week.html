@@ -67,6 +67,20 @@
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .weeksel{margin-top:8px;width:100%;-webkit-appearance:none;appearance:none;background:var(--panel2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C8A869' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 34px 11px 13px;font-size:14px;font-family:var(--serif);letter-spacing:.01em;cursor:pointer}
   .weeksel:focus{outline:none;border-color:var(--gold)}
+  /* Desktop: show two posts per row, image + caption + buttons side by side */
+  @media(min-width:900px){
+    .wrap{max-width:1200px}
+    .weeksel{max-width:520px}
+    #main{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+    .post{display:grid;grid-template-columns:300px 1fr;align-items:stretch;margin-bottom:0}
+    .imgwrap{aspect-ratio:auto;height:100%;min-height:340px}
+    .pbody{display:flex;flex-direction:column}
+    .caption{max-height:140px}
+    .btnrow{margin-top:auto}
+  }
+  @media(min-width:1280px){
+    .post{grid-template-columns:340px 1fr}
+  }
 </style>
 </head>
 <body>
@@ -83,7 +97,7 @@
     <summary>How to post (60-second guide)</summary>
     <div class="howbody">
       <ol>
-        <li><b>Download</b> the image — tap the gold <b>Download</b> button. On iPhone: if it opens the photo, press &amp; hold it → <b>Save to Photos</b>.</li>
+        <li><b>Download</b> the image — tap the gold <b>Download</b> button. On iPhone the share sheet pops up → tap <b>Save Image</b> to send it to Photos. (Desktop downloads the file directly.)</li>
         <li><b>Copy</b> the caption — tap <b>Copy caption + tags</b>. It's now on your clipboard.</li>
         <li>Open <b>Instagram</b> → new post → pick the saved photo → paste the caption.</li>
         <li>Tap <b>…</b> / <b>Advanced settings</b> → <b>Schedule</b> and set the day &amp; time shown on the card.</li>
@@ -116,12 +130,23 @@ async function copyText(txt,btn,label){
   catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity=0;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(_){prompt('Copy this:',txt);}document.body.removeChild(ta);}
 }
 async function download(url,filename,btn){
-  const o=btn.innerHTML;btn.innerHTML='Downloading…';
+  const o=btn.innerHTML;btn.innerHTML='Preparing…';
   try{
-    const r=await fetch(url,{cache:'no-store'});const b=await r.blob();const u=URL.createObjectURL(b);
+    const r=await fetch(url,{cache:'no-store'});const b=await r.blob();
+    const file=new File([b],filename,{type:b.type||'image/jpeg'});
+    // iOS / mobile: use the native share sheet → "Save Image" saves straight to Photos
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      try{
+        await navigator.share({files:[file]});
+        btn.innerHTML='Done ✓';toast('Tap “Save Image” to add to Photos');
+        setTimeout(()=>btn.innerHTML=o,1800);return;
+      }catch(err){ if(err && err.name==='AbortError'){btn.innerHTML=o;return;} /* fall through */ }
+    }
+    // Desktop / Android: trigger a real file download
+    const u=URL.createObjectURL(b);
     const a=document.createElement('a');a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(u),4000);
-    btn.innerHTML='Saved ✓';toast('Image downloaded');setTimeout(()=>btn.innerHTML=o,1600);
+    btn.innerHTML='Saved ✓';toast('Image downloaded');setTimeout(()=>btn.innerHTML=o,1800);
   }catch(e){window.open(url,'_blank');btn.innerHTML=o;toast('Opened image — press & hold to save');}
 }
 
