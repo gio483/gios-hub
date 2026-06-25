@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Jul 6 – Jul 10, 2026 · v2 (varied homes)",
+      "folder": "week-2026-07-06-v2",
+      "manifest": "sdlr-content/week-2026-07-06-v2/manifest.json",
+      "generated": "2026-06-25"
+    },
+    {
       "label": "Week of Jul 6 – Jul 10, 2026",
       "folder": "week-2026-07-06",
       "manifest": "sdlr-content/week-2026-07-06/manifest.json",
