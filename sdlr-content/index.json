@@ -1,0 +1,16 @@
+{
+  "weeks": [
+    {
+      "label": "Week of Jul 6 – Jul 10, 2026",
+      "folder": "week-2026-07-06",
+      "manifest": "sdlr-content/week-2026-07-06/manifest.json",
+      "generated": "2026-06-25"
+    },
+    {
+      "label": "Week of Jun 29 – Jul 3, 2026",
+      "folder": "week-2026-06-29",
+      "manifest": "sdlr-content/week-2026-06-29/manifest.json",
+      "generated": "2026-06-25"
+    }
+  ]
+}
