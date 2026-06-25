@@ -65,12 +65,15 @@
   .err{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;color:var(--muted);font-size:14px;text-align:center;margin-top:20px}
   .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--green);color:#fff;padding:11px 18px;border-radius:99px;font-size:13px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.4)}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .weeksel{margin-top:8px;width:100%;-webkit-appearance:none;appearance:none;background:var(--panel2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C8A869' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 12px center;border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:11px 34px 11px 13px;font-size:14px;font-family:var(--serif);letter-spacing:.01em;cursor:pointer}
+  .weeksel:focus{outline:none;border-color:var(--gold)}
 </style>
 </head>
 <body>
 <header class="top"><div class="wrap">
   <div class="kicker">San Diego Landscape Remodeling</div>
   <h1>This Week's Posts</h1>
+  <select id="weekSel" class="weeksel" aria-label="Select a week"></select>
   <div class="weeksub" id="weekLabel">Loading…</div>
   <div class="progwrap">
     <div class="progbar"><div class="progfill" id="progFill"></div></div>
@@ -170,7 +173,7 @@ function postCard(p){
 }
 
 function render(){
-  $('#weekLabel').textContent=DATA.week_label||'';
+  $('#weekLabel').textContent=(DATA.generated?('generated '+DATA.generated):'')+(DATA.posts&&DATA.posts.length?(' · '+DATA.posts.length+' posts'):'');
   $('#genDate').textContent=DATA.generated?('generated '+DATA.generated):'';
   const main=$('#main');main.innerHTML='';
   if(!DATA.posts||!DATA.posts.length){main.innerHTML='<div class="err">No posts loaded yet for this week. Tap ↻ Reload, or check back Sunday evening when the next batch is generated.</div>';updateProgress();return;}
@@ -178,13 +181,35 @@ function render(){
   updateProgress();
 }
 
+let WEEKS=[];
+async function loadWeek(entry){
+  try{
+    const r=await fetch(entry.manifest+'?cb='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw 0; DATA=await r.json();
+  }catch(e){ DATA={week_label:entry.label,folder:entry.folder,generated:entry.generated,posts:[]}; }
+  localStorage.setItem('sdlr_week',entry.folder);
+  render();
+}
+function buildWeekSel(){
+  const sel=$('#weekSel');sel.innerHTML='';
+  WEEKS.forEach((w,i)=>{const o=document.createElement('option');o.value=i;o.textContent=w.label+(i===0?'  ·  current':'');sel.appendChild(o);});
+  sel.onchange=()=>loadWeek(WEEKS[+sel.value]);
+}
 (async function(){
   try{
-    const r=await fetch('sdlr-content/manifest.json?cb='+Date.now(),{cache:'no-store'});
-    if(!r.ok) throw new Error('no manifest');
-    DATA=await r.json();
-  }catch(e){ DATA=FALLBACK; }
-  render();
+    const r=await fetch('sdlr-content/index.json?cb='+Date.now(),{cache:'no-store'});
+    if(!r.ok) throw 0; const idx=await r.json(); WEEKS=idx.weeks||[];
+  }catch(e){ WEEKS=[]; }
+  if(!WEEKS.length){
+    $('#weekSel').style.display='none';
+    try{const r=await fetch('sdlr-content/manifest.json?cb='+Date.now(),{cache:'no-store'});DATA=r.ok?await r.json():FALLBACK;}catch(e){DATA=FALLBACK;}
+    render();return;
+  }
+  buildWeekSel();
+  const saved=localStorage.getItem('sdlr_week');
+  let i=WEEKS.findIndex(w=>w.folder===saved); if(i<0) i=0;
+  $('#weekSel').value=i;
+  loadWeek(WEEKS[i]);
 })();
 </script>
 </body>
