@@ -81,7 +81,9 @@
 
   /* ============ PROPOSAL (letter, print-ready) — KSH blue ============ */
   #proposalWrap{background:#5a6a76;border-radius:12px;padding:22px;overflow-x:auto}
-  #proposalDoc .page{width:8.5in;min-height:11in;background:#fff;margin:0 auto 22px;position:relative;color:#16242f;box-shadow:0 8px 30px #0006}
+  #proposalDoc{counter-reset:pg}
+  #proposalDoc .page{width:8.5in;min-height:11in;background:#fff;margin:0 auto 22px;position:relative;color:#16242f;box-shadow:0 8px 30px #0006;counter-increment:pg}
+  #proposalDoc .page.cover,#proposalDoc .page.toc{counter-increment:none}
   #proposalDoc .page.cover{overflow:hidden;height:11in}
   #proposalDoc .pad{padding:0.7in 0.75in}
   #proposalDoc h2,#proposalDoc .serif{font-family:"Playfair Display",serif}
@@ -145,7 +147,16 @@
   #proposalDoc .stagecard .sf{font-family:"Playfair Display";font-size:18px;color:#2c6ea3;white-space:nowrap}
   #proposalDoc .subhead{font-family:"Playfair Display";font-size:15px;margin:22px 0 8px}
   #proposalDoc .fineprint{font-size:10.5px;color:#6b7c8a;line-height:1.6;border-top:1px solid #d3e2ee;margin-top:22px;padding-top:14px}
-  #proposalDoc .pfooter{text-align:center;font-size:9.5px;color:#9bb0c0;letter-spacing:.05em;margin-top:34px}
+  #proposalDoc .pfooter{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:9.5px;color:#9bb0c0;letter-spacing:.05em;margin-top:34px}
+  #proposalDoc .pfooter .pgn::after{content:"Page " counter(pg)}
+  #proposalDoc .pfooter .pgn{color:#6b7c8a}
+  /* table of contents (on the About page) */
+  #proposalDoc .tochead{text-align:center;color:#3f86c0;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;margin:30px 0 10px}
+  #proposalDoc .toc{max-width:4.9in;margin:0 auto}
+  #proposalDoc .tocrow{display:flex;align-items:baseline;gap:10px;padding:8px 2px;border-bottom:1px solid #eaf0f6}
+  #proposalDoc .tocrow .tnum{font-family:"Playfair Display";font-size:12px;color:#9bbdd8;width:22px;flex:none}
+  #proposalDoc .tocrow .ttl{font-size:12.5px;color:#2c3a45;flex:1}
+  #proposalDoc .tocrow .tpg{font-size:11.5px;color:#3f97d3;font-variant-numeric:tabular-nums;font-weight:600}
 
   @media print{
     @page{ size:8.5in 11in; margin:0; }
@@ -647,13 +658,13 @@ function renderProposal(){
     ${sec('8300 · Debris Disposal', STD.debris)}
     ${sec('8400 · Cleaning', STD.cleaning)}
     ${sec('8700 · Warranty Inspection', STD.warranty)}
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>`;
   const articlesPage=`<div class="page"><div class="pad">
     <div class="kicker">The Agreement</div><h2 class="stitle">Articles of Contract</h2><div class="rule"></div>
     ${para(ARTICLES_INTRO)}
     ${ARTICLES.map(a=>`<div class="bsec"><div class="bsh">Article ${a[0]} — ${a[1]}</div>${para(a[2].replace('__STARTDAYS__',esc(cp.startDays||'30')).replace('__COMPLETEMONTHS__',esc(cp.completeMonths||'10')))}</div>`).join('')}
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>`;
 
   $('proposalDoc').innerHTML=`
@@ -673,21 +684,31 @@ function renderProposal(){
     <p class="lead">KSH Construction is a luxury residential general contractor in coastal San Diego, founded in 2009 by San Diego native Kyle Harrell. We build new custom homes and whole-home remodels for discerning homeowners — and for the designers and architects who trust us to carry out their vision down to the smallest detail.</p>
     <p class="lead">With roughly fifteen craftspeople in-house — carpenters, electricians, site supervisors, and project coordinators — we keep the work that matters most under one roof. We don't sub out the details that define a home.</p>
     <div class="proofstrip"><div><b>17</b><span>Years Building</span></div><div><b>~15</b><span>In-House Team</span></div><div><b>One Team</b><span>Start to Finish</span></div><div><b>Licensed</b><span>CSLB #962269</span></div></div>
-    <div class="pfooter">${FOOT}</div>
+    <div class="tochead">What's Inside</div>
+    <div class="toc">
+      <div class="tocrow"><span class="tnum">02</span><span class="ttl">Meet Your Team</span><span class="tpg">Page 2</span></div>
+      <div class="tocrow"><span class="tnum">03</span><span class="ttl">Our Capabilities</span><span class="tpg">Page 3</span></div>
+      <div class="tocrow"><span class="tnum">04</span><span class="ttl">Where Your Budget Goes</span><span class="tpg">Page 4</span></div>
+      <div class="tocrow"><span class="tnum">05</span><span class="ttl">Your Project, by Stage</span><span class="tpg">Page 5</span></div>
+      <div class="tocrow"><span class="tnum">06</span><span class="ttl">Scope of Work &amp; Project Terms</span><span class="tpg">Page 6</span></div>
+      <div class="tocrow"><span class="tnum">07</span><span class="ttl">Articles of Contract</span><span class="tpg">Page 7</span></div>
+      <div class="tocrow"><span class="tnum">08</span><span class="ttl">Acceptance &amp; Authorization</span><span class="tpg">Page 8</span></div>
+    </div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">The People</div><h2 class="stitle">Meet Your Team</h2><div class="rule"></div>
     <p class="lead">The team that shows up to your project — in-house, the same faces from first walkthrough to final handover.</p>
     <div class="team">${team}</div>
     <div class="crewline"><b>Plus our full in-house crew</b> — carpenters, electricians, and site leads who keep the work that defines a home under one roof.</div>
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">What We Do</div><h2 class="stitle">Our Capabilities</h2><div class="rule"></div>
     <p class="lead">What working with KSH gives you — six commitments we hold to on every project, start to finish.</p>
     <div class="caps">${caps}</div>
     <div class="capfoot">From the first walkthrough to the final handover, the same in-house team carries your home — protecting your designer's vision and the craft that makes it real.</div>
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">The Investment</div><h2 class="stitle">Where Your Budget Goes</h2><div class="rule"></div>
@@ -696,14 +717,14 @@ function renderProposal(){
       ${feeRows}
     </table>
     <div class="note">${p.sqft?`Approx. ${num(p.sqft).toLocaleString()} sq ft · about ${money(c.persf)}/sq ft. `:''}This is a <b>cost-plus</b> estimate: KSH tracks the actual cost of the work and applies its fee as shown, so you only pay for what the project actually costs. Line items may shift as selections are finalized; any change is documented and approved before the work proceeds. Items provided by the homeowner or designer (and work by others) are excluded — see Terms.</div>
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">The Build</div><h2 class="stitle">Your Project, by Stage</h2><div class="rule"></div>
     <p class="lead">How the work — and your investment — moves across the build, from planning to the day we hand you the keys.</p>
     ${stages}
     ${hasAllow?`<div class="subhead">Selection allowances included</div><table class="fee"><tr><th>Selection</th><th style="text-align:right">Allowance</th></tr>${allowRows}<tr class="sub"><td>Total allowances</td><td class="amt">${money(c.allowT)}</td></tr></table>`:''}
-    <div class="pfooter">${FOOT}</div>
+    <div class="pfooter"><span>${FOOT}</span><span class="pgn"></span></div>
   </div></div>
   ${scopePage}
   ${articlesPage}
@@ -726,7 +747,7 @@ function renderProposal(){
       <div class="step"><b>4</b><span>Your build begins</span></div>
     </div>
     <div class="fineprint">Questions? ${esc(p.estimator||'Your KSH estimator')} · (619) 987-2700 · kshconstruction.com · CSLB #962269. This acceptance authorizes the project to be scheduled and is confirmed by KSH Construction's standard written agreement.</div>
-    <div class="pfooter">KSH CONSTRUCTION · 3755 Avocado Blvd #510, La Mesa, CA 91941 · (619) 987-2700</div>
+    <div class="pfooter"><span>KSH CONSTRUCTION · 3755 Avocado Blvd #510, La Mesa, CA 91941 · (619) 987-2700</span><span class="pgn"></span></div>
   </div></div>`;
 }
 
@@ -740,5 +761,3 @@ function renderProposal(){
 </script>
 </body>
 </html>
-
-<!-- redeploy 1782413115 -->
