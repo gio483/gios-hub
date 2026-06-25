@@ -44,7 +44,7 @@ module.exports = async (req, res) => {
     }
   }
   content.push({ type: "text", text: transcribe
-    ? `Transcribe this entire document to clean Markdown, verbatim. Preserve EVERY heading and paragraph in order — especially all narrative, scope-of-work, terms, exclusions, payment, warranty, and contract language that comes after the pricing/number tables. Do not summarize, shorten, or skip anything. For pricing tables you may write "[pricing table]" in place of the numbers, but reproduce ALL prose word-for-word. Output only the Markdown.`
+    ? `Transcribe the requested part of this document to clean Markdown, verbatim. Preserve EVERY heading and paragraph in order — especially all narrative, scope-of-work, terms, exclusions, payment, warranty, and contract language. Do not summarize, shorten, or skip anything. For pricing tables you may write "[pricing table]" in place of the numbers, but reproduce ALL prose word-for-word. Output only the Markdown.${(text && text.trim()) ? `\n\nSCOPE OF THIS REQUEST: ${text}` : ` Transcribe the entire document.`}`
     : (text && text.trim() ? `Here is the raw estimate to convert:\n\n${text}` : `Convert the attached estimate document into the JSON structure.`) });
 
   try {
