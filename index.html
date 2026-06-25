@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
+<meta name="theme-color" content="#07080a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gio Hub">
@@ -13,43 +13,79 @@
 <title>Gio's Hub</title>
 <style>
   :root{
-    --bg:#0b1220; --card:#151f33; --card-hover:#1c2a44; --text:#f1f5f9; --muted:#94a3b8; --line:#26344f;
-    --accent:#38bdf8; --personal:#a78bfa; --ksh:#fbbf24; --sdlr:#88a173;
+    /* Default = "Gio's Hub" mono / techy theme. Overwritten per company by JS. */
+    --bg:#07080a; --bg2:#0e1014; --card:rgba(255,255,255,.045); --card-hover:rgba(255,255,255,.085);
+    --text:#f4f6f8; --muted:#8b909a; --line:rgba(255,255,255,.12);
+    --accent:#ffffff; --accent2:#c6c9d0; --glow:rgba(255,255,255,.10);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
   body{
     margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1200px 600px at 50% -10%, #16233e 0%, var(--bg) 55%) fixed;
-    color:var(--text);min-height:100vh;
-    padding:max(24px,env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom));
+    background:
+      radial-gradient(1100px 620px at 50% -12%, var(--bg2) 0%, var(--bg) 58%) fixed,
+      var(--bg);
+    color:var(--text);min-height:100vh;position:relative;overflow-x:hidden;
+    padding:max(26px,env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom));
+    transition:color .5s ease;
   }
-  header{max-width:760px;margin:0 auto 22px;text-align:center}
-  .logo{width:58px;height:58px;border-radius:18px;margin:0 auto 14px;background:linear-gradient(135deg,var(--accent),#6366f1);display:flex;align-items:center;justify-content:center;font-size:29px;font-weight:800;color:#0b1220;box-shadow:0 10px 30px rgba(56,189,248,.35)}
-  h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.02em}
-  .sub{color:var(--muted);font-size:.95rem;margin:0}
-  main{max-width:760px;margin:0 auto}
+  /* animated background canvas */
+  #bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;
+      transition:opacity .5s ease}
+  body::before{ /* color wash that fades on theme change */
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:radial-gradient(900px 520px at 50% -12%, var(--glow) 0%, transparent 60%);
+    transition:background .6s ease;
+  }
+  header,main,footer{position:relative;z-index:2}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:13px}
-  .tile{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;text-decoration:none;color:inherit;cursor:pointer;transition:transform .12s ease,background .12s ease,border-color .12s ease;min-height:128px;text-align:left;font:inherit;width:100%}
+  header{max-width:780px;margin:0 auto 24px;text-align:center}
+  .logo{width:60px;height:60px;border-radius:18px;margin:0 auto 14px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;
+    color:var(--bg);box-shadow:0 12px 34px var(--glow);cursor:pointer;
+    transition:background .5s ease,box-shadow .5s ease,transform .15s ease}
+  .logo:active{transform:scale(.94)}
+  h1{font-size:1.55rem;margin:0 0 5px;letter-spacing:-.02em;transition:color .5s ease}
+  .sub{color:var(--muted);font-size:.95rem;margin:0;transition:color .5s ease}
+  .kicker{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.66rem;letter-spacing:.32em;
+    text-transform:uppercase;color:var(--muted);opacity:.7;margin:0 0 12px}
+  main{max-width:780px;margin:0 auto}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(152px,1fr));gap:13px}
+  .tile{display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden;
+    background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;
+    text-decoration:none;color:inherit;cursor:pointer;min-height:130px;text-align:left;font:inherit;width:100%;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    transition:transform .14s ease,background .18s ease,border-color .18s ease,box-shadow .18s ease}
   .tile:active{transform:scale(.97)}
-  @media(hover:hover){.tile:hover{background:var(--card-hover);border-color:#3a4d72;transform:translateY(-2px)}}
-  .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,.06)}
+  @media(hover:hover){.tile:hover{background:var(--card-hover);transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(0,0,0,.35)}}
+  .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;
+    font-size:24px;background:rgba(255,255,255,.06)}
   .tile h3{margin:0;font-size:1.04rem;line-height:1.2}
   .tile p{margin:0;font-size:.82rem;color:var(--muted);line-height:1.35}
-  .tag{margin-top:auto;font-size:.68rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;opacity:.85}
+  .tag{margin-top:auto;font-size:.68rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.9}
+  /* brand accent bar that appears on home company tiles + hover */
+  .tile .edge{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px;opacity:.85}
 
-  .back{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--muted);font-size:.92rem;cursor:pointer;padding:6px 2px;margin-bottom:6px;font-weight:600}
+  .back{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--muted);
+    font-size:.92rem;cursor:pointer;padding:6px 2px;margin-bottom:6px;font-weight:600;transition:color .2s}
   .back:hover{color:var(--text)}
-  .group-title{display:flex;align-items:center;gap:10px;font-size:1.15rem;font-weight:700;margin:2px 4px 14px}
+  .group-title{display:flex;align-items:center;gap:11px;font-size:1.18rem;font-weight:700;margin:2px 4px 16px}
   .group-dot{width:11px;height:11px;border-radius:50%}
 
-  footer{max-width:760px;margin:34px auto 0;text-align:center;color:var(--muted);font-size:.78rem;line-height:1.6}
+  footer{max-width:780px;margin:36px auto 0;text-align:center;color:var(--muted);font-size:.78rem;line-height:1.6}
   .hidden{display:none}
+  @media (prefers-reduced-motion: reduce){#bg{display:none}}
 </style>
 </head>
 <body>
+  <canvas id="bg"></canvas>
+
   <header>
-    <div class="logo" onclick="location.hash=''" style="cursor:pointer" title="Back to home">G</div>
+    <div class="logo" id="logo" title="Back to home">G</div>
+    <p class="kicker" id="kicker">GIO&nbsp;‚Ä¢&nbsp;COMMAND&nbsp;HUB</p>
     <h1 id="title">Gio's Hub</h1>
     <p class="sub" id="subtitle">Pick a company to see its apps.</p>
   </header>
@@ -72,50 +108,124 @@
   <footer>Add to your home screen for an app-like shortcut. Updates automatically on every deploy.</footer>
 
 <script>
+/* ---------- THEME PRESETS ----------
+   home  = "Gio's Hub": black & white, techy, geometric
+   each company re-skins the whole hub to its real brand colors. */
+const HOME_THEME = {
+  bg:'#07080a', bg2:'#0e1014', card:'rgba(255,255,255,.045)', cardHover:'rgba(255,255,255,.085)',
+  text:'#f4f6f8', muted:'#8b909a', line:'rgba(255,255,255,.12)',
+  accent:'#ffffff', accent2:'#c6c9d0', glow:'rgba(255,255,255,.10)', particle:'#ffffff'
+};
+
 const GROUPS = [
-  { id:'personal', name:'Personal', color:'var(--personal)', icon:'👤', desc:'Money & life tools', apps:[
-    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'🧭', tag:'Daily' },
-    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'💰', tag:'App' },
-    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'🍳', tag:'App' }
+  { id:'personal', name:'Personal', color:'#ff8a3c', icon:'üë§', desc:'Money & life tools',
+    logo:{ type:'mono', text:'G' },
+    theme:{ bg:'#120a05', bg2:'#2a1408', card:'rgba(255,138,60,.07)', cardHover:'rgba(255,138,60,.15)',
+            text:'#fdf0e8', muted:'#c9a489', line:'rgba(255,138,60,.22)',
+            accent:'#ff8a3c', accent2:'#ffb27a', glow:'rgba(255,138,60,.18)', particle:'#ff8a3c' },
+    apps:[
+    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'üß≠', tag:'Daily' },
+    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'üí∞', tag:'App' },
+    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'üç≥', tag:'App' }
   ]},
-  { id:'ksh', name:'KSH Construction', color:'var(--ksh)', icon:'🏗️', desc:'Designs, ads & meetings', apps:[
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'🎨', tag:'Gallery' },
-    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'📊', tag:'Dashboard' },
-    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'🎙️', tag:'Recorder' },
-    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'📇', tag:'Dashboard' },
-    { name:'Estimate Builder', desc:'Turn numbers into a polished client proposal', href:'ksh-estimator.html', icon:'🧮', tag:'Pricing' }
+  { id:'ksh', name:'KSH Construction', color:'#378ADD', icon:'üèóÔ∏è', desc:'Designs, ads & meetings',
+    logo:{ type:'img', src:'ksh-logo.png' },
+    theme:{ bg:'#06121f', bg2:'#0e2c47', card:'rgba(63,151,211,.08)', cardHover:'rgba(63,151,211,.16)',
+            text:'#eaf3fb', muted:'#90aecb', line:'rgba(63,151,211,.22)',
+            accent:'#3f97d3', accent2:'#d9a441', glow:'rgba(63,151,211,.20)', particle:'#3f97d3' },
+    apps:[
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'üé®', tag:'Gallery' },
+    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'üìä', tag:'Dashboard' },
+    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'üéôÔ∏è', tag:'Recorder' },
+    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'üìá', tag:'Dashboard' },
+    { name:'Estimate Builder', desc:'Turn numbers into a polished client proposal', href:'ksh-estimator.html', icon:'üßÆ', tag:'Pricing' }
   ]},
-  { id:'sdlr', name:'San Diego Landscape', color:'var(--sdlr)', icon:'🌵', desc:'Estimator, social & SEO', apps:[
-    { name:"This Week's Posts", desc:'Download image, copy caption, schedule', href:'sdlr-this-week.html', icon:'📲', tag:'Post now' },
-    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'🧮', tag:'Pricing' },
-    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'📝', tag:'Intake' },
-    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'📅', tag:'Dashboard' },
-    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'📍', tag:'Tracker' },
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'🎨', tag:'Gallery' }
+  { id:'sdlr', name:'San Diego Landscape', color:'#8aa05c', icon:'üåø', desc:'Estimator, social & SEO',
+    logo:{ type:'img', src:'data:image/jpeg;base64,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', fit:'cover', bg:'transparent' },
+    theme:{ bg:'#0d0f09', bg2:'#1c2114', card:'rgba(200,168,105,.07)', cardHover:'rgba(200,168,105,.15)',
+            text:'#f4f1e6', muted:'#a8a98e', line:'rgba(200,168,105,.22)',
+            accent:'#9fb56a', accent2:'#c8a869', glow:'rgba(160,176,92,.18)', particle:'#c8a869' },
+    apps:[
+    { name:"This Week's Posts", desc:'Download image, copy caption, schedule', href:'sdlr-this-week.html', icon:'üì≤', tag:'Post now' },
+    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'üßÆ', tag:'Pricing' },
+    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'üìù', tag:'Intake' },
+    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'üìÖ', tag:'Dashboard' },
+    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'üìç', tag:'Tracker' },
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'üé®', tag:'Gallery' }
   ]},
-  { id:'svm', name:'Shift Vision Media', color:'#fb7a3c', icon:'◢', desc:'Websites, content & delivery', apps:[
-    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'🌐', tag:'Directory' },
-    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'✏️', tag:'Editor' },
-    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'⚡', tag:'Generator' }
+  { id:'svm', name:'Shift Vision Media', color:'#29abe2', icon:'‚ó¢', desc:'Websites, content & delivery',
+    logo:{ type:'svg', svg:'<svg viewBox="0 0 32 32" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="7" fill="#04141d"/><path d="M16 8 L25 24 L7 24 Z" fill="#29abe2"/></svg>' },
+    theme:{ bg:'#03121a', bg2:'#06222f', card:'rgba(41,171,226,.08)', cardHover:'rgba(41,171,226,.16)',
+            text:'#e9f6fd', muted:'#8fb6c9', line:'rgba(41,171,226,.22)',
+            accent:'#29abe2', accent2:'#7fd4f2', glow:'rgba(41,171,226,.20)', particle:'#29abe2' },
+    apps:[
+    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'üåê', tag:'Directory' },
+    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'‚úèÔ∏è', tag:'Editor' },
+    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'‚ö°', tag:'Generator' }
   ]},
-  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'🛟', desc:'Wedding backup network — new venture', apps:[
-    { name:'Website', desc:'Public site — where photographers buy', href:'standby-site.html', icon:'🌐', tag:'Site' },
-    { name:'The app', desc:'Login — dashboard, check-ins, messaging', href:'standby-app.html', icon:'📱', tag:'App' },
-    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'🎬', tag:'Demo' }
+  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'üõü', desc:'Wedding backup network ‚Äî new venture',
+    logo:{ type:'mono', text:'S', serif:true },
+    theme:{ bg:'#0d0b07', bg2:'#231c10', card:'rgba(201,168,106,.07)', cardHover:'rgba(201,168,106,.15)',
+            text:'#f6f0e4', muted:'#b3a88c', line:'rgba(201,168,106,.22)',
+            accent:'#c9a86a', accent2:'#e8cf9a', glow:'rgba(201,168,106,.18)', particle:'#c9a86a' },
+    apps:[
+    { name:'Website', desc:'Public site ‚Äî where photographers buy', href:'standby-site.html', icon:'üåê', tag:'Site' },
+    { name:'The app', desc:'Login ‚Äî dashboard, check-ins, messaging', href:'standby-app.html', icon:'üì±', tag:'App' },
+    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'üé¨', tag:'Demo' }
   ]}
 ];
 
+/* ---------- THEME APPLY ---------- */
+const root = document.documentElement.style;
+let currentParticle = HOME_THEME.particle;
+function applyTheme(t){
+  root.setProperty('--bg', t.bg);
+  root.setProperty('--bg2', t.bg2);
+  root.setProperty('--card', t.card);
+  root.setProperty('--card-hover', t.cardHover);
+  root.setProperty('--text', t.text);
+  root.setProperty('--muted', t.muted);
+  root.setProperty('--line', t.line);
+  root.setProperty('--accent', t.accent);
+  root.setProperty('--accent2', t.accent2);
+  root.setProperty('--glow', t.glow);
+  currentParticle = t.particle;
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', t.bg);
+}
+
+/* ---------- VIEWS ---------- */
 const homeView = document.getElementById('home');
 const companyView = document.getElementById('company');
 const companyGrid = document.getElementById('companyGrid');
 const appGrid = document.getElementById('appGrid');
 const title = document.getElementById('title');
 const subtitle = document.getElementById('subtitle');
+const kicker = document.getElementById('kicker');
+const logoEl = document.getElementById('logo');
+
+/* Render the header box: real company logo (image / svg mark) or a clean monogram. */
+function setLogo(spec){
+  // reset any inline overrides from a previous view
+  logoEl.style.background=''; logoEl.style.padding=''; logoEl.style.color='';
+  logoEl.style.fontFamily=''; logoEl.style.overflow='hidden'; logoEl.innerHTML='';
+  if(spec && spec.type==='img'){
+    logoEl.style.background = spec.bg || '#ffffff';
+    logoEl.style.padding = (spec.fit==='cover') ? '0' : '7px';
+    logoEl.innerHTML = `<img src="${spec.src}" alt="" style="width:100%;height:100%;object-fit:${spec.fit||'contain'}">`;
+  } else if(spec && spec.type==='svg'){
+    logoEl.style.background='transparent'; logoEl.style.padding='0';
+    logoEl.innerHTML = spec.svg;
+  } else { // monogram
+    logoEl.textContent = (spec && spec.text) || 'G';
+    if(spec && spec.serif) logoEl.style.fontFamily = 'Georgia,"Times New Roman",serif';
+  }
+}
 
 function renderHome(){
   companyGrid.innerHTML = GROUPS.map(g => `
     <a class="tile" href="#${g.id}">
-      <div class="ico" style="background:color-mix(in srgb, ${g.color} 16%, transparent)">${g.icon}</div>
+      <span class="edge" style="background:${g.color}"></span>
+      <div class="ico" style="background:color-mix(in srgb, ${g.color} 18%, transparent)">${g.icon}</div>
       <h3>${g.name}</h3>
       <p>${g.desc}</p>
       <span class="tag" style="color:${g.color}">${g.apps.length} app${g.apps.length>1?'s':''}</span>
@@ -123,23 +233,30 @@ function renderHome(){
 }
 
 function showHome(){
+  applyTheme(HOME_THEME);
   companyView.classList.add('hidden');
   homeView.classList.remove('hidden');
+  kicker.textContent = 'GIO ‚Ä¢ COMMAND HUB';
   title.textContent = "Gio's Hub";
   subtitle.textContent = 'Pick a company to see its apps.';
+  setLogo({ type:'mono', text:'G' });
   window.scrollTo(0,0);
 }
 
 function showGroup(id){
   const g = GROUPS.find(x => x.id === id);
   if(!g){ showHome(); return; }
+  applyTheme(g.theme);
   document.getElementById('groupName').textContent = g.name;
   document.getElementById('groupDot').style.background = g.color;
+  kicker.textContent = g.name.toUpperCase() + ' ‚Ä¢ WORKSPACE';
   title.textContent = g.name;
   subtitle.textContent = g.desc;
+  setLogo(g.logo || { type:'mono', text:(g.name[0]||'G') });
   appGrid.innerHTML = g.apps.map(a => `
     <a class="tile" href="${a.href}">
-      <div class="ico" style="background:color-mix(in srgb, ${g.color} 16%, transparent)">${a.icon}</div>
+      <span class="edge" style="background:${g.color}"></span>
+      <div class="ico" style="background:color-mix(in srgb, ${g.color} 18%, transparent)">${a.icon}</div>
       <h3>${a.name}</h3>
       <p>${a.desc}</p>
       <span class="tag" style="color:${g.color}">${a.tag}</span>
@@ -150,6 +267,7 @@ function showGroup(id){
 }
 
 document.getElementById('backBtn').onclick = () => { location.hash = ''; };
+document.getElementById('logo').onclick = () => { location.hash = ''; };
 
 function route(){
   const id = location.hash.replace('#','');
@@ -158,6 +276,97 @@ function route(){
 window.addEventListener('hashchange', route);
 renderHome();
 route();
+
+/* ---------- ANIMATED GEOMETRIC BACKGROUND ----------
+   Drifting node mesh that connects nearby nodes + links to the cursor,
+   over slow-rotating geometric wireframes. Recolors with the active theme. */
+(function(){
+  const canvas = document.getElementById('bg');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W=0, H=0, DPR=Math.min(window.devicePixelRatio||1, 2);
+  let nodes=[], polys=[], t=0;
+  const mouse={x:-9999,y:-9999};
+
+  function hex2rgb(c){
+    c=c.trim();
+    if(c[0]==='#'){ const n=parseInt(c.slice(1),16);
+      return c.length>=7?[n>>16&255,n>>8&255,n&255]:[((n>>8)&15)*17,((n>>4)&15)*17,(n&15)*17]; }
+    return [255,255,255];
+  }
+  function resize(){
+    W=canvas.width=Math.floor(innerWidth*DPR);
+    H=canvas.height=Math.floor(innerHeight*DPR);
+    canvas.style.width=innerWidth+'px'; canvas.style.height=innerHeight+'px';
+    const target=Math.min(72, Math.round(innerWidth*innerHeight/16000));
+    nodes=[];
+    for(let i=0;i<target;i++){
+      nodes.push({ x:Math.random()*W, y:Math.random()*H,
+        vx:(Math.random()-.5)*.18*DPR, vy:(Math.random()-.5)*.18*DPR,
+        r:(Math.random()*1.6+1)*DPR });
+    }
+    // geometric wireframes (centered polygons that slowly rotate)
+    polys=[
+      {cx:W*.5, cy:H*.34, R:Math.min(W,H)*.34, sides:6, rot:0, spin:.00022},
+      {cx:W*.5, cy:H*.34, R:Math.min(W,H)*.22, sides:3, rot:1, spin:-.00031},
+      {cx:W*.5, cy:H*.34, R:Math.min(W,H)*.46, sides:6, rot:.5, spin:.00012}
+    ];
+  }
+  function polygon(p, rgb){
+    ctx.beginPath();
+    for(let i=0;i<=p.sides;i++){
+      const a=p.rot + i/p.sides*Math.PI*2;
+      const x=p.cx+Math.cos(a)*p.R, y=p.cy+Math.sin(a)*p.R;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
+    }
+    ctx.strokeStyle=`rgba(${rgb[0]},${rgb[1]},${rgb[2]},.05)`;
+    ctx.lineWidth=1*DPR; ctx.stroke();
+  }
+  function frame(){
+    t++;
+    const rgb=hex2rgb(currentParticle);
+    ctx.clearRect(0,0,W,H);
+
+    // wireframes
+    for(const p of polys){ p.rot+=p.spin; polygon(p,rgb); }
+
+    const max=140*DPR, maxM=170*DPR;
+    // node-node links
+    for(let i=0;i<nodes.length;i++){
+      const a=nodes[i];
+      a.x+=a.vx; a.y+=a.vy;
+      if(a.x<0||a.x>W)a.vx*=-1; if(a.y<0||a.y>H)a.vy*=-1;
+      for(let j=i+1;j<nodes.length;j++){
+        const b=nodes[j], dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+        if(d<max){
+          ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle=`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${(1-d/max)*.18})`;
+          ctx.lineWidth=1*DPR; ctx.stroke();
+        }
+      }
+      // link to cursor
+      const mdx=a.x-mouse.x, mdy=a.y-mouse.y, md=Math.hypot(mdx,mdy);
+      if(md<maxM){
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(mouse.x,mouse.y);
+        ctx.strokeStyle=`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${(1-md/maxM)*.35})`;
+        ctx.lineWidth=1*DPR; ctx.stroke();
+      }
+      // node dot
+      const near=md<maxM;
+      ctx.beginPath(); ctx.arc(a.x,a.y,a.r*(near?1.5:1),0,Math.PI*2);
+      ctx.fillStyle=`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${near?.9:.5})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  function setMouse(x,y){ mouse.x=x*DPR; mouse.y=y*DPR; }
+  window.addEventListener('mousemove', e=>setMouse(e.clientX,e.clientY));
+  window.addEventListener('mouseout', ()=>{mouse.x=-9999;mouse.y=-9999;});
+  window.addEventListener('touchmove', e=>{ if(e.touches[0]) setMouse(e.touches[0].clientX,e.touches[0].clientY); }, {passive:true});
+  window.addEventListener('touchend', ()=>{mouse.x=-9999;mouse.y=-9999;});
+  let rt; window.addEventListener('resize', ()=>{clearTimeout(rt);rt=setTimeout(resize,150)});
+  resize(); frame();
+})();
 </script>
 </body>
 </html>
