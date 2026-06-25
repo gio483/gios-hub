@@ -81,7 +81,8 @@
 
   /* ============ PROPOSAL (letter, print-ready) — KSH blue ============ */
   #proposalWrap{background:#5a6a76;border-radius:12px;padding:22px;overflow-x:auto}
-  #proposalDoc .page{width:8.5in;min-height:11in;background:#fff;margin:0 auto 22px;position:relative;overflow:hidden;color:#16242f;box-shadow:0 8px 30px #0006}
+  #proposalDoc .page{width:8.5in;min-height:11in;background:#fff;margin:0 auto 22px;position:relative;color:#16242f;box-shadow:0 8px 30px #0006}
+  #proposalDoc .page.cover{overflow:hidden;height:11in}
   #proposalDoc .pad{padding:0.7in 0.75in}
   #proposalDoc h2,#proposalDoc .serif{font-family:"Playfair Display",serif}
   #proposalDoc .sample{position:absolute;top:16px;right:-46px;transform:rotate(45deg);background:#d9a441;color:#3a2c08;font-size:10px;font-weight:700;letter-spacing:.14em;padding:6px 58px;z-index:5}
@@ -111,10 +112,23 @@
   #proposalDoc .tcard .tb{font-size:10.5px;color:#5f7180;line-height:1.5}
   #proposalDoc .crewline{text-align:center;font-size:12px;color:#2c3a45;border:1px dashed #c5d6e4;border-radius:10px;padding:13px;margin-top:16px}
   #proposalDoc .crewline b{color:#16242f}
-  #proposalDoc .caps{display:grid;grid-template-columns:1fr 1fr;gap:0.26in;margin-top:6px}
-  #proposalDoc .ccard{border:1px solid #d3e2ee;border-top:3px solid #3f97d3;border-radius:9px;padding:16px 18px}
-  #proposalDoc .ccard .cn{font-family:"Playfair Display";font-size:16px;margin:0 0 6px}
-  #proposalDoc .ccard .cb{font-size:11.5px;color:#5f7180;line-height:1.55}
+  #proposalDoc .caps{display:grid;grid-template-columns:1fr 1fr;gap:0.3in;margin-top:14px}
+  #proposalDoc .ccard{border:1px solid #d3e2ee;border-top:3px solid #3f97d3;border-radius:10px;padding:24px;min-height:2.05in;display:flex;flex-direction:column}
+  #proposalDoc .ccard .cnum{font-family:"Playfair Display";font-size:13px;color:#9bbdd8;letter-spacing:.1em;margin:0 0 8px}
+  #proposalDoc .ccard .cn{font-family:"Playfair Display";font-size:19px;margin:0 0 9px;color:#16242f}
+  #proposalDoc .ccard .cb{font-size:13px;color:#5f7180;line-height:1.6}
+  #proposalDoc .capfoot{text-align:center;font-size:12.5px;color:#33414c;font-style:italic;max-width:5.4in;margin:28px auto 0;line-height:1.6}
+  #proposalDoc .terms2{display:grid;grid-template-columns:1fr 1fr;gap:0.45in;margin-top:8px}
+  #proposalDoc .tp{font-size:12px;color:#5f7180;line-height:1.6;margin:0 0 6px}
+  #proposalDoc ul.tl{margin:0 0 8px;padding-left:18px}
+  #proposalDoc ul.tl li{font-size:12px;color:#3a4754;line-height:1.75}
+  #proposalDoc .signgrid{display:grid;grid-template-columns:1fr 1fr;gap:34px 42px;margin:28px 0 4px}
+  #proposalDoc .sigcol .sigline{height:30px;border-bottom:1.5px solid #2c3a45;font-family:"Playfair Display";font-size:16px;color:#16242f;display:flex;align-items:flex-end;padding-bottom:3px}
+  #proposalDoc .sigcol .siglabel{font-size:10.5px;color:#7c8893;text-transform:uppercase;letter-spacing:.05em;margin-top:6px}
+  #proposalDoc .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:10px}
+  #proposalDoc .step{border:1px solid #d3e2ee;border-radius:9px;padding:14px 10px;text-align:center}
+  #proposalDoc .step b{display:block;font-family:"Playfair Display";font-size:20px;color:#3f97d3;margin-bottom:5px}
+  #proposalDoc .step span{font-size:11px;color:#5f7180;line-height:1.4}
   #proposalDoc table.fee{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
   #proposalDoc table.fee th{background:#0e2c47;color:#d6e6f2;text-align:left;font-weight:600;padding:11px 14px;font-size:12px}
   #proposalDoc table.fee td{padding:9px 14px;border-bottom:1px solid #e6eef5;color:#2c3a45}
@@ -128,7 +142,7 @@
   #proposalDoc .stagecard .sf{font-family:"Playfair Display";font-size:18px;color:#2c6ea3;white-space:nowrap}
   #proposalDoc .subhead{font-family:"Playfair Display";font-size:15px;margin:22px 0 8px}
   #proposalDoc .fineprint{font-size:10.5px;color:#6b7c8a;line-height:1.6;border-top:1px solid #d3e2ee;margin-top:22px;padding-top:14px}
-  #proposalDoc .pfooter{position:absolute;bottom:0.4in;left:0;right:0;text-align:center;font-size:9.5px;color:#9bb0c0;letter-spacing:.05em}
+  #proposalDoc .pfooter{text-align:center;font-size:9.5px;color:#9bb0c0;letter-spacing:.05em;margin-top:34px}
 
   @media print{
     @page{ size:8.5in 11in; margin:0; }
@@ -137,7 +151,10 @@
     header.app,.nav,.no-print,#proposalActions{display:none !important}
     .wrap{padding:0;max-width:none}
     #proposalWrap{background:#fff;padding:0;border-radius:0;overflow:visible}
-    #proposalDoc .page{box-shadow:none;margin:0;page-break-after:always}
+    #proposalDoc .page{box-shadow:none;margin:0;min-height:0;page-break-before:always}
+    #proposalDoc .page:first-child{page-break-before:avoid}
+    #proposalDoc .page.cover{height:11in}
+    #proposalDoc tr,#proposalDoc .ccard,#proposalDoc .stagecard,#proposalDoc .tcard,#proposalDoc .step,#proposalDoc .sigcol,#proposalDoc .proofstrip{break-inside:avoid}
   }
 </style>
 </head>
@@ -240,10 +257,12 @@
         </div>
         <div class="card">
           <h2>Markup &amp; stages</h2>
-          <div class="row c2" style="margin-bottom:18px">
-            <div><label>Contingency %</label><input id="f_cont" type="number" value="7" oninput="setCont(this.value)"></div>
-            <div><label>&nbsp;</label><div class="hint" style="margin:0">Overhead &amp; profit is carried inside the trade lines.</div></div>
+          <div class="row c3" style="margin-bottom:8px">
+            <div><label>Markup / KSH fee %</label><input id="f_markup" type="number" value="0" oninput="setMarkup(this.value)"></div>
+            <div><label>Contingency %</label><input id="f_cont" type="number" value="0" oninput="setCont(this.value)"></div>
+            <div></div>
           </div>
+          <div class="hint" style="margin:0 0 18px">Leave markup at <b>0</b> if your line items are already final prices (e.g. an estimate you uploaded). Set it — say <b>23%</b> — to add KSH's fee on top of raw subcontractor costs.</div>
           <label>Stage split (must total 100%)</label>
           <div id="stageRows" style="margin-top:6px"></div>
           <div class="hint" id="stageWarn"></div>
@@ -293,10 +312,14 @@ const CAPS = [
   ['Transparent Communication',"Clear budgets, regular updates, and honest answers. You'll always know where your project stands and what comes next."],
   ['Timely Delivery',"A pace you can plan around, communicated honestly at every stage so the schedule stays realistic from start to finish."],
 ];
-const DEFAULT_BUCKETS = ['General Conditions & Supervision','Demolition','Site Prep & Foundation','Framing & Structural',
-  'Exterior Envelope — roof, siding, windows','Plumbing','Electrical (in-house)','HVAC / Mechanical','Insulation & Drywall',
-  'Interior Carpentry & Millwork (in-house)','Tile & Stone — installation','Flooring — installation','Interior & Exterior Painting'];
-const DEFAULT_ALLOW = ['Cabinetry','Countertops','Tile & stone (material)','Plumbing fixtures','Appliances','Lighting fixtures','Flooring (material)','Door & cabinet hardware'];
+// KSH's real cost-plus division list (from their sent estimates)
+const DEFAULT_BUCKETS = ['Demolition','Project Management','Site Protection','Rough Carpentry','HVAC / Venting','Plumbing',
+  'Electrical','Fireplace','Exterior Doors','Windows & Sliders','Siding','Gutters','Insulation & Air Sealing','Drywall',
+  'Interior Paint & Wall Coverings','Flooring','Interior Doors & Hardware','Interior Trim & Millwork','Cabinetry & Hardware',
+  'Countertops & Slab Stone','Tile','Appliances','Shower Glass & Mirrors','Interior Finishes – Misc','Site Services',
+  'Debris Disposal','Building Cleanup','Contingency Funds'];
+// Allowances are optional (owner/designer-provided items). Empty by default — KSH's cost-plus format folds these into the divisions above.
+const DEFAULT_ALLOW = [];
 const STAGE_DEFS = [
   ['Pre-Construction','Planning, permits, final selections, and mobilization — everything locked before the first wall comes down.',15],
   ['Construction','Demolition through finishes — framing, systems, millwork, tile, and paint, built by one in-house team.',70],
@@ -324,7 +347,7 @@ function freshEstimate(){
     project:{client:'',project:'',hood:'',date:'',designer:'',type:'Whole-Home Remodel',sqft:'',estimator:'',hero:COVERS[0].f},
     buckets:DEFAULT_BUCKETS.map(n=>({name:n,amount:0})),
     allow:DEFAULT_ALLOW.map(n=>({name:n,amount:0})),
-    cont:7,
+    markup:0, cont:0,
     stages:STAGE_DEFS.map(s=>({name:s[0],desc:s[1],pct:s[2]})),
   };
 }
@@ -332,10 +355,11 @@ function calc(){
   const construction=cur.buckets.reduce((a,b)=>a+num(b.amount),0);
   const allowT=cur.allow.reduce((a,b)=>a+num(b.amount),0);
   const subtotal=construction+allowT;
-  const cont=subtotal*num(cur.cont)/100;
-  const total=subtotal+cont;
+  const markup=subtotal*num(cur.markup||0)/100;
+  const cont=(subtotal+markup)*num(cur.cont||0)/100;
+  const total=subtotal+markup+cont;
   const sqft=num(cur.project.sqft);
-  return {construction,allowT,subtotal,cont,total,persf:sqft?total/sqft:0};
+  return {construction,allowT,subtotal,markup,cont,total,persf:sqft?total/sqft:0};
 }
 
 /* ---------------- views ---------------- */
@@ -402,7 +426,7 @@ function importLibrary(file){
 function bindEditor(){
   const map={f_client:'client',f_project:'project',f_hood:'hood',f_date:'date',f_designer:'designer',f_type:'type',f_sqft:'sqft',f_estimator:'estimator'};
   Object.entries(map).forEach(([id,k])=>{const el=$(id);el.value=cur.project[k]||'';el.oninput=()=>{cur.project[k]=el.value;persistDraft();renderSums();};});
-  $('f_cont').value=cur.cont;
+  $('f_cont').value=cur.cont; $('f_markup').value=cur.markup||0;
   renderCovers();renderBuckets();renderAllow();renderStages();renderSums();
 }
 function renderCovers(){
@@ -425,6 +449,7 @@ function delLine(kind,i){cur[kind].splice(i,1);persistDraft();(kind==='buckets'?
 function addBucket(){cur.buckets.push({name:'',amount:0});renderBuckets();persistDraft();}
 function addAllow(){cur.allow.push({name:'',amount:0});renderAllow();persistDraft();}
 function setCont(v){cur.cont=num(v);persistDraft();renderSums();renderStages();}
+function setMarkup(v){cur.markup=num(v);persistDraft();renderSums();renderStages();}
 function renderStages(){
   $('stageRows').innerHTML=cur.stages.map((s,i)=>`
     <div style="display:grid;grid-template-columns:1fr 80px 120px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
@@ -438,8 +463,9 @@ function renderStages(){
 function updStage(i,v){cur.stages[i].pct=num(v);persistDraft();renderStages();}
 function sumHTML(){const c=calc();let h='';
   h+=`<div class="sumline"><span class="muted">Construction</span><span class="v">${money(c.construction)}</span></div>`;
-  h+=`<div class="sumline"><span class="muted">Allowances</span><span class="v">${money(c.allowT)}</span></div>`;
-  h+=`<div class="sumline"><span class="muted">Contingency (${cur.cont}%)</span><span class="v">${money(c.cont)}</span></div>`;
+  if(c.allowT)h+=`<div class="sumline"><span class="muted">Allowances</span><span class="v">${money(c.allowT)}</span></div>`;
+  if(c.markup)h+=`<div class="sumline"><span class="muted">Markup / KSH fee (${cur.markup}%)</span><span class="v">${money(c.markup)}</span></div>`;
+  if(c.cont)h+=`<div class="sumline"><span class="muted">Contingency (${cur.cont}%)</span><span class="v">${money(c.cont)}</span></div>`;
   h+=`<div class="sumline big"><span>Total</span><span class="v">${money(c.total)}</span></div>`;
   if(c.persf)h+=`<div class="sumline"><span class="muted">Per sq ft</span><span class="v">${money(c.persf)}/sf</span></div>`;
   if(c.total&&c.total<100000)h+=`<div class="hint" style="color:var(--amber)">⚠ Below the $100K project minimum.</div>`;
@@ -499,17 +525,24 @@ function renderProposal(){
     ?`Built in partnership with <b>${esc(p.designer)}</b>, protecting the integrity of their design down to the smallest detail.`
     :`Built in partnership with your design team, protecting the integrity of their vision down to the smallest detail.`;
   const team=TEAM.map(t=>`<div class="tcard"><img class="ph" src="${t[0]}"><div class="tn">${esc(t[1])}</div><div class="tr">${esc(t[2])}</div><div class="tb">${esc(t[3])}</div></div>`).join('');
-  const caps=CAPS.map(c=>`<div class="ccard"><div class="cn">${esc(c[0])}</div><div class="cb">${esc(c[1])}</div></div>`).join('');
+  const caps=CAPS.map((cc,i)=>`<div class="ccard"><div class="cnum">${String(i+1).padStart(2,'0')}</div><div class="cn">${esc(cc[0])}</div><div class="cb">${esc(cc[1])}</div></div>`).join('');
+  const hasAllow=cur.allow.some(a=>num(a.amount)>0);
   const buckets=cur.buckets.filter(b=>num(b.amount)>0).map(b=>`<tr><td>${esc(b.name)}</td><td class="amt">${money(num(b.amount))}</td></tr>`).join('')
     ||'<tr><td class="muted">Add trade line items in the Numbers tab.</td><td></td></tr>';
-  const allowRows=cur.allow.filter(a=>num(a.amount)>0).map(a=>`<tr><td>${esc(a.name)}</td><td class="amt">${money(num(a.amount))}</td></tr>`).join('')
-    ||'<tr><td class="muted">No allowances entered.</td><td></td></tr>';
+  const allowRows=cur.allow.filter(a=>num(a.amount)>0).map(a=>`<tr><td>${esc(a.name)}</td><td class="amt">${money(num(a.amount))}</td></tr>`).join('');
   const stages=cur.stages.map((s,i)=>`<div class="stagecard"><div><div class="sn">${i+1}. ${esc(s.name)}</div><div class="sd">${esc(s.desc)}</div></div><div class="sf">${money(c.total*num(s.pct)/100)}</div></div>`).join('');
   const sampleTag=sample?'<div class="sample">Sample · Demo</div>':'';
   const FOOT='KSH CONSTRUCTION · Timeless luxury, masterfully crafted';
+  // fee table rows (conditional)
+  let feeRows=buckets;
+  if(c.allowT) feeRows+=`<tr><td>Client selection allowances</td><td class="amt">${money(c.allowT)}</td></tr>`;
+  if(c.markup||c.cont) feeRows+=`<tr class="sub"><td>Subtotal — direct costs</td><td class="amt">${money(c.subtotal)}</td></tr>`;
+  if(c.markup) feeRows+=`<tr><td>KSH fee (${cur.markup}%)</td><td class="amt">${money(c.markup)}</td></tr>`;
+  if(c.cont) feeRows+=`<tr><td>Contingency (${cur.cont}%)</td><td class="amt">${money(c.cont)}</td></tr>`;
+  feeRows+=`<tr class="grand"><td>Total Estimated Investment</td><td class="amt">${money(c.total)}</td></tr>`;
 
   $('proposalDoc').innerHTML=`
-  <div class="page">${sampleTag}
+  <div class="page cover">${sampleTag}
     <img class="cover-hero" src="${esc(p.hero||COVERS[0].f)}">
     <div class="cover-body">
       <img class="plogo" src="ksh-logo.png">
@@ -536,29 +569,64 @@ function renderProposal(){
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">What We Do</div><h2 class="stitle">Our Capabilities</h2><div class="rule"></div>
-    <p class="lead">Six things you can count on from KSH on every project.</p>
+    <p class="lead">What working with KSH gives you — six commitments we hold to on every project, start to finish.</p>
     <div class="caps">${caps}</div>
+    <div class="capfoot">From the first walkthrough to the final handover, the same in-house team carries your home — protecting your designer's vision and the craft that makes it real.</div>
     <div class="pfooter">${FOOT}</div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">The Investment</div><h2 class="stitle">Where Your Budget Goes</h2><div class="rule"></div>
-    <p class="lead">A clear view of how the investment breaks down across the work — so you can see exactly where the money goes.</p>
-    <table class="fee"><tr><th>Construction — by trade</th><th style="text-align:right">Estimate</th></tr>
-      ${buckets}
-      <tr><td>Client selection allowances</td><td class="amt">${money(c.allowT)}</td></tr>
-      <tr class="sub"><td>Subtotal</td><td class="amt">${money(c.subtotal)}</td></tr>
-      <tr><td>Project contingency (${cur.cont}%)</td><td class="amt">${money(c.cont)}</td></tr>
-      <tr class="grand"><td>Total Project Investment</td><td class="amt">${money(c.total)}</td></tr>
+    <p class="lead">Your project priced by trade, so you can see exactly where every dollar goes. Each line below is an estimate based on current drawings, subcontractor quotes, and KSH's historical costs.</p>
+    <table class="fee"><tr><th>Scope — by trade division</th><th style="text-align:right">Estimate</th></tr>
+      ${feeRows}
     </table>
-    <div class="note">${p.sqft?`Approx. ${num(p.sqft).toLocaleString()} sq ft · about ${money(c.persf)}/sq ft. `:''}Figures are planning estimates; allowances adjust to the finishes you and your designer select. Overhead &amp; profit is carried within the trade line items.</div>
+    <div class="note">${p.sqft?`Approx. ${num(p.sqft).toLocaleString()} sq ft · about ${money(c.persf)}/sq ft. `:''}This is a <b>cost-plus</b> estimate: KSH tracks the actual cost of the work and applies its fee as shown, so you only pay for what the project actually costs. Line items may shift as selections are finalized; any change is documented and approved before the work proceeds. Items provided by the homeowner or designer (and work by others) are excluded — see Terms.</div>
     <div class="pfooter">${FOOT}</div>
   </div></div>
   <div class="page"><div class="pad">
     <div class="kicker">The Build</div><h2 class="stitle">Your Project, by Stage</h2><div class="rule"></div>
+    <p class="lead">How the work — and your investment — moves across the build, from planning to the day we hand you the keys.</p>
     ${stages}
-    <div class="subhead">Selection allowances included</div>
-    <table class="fee"><tr><th>Selection</th><th style="text-align:right">Allowance</th></tr>${allowRows}<tr class="sub"><td>Total allowances</td><td class="amt">${money(c.allowT)}</td></tr></table>
-    <div class="fineprint">This proposal is a planning estimate prepared for ${esc(p.client||'the client')} and is valid for 30 days${dateStr?` from ${dateStr}`:''}. It is not a binding contract. Final scope, allowances, and pricing are confirmed in KSH Construction's standard written agreement. Estimator: ${esc(p.estimator||'KSH')}.</div>
+    ${hasAllow?`<div class="subhead">Selection allowances included</div><table class="fee"><tr><th>Selection</th><th style="text-align:right">Allowance</th></tr>${allowRows}<tr class="sub"><td>Total allowances</td><td class="amt">${money(c.allowT)}</td></tr></table>`:''}
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">The Details</div><h2 class="stitle">Terms &amp; What's Included</h2><div class="rule"></div>
+    <div class="terms2">
+      <div>
+        <div class="subhead">How pricing works</div>
+        <p class="tp">This is a <b>cost-plus</b> proposal. KSH bills the actual cost of labor, materials, and subcontractors, plus KSH's fee. Estimates are based on the current drawings and the quotes available today; the final amount reflects the real cost of the work, tracked and shared with you throughout.</p>
+        <div class="subhead">Included</div>
+        <ul class="tl"><li>All trade scopes listed in the estimate</li><li>Project management &amp; site supervision</li><li>Site protection, cleanup &amp; debris disposal</li><li>Coordination with your architect &amp; designer</li></ul>
+      </div>
+      <div>
+        <div class="subhead">Not included (unless noted)</div>
+        <ul class="tl"><li>Permits &amp; city fees — homeowner's responsibility</li><li>Architectural &amp; design fees</li><li>Fixtures, finishes &amp; appliances provided by the homeowner or designer</li><li>Work performed by others, outside KSH's scope</li><li>Unforeseen conditions discovered during construction</li></ul>
+        <div class="subhead">Good to know</div>
+        <p class="tp">This estimate is valid for 30 days${dateStr?` from ${dateStr}`:''}. It is a planning estimate, not a binding contract — scope and pricing become final in KSH's standard written agreement, which governs the project.</p>
+      </div>
+    </div>
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">Next Steps</div><h2 class="stitle">Acceptance &amp; Authorization</h2><div class="rule"></div>
+    <p class="lead">By signing below, the homeowner accepts this proposal in the estimated amount of <b>${money(c.total)}</b> and authorizes KSH Construction, Inc. to proceed. This confirms the scope and the cost-plus pricing described, and allows KSH to schedule the project and issue the initial deposit invoice. Final amounts reflect actual costs plus KSH's fee, documented throughout the build.</p>
+    <div class="signgrid">
+      <div class="sigcol"><div class="sigline"></div><div class="siglabel">Homeowner signature</div></div>
+      <div class="sigcol"><div class="sigline"></div><div class="siglabel">Date</div></div>
+      <div class="sigcol"><div class="sigline">${esc(p.client||'')}</div><div class="siglabel">Printed name</div></div>
+      <div class="sigcol"><div class="sigline">${money(c.total)}</div><div class="siglabel">Accepted estimated amount</div></div>
+      <div class="sigcol"><div class="sigline"></div><div class="siglabel">KSH Construction, Inc. — authorized representative</div></div>
+      <div class="sigcol"><div class="sigline"></div><div class="siglabel">Date</div></div>
+    </div>
+    <div class="subhead" style="margin-top:24px">What happens next</div>
+    <div class="steps">
+      <div class="step"><b>1</b><span>Sign &amp; return this page</span></div>
+      <div class="step"><b>2</b><span>Initial deposit is invoiced</span></div>
+      <div class="step"><b>3</b><span>Pre-construction &amp; scheduling</span></div>
+      <div class="step"><b>4</b><span>Your build begins</span></div>
+    </div>
+    <div class="fineprint">Questions? ${esc(p.estimator||'Your KSH estimator')} · (619) 987-2700 · kshconstruction.com · CSLB #962269. This acceptance authorizes the project to be scheduled and is confirmed by KSH Construction's standard written agreement.</div>
     <div class="pfooter">KSH CONSTRUCTION · 3755 Avocado Blvd #510, La Mesa, CA 91941 · (619) 987-2700</div>
   </div></div>`;
 }
