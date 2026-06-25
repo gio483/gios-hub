@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0c1722">
+<title>KSH Estimate &amp; Proposal Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c1722; --panel:#13212e; --panel2:#1a2c3b; --line:#26404f;
+    --ink:#eef4f9; --muted:#90a6b8; --blue:#3f97d3; --blue2:#6fb4e3;
+    --green:#7cae8a; --amber:#d9a441; --red:#d9826c; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;font-size:15px;line-height:1.45}
+  h1,h2,h3,.serif{font-family:"Playfair Display",Georgia,serif}
+  a{color:var(--blue2)}
+  header.app{padding:16px 26px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#11202d,#0c1722);
+    display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:20}
+  header.app img.logo{height:48px}
+  header.app h1{margin:0;font-size:19px;font-weight:600}
+  header.app h1 span{color:var(--blue)}
+  header.app .crumb{color:var(--muted);font-size:12.5px;margin-top:2px}
+  header.app .spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;background:var(--blue);color:#06202f;border:none;border-radius:9px;
+    padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none}
+  .btn:hover{filter:brightness(1.07)}
+  .btn.ghost{background:none;border:1px solid var(--line);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--blue);color:var(--blue2)}
+  .btn.sm{padding:7px 12px;font-size:13px}
+  .btn.danger{color:var(--red);border-color:#5a2f29;background:none}
+  .wrap{max-width:1140px;margin:0 auto;padding:24px 26px 120px}
+  .nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
+  .navbtn{padding:9px 16px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--muted);
+    cursor:pointer;font-size:13.5px;font-family:inherit}
+  .navbtn.active{background:var(--blue);color:#06202f;border-color:var(--blue);font-weight:600}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-bottom:18px}
+  .card h2{margin:0 0 4px;font-size:18px}
+  .card .sub{color:var(--muted);font-size:12.5px;margin:0 0 16px}
+  label{display:block;font-size:11.5px;color:var(--muted);margin:0 0 4px;text-transform:uppercase;letter-spacing:.03em}
+  input,textarea,select{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:9px;
+    padding:10px 11px;font-size:14px;font-family:inherit;font-variant-numeric:tabular-nums}
+  textarea{resize:vertical;min-height:90px;line-height:1.5}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue)}
+  .row{display:grid;gap:12px;margin-bottom:14px}
+  .row.c2{grid-template-columns:1fr 1fr}.row.c3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:620px){.row.c2,.row.c3{grid-template-columns:1fr}}
+  .grid{display:grid;grid-template-columns:1fr 330px;gap:22px;align-items:start}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  table.lines{width:100%;border-collapse:collapse;font-size:14px}
+  table.lines td{padding:5px 4px;border-bottom:1px solid #1b2c3a}
+  table.lines input{padding:8px 9px}
+  .amtcell{width:150px}
+  .del{background:none;border:none;color:var(--red);cursor:pointer;font-size:17px;line-height:1;padding:2px 7px}
+  .addbtn{background:none;border:1px dashed var(--line);color:var(--muted);border-radius:8px;padding:9px 13px;cursor:pointer;font-size:13px;margin-top:8px;font-family:inherit}
+  .addbtn:hover{border-color:var(--blue);color:var(--blue)}
+  .summary{position:sticky;top:90px}
+  .sumline{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .sumline.big{font-size:20px;font-weight:600;border-bottom:none;padding-top:14px;font-family:"Playfair Display"}
+  .sumline.big .v{color:var(--blue2)} .sumline .v{font-variant-numeric:tabular-nums} .muted{color:var(--muted)}
+  .hint{font-size:12px;color:var(--muted);line-height:1.55;margin-top:10px}
+  .uploadbox{background:#10202c;border:1px dashed #2f5570;border-radius:12px;padding:16px;margin-bottom:18px}
+  .uploadbox h3{margin:0 0 4px;font-size:15px;color:var(--blue2)}
+  .covers{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+  .cover-opt{border:2px solid transparent;border-radius:10px;overflow:hidden;cursor:pointer;position:relative;aspect-ratio:4/3;background:#0e1b26}
+  .cover-opt img{width:100%;height:100%;object-fit:cover;display:block}
+  .cover-opt.sel{border-color:var(--blue)}
+  .cover-opt .lab{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,#000a);color:#fff;font-size:10.5px;padding:10px 8px 5px}
+  /* library */
+  .libitem{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;margin-bottom:11px;background:var(--panel2)}
+  .libitem .nm{font-family:"Playfair Display";font-size:16px}
+  .libitem .meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .libitem .tot{color:var(--blue2);font-variant-numeric:tabular-nums;font-weight:600}
+  .pill{display:inline-block;font-size:10px;text-transform:uppercase;letter-spacing:.05em;padding:2px 8px;border-radius:20px;border:1px solid #2f5570;color:var(--blue2);margin-left:8px}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#13384e;border:1px solid var(--blue);color:var(--ink);padding:12px 20px;border-radius:10px;z-index:50;box-shadow:0 10px 40px #0008;font-size:14px;display:none}
+  .hidden{display:none}
+
+  /* ============ PROPOSAL (letter, print-ready) — KSH blue ============ */
+  #proposalWrap{background:#5a6a76;border-radius:12px;padding:22px;overflow-x:auto}
+  #proposalDoc .page{width:8.5in;min-height:11in;background:#fff;margin:0 auto 22px;position:relative;overflow:hidden;color:#16242f;box-shadow:0 8px 30px #0006}
+  #proposalDoc .pad{padding:0.7in 0.75in}
+  #proposalDoc h2,#proposalDoc .serif{font-family:"Playfair Display",serif}
+  #proposalDoc .sample{position:absolute;top:16px;right:-46px;transform:rotate(45deg);background:#d9a441;color:#3a2c08;font-size:10px;font-weight:700;letter-spacing:.14em;padding:6px 58px;z-index:5}
+  #proposalDoc .cover-hero{height:5.4in;width:100%;object-fit:cover;display:block;background:#0e2c47}
+  #proposalDoc .cover-body{background:linear-gradient(160deg,#0e2c47,#0a1822);color:#eef4f9;min-height:5.6in;text-align:center;padding:0.5in 0.75in;display:flex;flex-direction:column;justify-content:center}
+  #proposalDoc .cover-body .plogo{height:0.9in;margin:0 auto 0.18in}
+  #proposalDoc .eyebrow{font-size:11px;letter-spacing:.30em;text-transform:uppercase;color:#6fb4e3;margin:0 0 14px}
+  #proposalDoc .cover-body h2.big{font-size:38px;margin:0 0 8px;font-weight:600}
+  #proposalDoc .cover-body .for{color:#a9c2d4;font-size:14px;margin:14px 0 2px}
+  #proposalDoc .cover-body .who{font-family:"Playfair Display";font-size:24px;margin:0}
+  #proposalDoc .band{margin-top:auto;display:flex;justify-content:center;gap:20px;flex-wrap:wrap;font-size:11px;color:#a9c2d4;padding-top:22px}
+  #proposalDoc .band b{color:#eef4f9}
+  #proposalDoc .kicker{text-align:center;color:#3f86c0;font-size:11px;letter-spacing:.24em;text-transform:uppercase;margin:0 0 6px}
+  #proposalDoc .stitle{text-align:center;font-size:25px;margin:0 0 4px;font-weight:600}
+  #proposalDoc .rule{width:54px;height:2px;background:#3f97d3;margin:10px auto 22px}
+  #proposalDoc p.lead{font-size:13.5px;line-height:1.7;color:#33414c;max-width:5.6in;margin:0 auto 16px;text-align:center}
+  #proposalDoc .proofstrip{display:flex;background:#0e2c47;border-radius:10px;overflow:hidden;margin-top:20px}
+  #proposalDoc .proofstrip div{flex:1;text-align:center;padding:18px 8px;color:#d6e6f2;border-right:1px solid #1c3e5a}
+  #proposalDoc .proofstrip div:last-child{border-right:none}
+  #proposalDoc .proofstrip b{display:block;font-family:"Playfair Display";font-size:21px;color:#6fb4e3}
+  #proposalDoc .proofstrip span{font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#8ea6b8}
+  #proposalDoc .team{display:grid;grid-template-columns:repeat(3,1fr);gap:0.26in;margin-top:6px}
+  #proposalDoc .tcard{text-align:center}
+  #proposalDoc .tcard .ph{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:50% 20%;border-radius:9px;border:1px solid #d3e2ee}
+  #proposalDoc .tcard .tn{font-family:"Playfair Display";font-size:15px;margin:9px 0 1px}
+  #proposalDoc .tcard .tr{color:#3f86c0;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;margin:0 0 6px}
+  #proposalDoc .tcard .tb{font-size:10.5px;color:#5f7180;line-height:1.5}
+  #proposalDoc .crewline{text-align:center;font-size:12px;color:#2c3a45;border:1px dashed #c5d6e4;border-radius:10px;padding:13px;margin-top:16px}
+  #proposalDoc .crewline b{color:#16242f}
+  #proposalDoc .caps{display:grid;grid-template-columns:1fr 1fr;gap:0.26in;margin-top:6px}
+  #proposalDoc .ccard{border:1px solid #d3e2ee;border-top:3px solid #3f97d3;border-radius:9px;padding:16px 18px}
+  #proposalDoc .ccard .cn{font-family:"Playfair Display";font-size:16px;margin:0 0 6px}
+  #proposalDoc .ccard .cb{font-size:11.5px;color:#5f7180;line-height:1.55}
+  #proposalDoc table.fee{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+  #proposalDoc table.fee th{background:#0e2c47;color:#d6e6f2;text-align:left;font-weight:600;padding:11px 14px;font-size:12px}
+  #proposalDoc table.fee td{padding:9px 14px;border-bottom:1px solid #e6eef5;color:#2c3a45}
+  #proposalDoc table.fee td.amt{text-align:right;font-variant-numeric:tabular-nums}
+  #proposalDoc table.fee tr.sub td{font-weight:700;background:#f2f7fc;border-top:1px solid #cfe0ee;color:#16242f}
+  #proposalDoc table.fee tr.grand td{font-weight:700;font-size:15px;background:#eef5fb;border-top:2px solid #3f97d3;color:#16242f}
+  #proposalDoc .note{font-size:10.5px;color:#7c8893;margin-top:12px;line-height:1.5}
+  #proposalDoc .stagecard{border:1px solid #d3e2ee;border-top:3px solid #3f97d3;border-radius:8px;padding:16px 18px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+  #proposalDoc .stagecard .sn{font-family:"Playfair Display";font-size:17px}
+  #proposalDoc .stagecard .sd{font-size:12px;color:#5f7180;margin-top:3px;max-width:4.6in}
+  #proposalDoc .stagecard .sf{font-family:"Playfair Display";font-size:18px;color:#2c6ea3;white-space:nowrap}
+  #proposalDoc .subhead{font-family:"Playfair Display";font-size:15px;margin:22px 0 8px}
+  #proposalDoc .fineprint{font-size:10.5px;color:#6b7c8a;line-height:1.6;border-top:1px solid #d3e2ee;margin-top:22px;padding-top:14px}
+  #proposalDoc .pfooter{position:absolute;bottom:0.4in;left:0;right:0;text-align:center;font-size:9.5px;color:#9bb0c0;letter-spacing:.05em}
+
+  @media print{
+    @page{ size:8.5in 11in; margin:0; }
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff}
+    header.app,.nav,.no-print,#proposalActions{display:none !important}
+    .wrap{padding:0;max-width:none}
+    #proposalWrap{background:#fff;padding:0;border-radius:0;overflow:visible}
+    #proposalDoc .page{box-shadow:none;margin:0;page-break-after:always}
+  }
+</style>
+</head>
+<body>
+<header class="app">
+  <img class="logo" src="ksh-logo.png" alt="KSH">
+  <div>
+    <h1>KSH <span>Estimate &amp; Proposal</span></h1>
+    <div class="crumb" id="crumb">Team library</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn ghost sm no-print" id="homeBtn">☰ Library</button>
+</header>
+
+<div class="wrap">
+
+<!-- ===================== LIBRARY ===================== -->
+<section id="view-library">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+    <button class="btn" id="newBtn">+ New estimate</button>
+    <input id="libSearch" placeholder="Search client or project…" style="max-width:300px" oninput="renderLibrary()">
+    <div class="spacer" style="flex:1"></div>
+    <button class="btn ghost sm" onclick="exportLibrary()">⬇ Export library</button>
+    <label class="btn ghost sm" style="margin:0;cursor:pointer">⬆ Import<input type="file" accept="application/json" style="display:none" onchange="importLibrary(this.files[0])"></label>
+  </div>
+  <div class="hint" style="margin:-6px 0 16px">Saved estimates live on this device. To share across the team, use <b>Export library</b> to a shared Google Drive folder; teammates use <b>Import</b> to load it. (A live shared database can replace this later.)</div>
+  <div id="libList"></div>
+</section>
+
+<!-- ===================== EDITOR ===================== -->
+<section id="view-editor" class="hidden">
+  <div class="nav no-print">
+    <button class="navbtn active" data-tab="project">1 · Project</button>
+    <button class="navbtn" data-tab="numbers">2 · Numbers</button>
+    <button class="navbtn" data-tab="proposal">3 · Proposal</button>
+  </div>
+
+  <!-- PROJECT -->
+  <div id="tab-project">
+    <div class="grid">
+      <div>
+        <div class="card">
+          <h2>Project &amp; client</h2>
+          <p class="sub">Fills the proposal cover and header.</p>
+          <div class="row c2">
+            <div><label>Client name</label><input id="f_client" placeholder="The Harrells"></div>
+            <div><label>Project name</label><input id="f_project" placeholder="Coronado Whole-Home Remodel"></div>
+          </div>
+          <div class="row c2">
+            <div><label>Neighborhood</label><input id="f_hood" placeholder="Coronado"></div>
+            <div><label>Proposal date</label><input id="f_date" type="date"></div>
+          </div>
+          <div class="row c2">
+            <div><label>Designer / architect (credited)</label><input id="f_designer" placeholder="Studio name (optional)"></div>
+            <div><label>Project type</label><select id="f_type">
+              <option>Whole-Home Remodel</option><option>Kitchen Remodel</option><option>Bathroom Remodel</option>
+              <option>Addition</option><option>ADU</option><option>New Custom Home</option></select></div>
+          </div>
+          <div class="row c2">
+            <div><label>Total area (sq ft)</label><input id="f_sqft" type="number" placeholder="3400"></div>
+            <div><label>Estimator</label><input id="f_estimator" placeholder="Andrew Amato"></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Cover photo</h2>
+          <p class="sub">Pick a finished-work photo to lead the proposal.</p>
+          <div class="covers" id="coverPick"></div>
+        </div>
+      </div>
+      <div><div class="card summary"><h2>Running total</h2><div id="sum1"></div>
+        <button class="btn no-print" style="margin-top:14px;width:100%;justify-content:center" onclick="go('numbers')">Enter the numbers →</button></div></div>
+    </div>
+  </div>
+
+  <!-- NUMBERS -->
+  <div id="tab-numbers" class="hidden">
+    <div class="grid">
+      <div>
+        <div class="uploadbox">
+          <h3>✨ Already have an estimate? Drop it in.</h3>
+          <p class="hint" style="margin:2px 0 12px">Paste your line items below (or upload a PDF/Excel), and we'll sort them into the buckets for you. Then tidy anything and head to the proposal.</p>
+          <textarea id="pasteBox" placeholder="Paste estimate text, e.g.&#10;Demolition  42000&#10;Plumbing  $86,000&#10;Cabinetry allowance  120000"></textarea>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;align-items:center">
+            <button class="btn sm" onclick="parsePaste()">Format the numbers</button>
+            <label class="btn ghost sm" style="margin:0;cursor:pointer">Upload PDF/Excel<input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*" style="display:none" onchange="parseFile(this.files[0])"></label>
+            <span class="hint" id="parseMsg" style="margin:0"></span>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Construction — by trade</h2>
+          <p class="sub">Where the money goes. These become the budget-buckets page.</p>
+          <table class="lines"><tbody id="bucketRows"></tbody></table>
+          <button class="addbtn" onclick="addBucket()">+ Add a trade line</button>
+        </div>
+        <div class="card">
+          <h2>Client selection allowances</h2>
+          <p class="sub">Cabinetry, countertops, fixtures, appliances, lighting, etc.</p>
+          <table class="lines"><tbody id="allowRows"></tbody></table>
+          <button class="addbtn" onclick="addAllow()">+ Add an allowance</button>
+        </div>
+        <div class="card">
+          <h2>Markup &amp; stages</h2>
+          <div class="row c2" style="margin-bottom:18px">
+            <div><label>Contingency %</label><input id="f_cont" type="number" value="7" oninput="setCont(this.value)"></div>
+            <div><label>&nbsp;</label><div class="hint" style="margin:0">Overhead &amp; profit is carried inside the trade lines.</div></div>
+          </div>
+          <label>Stage split (must total 100%)</label>
+          <div id="stageRows" style="margin-top:6px"></div>
+          <div class="hint" id="stageWarn"></div>
+        </div>
+      </div>
+      <div><div class="card summary"><h2>Running total</h2><div id="sum2"></div>
+        <button class="btn no-print" style="margin-top:14px;width:100%;justify-content:center" onclick="go('proposal')">Build the proposal →</button></div></div>
+    </div>
+  </div>
+
+  <!-- PROPOSAL -->
+  <div id="tab-proposal" class="hidden">
+    <div id="proposalActions" class="no-print" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
+      <button class="btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+      <button class="btn ghost" onclick="saveToLibrary()">💾 Save to library</button>
+      <label style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);cursor:pointer">
+        <input type="checkbox" id="sampleTag" style="width:auto" onchange="renderProposal()"> Show "Sample · Demo" tag</label>
+      <span class="hint" style="margin:0">Tip: in the print dialog, turn on "Background graphics" and set margins to None.</span>
+    </div>
+    <div id="proposalWrap"><div id="proposalDoc"></div></div>
+  </div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- constants ---------------- */
+const COVERS = [
+  {f:'cover-living.jpg', label:'Vista Azul — Living'},
+  {f:'cover-pool.jpg', label:'Coronado — Pool & Skyline'},
+  {f:'cover-kitchen.jpg', label:'Coronado Cottage — Kitchen'},
+  {f:'cover-bath.jpg', label:'Gallery House — Bath'},
+  {f:'cover-great-room.jpg', label:'Fairway Haven — Great Room'},
+];
+const TEAM = [
+  ['team-kyle-harrell.jpg','Kyle Harrell','Owner',"Founded KSH in 2009 and built it around one belief — keep the craft in-house and treat every home like his own. Kyle stays close to each project and the people behind it, from the first conversation to the final handover."],
+  ['team-jeff-tipton.jpg','Jeff Tipton','Site Supervisor',"Runs the jobsite — crews, trades, schedule, and quality all run through Jeff. He keeps the build moving in order and makes sure the work on site holds to the standard it was promised at."],
+  ['team-chris-bentley.jpg','Chris Bentley','Project Coordinator',"Keeps your project organized and moving — selections, schedules, and updates. Chris is your steady line of communication through the build, so you always know where things stand."],
+  ['team-andrew-amato.jpg','Andrew Amato','Estimator',"Builds the numbers behind your home — scope, allowances, and budget — with the detail that keeps a project honest from first estimate to final invoice."],
+  ['team-leonard-almendarez.jpg','Leonard Almendarez','Lead Electrician',"Leads KSH's in-house electrical team — the wiring, lighting, and systems most builders hand off to a sub, kept under our own roof and held to our own standard."],
+  ['team-erin-mizicko.jpg','Erin Mizicko','Office Administrator',"Keeps the office and the details running smoothly behind every project, so your experience with KSH feels as organized and cared-for as the home itself."],
+];
+const CAPS = [
+  ['Expert Craftsmanship',"In-house carpenters and electricians handle the details that define a home — the work most builders sub out, kept under our own roof."],
+  ['Designer Partnership',"We don't design your home; we protect the integrity of your designer's vision and carry it out down to the smallest detail."],
+  ['Project Management',"One team, one schedule, one point of contact — from the first walkthrough to the final handoff, with nothing falling through the cracks."],
+  ['Quality Control',"Every detail is inspected, corrected, and held to one standard before it's called done. The finish is checked, then checked again."],
+  ['Transparent Communication',"Clear budgets, regular updates, and honest answers. You'll always know where your project stands and what comes next."],
+  ['Timely Delivery',"A pace you can plan around, communicated honestly at every stage so the schedule stays realistic from start to finish."],
+];
+const DEFAULT_BUCKETS = ['General Conditions & Supervision','Demolition','Site Prep & Foundation','Framing & Structural',
+  'Exterior Envelope — roof, siding, windows','Plumbing','Electrical (in-house)','HVAC / Mechanical','Insulation & Drywall',
+  'Interior Carpentry & Millwork (in-house)','Tile & Stone — installation','Flooring — installation','Interior & Exterior Painting'];
+const DEFAULT_ALLOW = ['Cabinetry','Countertops','Tile & stone (material)','Plumbing fixtures','Appliances','Lighting fixtures','Flooring (material)','Door & cabinet hardware'];
+const STAGE_DEFS = [
+  ['Pre-Construction','Planning, permits, final selections, and mobilization — everything locked before the first wall comes down.',15],
+  ['Construction','Demolition through finishes — framing, systems, millwork, tile, and paint, built by one in-house team.',70],
+  ['Final Handoff','Punch list, final clean, and a careful walk-through before the keys are yours.',15],
+];
+
+/* ---------------- helpers ---------------- */
+const $=id=>document.getElementById(id);
+const money=n=>'$'+Math.round(n||0).toLocaleString('en-US');
+const num=v=>{const n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isNaN(n)?0:n;};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){const t=$('toast');t.textContent=m;t.style.display='block';clearTimeout(t._t);t._t=setTimeout(()=>t.style.display='none',2600);}
+
+/* ---------------- storage ---------------- */
+const LS='ksh_estimates_v2', DRAFT='ksh_draft_v2';
+function loadAll(){try{return JSON.parse(localStorage.getItem(LS))||[];}catch(e){return[];}}
+function saveAll(a){localStorage.setItem(LS,JSON.stringify(a));}
+function persistDraft(){if(cur)localStorage.setItem(DRAFT,JSON.stringify(cur));}
+
+/* ---------------- state ---------------- */
+let cur=null;
+function freshEstimate(){
+  return {
+    id:'e'+Date.now(), updated:Date.now(),
+    project:{client:'',project:'',hood:'',date:'',designer:'',type:'Whole-Home Remodel',sqft:'',estimator:'',hero:COVERS[0].f},
+    buckets:DEFAULT_BUCKETS.map(n=>({name:n,amount:0})),
+    allow:DEFAULT_ALLOW.map(n=>({name:n,amount:0})),
+    cont:7,
+    stages:STAGE_DEFS.map(s=>({name:s[0],desc:s[1],pct:s[2]})),
+  };
+}
+function calc(){
+  const construction=cur.buckets.reduce((a,b)=>a+num(b.amount),0);
+  const allowT=cur.allow.reduce((a,b)=>a+num(b.amount),0);
+  const subtotal=construction+allowT;
+  const cont=subtotal*num(cur.cont)/100;
+  const total=subtotal+cont;
+  const sqft=num(cur.project.sqft);
+  return {construction,allowT,subtotal,cont,total,persf:sqft?total/sqft:0};
+}
+
+/* ---------------- views ---------------- */
+function showView(v){
+  $('view-library').classList.toggle('hidden',v!=='library');
+  $('view-editor').classList.toggle('hidden',v!=='editor');
+  $('crumb').textContent = v==='library' ? 'Team library' : (cur&&cur.project.client? cur.project.client : 'New estimate');
+  window.scrollTo(0,0);
+}
+function go(tab){
+  ['project','numbers','proposal'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==tab));
+  document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  if(tab==='proposal')renderProposal();
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+$('homeBtn').onclick=()=>{renderLibrary();showView('library');};
+$('newBtn').onclick=()=>{cur=freshEstimate();persistDraft();bindEditor();showView('editor');go('project');};
+
+/* ---------------- library ---------------- */
+function renderLibrary(){
+  const q=($('libSearch').value||'').toLowerCase();
+  const all=loadAll().sort((a,b)=>b.updated-a.updated)
+    .filter(e=>!q||((e.project.client||'')+' '+(e.project.project||'')).toLowerCase().includes(q));
+  const box=$('libList');
+  if(!all.length){box.innerHTML='<div class="card" style="text-align:center;color:var(--muted)">No saved estimates yet. Hit <b>+ New estimate</b> to start.</div>';return;}
+  box.innerHTML=all.map(e=>{
+    const t=estTotal(e);
+    return `<div class="libitem">
+      <div style="flex:1">
+        <div class="nm">${esc(e.project.client||'(untitled)')}<span class="pill">${esc(e.project.type||'')}</span></div>
+        <div class="meta">${esc(e.project.project||'')} ${e.project.sqft?'· '+e.project.sqft+' sf':''} · updated ${new Date(e.updated).toLocaleDateString()}</div>
+      </div>
+      <div class="tot">${money(t)}</div>
+      <button class="btn ghost sm" onclick="openEstimate('${e.id}')">Open</button>
+      <button class="btn ghost sm danger" onclick="deleteEstimate('${e.id}')">Delete</button>
+    </div>`;}).join('');
+}
+function estTotal(e){const c=e.buckets.reduce((a,b)=>a+num(b.amount),0)+e.allow.reduce((a,b)=>a+num(b.amount),0);return c*(1+num(e.cont)/100);}
+function openEstimate(id){const e=loadAll().find(x=>x.id===id);if(e){cur=JSON.parse(JSON.stringify(e));persistDraft();bindEditor();showView('editor');go('project');}}
+function deleteEstimate(id){if(confirm('Delete this estimate?')){saveAll(loadAll().filter(x=>x.id!==id));renderLibrary();}}
+function saveToLibrary(){
+  cur.updated=Date.now();
+  const all=loadAll();const i=all.findIndex(x=>x.id===cur.id);
+  if(i>=0)all[i]=JSON.parse(JSON.stringify(cur));else all.push(JSON.parse(JSON.stringify(cur)));
+  saveAll(all);toast('Saved to library ✓');
+}
+function exportLibrary(){
+  const blob=new Blob([JSON.stringify(loadAll(),null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ksh-estimates.json';a.click();
+}
+function importLibrary(file){
+  if(!file)return;const r=new FileReader();
+  r.onload=()=>{try{
+    const incoming=JSON.parse(r.result);if(!Array.isArray(incoming))throw 0;
+    const all=loadAll();const byId={};all.forEach(e=>byId[e.id]=e);
+    incoming.forEach(e=>{if(!byId[e.id]||e.updated>byId[e.id].updated)byId[e.id]=e;});
+    saveAll(Object.values(byId));renderLibrary();toast('Library imported ✓');
+  }catch(e){toast('That file could not be read.');}};
+  r.readAsText(file);
+}
+
+/* ---------------- editor binding ---------------- */
+function bindEditor(){
+  const map={f_client:'client',f_project:'project',f_hood:'hood',f_date:'date',f_designer:'designer',f_type:'type',f_sqft:'sqft',f_estimator:'estimator'};
+  Object.entries(map).forEach(([id,k])=>{const el=$(id);el.value=cur.project[k]||'';el.oninput=()=>{cur.project[k]=el.value;persistDraft();renderSums();};});
+  $('f_cont').value=cur.cont;
+  renderCovers();renderBuckets();renderAllow();renderStages();renderSums();
+}
+function renderCovers(){
+  $('coverPick').innerHTML=COVERS.map(c=>`
+    <div class="cover-opt ${cur.project.hero===c.f?'sel':''}" onclick="pickCover('${c.f}')">
+      <img src="${c.f}" alt=""><div class="lab">${esc(c.label)}</div></div>`).join('');
+}
+function pickCover(f){cur.project.hero=f;persistDraft();renderCovers();}
+function lineTable(arr,kind){
+  return arr.map((it,i)=>`<tr>
+    <td><input value="${esc(it.name)}" oninput="updLine('${kind}',${i},'name',this.value)"></td>
+    <td class="amtcell"><input type="number" value="${it.amount||''}" placeholder="0" oninput="updLine('${kind}',${i},'amount',this.value)"></td>
+    <td style="width:34px"><button class="del" onclick="delLine('${kind}',${i})">×</button></td>
+  </tr>`).join('');
+}
+function renderBuckets(){$('bucketRows').innerHTML=lineTable(cur.buckets,'buckets');}
+function renderAllow(){$('allowRows').innerHTML=lineTable(cur.allow,'allow');}
+function updLine(kind,i,k,v){cur[kind][i][k]=v;persistDraft();renderSums();}
+function delLine(kind,i){cur[kind].splice(i,1);persistDraft();(kind==='buckets'?renderBuckets:renderAllow)();renderSums();}
+function addBucket(){cur.buckets.push({name:'',amount:0});renderBuckets();persistDraft();}
+function addAllow(){cur.allow.push({name:'',amount:0});renderAllow();persistDraft();}
+function setCont(v){cur.cont=num(v);persistDraft();renderSums();renderStages();}
+function renderStages(){
+  $('stageRows').innerHTML=cur.stages.map((s,i)=>`
+    <div style="display:grid;grid-template-columns:1fr 80px 120px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)">
+      <div>${esc(s.name)}</div>
+      <input type="number" value="${s.pct}" oninput="updStage(${i},this.value)">
+      <div class="muted" style="text-align:right;font-variant-numeric:tabular-nums">${money(calc().total*num(s.pct)/100)}</div>
+    </div>`).join('');
+  const tot=cur.stages.reduce((a,s)=>a+num(s.pct),0);
+  $('stageWarn').innerHTML=tot===100?'✓ Stages total 100%.':`⚠ Stages total <b>${tot}%</b> — adjust to 100%.`;
+}
+function updStage(i,v){cur.stages[i].pct=num(v);persistDraft();renderStages();}
+function sumHTML(){const c=calc();let h='';
+  h+=`<div class="sumline"><span class="muted">Construction</span><span class="v">${money(c.construction)}</span></div>`;
+  h+=`<div class="sumline"><span class="muted">Allowances</span><span class="v">${money(c.allowT)}</span></div>`;
+  h+=`<div class="sumline"><span class="muted">Contingency (${cur.cont}%)</span><span class="v">${money(c.cont)}</span></div>`;
+  h+=`<div class="sumline big"><span>Total</span><span class="v">${money(c.total)}</span></div>`;
+  if(c.persf)h+=`<div class="sumline"><span class="muted">Per sq ft</span><span class="v">${money(c.persf)}/sf</span></div>`;
+  if(c.total&&c.total<100000)h+=`<div class="hint" style="color:var(--amber)">⚠ Below the $100K project minimum.</div>`;
+  return h;}
+function renderSums(){$('sum1').innerHTML=sumHTML();$('sum2').innerHTML=sumHTML();if(!$('tab-numbers').classList.contains('hidden'))renderStages();}
+
+/* ---------------- parse (paste / file) ---------------- */
+function applyParsed(p){
+  if(p.project){['client','project','type'].forEach(k=>{if(p.project[k])cur.project[k]=p.project[k];});
+    if(p.project.sqft)cur.project.sqft=p.project.sqft;}
+  if(Array.isArray(p.buckets)&&p.buckets.length)cur.buckets=p.buckets.map(b=>({name:b.name||'',amount:num(b.amount)}));
+  if(Array.isArray(p.allowances)&&p.allowances.length)cur.allow=p.allowances.map(b=>({name:b.name||'',amount:num(b.amount)}));
+  if(p.contingencyPct!=null)cur.cont=num(p.contingencyPct);
+  bindEditor();persistDraft();
+}
+function clientTabular(text){
+  const buckets=[],allow=[];
+  text.split(/\n+/).forEach(line=>{
+    const nums=line.match(/[\$]?[\d,]+(?:\.\d+)?/g);if(!nums)return;
+    const amt=num(nums[nums.length-1]);if(!amt)return;
+    let name=line.slice(0,line.lastIndexOf(nums[nums.length-1])).replace(/[\:\.\-\|,\s]+$/,'').trim();
+    if(!name)return;
+    if(/allow|cabinet|counter|fixture|appliance|lighting|hardware|flooring material|tile.*material/i.test(line))allow.push({name,amount:amt});
+    else buckets.push({name,amount:amt});
+  });
+  return {buckets,allowances:allow};
+}
+function parsePaste(){
+  const text=$('pasteBox').value.trim();
+  if(!text){$('parseMsg').textContent='Paste some line items first.';return;}
+  $('parseMsg').textContent='Formatting…';
+  fetch('/api/parse-estimate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({text})})
+    .then(r=>{if(!r.ok)throw 0;return r.json();})
+    .then(p=>{applyParsed(p);$('parseMsg').textContent='Formatted with AI ✓';toast('Numbers imported ✓');})
+    .catch(()=>{const p=clientTabular(text);if(!p.buckets.length&&!p.allowances.length){$('parseMsg').textContent='Couldn\'t find line items. Try "Name  amount" per line.';return;}
+      applyParsed(p);$('parseMsg').textContent='Imported '+(p.buckets.length+p.allowances.length)+' lines (offline mode).';toast('Numbers imported ✓');});
+}
+function parseFile(file){
+  if(!file)return;$('parseMsg').textContent='Reading '+file.name+'…';
+  const r=new FileReader();
+  r.onload=()=>{
+    const b64=String(r.result).split(',')[1];
+    fetch('/api/parse-estimate',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({fileBase64:b64,mimeType:file.type})})
+      .then(x=>{if(!x.ok)throw 0;return x.json();})
+      .then(p=>{applyParsed(p);$('parseMsg').textContent='Read '+file.name+' with AI ✓';toast('Estimate imported ✓');})
+      .catch(()=>{$('parseMsg').textContent='File reading needs the app deployed (AI endpoint). For now, paste the text instead.';});
+  };
+  r.readAsDataURL(file);
+}
+
+/* ---------------- proposal ---------------- */
+function renderProposal(){
+  const p=cur.project,c=calc();
+  const dateStr=p.date?new Date(p.date+'T00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):'';
+  const sample=$('sampleTag')&&$('sampleTag').checked;
+  const designerLine=p.designer
+    ?`Built in partnership with <b>${esc(p.designer)}</b>, protecting the integrity of their design down to the smallest detail.`
+    :`Built in partnership with your design team, protecting the integrity of their vision down to the smallest detail.`;
+  const team=TEAM.map(t=>`<div class="tcard"><img class="ph" src="${t[0]}"><div class="tn">${esc(t[1])}</div><div class="tr">${esc(t[2])}</div><div class="tb">${esc(t[3])}</div></div>`).join('');
+  const caps=CAPS.map(c=>`<div class="ccard"><div class="cn">${esc(c[0])}</div><div class="cb">${esc(c[1])}</div></div>`).join('');
+  const buckets=cur.buckets.filter(b=>num(b.amount)>0).map(b=>`<tr><td>${esc(b.name)}</td><td class="amt">${money(num(b.amount))}</td></tr>`).join('')
+    ||'<tr><td class="muted">Add trade line items in the Numbers tab.</td><td></td></tr>';
+  const allowRows=cur.allow.filter(a=>num(a.amount)>0).map(a=>`<tr><td>${esc(a.name)}</td><td class="amt">${money(num(a.amount))}</td></tr>`).join('')
+    ||'<tr><td class="muted">No allowances entered.</td><td></td></tr>';
+  const stages=cur.stages.map((s,i)=>`<div class="stagecard"><div><div class="sn">${i+1}. ${esc(s.name)}</div><div class="sd">${esc(s.desc)}</div></div><div class="sf">${money(c.total*num(s.pct)/100)}</div></div>`).join('');
+  const sampleTag=sample?'<div class="sample">Sample · Demo</div>':'';
+  const FOOT='KSH CONSTRUCTION · Timeless luxury, masterfully crafted';
+
+  $('proposalDoc').innerHTML=`
+  <div class="page">${sampleTag}
+    <img class="cover-hero" src="${esc(p.hero||COVERS[0].f)}">
+    <div class="cover-body">
+      <img class="plogo" src="ksh-logo.png">
+      <div class="eyebrow">Construction Proposal</div>
+      <h2 class="big">${esc(p.project||'Whole-Home Remodel')}</h2>
+      <div class="for">Prepared for</div><div class="who">${esc(p.client||'[ Client Name ]')}</div>
+      <div class="band"><span><b>${esc(p.hood||'Coastal San Diego')}</b></span>${dateStr?`<span>${dateStr}</span>`:''}<span>CSLB <b>#962269</b></span><span>kshconstruction.com</span><span>(619) 987-2700</span></div>
+    </div>
+  </div>
+  <div class="page"><div class="pad">
+    <div class="kicker">Who We Are</div><h2 class="stitle">About KSH</h2><div class="rule"></div>
+    <p class="lead">${designerLine}</p>
+    <p class="lead">KSH Construction is a luxury residential general contractor in coastal San Diego, founded in 2009 by San Diego native Kyle Harrell. We build new custom homes and whole-home remodels for discerning homeowners — and for the designers and architects who trust us to carry out their vision down to the smallest detail.</p>
+    <p class="lead">With roughly fifteen craftspeople in-house — carpenters, electricians, site supervisors, and project coordinators — we keep the work that matters most under one roof. We don't sub out the details that define a home.</p>
+    <div class="proofstrip"><div><b>17</b><span>Years Building</span></div><div><b>~15</b><span>In-House Team</span></div><div><b>One Team</b><span>Start to Finish</span></div><div><b>Licensed</b><span>CSLB #962269</span></div></div>
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">The People</div><h2 class="stitle">Meet Your Team</h2><div class="rule"></div>
+    <p class="lead">The team that shows up to your project — in-house, the same faces from first walkthrough to final handover.</p>
+    <div class="team">${team}</div>
+    <div class="crewline"><b>Plus our full in-house crew</b> — carpenters, electricians, and site leads who keep the work that defines a home under one roof.</div>
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">What We Do</div><h2 class="stitle">Our Capabilities</h2><div class="rule"></div>
+    <p class="lead">Six things you can count on from KSH on every project.</p>
+    <div class="caps">${caps}</div>
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">The Investment</div><h2 class="stitle">Where Your Budget Goes</h2><div class="rule"></div>
+    <p class="lead">A clear view of how the investment breaks down across the work — so you can see exactly where the money goes.</p>
+    <table class="fee"><tr><th>Construction — by trade</th><th style="text-align:right">Estimate</th></tr>
+      ${buckets}
+      <tr><td>Client selection allowances</td><td class="amt">${money(c.allowT)}</td></tr>
+      <tr class="sub"><td>Subtotal</td><td class="amt">${money(c.subtotal)}</td></tr>
+      <tr><td>Project contingency (${cur.cont}%)</td><td class="amt">${money(c.cont)}</td></tr>
+      <tr class="grand"><td>Total Project Investment</td><td class="amt">${money(c.total)}</td></tr>
+    </table>
+    <div class="note">${p.sqft?`Approx. ${num(p.sqft).toLocaleString()} sq ft · about ${money(c.persf)}/sq ft. `:''}Figures are planning estimates; allowances adjust to the finishes you and your designer select. Overhead &amp; profit is carried within the trade line items.</div>
+    <div class="pfooter">${FOOT}</div>
+  </div></div>
+  <div class="page"><div class="pad">
+    <div class="kicker">The Build</div><h2 class="stitle">Your Project, by Stage</h2><div class="rule"></div>
+    ${stages}
+    <div class="subhead">Selection allowances included</div>
+    <table class="fee"><tr><th>Selection</th><th style="text-align:right">Allowance</th></tr>${allowRows}<tr class="sub"><td>Total allowances</td><td class="amt">${money(c.allowT)}</td></tr></table>
+    <div class="fineprint">This proposal is a planning estimate prepared for ${esc(p.client||'the client')} and is valid for 30 days${dateStr?` from ${dateStr}`:''}. It is not a binding contract. Final scope, allowances, and pricing are confirmed in KSH Construction's standard written agreement. Estimator: ${esc(p.estimator||'KSH')}.</div>
+    <div class="pfooter">KSH CONSTRUCTION · 3755 Avocado Blvd #510, La Mesa, CA 91941 · (619) 987-2700</div>
+  </div></div>`;
+}
+
+/* ---------------- init ---------------- */
+(function init(){
+  const d=localStorage.getItem(DRAFT);
+  renderLibrary();
+  if(d){try{cur=JSON.parse(d);}catch(e){cur=null;}}
+  showView('library');
+})();
+</script>
+</body>
+</html>

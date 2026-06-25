@@ -73,33 +73,34 @@
 
 <script>
 const GROUPS = [
-  { id:'personal', name:'Personal', color:'var(--personal)', icon:'\u{1f464}', desc:'Money & life tools', apps:[
-    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'\u{1f9ed}', tag:'Daily' },
-    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'\u{1f4b0}', tag:'App' },
-    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'\u{1f373}', tag:'App' }
+  { id:'personal', name:'Personal', color:'var(--personal)', icon:'👤', desc:'Money & life tools', apps:[
+    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'🧭', tag:'Daily' },
+    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'💰', tag:'App' },
+    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'🍳', tag:'App' }
   ]},
-  { id:'ksh', name:'KSH Construction', color:'var(--ksh)', icon:'\u{1f3d7}\ufe0f', desc:'Designs, ads & meetings', apps:[
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'\u{1f3a8}', tag:'Gallery' },
-    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'\u{1f4ca}', tag:'Dashboard' },
-    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'\u{1f399}\ufe0f', tag:'Recorder' },
-    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'\u{1f4c7}', tag:'Dashboard' }
+  { id:'ksh', name:'KSH Construction', color:'var(--ksh)', icon:'🏗️', desc:'Designs, ads & meetings', apps:[
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'🎨', tag:'Gallery' },
+    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'📊', tag:'Dashboard' },
+    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'🎙️', tag:'Recorder' },
+    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'📇', tag:'Dashboard' },
+    { name:'Estimate Builder', desc:'Turn numbers into a polished client proposal', href:'ksh-estimator.html', icon:'🧮', tag:'Pricing' }
   ]},
-  { id:'sdlr', name:'San Diego Landscape', color:'var(--sdlr)', icon:'\u{1f335}', desc:'Estimator, social & SEO', apps:[
-    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'\u{1f9ee}', tag:'Pricing' },
-    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'\u{1f4dd}', tag:'Intake' },
-    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'\u{1f4c5}', tag:'Dashboard' },
-    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'\u{1f4cd}', tag:'Tracker' },
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'\u{1f3a8}', tag:'Gallery' }
+  { id:'sdlr', name:'San Diego Landscape', color:'var(--sdlr)', icon:'🌵', desc:'Estimator, social & SEO', apps:[
+    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'🧮', tag:'Pricing' },
+    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'📝', tag:'Intake' },
+    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'📅', tag:'Dashboard' },
+    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'📍', tag:'Tracker' },
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'🎨', tag:'Gallery' }
   ]},
-  { id:'svm', name:'Shift Vision Media', color:'#fb7a3c', icon:'\u25e2', desc:'Websites, content & delivery', apps:[
-    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'\u{1f310}', tag:'Directory' },
-    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'\u270f\ufe0f', tag:'Editor' },
-    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'\u26a1', tag:'Generator' }
+  { id:'svm', name:'Shift Vision Media', color:'#fb7a3c', icon:'◢', desc:'Websites, content & delivery', apps:[
+    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'🌐', tag:'Directory' },
+    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'✏️', tag:'Editor' },
+    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'⚡', tag:'Generator' }
   ]},
-  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'\u{1f6df}', desc:'Wedding backup network \u2014 new venture', apps:[
-    { name:'Website', desc:'Public site \u2014 where photographers buy', href:'standby-site.html', icon:'\u{1f310}', tag:'Site' },
-    { name:'The app', desc:'Login \u2014 dashboard, check-ins, messaging', href:'standby-app.html', icon:'\u{1f4f1}', tag:'App' },
-    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'\u{1f3ac}', tag:'Demo' }
+  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'🛟', desc:'Wedding backup network — new venture', apps:[
+    { name:'Website', desc:'Public site — where photographers buy', href:'standby-site.html', icon:'🌐', tag:'Site' },
+    { name:'The app', desc:'Login — dashboard, check-ins, messaging', href:'standby-app.html', icon:'📱', tag:'App' },
+    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'🎬', tag:'Demo' }
   ]}
 ];
 
