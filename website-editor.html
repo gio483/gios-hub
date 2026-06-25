@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>Website Editor &#8212; Gio's Hub</title>
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#0b1220; --card:#151f33; --card-hover:#1c2a44; --text:#f1f5f9; --muted:#94a3b8; --line:#26344f;
+    --svm:#fb7a3c; --ok:#34d399; --warn:#fbbf24;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #16233e 0%, var(--bg) 55%) fixed;
+    color:var(--text);min-height:100vh;
+    padding:max(24px,env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom));
+  }
+  main{max-width:680px;margin:0 auto}
+  .back{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--muted);font-size:.92rem;cursor:pointer;padding:6px 2px;margin-bottom:14px;font-weight:600;text-decoration:none}
+  .back:hover{color:var(--text)}
+  .head{display:flex;align-items:center;gap:13px;margin:2px 4px 6px}
+  .head .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;background:color-mix(in srgb, var(--svm) 16%, transparent)}
+  h1{font-size:1.4rem;margin:0;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:.92rem;margin:4px 4px 20px;line-height:1.5}
+
+  .status-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;text-align:center}
+  .dotline{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:.95rem}
+  .led{width:11px;height:11px;border-radius:50%;background:var(--muted);box-shadow:0 0 0 4px rgba(148,163,184,.15)}
+  .led.on{background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.2)}
+  .led.off{background:var(--warn);box-shadow:0 0 0 4px rgba(251,191,36,.18)}
+  .open-btn{display:inline-flex;align-items:center;gap:9px;margin-top:15px;text-decoration:none;font-size:1rem;font-weight:700;padding:13px 24px;border-radius:13px;background:var(--svm);color:#0b1220}
+  .open-btn:hover{filter:brightness(1.07)}
+  .statusmsg{margin-top:12px;font-size:.85rem;color:var(--muted);min-height:1.2em}
+
+  .steps{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 18px}
+  .step{display:flex;gap:13px;padding:14px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+  .step:last-child{border-bottom:0}
+  .num{width:26px;height:26px;border-radius:50%;flex:none;background:rgba(251,122,60,.16);color:var(--svm);font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+  .step h3{margin:0 0 3px;font-size:.96rem}
+  .step p{margin:0;font-size:.86rem;color:var(--muted);line-height:1.45}
+  code{background:#0b1220;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:.82em}
+  .note{margin:16px 4px 0;font-size:.82rem;color:var(--muted);line-height:1.5}
+  .note b{color:#cbd5e1}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html#svm">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    Shift Vision Media
+  </a>
+  <div class="head">
+    <div class="ico">&#9999;&#65039;</div>
+    <h1>Website Editor</h1>
+  </div>
+  <p class="sub">Change the words on any of your websites yourself &#8212; no code. The editor runs on your Mac, where your site files live.</p>
+
+  <div class="status-card">
+    <div class="dotline"><span class="led" id="led"></span><span id="ledText">Checking if the editor is running&#8230;</span></div>
+    <div><a class="open-btn" href="http://localhost:4399" target="_blank" rel="noopener">Open the editor &#8594;</a></div>
+    <div class="statusmsg" id="statusmsg"></div>
+  </div>
+
+  <div class="steps">
+    <div class="step"><div class="num">1</div><div><h3>Start the editor on your Mac</h3><p>In your <code>Claude AI</code> folder, open <code>tools/site-editor</code> and double-click <b>Open Site Editor.command</b>. A small black window opens &#8212; leave it running.</p></div></div>
+    <div class="step"><div class="num">2</div><div><h3>Click "Open the editor" above</h3><p>It opens the editor in your browser. Pick a website at the top.</p></div></div>
+    <div class="step"><div class="num">3</div><div><h3>Edit and save</h3><p>Click into any text, change the words like a Google Doc, then hit <b>Save changes</b>. Every save keeps a backup automatically.</p></div></div>
+  </div>
+
+  <p class="note"><b>Why a button instead of editing right here?</b> Your website files live on your Mac, not on this hub. The editor has to run where the files are, so it runs locally. On your phone this page is just a reminder &#8212; the editing itself happens on your Mac.</p>
+</main>
+
+<script>
+// Try to detect if the local editor is running. Chrome allows requests to
+// localhost; if it's blocked or down, we just show the "start it" state.
+const led = document.getElementById('led');
+const ledText = document.getElementById('ledText');
+const statusmsg = document.getElementById('statusmsg');
+
+fetch('http://localhost:4399/api/sites', { mode:'no-cors' })
+  .then(() => {
+    led.className = 'led on';
+    ledText.textContent = 'Editor is running';
+    statusmsg.textContent = 'You\'re good to go \u2014 click Open the editor.';
+  })
+  .catch(() => {
+    led.className = 'led off';
+    ledText.textContent = 'Editor not detected';
+    statusmsg.textContent = 'Start it first (Step 1 below), then refresh this page.';
+  });
+</script>
+</body>
+</html>
