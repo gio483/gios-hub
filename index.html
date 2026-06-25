@@ -85,7 +85,7 @@
 
   <header>
     <div class="logo" id="logo" title="Back to home">G</div>
-    <p class="kicker" id="kicker">GIO&nbsp;‚Ä¢&nbsp;COMMAND&nbsp;HUB</p>
+    <p class="kicker" id="kicker">GIO&nbsp;&#8226;&nbsp;COMMAND&nbsp;HUB</p>
     <h1 id="title">Gio's Hub</h1>
     <p class="sub" id="subtitle">Pick a company to see its apps.</p>
   </header>
@@ -118,60 +118,60 @@ const HOME_THEME = {
 };
 
 const GROUPS = [
-  { id:'personal', name:'Personal', color:'#ff8a3c', icon:'üë§', desc:'Money & life tools',
+  { id:'personal', name:'Personal', color:'#ff8a3c', icon:'\u{1f464}', desc:'Money & life tools',
     logo:{ type:'mono', text:'G' },
     theme:{ bg:'#120a05', bg2:'#2a1408', card:'rgba(255,138,60,.07)', cardHover:'rgba(255,138,60,.15)',
             text:'#fdf0e8', muted:'#c9a489', line:'rgba(255,138,60,.22)',
             accent:'#ff8a3c', accent2:'#ffb27a', glow:'rgba(255,138,60,.18)', particle:'#ff8a3c' },
     apps:[
-    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'üß≠', tag:'Daily' },
-    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'üí∞', tag:'App' },
-    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'üç≥', tag:'App' }
+    { name:'Daily Life OS', desc:'Energy, sleep, faith & reflection', href:'lifeos.html', icon:'\u{1f9ed}', tag:'Daily' },
+    { name:'Money Terminal', desc:'Personal budget & spending tracker', href:'budget.html', icon:'\u{1f4b0}', tag:'App' },
+    { name:"Gio's Kitchen", desc:'What can I make? Live recipes + cookbook', href:'kitchen.html', icon:'\u{1f373}', tag:'App' }
   ]},
-  { id:'ksh', name:'KSH Construction', color:'#378ADD', icon:'üèóÔ∏è', desc:'Designs, ads & meetings',
+  { id:'ksh', name:'KSH Construction', color:'#378ADD', icon:'\u{1f3d7}\ufe0f', desc:'Designs, ads & meetings',
     logo:{ type:'img', src:'ksh-logo.png' },
     theme:{ bg:'#06121f', bg2:'#0e2c47', card:'rgba(63,151,211,.08)', cardHover:'rgba(63,151,211,.16)',
             text:'#eaf3fb', muted:'#90aecb', line:'rgba(63,151,211,.22)',
             accent:'#3f97d3', accent2:'#d9a441', glow:'rgba(63,151,211,.20)', particle:'#3f97d3' },
     apps:[
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'üé®', tag:'Gallery' },
-    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'üìä', tag:'Dashboard' },
-    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'üéôÔ∏è', tag:'Recorder' },
-    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'üìá', tag:'Dashboard' },
-    { name:'Estimate Builder', desc:'Turn numbers into a polished client proposal', href:'ksh-estimator.html', icon:'üßÆ', tag:'Pricing' }
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=ksh', icon:'\u{1f3a8}', tag:'Gallery' },
+    { name:'Google Ads', desc:'Ad performance dashboard', href:'ksh-ads-dashboard.html', icon:'\u{1f4ca}', tag:'Dashboard' },
+    { name:'Meeting Recorder', desc:'Record, transcribe & summarize', href:'ksh-meeting-assistant.html', icon:'\u{1f399}\ufe0f', tag:'Recorder' },
+    { name:'Designer Network', desc:'Designers & architects directory', href:'ksh-networking-dashboard.html', icon:'\u{1f4c7}', tag:'Dashboard' },
+    { name:'Estimate Builder', desc:'Turn numbers into a polished client proposal', href:'ksh-estimator.html', icon:'\u{1f9ee}', tag:'Pricing' }
   ]},
-  { id:'sdlr', name:'San Diego Landscape', color:'#8aa05c', icon:'üåø', desc:'Estimator, social & SEO',
+  { id:'sdlr', name:'San Diego Landscape', color:'#8aa05c', icon:'\u{1f33f}', desc:'Estimator, social & SEO',
     logo:{ type:'img', src:'data:image/jpeg;base64,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', fit:'cover', bg:'transparent' },
     theme:{ bg:'#0d0f09', bg2:'#1c2114', card:'rgba(200,168,105,.07)', cardHover:'rgba(200,168,105,.15)',
             text:'#f4f1e6', muted:'#a8a98e', line:'rgba(200,168,105,.22)',
             accent:'#9fb56a', accent2:'#c8a869', glow:'rgba(160,176,92,.18)', particle:'#c8a869' },
     apps:[
-    { name:"This Week's Posts", desc:'Download image, copy caption, schedule', href:'sdlr-this-week.html', icon:'üì≤', tag:'Post now' },
-    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'üßÆ', tag:'Pricing' },
-    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'üìù', tag:'Intake' },
-    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'üìÖ', tag:'Dashboard' },
-    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'üìç', tag:'Tracker' },
-    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'üé®', tag:'Gallery' }
+    { name:"This Week's Posts", desc:'Download image, copy caption, schedule', href:'sdlr-this-week.html', icon:'\u{1f4f2}', tag:'Post now' },
+    { name:'Estimator', desc:'Price jobs & generate client estimates', href:'sdlr-estimator.html', icon:'\u{1f9ee}', tag:'Pricing' },
+    { name:'Job Intake', desc:'Capture site details for an estimate', href:'sdlr-intake.html', icon:'\u{1f4dd}', tag:'Intake' },
+    { name:'90-Day Social', desc:'Social content calendar', href:'sdlr-social-dashboard.html', icon:'\u{1f4c5}', tag:'Dashboard' },
+    { name:'SEO Grid', desc:'Local rank-tracking grid', href:'sdlr-seo-tracker.html', icon:'\u{1f4cd}', tag:'Tracker' },
+    { name:'Design Gallery', desc:'Flipbooks & visual deliverables', href:'designs.html?c=sdlr', icon:'\u{1f3a8}', tag:'Gallery' }
   ]},
-  { id:'svm', name:'Shift Vision Media', color:'#29abe2', icon:'‚ó¢', desc:'Websites, content & delivery',
+  { id:'svm', name:'Shift Vision Media', color:'#29abe2', icon:'\u25e2', desc:'Websites, content & delivery',
     logo:{ type:'svg', svg:'<svg viewBox="0 0 32 32" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><rect width="32" height="32" rx="7" fill="#04141d"/><path d="M16 8 L25 24 L7 24 Z" fill="#29abe2"/></svg>' },
     theme:{ bg:'#03121a', bg2:'#06222f', card:'rgba(41,171,226,.08)', cardHover:'rgba(41,171,226,.16)',
             text:'#e9f6fd', muted:'#8fb6c9', line:'rgba(41,171,226,.22)',
             accent:'#29abe2', accent2:'#7fd4f2', glow:'rgba(41,171,226,.20)', particle:'#29abe2' },
     apps:[
-    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'üåê', tag:'Directory' },
-    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'‚úèÔ∏è', tag:'Editor' },
-    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'‚ö°', tag:'Generator' }
+    { name:'Our Websites', desc:'Every site we\'ve built together', href:'websites.html', icon:'\u{1f310}', tag:'Directory' },
+    { name:'Website Editor', desc:'Change the words on your sites yourself', href:'website-editor.html', icon:'\u270f\ufe0f', tag:'Editor' },
+    { name:'Content Engine', desc:'A month of client content in one run', href:'svm-content-engine.html', icon:'\u26a1', tag:'Generator' }
   ]},
-  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'üõü', desc:'Wedding backup network ‚Äî new venture',
+  { id:'standby', name:'Standby Pro', color:'#c9a86a', icon:'\u{1f6df}', desc:'Wedding backup network \u2014 new venture',
     logo:{ type:'mono', text:'S', serif:true },
     theme:{ bg:'#0d0b07', bg2:'#231c10', card:'rgba(201,168,106,.07)', cardHover:'rgba(201,168,106,.15)',
             text:'#f6f0e4', muted:'#b3a88c', line:'rgba(201,168,106,.22)',
             accent:'#c9a86a', accent2:'#e8cf9a', glow:'rgba(201,168,106,.18)', particle:'#c9a86a' },
     apps:[
-    { name:'Website', desc:'Public site ‚Äî where photographers buy', href:'standby-site.html', icon:'üåê', tag:'Site' },
-    { name:'The app', desc:'Login ‚Äî dashboard, check-ins, messaging', href:'standby-app.html', icon:'üì±', tag:'App' },
-    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'üé¨', tag:'Demo' }
+    { name:'Website', desc:'Public site \u2014 where photographers buy', href:'standby-site.html', icon:'\u{1f310}', tag:'Site' },
+    { name:'The app', desc:'Login \u2014 dashboard, check-ins, messaging', href:'standby-app.html', icon:'\u{1f4f1}', tag:'App' },
+    { name:'Product demo', desc:'Standalone clickable walkthrough', href:'standby-prototype.html', icon:'\u{1f3ac}', tag:'Demo' }
   ]}
 ];
 
@@ -236,7 +236,7 @@ function showHome(){
   applyTheme(HOME_THEME);
   companyView.classList.add('hidden');
   homeView.classList.remove('hidden');
-  kicker.textContent = 'GIO ‚Ä¢ COMMAND HUB';
+  kicker.textContent = 'GIO \u2022 COMMAND HUB';
   title.textContent = "Gio's Hub";
   subtitle.textContent = 'Pick a company to see its apps.';
   setLogo({ type:'mono', text:'G' });
@@ -249,7 +249,7 @@ function showGroup(id){
   applyTheme(g.theme);
   document.getElementById('groupName').textContent = g.name;
   document.getElementById('groupDot').style.background = g.color;
-  kicker.textContent = g.name.toUpperCase() + ' ‚Ä¢ WORKSPACE';
+  kicker.textContent = g.name.toUpperCase() + ' \u2022 WORKSPACE';
   title.textContent = g.name;
   subtitle.textContent = g.desc;
   setLogo(g.logo || { type:'mono', text:(g.name[0]||'G') });
