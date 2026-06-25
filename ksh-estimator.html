@@ -118,6 +118,9 @@
   #proposalDoc .ccard .cn{font-family:"Playfair Display";font-size:19px;margin:0 0 9px;color:#16242f}
   #proposalDoc .ccard .cb{font-size:13px;color:#5f7180;line-height:1.6}
   #proposalDoc .capfoot{text-align:center;font-size:12.5px;color:#33414c;font-style:italic;max-width:5.4in;margin:28px auto 0;line-height:1.6}
+  #proposalDoc .bsec{break-inside:avoid;margin-bottom:13px}
+  #proposalDoc .bsh{font-family:"Playfair Display";font-size:13.5px;color:#16242f;margin:0 0 5px;padding-bottom:4px;border-bottom:1px solid #e1ebf3;font-weight:600}
+  #proposalDoc .bp{font-size:11px;color:#46535f;line-height:1.6;margin:0 0 6px;text-align:left}
   #proposalDoc .terms2{display:grid;grid-template-columns:1fr 1fr;gap:0.45in;margin-top:8px}
   #proposalDoc .tp{font-size:12px;color:#5f7180;line-height:1.6;margin:0 0 6px}
   #proposalDoc ul.tl{margin:0 0 8px;padding-left:18px}
@@ -189,7 +192,8 @@
   <div class="nav no-print">
     <button class="navbtn active" data-tab="project">1 · Project</button>
     <button class="navbtn" data-tab="numbers">2 · Numbers</button>
-    <button class="navbtn" data-tab="proposal">3 · Proposal</button>
+    <button class="navbtn" data-tab="scope">3 · Scope &amp; Terms</button>
+    <button class="navbtn" data-tab="proposal">4 · Proposal</button>
   </div>
 
   <!-- PROJECT -->
@@ -269,7 +273,35 @@
         </div>
       </div>
       <div><div class="card summary"><h2>Running total</h2><div id="sum2"></div>
-        <button class="btn no-print" style="margin-top:14px;width:100%;justify-content:center" onclick="go('proposal')">Build the proposal →</button></div></div>
+        <button class="btn no-print" style="margin-top:14px;width:100%;justify-content:center" onclick="go('scope')">Next: Scope &amp; Terms →</button></div></div>
+    </div>
+  </div>
+
+  <!-- SCOPE & TERMS -->
+  <div id="tab-scope" class="hidden">
+    <div class="card" style="max-width:840px">
+      <h2>Scope &amp; terms</h2>
+      <p class="sub">KSH's standard contract language is added to every estimate automatically. The boxes below are the parts that change per project — edit each and it drops into the estimate where it belongs.</p>
+      <div class="banner" style="border-color:#2f5570;background:#10202c;color:var(--blue2)">✓ <b>Auto-included on every estimate</b> (standard, identical wording — you don't need to touch these): Project Management, Site Protection, Porta Potty, Debris Disposal, Cleaning, Warranty Inspection, and Articles of Contract 1–21.</div>
+
+      <label>Section 100 — Scope of Work <span class="muted" style="text-transform:none">· the per-trade narrative for this project</span></label>
+      <textarea id="c_scope" style="min-height:170px" oninput="setCopy('scope',this.value)"></textarea>
+
+      <label style="margin-top:16px">Section 200 — Cost Plus <span class="muted" style="text-transform:none">· confirm the markup % (23% / 25% / etc.)</span></label>
+      <textarea id="c_costPlus" style="min-height:150px" oninput="setCopy('costPlus',this.value)"></textarea>
+
+      <label style="margin-top:16px">Section 1200 — Permits</label>
+      <textarea id="c_permits" style="min-height:100px" oninput="setCopy('permits',this.value)"></textarea>
+
+      <label style="margin-top:16px">Section 1400 — Hazardous Material Testing</label>
+      <textarea id="c_hazmat" style="min-height:90px" oninput="setCopy('hazmat',this.value)"></textarea>
+
+      <div class="row c2" style="margin-top:16px">
+        <div><label>Article 2 — commence within (days)</label><input id="c_startDays" type="number" oninput="setCopy('startDays',this.value)"></div>
+        <div><label>Article 2 — complete within (months)</label><input id="c_completeMonths" type="number" oninput="setCopy('completeMonths',this.value)"></div>
+      </div>
+      <div class="hint">The interior designer is pulled from the Project tab. These sections are the ones that differed between estimates — flagged for confirmation with Kyle.</div>
+      <button class="btn no-print" style="margin-top:14px" onclick="go('proposal')">Build the proposal →</button>
     </div>
   </div>
 
@@ -326,6 +358,48 @@ const STAGE_DEFS = [
   ['Final Handoff','Punch list, final clean, and a careful walk-through before the keys are yours.',15],
 ];
 
+/* ---- KSH standard boilerplate (identical across estimates — auto-included) ---- */
+const STD = {
+  projectManagement:`All project supervision and organization to be provided by KSH Construction and to include the following — organization of project documents including plansets, designer-provided spec sheets, and other project-related documents and providing of documents to tradesman. Updating of JobTread/Google Drive folders with project-specific information. On-site supervision of tradesman and work being performed to ensure everything is installed/applied correctly per manufacturer's and designer's specifications. Coordination of material orders, deliveries, and site services. Site visits with Owner, designer, and architect throughout the duration of the project.`,
+  siteProtection:`After installation of countertops, floor and tile, KSH will use protection materials such as ramboard, masonite board and foam board to protect all finished flooring, cabinets, and countertops as project work continues.`,
+  portaPotty:`A porta potty and wash station will be provided by KSH Construction at the jobsite for the duration of the project. The porta potty and wash station will be cleaned weekly and KSH Construction will be responsible for clean-up of the area around them as needed. Location TBD.`,
+  debris:`Disposal of all accumulated site trash, packaging, and debris. Debris will be stored in a designated area and disposed of off-site as needed. A dump trailer or debris container may be parked on site and used as needed for large portions of debris such as demo and major cleaning milestones. We may also store trash on site or in designated areas for scheduled pick-ups.`,
+  cleaning:`Daily/weekly clean-ups to include neatly stacking all debris, materials, tools, and equipment in designated areas for on-site storage. All interior work areas will be broom-swept and vacuumed as needed; all exterior work areas broom-swept. Final clean-up includes — Interior: washing of windows and mirrors, wipe-down of all horizontal surfaces, removal of all floor protectant and masking, broom-sweeping of flooring. Exterior: removal of all debris, materials, storage containers, porta potty, and equipment; all walkways and patios blown clean.`,
+  warranty:`Two follow-up inspections will be scheduled during the warranty period to ensure a quality product is delivered to our clients. An inspection at 6 months after completion will address any abnormal issues with structural framing, MEPs, and doors/windows. A second inspection at 12 months will address cosmetic issues such as nail pops in drywall and shrinking caulking. The home needs to go through a complete heating and cooling cycle to reach equilibrium so that once these repairs are completed, they stay fixed.`,
+};
+// Editable per-project defaults (pre-filled with KSH's standard wording; the markup/timeline are the parts that change)
+const COPY_DEFAULTS = {
+  scope:`[ Paste or type the project scope of work here — the per-trade narrative (demolition, framing, plumbing, electrical, cabinetry, tile, finishes, etc.). When you upload an estimate, this can be pulled in automatically. ]`,
+  costPlus:`Homeowner has elected to perform this contract cost plus. All work costs quoted are estimates/allowances based on previous historical numbers, subcontractor quotes, and supplier quotes.\nKSH Construction bills our employees at $125.00/hour for Project Managers & Site Superintendents, $95.00/hour for lead carpenters, $85.00/hour for carpenters, and $115.00/hour for electricians. All subcontractor/supplier invoices will be billed for all work outside of KSH employees. Certain items like large/specialty tools, scaffolding/fencing, and dump trailers/vehicles owned by KSH may incur a "rental fee" to help cover purchase/maintenance costs (available for review upon request). All labor, materials, consumables, equipment, subcontractor, and supplier costs will be marked up 23% for KSH fees. Receipts may not always be available for some materials/consumables due to the way they are purchased or pulled from regularly stocked items.\nHomeowner is responsible for all fees required for successful completion of the project to the plan specifications, even if prices have increased from what was originally allotted.`,
+  permits:`Homeowner is responsible for procurement of the construction permit and payment of all permit fees, development fees, and any fees required by the local building/permitting department before the start of construction. Proof of permit and payment may be requested before the start of the project. Homeowner/Architect is responsible for completion of the permit and delivery to the jobsite before the start of the project. Unless otherwise noted, Homeowner is responsible for all fees required by SDG&E (or local power provider), the local water municipality, and the city for utility relocations and improvements. KSH management is limited to material and trade supervision, not permits and inspections.`,
+  hazmat:`Homeowner is responsible for testing all materials before demolition for lead/asbestos. No allowance is currently included for remediation. If certain materials test positive for lead or asbestos, a change order will be submitted for the required removal of hazardous materials based on the test results.`,
+  startDays:'30', completeMonths:'10',
+};
+const ARTICLES_INTRO=`This proposal is valid for 30 days from the submitted date and is subject to approval by KSH Construction. KSH Construction reserves the right to retract, cancel, change, adjust, or refuse a bid before signing this contract. KSH Construction will supply all work as described in the proposal, in accordance with the time schedule if applicable. All work will be performed by trained and accredited personnel.`;
+const ARTICLES=[
+['1','Payment',`Payment schedule to be determined based on final scope of work and options selected. An expected progress payment schedule will be submitted with the finalized proposal. A $1,000 deposit is required at signing of contract for scheduling. A mobilization/special-order materials payment will be required before the start of the project. A bi-weekly billing statement will be provided by KSH with a spreadsheet of all project costs; available receipts/invoices will be on JobTread for review. Additional deposits may be collected throughout the project for ordering of additional materials. Deposit/mobilization payments will be credited back on the final invoice. Progress and final payments are due within 5 days of submission of the invoice. Failure to pay within the 5-day window can postpone the work schedule without penalty to KSH until payment is made in full. Invoices not paid within 30 days will be charged a 1.5% service fee per month (18% annual). Unless otherwise noted, all prices are for cash/check/ACH payment; credit cards are accepted with an additional 4% to cover merchant fees. KSH reserves the right to terminate this agreement if work is stopped for fifteen (15) continuous calendar days due to the Homeowner's failure to make prompt payment, and Homeowner will be responsible for outstanding invoices plus projected overhead/profit on the remaining contract.`],
+['2','Start Date',`Upon signature of contract, work will commence within __STARTDAYS__ days (dependent upon schedule confirmation) and the expected completion date will be within __COMPLETEMONTHS__ months, subject to delays caused by (but not limited to) acts of God, stormy weather, labor trouble, material shortages, riots, mischief, thefts, changes in plans or scope, lead time on special-order items, or unforeseen contingencies outside the contractor's control. Special-order materials are at the mercy of the manufacturer/supplier and lead times can change quickly. Any delays will be discussed with the Owner/Representative as soon as feasible.`],
+['3','License / Insurance',`KSH Construction maintains an active contractor's license in good standing with the California State License Board. KSH will supply worker's compensation insurance for its employees in the forms and amounts required by law, plus general liability and auto insurance (certificate available on request) with a combined single limit of $1,000,000 per occurrence. KSH's subcontractors are responsible for maintaining an active license and the required insurances for the work they perform. Any questions concerning a contractor may be referred to the Contractors State License Board, 3262 Bradshaw Rd., Sacramento, CA 95826.`],
+['4','Permits',`Owner is responsible for obtaining permits and regulatory approval required by the local municipal/county government. Owner may employ KSH to obtain such permits, the cost of which shall be an expense of the job, billed at a $100.00 hourly rate for application, submittal, and inspections, unless otherwise specified in the scope of work.`],
+['5','Site Access',`Owner shall grant free access to work areas for workers and vehicles and provide areas for storage of materials and debris, keeping driveways clear during scheduled hours. Owner is responsible for securing all entrances to the jobsite. KSH shall not be liable for damage to driveways, walks, lawns, shrubs, or vegetation from movement of trucks, workers, equipment, materials, or debris. Owner will provide toilet facilities, water, and usable power; if not accessible and no written notice is given during bid, Owner will be billed for KSH providing them. Access to the work area is limited to KSH employees, subcontractors, and the customer's authorized visitors. All hourly work is charged portal to portal.`],
+['6','Site Conditions & Specifications',`This contract is based on the contractor's visual observation of conditions. Conditions not knowable by visual observation — termite or hidden water damage, hidden code violations, differences in plumbing/electrical materials or methods, hazardous materials, or unanticipated underground conditions — may require extra labor or materials not part of this contract. If discovered, the contractor will notify the Owner and attempt to reach a change order. The project will be constructed per the drawings and specifications in the Scope of Work, with a reasonable allowance on stated dimensions. If any conflict exists between sketches/renderings/plans and this Contract, this Contract controls. Work does not include changes required by any public body, utility, or inspector unless specified; any such alteration is in addition to the contract price.`],
+['7','Hazardous Materials',`Unless this contract calls for the removal, disturbance, or transportation of asbestos, lead, mold, or other hazardous materials, the parties acknowledge such work requires special procedures and licenses, and the contractor shall not be responsible for removal or remediation of hidden or unknown hazardous materials. If encountered, Owner shall pay all additional costs to remove/dispose of them per applicable law, treated as extra work. Federal law requires customers be informed about lead if the property was built before 1978; if lead paint is present on more than 2 square feet we cannot continue work unless precautions are taken per EPA regulations at the Owner's expense (see EPA747-K-99-001 and EPA747-K-97-002).`],
+['8','Change Orders',`Without invalidating this agreement, Owner may order extra work or change the contract via a change/additional work order (additions, deletions, or modifications, with the contract sum and time adjusted accordingly), mutually agreed and signed by both parties. Any additional sum is paid 50% upon signature of the change order and 50% at the next progress or final payment. A design/estimating and coordination fee of $75.00 per hour is incurred on the design, drafting, and pricing of the change, whether or not it is elected. KSH is not liable for any charges made without a completed, signed change order.`],
+['9','Customer Satisfaction / Completion',`All work will be completed in a professional manner, at or exceeding normally accepted industry standards and in compliance with all local and state building codes. Work is considered completed upon Owner approval, which shall not be unreasonably withheld. Substantial performance in a workmanlike manner is sufficient grounds for KSH to require final payment. If certain items are incomplete, up to 5% of the original base contract (or a mutually agreed sum) may be withheld until those items are complete or the final walk-through is approved. When punch-list items are completed, Owner will pay the balance due within three (3) days.`],
+['10','Warranty',`KSH Construction warrants that for one year from completion it will repair or replace any work that is defective in materials or workmanship or does not conform to the specifications. KSH's liability is limited to the foregoing and shall not include indirect, incidental, or consequential damages. KSH does not guarantee the performance of any material beyond its intended use, and in no case shall KSH's liability exceed that of the product manufacturer's guarantee.`],
+['11','Subcontractors',`KSH may, at its discretion, engage licensed and insured subcontractors to perform any parts of the work, provided KSH fully pays said subcontractor and remains responsible for proper completion. All subcontractors are required to maintain current general liability and workers' compensation coverage.`],
+['12','Jobsite Prep and Work',`KSH is solely responsible for securing labor, materials, and subcontractor work, and for scheduling, techniques, and coordination of all trades. Owner and Owner's agents are prohibited from directing the progress of the work or securing labor/materials/subcontractors that substitute those included, unless authorized in writing by KSH. Questions or change requests go solely to the KSH job superintendent. Owner is solely responsible to pay any subcontractors engaged at Owner's direction without KSH's written authority, and shall indemnify KSH from resulting claims. Owner is responsible for costs from delays or interference by Owner or Owner-solicited subcontractors; resulting corrective work is billed at cost plus fifty (50) percent.`],
+['13','Materials',`Owner acknowledges the limitations of some materials, such as patching concrete/sheetrock/plaster/stucco or matching pre-existing paint colors. While KSH will make reasonable effort to match existing textures, colors, planes, and materials, exact duplication is not promised. Concrete and stucco naturally crack over time; KSH is not responsible for repairing naturally occurring cracks in rigid materials during or after the warranty period.`],
+['14','Escalation Clause',`The contract price is based on current prices for component building materials (framing lumber, concrete, steel/metals, roofing, fuel, etc.). Should prices of these materials increase by more than 5% after execution of the contract, Owner agrees to pay that cost increase, supported by written notice with invoices. Should a rise cause the total contract price to increase by more than 3%, KSH will provide a written statement of the percentage increase and dollar amount before purchasing; Owner may then terminate within 3 business days by providing written notice and payment for all costs expended plus a prorated percentage of profit, or KSH may proceed at the increased price with Owner paying the increased cost.`],
+['15','Finances',`Owner is responsible for obtaining all funds and financing necessary to fund the work, and represents that they have sufficient funds or financing arrangements to comply with this contract.`],
+['16','Mechanics Lien Law',`Under California Mechanics Lien Law, any contractor, subcontractor, laborer, supplier, or other person who helps improve your property but is not paid for their work or supplies has a right to enforce their claim against your property. This means that after a court hearing, your property could be sold by a court officer and the proceeds used to satisfy the indebtedness.`],
+['17','Social Media / Jobsite Signage',`Owner agrees to allow KSH to photograph and video the work area before, during, and after completion. Photos and videos may be used in social media and marketing materials, and time-lapse cameras may be left on site and active during the project (Owner understands they may be recorded if they enter an active work area). KSH may schedule 1–2 days after completion for finish photos or a video walk-through, at no cost to KSH. Owner agrees to allow KSH and subcontractors to display advertising signs during the project and for up to 7 days after completion; if Owner removes signs before the 7-day period they are responsible for replacement costs.`],
+['18','Arbitration',`Any controversy arising out of or relating to this Contract that the parties do not promptly resolve shall be decided by arbitration administered in accordance with the Construction Industry Arbitration Rules of the American Arbitration Association unless the parties agree otherwise in writing. This paragraph is specifically enforceable. The award rendered shall be final and judgment may be entered in any court of competent jurisdiction. In any arbitration or litigation arising from this Contract, the prevailing party shall be entitled to recover its costs and reasonable attorney's fees.`],
+['19','Integration & Severability',`This document and all documents incorporated by reference constitute the parties' entire contract. No other contracts, oral or written, regarding the work exist between the parties. This contract is governed by the laws of the State of California. If any provision is found unenforceable, it will be modified to reflect the parties' intention, and all remaining provisions remain in full force and effect.`],
+['20','Termination of Contract',`Owner/Representative has the right to terminate the contract for a "good faith" reason (e.g., the building authority refusing a permit, inability to secure financing, an unexpected legal or financial obligation, or other reasons detrimental to completion). If accepted by KSH, Owner may terminate at any time after the three-day right to cancel. Upon such notice, KSH shall discontinue work and orders, and is entitled to payment for all work executed, costs incurred for preparatory and special-order materials, and costs incurred by reason of termination, plus reasonable overhead and profit on the unexecuted scope (typically 20–30%). Payments already made are deducted; the remaining balance is due in full within 3 days of termination.`],
+['21','Cancellations',`NOTICE TO CONSUMER: YOU MAY CANCEL THIS CONTRACT AT ANY TIME BEFORE MIDNIGHT OF THE THIRD BUSINESS DAY AFTER SIGNING A COPY OF THIS CONTRACT. IF YOU WISH TO CANCEL, YOU MUST SEND A SIGNED AND DATED WRITTEN NOTICE OF CANCELLATION BY REGISTERED OR CERTIFIED MAIL, RETURN RECEIPT REQUESTED, TO 3755 Avocado Blvd #510, La Mesa, CA 91941-7301. Schedule changes must be made no later than 48 hours in advance. If our crew arrives at the jobsite as scheduled and is unable to start work, you agree to pay a minimum of $150.00 for 2 hours of show-up time per worker scheduled that day. Additional costs may be charged for equipment rentals, lost labor, schedule adjustments, etc.`],
+];
+
 /* ---------------- helpers ---------------- */
 const $=id=>document.getElementById(id);
 const money=n=>'$'+Math.round(n||0).toLocaleString('en-US');
@@ -349,6 +423,7 @@ function freshEstimate(){
     allow:DEFAULT_ALLOW.map(n=>({name:n,amount:0})),
     markup:0, cont:0,
     stages:STAGE_DEFS.map(s=>({name:s[0],desc:s[1],pct:s[2]})),
+    copy: JSON.parse(JSON.stringify(COPY_DEFAULTS)),
   };
 }
 function calc(){
@@ -370,7 +445,7 @@ function showView(v){
   window.scrollTo(0,0);
 }
 function go(tab){
-  ['project','numbers','proposal'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==tab));
+  ['project','numbers','scope','proposal'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==tab));
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   if(tab==='proposal')renderProposal();
   window.scrollTo(0,0);
@@ -427,8 +502,11 @@ function bindEditor(){
   const map={f_client:'client',f_project:'project',f_hood:'hood',f_date:'date',f_designer:'designer',f_type:'type',f_sqft:'sqft',f_estimator:'estimator'};
   Object.entries(map).forEach(([id,k])=>{const el=$(id);el.value=cur.project[k]||'';el.oninput=()=>{cur.project[k]=el.value;persistDraft();renderSums();};});
   $('f_cont').value=cur.cont; $('f_markup').value=cur.markup||0;
+  if(!cur.copy) cur.copy=JSON.parse(JSON.stringify(COPY_DEFAULTS));
+  ['scope','costPlus','permits','hazmat','startDays','completeMonths'].forEach(k=>{ if($('c_'+k)) $('c_'+k).value=(cur.copy[k]!=null?cur.copy[k]:''); });
   renderCovers();renderBuckets();renderAllow();renderStages();renderSums();
 }
+function setCopy(k,v){ if(!cur.copy)cur.copy={}; cur.copy[k]=v; persistDraft(); }
 function renderCovers(){
   $('coverPick').innerHTML=COVERS.map(c=>`
     <div class="cover-opt ${cur.project.hero===c.f?'sel':''}" onclick="pickCover('${c.f}')">
@@ -549,6 +627,34 @@ function renderProposal(){
   if(c.markup) feeRows+=`<tr><td>KSH fee (${cur.markup}%)</td><td class="amt">${money(c.markup)}</td></tr>`;
   if(c.cont) feeRows+=`<tr><td>Contingency (${cur.cont}%)</td><td class="amt">${money(c.cont)}</td></tr>`;
   feeRows+=`<tr class="grand"><td>Total Estimated Investment</td><td class="amt">${money(c.total)}</td></tr>`;
+  // ---- scope + contract boilerplate ----
+  const cp=cur.copy||COPY_DEFAULTS;
+  const para=t=>'<p class="bp">'+esc(t||'').trim().replace(/\n+/g,'</p><p class="bp">')+'</p>';
+  const sec=(t,b)=>`<div class="bsec"><div class="bsh">${t}</div>${para(b)}</div>`;
+  const designerSec = p.designer
+    ? sec('1100 · Interior Designer', `${p.designer} will be the designated interior designer for this project and will serve as the point of contact for all questions or RFIs for material selections, ordering/coordination, and installation specifications. The Interior Designer will organize all selections approved by the client and provide all specification/installation packets. Any changes by the homeowner during the project must be approved/submitted by the Interior Designer unless otherwise directed. No interior design fees are included in this proposal.`)
+    : '';
+  const scopePage=`<div class="page"><div class="pad">
+    <div class="kicker">The Work</div><h2 class="stitle">Scope of Work &amp; Project Terms</h2><div class="rule"></div>
+    ${sec('100 · Scope of Work', cp.scope)}
+    ${sec('200 · Cost Plus', cp.costPlus)}
+    ${designerSec}
+    ${sec('1200 · Permits', cp.permits)}
+    ${sec('1400 · Hazardous Material Testing', cp.hazmat)}
+    ${sec('1500 · Project Management', STD.projectManagement)}
+    ${sec('6400 · Site Protection', STD.siteProtection)}
+    ${sec('8100 · Site Services — Porta Potty', STD.portaPotty)}
+    ${sec('8300 · Debris Disposal', STD.debris)}
+    ${sec('8400 · Cleaning', STD.cleaning)}
+    ${sec('8700 · Warranty Inspection', STD.warranty)}
+    <div class="pfooter">${FOOT}</div>
+  </div></div>`;
+  const articlesPage=`<div class="page"><div class="pad">
+    <div class="kicker">The Agreement</div><h2 class="stitle">Articles of Contract</h2><div class="rule"></div>
+    ${para(ARTICLES_INTRO)}
+    ${ARTICLES.map(a=>`<div class="bsec"><div class="bsh">Article ${a[0]} — ${a[1]}</div>${para(a[2].replace('__STARTDAYS__',esc(cp.startDays||'30')).replace('__COMPLETEMONTHS__',esc(cp.completeMonths||'10')))}</div>`).join('')}
+    <div class="pfooter">${FOOT}</div>
+  </div></div>`;
 
   $('proposalDoc').innerHTML=`
   <div class="page cover">${sampleTag}
@@ -599,24 +705,8 @@ function renderProposal(){
     ${hasAllow?`<div class="subhead">Selection allowances included</div><table class="fee"><tr><th>Selection</th><th style="text-align:right">Allowance</th></tr>${allowRows}<tr class="sub"><td>Total allowances</td><td class="amt">${money(c.allowT)}</td></tr></table>`:''}
     <div class="pfooter">${FOOT}</div>
   </div></div>
-  <div class="page"><div class="pad">
-    <div class="kicker">The Details</div><h2 class="stitle">Terms &amp; What's Included</h2><div class="rule"></div>
-    <div class="terms2">
-      <div>
-        <div class="subhead">How pricing works</div>
-        <p class="tp">This is a <b>cost-plus</b> proposal. KSH bills the actual cost of labor, materials, and subcontractors, plus KSH's fee. Estimates are based on the current drawings and the quotes available today; the final amount reflects the real cost of the work, tracked and shared with you throughout.</p>
-        <div class="subhead">Included</div>
-        <ul class="tl"><li>All trade scopes listed in the estimate</li><li>Project management &amp; site supervision</li><li>Site protection, cleanup &amp; debris disposal</li><li>Coordination with your architect &amp; designer</li></ul>
-      </div>
-      <div>
-        <div class="subhead">Not included (unless noted)</div>
-        <ul class="tl"><li>Permits &amp; city fees — homeowner's responsibility</li><li>Architectural &amp; design fees</li><li>Fixtures, finishes &amp; appliances provided by the homeowner or designer</li><li>Work performed by others, outside KSH's scope</li><li>Unforeseen conditions discovered during construction</li></ul>
-        <div class="subhead">Good to know</div>
-        <p class="tp">This estimate is valid for 30 days${dateStr?` from ${dateStr}`:''}. It is a planning estimate, not a binding contract — scope and pricing become final in KSH's standard written agreement, which governs the project.</p>
-      </div>
-    </div>
-    <div class="pfooter">${FOOT}</div>
-  </div></div>
+  ${scopePage}
+  ${articlesPage}
   <div class="page"><div class="pad">
     <div class="kicker">Next Steps</div><h2 class="stitle">Acceptance &amp; Authorization</h2><div class="rule"></div>
     <p class="lead">By signing below, the homeowner accepts this proposal in the estimated amount of <b>${money(c.total)}</b> and authorizes KSH Construction, Inc. to proceed. This confirms the scope and the cost-plus pricing described, and allows KSH to schedule the project and issue the initial deposit invoice. Final amounts reflect actual costs plus KSH's fee, documented throughout the build.</p>
