@@ -1,12 +1,25 @@
 {
   "functions": {
-    "api/parse-estimate.js":      { "maxDuration": 60 },
-    "api/ksh-summarize.js":       { "maxDuration": 60 },
-    "api/ksh-email.js":           { "maxDuration": 30 },
-    "api/svm-ce-concepts.mjs":    { "maxDuration": 60 },
-    "api/svm-ce-longform.mjs":    { "maxDuration": 60 },
-    "api/svm-ce-image-start.mjs":  { "maxDuration": 30 },
-    "api/svm-ce-image-status.mjs": { "maxDuration": 15 },
-    "api/svm-ce-proxy.mjs":       { "maxDuration": 30 }
+    "api/ksh-summarize.js": {
+      "maxDuration": 60
+    },
+    "api/ksh-email.js": {
+      "maxDuration": 30
+    },
+    "api/svm-ce-concepts.mjs": {
+      "maxDuration": 60
+    },
+    "api/svm-ce-longform.mjs": {
+      "maxDuration": 60
+    },
+    "api/svm-ce-image-start.mjs": {
+      "maxDuration": 30
+    },
+    "api/svm-ce-image-status.mjs": {
+      "maxDuration": 15
+    },
+    "api/svm-ce-proxy.mjs": {
+      "maxDuration": 30
+    }
   }
 }
