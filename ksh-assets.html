@@ -16,7 +16,7 @@
     background:radial-gradient(1100px 620px at 50% -12%, var(--bg2) 0%, var(--bg) 58%) fixed;
     color:var(--text);min-height:100vh;
     padding:max(24px,env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom))}
-  header{max-width:860px;margin:0 auto 18px}
+  header{max-width:820px;margin:0 auto 20px}
   .back{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--muted);
     font-size:.92rem;cursor:pointer;padding:6px 2px;font-weight:600;text-decoration:none}
   .back:hover{color:var(--text)}
@@ -24,39 +24,26 @@
   .dot{width:12px;height:12px;border-radius:50%;background:var(--accent)}
   h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
   .sub{color:var(--muted);font-size:.92rem;margin:6px 4px 0;line-height:1.45}
-  main{max-width:860px;margin:16px auto 0}
-  .search{width:100%;background:var(--card);border:1px solid var(--line);border-radius:14px;
-    color:var(--text);font-size:1rem;padding:12px 16px;margin:4px 0 10px;outline:none}
-  .search::placeholder{color:var(--muted)}
-  .search:focus{border-color:var(--accent)}
-  .cat{margin:26px 0 0}
-  .cat-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 2px 4px}
-  .cat-head h2{font-size:1.12rem;margin:0;letter-spacing:-.01em}
-  .cat-head a{color:var(--accent);font-size:.8rem;font-weight:600;text-decoration:none}
-  .cat-head a:hover{text-decoration:underline}
-  .cat-sub{color:var(--muted);font-size:.83rem;margin:0 2px 12px;line-height:1.4}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px}
-  .card{display:flex;flex-direction:column;gap:8px;background:var(--card);border:1px solid var(--line);
-    border-radius:18px;padding:16px;text-decoration:none;color:inherit;min-height:150px;
+  main{max-width:820px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  .card{display:flex;flex-direction:column;gap:9px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:18px;text-decoration:none;color:inherit;min-height:170px;
     transition:transform .12s ease,background .12s ease,border-color .12s ease}
   .card:active{transform:scale(.98)}
   @media(hover:hover){.card:hover{background:var(--card-hover);border-color:var(--accent);transform:translateY(-2px)}}
-  .top{display:flex;align-items:center;gap:10px}
-  .ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
-    font-size:21px;background:rgba(255,255,255,.06);flex:none}
-  .card h3{margin:0;font-size:1rem;line-height:1.25}
-  .what{margin:0;font-size:.82rem;color:var(--muted);line-height:1.4}
-  .use{margin:0;font-size:.82rem;line-height:1.4;color:var(--text)}
+  .top{display:flex;align-items:center;gap:11px}
+  .ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:23px;background:rgba(255,255,255,.06);flex:none}
+  .card h3{margin:0;font-size:1.08rem;line-height:1.25}
+  .what{margin:0;font-size:.85rem;color:var(--muted);line-height:1.45}
+  .use{margin:0;font-size:.85rem;line-height:1.45;color:var(--text)}
   .use b{color:var(--accent2);font-weight:700}
-  .meta{margin-top:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-top:4px}
+  .meta{margin-top:auto;display:flex;gap:7px;align-items:center;flex-wrap:wrap;padding-top:5px}
   .pill{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;
-    padding:2px 9px;color:var(--muted);font-size:.7rem;font-weight:600}
+    padding:2px 10px;color:var(--muted);font-size:.71rem;font-weight:600}
   .pill.acc{color:var(--accent2);border-color:rgba(217,164,65,.4)}
-  .note{background:var(--card);border:1px dashed var(--line);border-radius:18px;padding:16px 18px;
-    color:var(--muted);font-size:.85rem;line-height:1.55;margin:30px 0 0}
-  .note b{color:var(--text)}
-  .hidden{display:none}
-  footer{max-width:860px;margin:34px auto 0;text-align:center;color:var(--muted);font-size:.76rem;line-height:1.6}
+  footer{max-width:820px;margin:34px auto 0;text-align:center;color:var(--muted);font-size:.76rem;line-height:1.6}
 </style>
 </head>
 <body>
@@ -66,188 +53,48 @@
       KSH Construction
     </a>
     <div class="title-row"><span class="dot"></span><h1>Asset Library</h1></div>
-    <p class="sub">Every KSH print, sales &amp; media asset — what it is, what it's for, and where it lives.
-    Files open in Google Drive (gio@shiftvisionmedia.com), organized inside the <b>KSH</b> folder.</p>
+    <p class="sub">The five KSH sales tools — always the latest version, ready to open, print, or send from any computer.</p>
   </header>
   <main>
-    <input class="search" id="q" type="search" placeholder="Search assets… (e.g. portfolio, Crommett, banner)">
-    <div id="cats"></div>
+    <div class="grid">
 
-    <div class="note">
-      <b>Housekeeping:</b> the files above are the clean, organized copies inside <b>KSH → Print &amp; Sales Assets / Estimates &amp; Proposals / Meeting Notes &amp; Internal Docs</b>.
-      The original loose copies still sit in the root of My Drive (including <b>3 duplicate uploads of KSH_Designer_Booklet_v2.pdf</b> from May 19) — safe to move to trash once you confirm the organized copies open fine.
+      <a class="card" href="ksh-client-presentation.pdf" target="_blank" rel="noopener">
+        <div class="top"><div class="ico">🖥️</div><h3>Client Presentation (Home Show Slideshow)</h3></div>
+        <p class="what">25-slide "Selected Works" deck — company history, Kyle &amp; the team, roles, featured projects. The presentation that runs at home shows and client meetings.</p>
+        <p class="use"><b>Use:</b> present full-screen at shows &amp; consultations, or send after a first meeting. Email-ready copy here; full-res original lives in the KSH client folder (Drive).</p>
+        <div class="meta"><span class="pill acc">LATEST · JUN 2026</span><span class="pill">Slideshow · PDF · 25 pages</span></div>
+      </a>
+
+      <a class="card" href="flipbook.html" target="_blank" rel="noopener">
+        <div class="top"><div class="ico">📖</div><h3>Designer Book</h3></div>
+        <p class="what">The booklet for interior designers &amp; architects — "the drawings are the decision," no-substitution guarantee, partnership pitch, featured projects. Opens as the interactive flipbook (Version 2, June 2 — the most current edition).</p>
+        <p class="use"><b>Use:</b> send the flipbook link to designers/architects you want referrals from, or print the PDF (in Drive → KSH → Print &amp; Sales Assets) for in-person handoffs.</p>
+        <div class="meta"><span class="pill acc">LATEST · V2 · JUN 2 2026</span><span class="pill">Flipbook + print PDF</span></div>
+      </a>
+
+      <a class="card" href="ksh-estimator.html" target="_blank" rel="noopener">
+        <div class="top"><div class="ico">🧮</div><h3>Estimate Builder</h3></div>
+        <p class="what">The estimating tool — takes raw numbers and turns them into a polished, branded client proposal (used for McNeal, Baucher, Crommett).</p>
+        <p class="use"><b>Use:</b> build every client-facing estimate here so they all go out looking consistent and professional.</p>
+        <div class="meta"><span class="pill acc">LIVE TOOL</span><span class="pill">App · in this hub</span></div>
+      </a>
+
+      <a class="card" href="https://drive.google.com/file/d/1aRFtVOBjhi2dfz3ZurdLDgzksa4nJKKp/view" target="_blank" rel="noopener">
+        <div class="top"><div class="ico">📦</div><h3>Estimate Leave-Behind Packet</h3></div>
+        <p class="what">The folder left with homeowners at every estimate visit — Kyle's letter, the in-house team, "we protect the design" philosophy, featured projects, process, testimonials.</p>
+        <p class="use"><b>Use:</b> print on heavy matte stock and leave behind at each estimate — it keeps selling while the client decides.</p>
+        <div class="meta"><span class="pill acc">LATEST · JUL 2 2026</span><span class="pill">Print · PDF</span></div>
+      </a>
+
+      <a class="card" href="ksh-portfolio-latest.pdf" target="_blank" rel="noopener">
+        <div class="top"><div class="ico">📕</div><h3>Portfolio (Latest — v7)</h3></div>
+        <p class="what">The current "Selected Works &amp; Client Handbook" — v7 with section dividers and photo gallery (Apr 28). Replaces v4; older versions are archived in the KSH Brand System folder.</p>
+        <p class="use"><b>Use:</b> the portfolio to send out to prospective clients. This copy is email-sized (3 MB); the full print-resolution file is in the KSH client folder → KSH Brand System → "KSH Portfolio (latest).pdf".</p>
+        <div class="meta"><span class="pill acc">LATEST · V7 · APR 28 2026</span><span class="pill">Send-out · PDF · 17 pages</span></div>
+      </a>
+
     </div>
   </main>
   <footer>KSH Construction · Asset Library · maintained in Gio's Hub — updates on every deploy.</footer>
-
-<script>
-const CATS = [
-  {
-    name:'Print & Sales Assets',
-    link:'https://drive.google.com/drive/folders/1nPbG4Dla8SISBVIb4NZ-F02UKBjLs-AL',
-    sub:'The client-facing printed pieces. Print on heavy matte stock; all include CSLB #962269 and (619) 987-2700.',
-    items:[
-      { icon:'📦', name:'Estimate Leave-Behind Packet', date:'Jul 2026', tag:'Print · PDF', acc:'NEWEST',
-        what:'Letter from Kyle + company one-pager, in-house team, philosophy ("we protect the design"), 4 featured projects, craft details, 5-step process, testimonials & "note on fit".',
-        use:'<b>Use:</b> printed & left with homeowners at every estimate visit — the follow-up piece that sells while they decide.',
-        href:'https://drive.google.com/file/d/1aRFtVOBjhi2dfz3ZurdLDgzksa4nJKKp/view' },
-      { icon:'📕', name:'Portfolio v4 — Selected Works & Client Handbook', date:'Apr 2026', tag:'Print · PDF', acc:'CURRENT',
-        what:'Client-facing portfolio: about/team roles, 5 featured projects (Skyline View, Cottage, Fairway Haven, Vista Azul, Serenity In Stone), 3-phase process, Job Tread communication cadence, begin-your-build QR.',
-        use:'<b>Use:</b> the main printed portfolio for prospective homeowners — consultations, office copies, mailers.',
-        href:'https://drive.google.com/file/d/1JOMWCBf4f2R92nPrPi8AGXW8U2KzfsFq/view' },
-      { icon:'📘', name:'Portfolio — earlier edition', date:'Apr 2026', tag:'Print · PDF',
-        what:'First edition of Selected Works & Client Handbook (5 projects incl. Coastal Crest, 5-phase process, full team roster). Superseded by v4.',
-        use:'<b>Use:</b> archive/reference only — print v4 instead.',
-        href:'https://drive.google.com/file/d/1XuPDS71fbkldpHHaw2JekBFZ4YBvQOSq/view' },
-      { icon:'📖', name:'Designer Booklet v2', date:'May 2026', tag:'Print · PDF',
-        what:'Booklet aimed at interior designers & architects: "the drawings are the decision" philosophy, no-substitution guarantee, designer partnership pitch, 6 featured projects, Kyle\'s note on craft & trust.',
-        use:'<b>Use:</b> hand or mail to designers/architects you want referrals from; pairs with the Designer Network dashboard. Digital version: Design Gallery → Designer Flipbook.',
-        href:'https://drive.google.com/file/d/1qF_91NNIbXkiy0QIgfTbuEWBI5lDCHiy/view' },
-      { icon:'👥', name:'Team Directory', date:'Feb 2025', tag:'Print · PDF',
-        what:'Photo directory of the full KSH team (Kyle, Chris, Andrew, Jeff, Erin, Leonard, site leads, electricians, carpenters).',
-        use:'<b>Use:</b> onboarding, office wall, and as the headshot source for other print pieces.',
-        href:'https://drive.google.com/file/d/1HF7V0veYvs7Jxbm9Ow3ke6znGNT_ZWry/view' },
-      { icon:'🪧', name:'Step-and-Repeat Banner', date:'Apr 2025', tag:'Large format · PDF',
-        what:'Repeating KSH logo backdrop artwork.',
-        use:'<b>Use:</b> send to a large-format printer for event/photo backdrops, job-site fencing or booth walls.',
-        href:'https://drive.google.com/file/d/1rmE2tCQ2z0kBUmaezlHQZzldBJV93ijW/view' }
-    ]
-  },
-  {
-    name:'Estimates & Proposals',
-    link:'https://drive.google.com/drive/folders/1LH4K7x_iKxBtQ5PjNgyAISvz2FviVRF8',
-    sub:'Live pricing documents. For new ones, use the Estimate Builder app on the KSH page of this hub.',
-    items:[
-      { icon:'🌿', name:'Crommett — SDLR Landscape Budget Proposal', date:'Jun 30, 2026 · valid 60 days', tag:'Proposal · PDF', acc:'ACTIVE',
-        what:'SDLR budget proposal to KSH (as GC) for the Crommett residence, La Jolla — three build options: Value-Engineered $500k / Design-Intent $715k (recommended) / Premium $900k, with scope, schedule & exclusions.',
-        use:'<b>Use:</b> print or forward to the KSH team for GC packaging on the Crommett exterior scope.',
-        href:'https://drive.google.com/file/d/1ByRL_1XcIHP0eYZCeW2isD2kxzlt3Tjs/view' },
-      { icon:'🧮', name:'Crommett — SDLR Estimate v1', date:'Jun 2026', tag:'Sheet',
-        what:'Internal line-item cost buildup behind the Crommett proposal.',
-        use:'<b>Use:</b> internal numbers only — never client-facing.',
-        href:'https://docs.google.com/spreadsheets/d/14XonDsxDbdkTqXcV_l-cBs7RIfV5CFxAuxUyTXTgSNQ/edit' },
-      { icon:'📊', name:'Crommett — SDLR Estimate by Category', date:'Jul 2026', tag:'Sheet',
-        what:'Same estimate broken out by trade category (7100 Landscaping … 7600 Exterior Structures).',
-        use:'<b>Use:</b> category totals for GC-format budgets & true-ups as plans develop.',
-        href:'https://docs.google.com/spreadsheets/d/1AEbgantplXcubmcBeh7P6W61Zu5C_mRh5uemxdYTRk4/edit' }
-    ]
-  },
-  {
-    name:'Meeting Notes & Internal Docs',
-    link:'https://drive.google.com/drive/folders/1p3swU67dOq-p3zUpnG3eEp0jcXwYOgcR',
-    sub:'Working documents — internal only. New recordings: use the Meeting Recorder app.',
-    items:[
-      { icon:'📝', name:'Herbert — Meeting Notes', date:'May 18, 2026', tag:'Doc',
-        what:'Notes from the Herbert project meeting.',
-        use:'<b>Use:</b> project reference for the Herbert job.',
-        href:'https://docs.google.com/document/d/1lQa4RowDCLpvvEYgcPViSzoMDqJs6YvDi8vZKGxJl6U/edit' },
-      { icon:'🗂️', name:'Herbert — Master Meeting Notes', date:'May 18, 2026', tag:'Doc',
-        what:'Consolidated running record of all Herbert meetings.',
-        use:'<b>Use:</b> the single source of truth for Herbert decisions.',
-        href:'https://docs.google.com/document/d/1L36FUZ7PgNEvKOBRosWP4W2R5prVyrIjs9RGTW_ns8I/edit' },
-      { icon:'👤', name:'Herbert — Andrew Summary', date:'May 18, 2026', tag:'Doc',
-        what:'Summary of Andrew Amato\'s estimating input on Herbert.',
-        use:'<b>Use:</b> estimating context when pricing Herbert scope.',
-        href:'https://docs.google.com/document/d/1jWH0EvywaY6RnqeKDR6C_mO9_AJ6MfiMw30vMydySHg/edit' },
-      { icon:'📝', name:'Crommett — Meeting Notes', date:'Jun 5, 2026', tag:'Doc',
-        what:'Notes from the Crommett project meeting with KSH.',
-        use:'<b>Use:</b> background for the Crommett proposal & estimates above.',
-        href:'https://docs.google.com/document/d/1LQ1RMpYLuzc4xS8Xvs4DtrxmXw9xYx_RykbFPj_DW1g/edit' },
-      { icon:'🤝', name:'Salary Negotiation Reference', date:'Jun 17, 2026', tag:'Doc · Private',
-        what:'Reference notes for KSH salary/compensation discussions.',
-        use:'<b>Use:</b> private — do not share or print.',
-        href:'https://docs.google.com/document/d/1KsYovDDMDUgYhUD29QwGC5f9WhqCRF7LgZ2sXZRFGUc/edit' },
-      { icon:'📋', name:'Marketing Responsibilities', date:'Feb 2025', tag:'Doc',
-        what:'Shift Vision Media\'s marketing scope of work for KSH.',
-        use:'<b>Use:</b> scope reference for what SVM owns vs. KSH.',
-        href:'https://docs.google.com/document/d/15cSTm3PXBXrgcSG-auVi4DENgK5M0o6uvE4YcDLQ6Zw/edit' },
-      { icon:'📈', name:'Master Marketing & Sales Dashboard', date:'2025', tag:'Sheet',
-        what:'Marketing & sales tracking spreadsheet (leads, campaigns, pipeline).',
-        use:'<b>Use:</b> historical tracker — newer ad data lives in the Google Ads app on this hub.',
-        href:'https://docs.google.com/spreadsheets/d/17SPSwhknHJM1K9RDqnmFIpqDliYKKkn0pDalVBPqOvs/edit' }
-    ]
-  },
-  {
-    name:'Brand & Logos',
-    link:'https://drive.google.com/drive/folders/1mdJTxx_j0043MGyvYCaqIir0a_mKehWw',
-    sub:'Identity files — use these, don\'t screenshot.',
-    items:[
-      { icon:'🔷', name:'Logos (working set)', date:'Feb 2025', tag:'PNG/JPG',
-        what:'KSH logo files: blue-background PNGs (full & mark), logotype JPG, 9000_KSH_LOGO_B.',
-        use:'<b>Use:</b> pull logo files from here for any print or digital piece.',
-        href:'https://drive.google.com/drive/folders/1mdJTxx_j0043MGyvYCaqIir0a_mKehWw' },
-      { icon:'🎨', name:'KSH Logo (original delivery)', date:'2024', tag:'Folder',
-        what:'Original logo delivery folder (shared by Clint).',
-        use:'<b>Use:</b> source files if you need versions not in the working set.',
-        href:'https://drive.google.com/drive/folders/19CAGRE1bCaep3xEEHtUSC2MLBK0J_Lxk' },
-      { icon:'🎞️', name:'KSH Background Video', date:'Feb 2025', tag:'Video',
-        what:'Brand background/loop video.',
-        use:'<b>Use:</b> website headers, presentations, screens at events.',
-        href:'https://drive.google.com/drive/folders/1yqRS93e2WT62AvGu6fE4qGirVIg_0W5x' }
-    ]
-  },
-  {
-    name:'Video & Photo Projects',
-    link:'https://drive.google.com/drive/folders/1-2iOlzZPaeC7KKifkBWlQiD2IWE5CEog',
-    sub:'Raw footage & finished media, by project, inside the main KSH folder.',
-    items:[
-      { icon:'🏠', name:'Blair project footage (series)', date:'2024–2025', tag:'~20 folders',
-        what:'Dated shoot folders covering the whole Blair build: framing, drywall, cabinets, pergola, exterior/interior, recap. Plus "Blair Final Photos" stills.',
-        use:'<b>Use:</b> source for reels, before/afters & portfolio updates on the Blair project.',
-        href:'https://drive.google.com/drive/folders/1-2iOlzZPaeC7KKifkBWlQiD2IWE5CEog' },
-      { icon:'🔨', name:'Herbert Floor Demo', date:'Aug 2025', tag:'Footage',
-        what:'Demo-day footage from the Herbert project.',
-        use:'<b>Use:</b> demo/transformation reel content.',
-        href:'https://drive.google.com/drive/folders/1Sm5GknJLWkltyHo7WYpeoaz5Cc3Q28li' },
-      { icon:'🎬', name:'Taylor — Final Project Video', date:'Dec 2024', tag:'Final',
-        what:'Finished project video for the Taylor job.',
-        use:'<b>Use:</b> ready to post/share as-is.',
-        href:'https://drive.google.com/drive/folders/1biCUr_tEhP8jWdvD2WjpHqbh8vk_ezJw' },
-      { icon:'📱', name:"Kyle's Reels", date:'Oct 2025', tag:'Reels',
-        what:'Short-form reel content featuring Kyle.',
-        use:'<b>Use:</b> Instagram/Facebook reels for KSH.',
-        href:'https://drive.google.com/drive/folders/1Qq9HKWzMe4C5BqawfMdk52E5Xna3AGXS' },
-      { icon:'⚽', name:'Soccer sponsorship media', date:'2024', tag:'3 folders',
-        what:'KSH Soccer Girls Reel, Soccer Game & Kyle\'s Soccer Game — community/sponsorship footage.',
-        use:'<b>Use:</b> community-involvement posts.',
-        href:'https://drive.google.com/drive/folders/1KYhcvx4xnFcFIMBiorlcMFFzAhrqNqDt' },
-      { icon:'🎥', name:'Finished & early projects', date:'2024', tag:'4 folders',
-        what:'Final Videos, Final 1st Street, Valley Center, Rancho Sante Fe — completed edits & early project media.',
-        use:'<b>Use:</b> evergreen portfolio clips.',
-        href:'https://drive.google.com/drive/folders/1vhjCWpmdP_cOGjem8_LWX0CRT-h13tlS' }
-    ]
-  }
-];
-
-const wrap = document.getElementById('cats');
-wrap.innerHTML = CATS.map((c,ci)=>`
-  <section class="cat" data-ci="${ci}">
-    <div class="cat-head"><h2>${c.name}</h2><a href="${c.link}" target="_blank" rel="noopener">Open folder in Drive ↗</a></div>
-    <p class="cat-sub">${c.sub}</p>
-    <div class="grid">
-      ${c.items.map(it=>`
-        <a class="card" href="${it.href}" target="_blank" rel="noopener" data-s="${(it.name+' '+it.what+' '+it.tag).toLowerCase().replace(/"/g,'')}">
-          <div class="top"><div class="ico">${it.icon}</div><h3>${it.name}</h3></div>
-          <p class="what">${it.what}</p>
-          <p class="use">${it.use}</p>
-          <div class="meta">
-            ${it.acc?`<span class="pill acc">${it.acc}</span>`:''}
-            <span class="pill">${it.tag}</span><span class="pill">${it.date}</span>
-          </div>
-        </a>`).join('')}
-    </div>
-  </section>`).join('');
-
-document.getElementById('q').addEventListener('input', e=>{
-  const q = e.target.value.trim().toLowerCase();
-  document.querySelectorAll('.card').forEach(card=>{
-    card.classList.toggle('hidden', q && !card.dataset.s.includes(q));
-  });
-  document.querySelectorAll('.cat').forEach(sec=>{
-    const any = [...sec.querySelectorAll('.card')].some(c=>!c.classList.contains('hidden'));
-    sec.classList.toggle('hidden', !any);
-  });
-});
-</script>
 </body>
 </html>
