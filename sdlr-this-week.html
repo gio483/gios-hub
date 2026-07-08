@@ -167,10 +167,10 @@ function postCard(p){
   const multi=imgs.length>1;
   let cur=0;
   const thumbsHtml=multi?`
-      <div class="thumbs" style="display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:rgba(0,0,0,.35);-webkit-overflow-scrolling:touch">
+      <div class="thumbs" style="position:absolute;left:0;right:0;bottom:0;z-index:3;display:flex;gap:6px;overflow-x:auto;padding:24px 10px 8px;background:linear-gradient(transparent,rgba(0,0,0,.78));-webkit-overflow-scrolling:touch">
         ${imgs.map((u,i)=>`
-        <div data-thumb="${i}" style="position:relative;flex:0 0 auto;cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid ${i===0?'#c9b37e':'transparent'}">
-          <img src="${u}" style="width:56px;height:70px;object-fit:cover;display:block" loading="lazy">
+        <div data-thumb="${i}" style="position:relative;flex:0 0 auto;width:60px;height:75px;cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid ${i===0?'#c9b37e':'rgba(255,255,255,.25)'}">
+          <img src="${u}" style="width:56px;height:71px;object-fit:cover;display:block" loading="lazy">
           <span style="position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.72);color:#fff;font-size:10px;line-height:1;padding:2px 5px;border-radius:4px">${i+1}</span>
         </div>`).join('')}
       </div>`:'';
@@ -184,8 +184,8 @@ function postCard(p){
         ${multi?`<span class="chip">🖼 ${imgs.length} slides</span>`:''}
       </div>
       <div class="donestamp">Scheduled ✓</div>
+      ${thumbsHtml}
     </div>
-    ${thumbsHtml}
     <div class="pbody">
       <div class="meta"><span><b>Post on:</b> ${p.platform}</span>${p.geotag?` <span>· <b>Geotag:</b> ${p.geotag}</span>`:''}</div>
       <p class="hook">${p.hook}</p>
