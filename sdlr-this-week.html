@@ -163,31 +163,63 @@ function updateProgress(){
 function postCard(p){
   const card=document.createElement('div');card.className='post';card.id='card-'+p.id;
   const captionFull=p.caption+'\n\n'+p.hashtags;
+  const imgs=(Array.isArray(p.images)&&p.images.length)?p.images:[p.image];
+  const multi=imgs.length>1;
+  let cur=0;
+  const thumbsHtml=multi?`
+      <div class="thumbs" style="display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:rgba(0,0,0,.35);-webkit-overflow-scrolling:touch">
+        ${imgs.map((u,i)=>`
+        <div data-thumb="${i}" style="position:relative;flex:0 0 auto;cursor:pointer;border-radius:6px;overflow:hidden;border:2px solid ${i===0?'#c9b37e':'transparent'}">
+          <img src="${u}" style="width:56px;height:70px;object-fit:cover;display:block" loading="lazy">
+          <span style="position:absolute;left:3px;bottom:3px;background:rgba(0,0,0,.72);color:#fff;font-size:10px;line-height:1;padding:2px 5px;border-radius:4px">${i+1}</span>
+        </div>`).join('')}
+      </div>`:'';
   card.innerHTML=`
     <div class="imgwrap">
-      <img src="${p.image}" alt="${(p.alt||'').replace(/"/g,'&quot;')}" loading="lazy">
+      <img class="mainimg" src="${imgs[0]}" alt="${(p.alt||'').replace(/"/g,'&quot;')}" loading="lazy" style="${multi?'cursor:zoom-in':''}">
       <div class="chips">
         <span class="chip day">${p.day} · ${p.date}</span>
         <span class="chip">${p.time}</span>
         <span class="chip">${p.style}</span>
+        ${multi?`<span class="chip">🖼 ${imgs.length} slides</span>`:''}
       </div>
       <div class="donestamp">Scheduled ✓</div>
     </div>
+    ${thumbsHtml}
     <div class="pbody">
-      <div class="meta"><span><b>Post on:</b> ${p.platform}</span></div>
+      <div class="meta"><span><b>Post on:</b> ${p.platform}</span>${p.geotag?` <span>· <b>Geotag:</b> ${p.geotag}</span>`:''}</div>
       <p class="hook">${p.hook}</p>
       <div class="caption">${p.caption}</div>
       <div class="tags">${p.hashtags}</div>
       <div class="btnrow">
         <button class="act dl full" data-act="dl">⬇ Download image</button>
+        ${multi?'<button class="act dl full" data-act="dlall">⬇ Download all slides</button>':''}
         <button class="act primary" data-act="capall">⧉ Copy caption + tags</button>
         <button class="act" data-act="cap">Copy caption</button>
         <button class="act sched full" data-act="sched">Mark scheduled ✓</button>
       </div>
-      <div class="ioshelp">iPhone: if Download opens the photo, press &amp; hold → Save to Photos.</div>
+      <div class="ioshelp">${multi?'Carousel: download every slide, then add them in numbered order in the Instagram app. ':''}iPhone: if Download opens the photo, press &amp; hold → Save to Photos.</div>
     </div>`;
-  const fn=(p.image.split('/').pop())||(p.id+'.jpg');
-  card.querySelector('[data-act=dl]').onclick=e=>download(p.image,fn,e.currentTarget);
+  const mainImg=card.querySelector('.mainimg');
+  const dlBtn=card.querySelector('[data-act=dl]');
+  const fname=i=>(imgs[i].split('/').pop())||(p.id+'-'+(i+1)+'.jpg');
+  const setCur=i=>{
+    cur=i;mainImg.src=imgs[i];
+    if(multi){dlBtn.innerHTML='⬇ Download slide '+(i+1)+' / '+imgs.length;
+      card.querySelectorAll('[data-thumb]').forEach((t,j)=>t.style.border='2px solid '+(j===i?'#c9b37e':'transparent'));}
+  };
+  if(multi){
+    dlBtn.innerHTML='⬇ Download slide 1 / '+imgs.length;
+    card.querySelectorAll('[data-thumb]').forEach(t=>t.onclick=()=>setCur(+t.dataset.thumb));
+    mainImg.onclick=()=>window.open(imgs[cur],'_blank');
+    card.querySelector('[data-act=dlall]').onclick=async e=>{
+      const b=e.currentTarget,o=b.innerHTML;
+      for(let i=0;i<imgs.length;i++){b.innerHTML='⬇ Slide '+(i+1)+' of '+imgs.length+'…';
+        try{await download(imgs[i],fname(i),b);}catch(_){}}
+      b.innerHTML='All slides done ✓';toast('All '+imgs.length+' slides downloaded');setTimeout(()=>b.innerHTML=o,2200);
+    };
+  }
+  dlBtn.onclick=e=>download(imgs[cur],fname(cur),e.currentTarget);
   card.querySelector('[data-act=capall]').onclick=e=>copyText(captionFull,e.currentTarget,'Caption + tags');
   card.querySelector('[data-act=cap]').onclick=e=>copyText(p.caption,e.currentTarget,'Caption');
   const sb=card.querySelector('[data-act=sched]');
