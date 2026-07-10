@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>KSH — Networking Events & Schedule</title>
+<link rel="icon" href="icon-192.png">
+<style>
+  :root{
+    /* KSH palette — Ocean Blue #3f97d3 · Gold #d9a441 · deep navy */
+    --bg:#06121f; --panel:#0d2136; --panel2:#123049; --ink:#eaf3fb; --muted:#90aecb;
+    --line:#1d3f5c; --blue:#3f97d3; --blue2:#7fc0ec; --gold:#d9a441; --gold2:#f0cd7f;
+    --green:#54b98a; --red:#e07a6b;
+    --serif:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+    --sans:'Helvetica Neue',Arial,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:radial-gradient(1100px 600px at 50% -10%,#0e2c47 0%,var(--bg) 60%) fixed,var(--bg);
+    color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:70px}
+  .wrap{max-width:940px;margin:0 auto;padding:0 16px}
+  header.top{padding:24px 0 14px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;
+    background:linear-gradient(180deg,var(--bg) 78%,rgba(6,18,31,.92));backdrop-filter:blur(6px)}
+  .kicker{letter-spacing:.28em;text-transform:uppercase;font-size:10px;color:var(--gold);margin-bottom:6px}
+  h1{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.05;margin:0}
+  .sub{font-size:13px;color:var(--muted);margin-top:6px;max-width:640px}
+  .reload{background:var(--panel2);border:1px solid var(--line);color:var(--gold2);border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;float:right}
+  .reload:active{transform:scale(.97)}
+
+  /* strategy card */
+  details.play{margin:16px 0 4px;background:linear-gradient(180deg,var(--panel),#0a1c2e);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  details.play summary{padding:15px 16px;cursor:pointer;font-size:14px;color:var(--gold2);font-weight:700;list-style:none;display:flex;align-items:center;gap:8px}
+  details.play summary::-webkit-details-marker{display:none}
+  details.play summary::before{content:"▸";color:var(--gold);font-size:12px}
+  details.play[open] summary::before{content:"▾"}
+  .playbody{padding:0 18px 18px;font-size:14px;color:#cfe0f0}
+  .playbody h4{font-family:var(--serif);font-size:18px;color:var(--blue2);margin:16px 0 6px;font-weight:600}
+  .playbody p{margin:7px 0}
+  .playbody b{color:var(--gold2)}
+  .playbody .rule{background:var(--panel2);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 13px;margin:10px 0;font-size:13.5px}
+
+  /* filters */
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 4px;align-items:center}
+  .fgroup{display:flex;flex-wrap:wrap;gap:6px}
+  .chipbtn{font-size:12px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer;transition:.15s;white-space:nowrap}
+  .chipbtn:active{transform:scale(.96)}
+  .chipbtn.on{background:var(--blue);color:#05121f;border-color:var(--blue);font-weight:700}
+  .chipbtn.on.gold{background:var(--gold);border-color:var(--gold)}
+  .fsep{width:1px;height:20px;background:var(--line);margin:0 3px}
+  .viewtabs{display:flex;gap:6px;margin:14px 0 2px}
+  .viewtab{flex:1;text-align:center;font-size:13px;font-weight:700;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+  .viewtab.on{background:var(--panel2);color:var(--gold2);border-color:var(--gold)}
+  .count{font-size:12px;color:var(--muted);margin:14px 4px 4px}
+
+  /* month header for schedule view */
+  .monthhead{font-family:var(--serif);font-size:22px;color:var(--gold2);font-weight:600;margin:22px 4px 10px;padding-bottom:7px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px}
+  .monthhead small{font-size:12px;color:var(--muted);font-family:var(--sans);font-weight:400;letter-spacing:.02em}
+
+  /* event card */
+  .grid{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:720px){.grid{grid-template-columns:1fr 1fr}.grid.sched{grid-template-columns:1fr}}
+  .ev{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 15px 13px;position:relative;transition:.15s;border-left:4px solid var(--line)}
+  .ev.cat-designers{border-left-color:var(--gold)}
+  .ev.cat-cars{border-left-color:#c76b9a}
+  .ev.cat-social{border-left-color:var(--blue)}
+  .ev.cat-industry{border-left-color:var(--green)}
+  .ev.done{opacity:.62}
+  .ev.hidden{display:none}
+  .ev .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .ev .date{font-size:12px;color:var(--gold2);font-weight:700;letter-spacing:.02em}
+  .ev .date .cad{color:var(--muted);font-weight:400}
+  .ev h3{font-family:var(--serif);font-size:20px;line-height:1.15;margin:5px 0 3px;color:var(--ink);font-weight:600}
+  .ev .tags{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0 9px}
+  .t{font-size:10px;letter-spacing:.03em;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted);text-transform:uppercase;font-weight:600}
+  .t.cat{color:var(--ink)}
+  .t.p1{background:var(--gold);color:#1a1206;border-color:var(--gold)}
+  .t.p2{background:rgba(63,151,211,.18);color:var(--blue2);border-color:transparent}
+  .t.who{background:var(--panel2);color:var(--gold2)}
+  .t.flag{background:rgba(224,122,107,.14);color:var(--red);border-color:transparent;text-transform:none}
+  .ev .why{font-size:13px;color:#cfe0f0;margin:2px 0 9px}
+  .ev .meta{font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--line);padding-top:9px}
+  .ev .meta b{color:var(--blue2);font-weight:600}
+  .ev .actions{display:flex;gap:8px;margin-top:11px}
+  .ev .actions a,.ev .actions button{flex:1;text-align:center;font-size:12.5px;font-weight:600;padding:9px;border-radius:9px;border:1px solid var(--line);cursor:pointer;text-decoration:none;transition:.15s}
+  .ev .actions a{background:var(--panel2);color:var(--blue2)}
+  .ev .actions a:active{transform:scale(.98)}
+  .stbtn{background:transparent;color:var(--muted)}
+  .stbtn.plan{background:rgba(63,151,211,.16);color:var(--blue2);border-color:transparent}
+  .stbtn.going{background:var(--green);color:#04160e;border-color:var(--green)}
+  .stbtn.done{background:var(--panel2);color:var(--muted)}
+  .statusdot{position:absolute;top:14px;right:14px;font-size:11px;font-weight:700}
+
+  .footer{border-top:1px solid var(--line);margin-top:30px;padding:20px 0 40px;color:var(--muted);font-size:11.5px;text-align:center;line-height:1.7}
+  .footer a{color:var(--gold2)}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:6px 0 12px;font-size:11px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:5px}
+  .dot{width:9px;height:9px;border-radius:2px;display:inline-block}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <button class="reload" onclick="location.reload()">↻ Reset filters</button>
+  <div class="kicker">KSH Construction · Business Development</div>
+  <h1>Networking Events &amp; Schedule</h1>
+  <p class="sub">Where to physically get in front of high-end designers, architects, and the affluent coastal homeowners who hire them — for the rest of 2026 and into 2027. Tap a card to mark it <b>Planning → Going → Done</b>; your picks are saved on this device.</p>
+</div></header>
+
+<main class="wrap">
+
+  <details class="play" open>
+    <summary>The play — read this first (2 min)</summary>
+    <div class="playbody">
+      <p>KSH is <b>execution-only</b> and its #1 lead source is <b>designers &amp; architects</b>. So the strategy is two-track, not one:</p>
+      <h4>Track 1 · Own the referral engine (designers, architects, the pros)</h4>
+      <p>These rooms are cheap, recurring, and full of the exact people who hand KSH $1M+ projects. The move isn't to "attend" — it's to <b>become a known regular</b>. Join <b>ASID San Diego as an Industry Partner</b> and <b>NKBA San Diego</b>, then show up monthly. Add <b>ProVisors</b> for the wider circle of realtors, wealth managers and attorneys who all touch the same coastal homeowner. This is Gio's lane, year-round.</p>
+      <h4>Track 2 · Stand next to the homeowner (car culture + the social circuit)</h4>
+      <p>Coronado / Point Loma / La Jolla / Rancho Santa Fe wealth gathers at concours, polo Sundays, and marquee galas. You don't sell here — you get <b>known and liked</b>, and you meet them where the designers already are too. This is where <b>Kyle is the face</b> for the high-net-worth rooms; Gio works the recurring, lower-cost ones.</p>
+      <h4>Highest-leverage moves</h4>
+      <p>1) <b>Rancho Santa Fe Cars &amp; Coffee</b> — free, every Saturday, in the wealthiest zip in the county. 2) <b>La Jolla Concours VIP tier</b> (April) — pay to stand shoulder-to-shoulder with collectors for hours. 3) <b>Sponsor a home tour</b> (La Jolla Modernism, Oct) — your brand in front of design-obsessed homeowners. 4) <b>Host your own</b> designer + agent mixer at The Lodge at Torrey Pines — puts KSH at the center of the room, not the edge.</p>
+      <div class="rule"><b>Bring-to-Kyle note:</b> memberships (ASID IP, NKBA, BIA, a car club) are the real budget ask — a few hundred to ~$1–2K each, but they convert one-off attendance into standing access. Frame them as designer-referral pipeline, not "events."</div>
+      <p style="font-size:12px;color:var(--muted);margin-top:12px">Dates are for 2026 unless noted. Marquee annual events that already happened this year are kept and marked <b>"returns 2027"</b> so you can plan and buy early. A ⚑ flag = date not yet confirmed; verify before committing budget.</p>
+    </div>
+  </details>
+
+  <div class="viewtabs">
+    <div class="viewtab on" data-view="schedule" onclick="setView('schedule')">📅 By month</div>
+    <div class="viewtab" data-view="priority" onclick="setView('priority')">⭐ By priority</div>
+  </div>
+
+  <div class="filters">
+    <div class="fgroup" id="catFilters"></div>
+    <div class="fsep"></div>
+    <div class="fgroup" id="whoFilters"></div>
+  </div>
+  <div class="legend">
+    <span><i class="dot" style="background:var(--gold)"></i> Designers &amp; Architects</span>
+    <span><i class="dot" style="background:#c76b9a"></i> Car culture</span>
+    <span><i class="dot" style="background:var(--blue)"></i> HNW &amp; social</span>
+    <span><i class="dot" style="background:var(--green)"></i> Building industry</span>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div id="list"></div>
+
+</main>
+
+<div class="footer"><div class="wrap">
+  KSH Construction · Networking &amp; relationship calendar · built July 2026<br>
+  A working tracker — dates verified against organizer sites; recurring/monthly groups have no fixed date and show as <em>ongoing</em>. Confirm any ⚑ before spending.
+</div></div>
+
+<script>
+/* ===== EVENT DATA =====
+   cat: designers | cars | social | industry
+   tier: 1 (do first) | 2 (high) | 3 (opportunistic)
+   who: 'Gio' | 'Kyle' | 'Both'
+   sort: sortable YYYYMM key for month view (recurring/ongoing use 0 = pinned top)
+   month: display bucket label
+*/
+const EVENTS = [
+  /* ---------- ONGOING / RECURRING (pinned) ---------- */
+  {id:'asid', cat:'designers', tier:1, who:'Gio', name:'ASID San Diego — monthly chapter meetings',
+   date:'Ongoing · ~3rd Wed', cad:'monthly', month:'Ongoing & recurring', sort:0,
+   why:'The core room of residential interior designers — KSH’s exact referral audience. Next up: Jul 15, Aug 19, Sep 9, Sep 30. Become an Industry Partner for standing access + directory listing designers actually use.',
+   cost:'~$25–$45/meeting · IP membership ~$500/yr', access:'Non-members welcome; IP membership recommended',
+   venue:'Rotating luxury showrooms (Artisan West, etc.)', url:'https://casd.asid.org/events/'},
+  {id:'nkba', cat:'designers', tier:1, who:'Gio', name:'NKBA San Diego — monthly chapter meetings',
+   date:'Ongoing · ~2nd Tue', cad:'monthly', month:'Ongoing & recurring', sort:0, flag:'H2 dates TBD',
+   why:'The most consistent, designer-dense room in the county — kitchen & bath designers who subcontract GCs, hosted inside high-end showrooms. Gold for trade relationships.',
+   cost:'~$10–$30', access:'Open to guests', venue:'Luxury showrooms (Stone Systems, Reece, DuChateau)', url:'https://kb.nkba.org/chapters/san-diego/events/'},
+  {id:'provisors', cat:'social', tier:1, who:'Gio', name:'ProVisors — San Diego groups',
+   date:'Ongoing · monthly', cad:'monthly', month:'Ongoing & recurring', sort:0,
+   why:'Vetted "trusted advisor" network — realtors, wealth managers, attorneys, architects, designers all serving the same wealthy homeowner. The single best structured room for the referrers around KSH’s buyer.',
+   cost:'Membership + application; guest via member invite', access:'Application / member-invite', venue:'Various SD county home groups', url:'https://www.provisors.com/san-diego-networking-group/'},
+  {id:'rsfcc', cat:'cars', tier:1, who:'Both', name:'Rancho Santa Fe Cars & Coffee',
+   date:'Every Saturday AM', cad:'weekly · free', month:'Ongoing & recurring', sort:0,
+   why:'Free, weekly, and literally in the wealthiest village in the county. Hypercars + their owners over coffee — the cheapest way to build repeat familiarity with exactly the buyer profile. Kyle should appear here regularly.',
+   cost:'Free, walk-up', access:'Open', venue:'Paseo Delicias & Ave De Acacias, Rancho Santa Fe', url:'https://www.ranchosantafecarsandcoffee.com/'},
+  {id:'brokers', cat:'social', tier:1, who:'Gio', name:'Luxury broker relationships — Willis Allen / Pacific Sotheby’s / Compass',
+   date:'Ongoing · relationship', cad:'year-round', month:'Ongoing & recurring', sort:0,
+   why:'High-end broker opens are ad-hoc and invite-only — there’s no public calendar. The durable channel is partnering with top La Jolla/RSF/Del Mar agents: offer pre-sale renovation walk-throughs, co-host a listing event. Feeds both designers and listings.',
+   cost:'Relationship (free)', access:'Direct outreach to top agents', venue:'La Jolla · Rancho Santa Fe · Del Mar', url:'https://www.willisallen.com/'},
+  {id:'nari', cat:'designers', tier:2, who:'Gio', name:'NARI San Diego — monthly chapter events',
+   date:'Ongoing · monthly', cad:'monthly', month:'Ongoing & recurring', sort:0, flag:'Dates posted per-event',
+   why:'Remodeler + trade peer network (Murray Lampert, Jackson, Marrokal gather here). More about trade partners and subs than reaching homeowners, but worth membership as a high-end remodeler.',
+   cost:'Free members / ~$35 visitors', access:'Open; membership recommended', venue:'Member-hosted', url:'https://www.narisandiego.org/events'},
+  {id:'bia', cat:'industry', tier:2, who:'Gio', name:'BIA San Diego — mixers, golf & councils',
+   date:'Ongoing · near-weekly', cad:'ongoing', month:'Ongoing & recurring', sort:0,
+   why:'County’s core homebuilding association — builders, developers, specialty trades. Join for the Sales & Marketing Council, "Bagels & Brews" mornings, golf tournaments and the ICON Awards. Best sustained access to the building side.',
+   cost:'Membership-based', access:'Join for full access', venue:'Various', url:'https://biasandiego.org/bia-events/'},
+  {id:'pca', cat:'cars', tier:2, who:'Both', name:'Porsche Club (PCA-SDR) / Ferrari Owners Club–SD',
+   date:'Ongoing · join', cad:'year-round', month:'Ongoing & recurring', sort:0,
+   why:'Porsche/Ferrari ownership overlaps hard with KSH’s buyer (business owners, affluent pros). Months of repeat, relationship-based contact via drives & socials. FOC-SD notably welcomes enthusiasts, not just owners — an easy front door.',
+   cost:'Club dues (varies)', access:'Membership (FOC-SD open to enthusiasts)', venue:'Drives, socials, track days', url:'https://www.focsandiego.com/membership/'},
+  {id:'showrooms', cat:'designers', tier:2, who:'Gio', name:'Luxury showroom trade nights (Ferguson, Cosentino, Artisan West, DuChateau)',
+   date:'Ongoing · relationship', cad:'varies', month:'Ongoing & recurring', sort:0,
+   why:'The showrooms that host ASID/NKBA also run their own designer/builder evenings. Build direct relationships and KSH gets invited to the trade nights where designers gather. Ask each about co-sponsoring a mixer.',
+   cost:'Usually free (trade)', access:'Trade relationship', venue:'Kearny Mesa / Miramar design corridor', url:'https://www.fergusonhome.com/showroom/branch/san-diego-ca-showroom-0674'},
+  {id:'polo', cat:'social', tier:2, who:'Both', name:'San Diego Surf Polo — Sunday matches',
+   date:'Sundays · May–Sept', cad:'weekly in season', month:'Ongoing & recurring', sort:0, flag:'2026 schedule unconfirmed',
+   why:'Public Sunday polo with tailgating, wine tastings and cabana tables in Rancho Santa Fe — one of the cheapest, most repeatable ways to be in a relaxed affluent setting all summer. Verify 2026 dates (site is stale).',
+   cost:'~$20–$40/car tailgate; VIP cabanas higher', access:'Open, ticketed', venue:'San Diego Surf Polo Club, Rancho Santa Fe', url:'https://sandiegosurfpolo.com/schedule-tickets/'},
+  {id:'lodgehost', cat:'social', tier:2, who:'Both', name:'Host your own designer + agent mixer',
+   date:'Pick a date · Q4', cad:'one-off', month:'Ongoing & recurring', sort:0,
+   why:'Instead of working the edge of someone else’s room, host your own. A curated evening at The Lodge at Torrey Pines (or a staged listing) with designers, architects and top agents puts KSH at the center. Highest-control play on this list.',
+   cost:'Venue + catering (budget item)', access:'You control the guest list', venue:'The Lodge at Torrey Pines', url:'https://www.lodgetorreypines.com/events-calendar'},
+
+  /* ---------- JULY 2026 ---------- */
+  {id:'usdwine', cat:'social', tier:3, who:'Gio', name:'USD Wine Classic',
+   date:'Jul 11, 2026', cad:'annual', month:'July 2026', sort:202607,
+   why:'Wine-tasting fundraiser drawing an affluent USD-alumni crowd. A low-stakes, easy first outing.',
+   cost:'Ticketed', access:'Open, ticketed', venue:'University of San Diego', url:'https://usdwineclassic.com/'},
+  {id:'delmaropen', cat:'social', tier:2, who:'Both', name:'Del Mar Racing — Opening Day (Turf Club)',
+   date:'Jul 17, 2026', cad:'annual · season runs into Sept', month:'July 2026', sort:202607,
+   why:'Opening Day and the summer meet’s Turf Club are a rolling HNW social scene — hats, champagne, coastal money. The Clubhouse/Turf Club tier is where the affluent gather all summer.',
+   cost:'GA low; Turf Club premium', access:'Ticketed; Turf Club is the tier', venue:'Del Mar Thoroughbred Club', url:'https://www.dmtc.com/season'},
+  {id:'champagning', cat:'social', tier:3, who:'Gio', name:'Caring, Sharing & Champagning',
+   date:'Jul 25, 2026', cad:'annual', month:'July 2026', sort:202607,
+   why:'Rancho Santa Fe charity afternoon — affluent RSF crowd in a relaxed setting.',
+   cost:'~$100+', access:'Ticketed', venue:'Rancho Santa Fe', url:'https://secure.givelively.org/event/operation-for-hope-foundation-inc'},
+  {id:'pcbc', cat:'industry', tier:1, who:'Both', name:'PCBC 2026 + Gold Nugget Awards',
+   date:'Jul 28–29, 2026', cad:'annual · in SD county this year', month:'July 2026', sort:202607,
+   why:'Major West-Coast homebuilding conference — in San Diego county this year. The Gold Nugget Awards gala is a room full of top builders, developers and architects. Prime developer/architect relationship terrain and rare to be local.',
+   cost:'Gold Nugget gala $175 (incl. 2-day expo)', access:'Open registration', venue:'Gaylord Pacific, Chula Vista', url:'https://www.pcbc.com/pcbc2026/'},
+
+  /* ---------- AUGUST 2026 ---------- */
+  {id:'prado', cat:'social', tier:3, who:'Both', name:'Patrons of the Prado',
+   date:'Aug 1, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'Balboa Park museums’ establishment gala — old-guard SD philanthropy.',
+   cost:'Ticketed (gala)', access:'Ticketed', venue:'Balboa Park', url:'https://www.patronsoftheprado.org/'},
+  {id:'sdcc', cat:'cars', tier:3, who:'Gio', name:'San Diego Cars & Coffee (Elite Finish) — quarterly',
+   date:'~Aug 1, 2026', cad:'quarterly', month:'August 2026', sort:202608,
+   why:'Largest C&C in SD — big exotic + enthusiast turnout. Broader crowd than La Jolla/RSF and a Miramar setting, but high volume of car owners. Good for reach.',
+   cost:'Free, walk-up', access:'Open', venue:'Elite Finish, Miramar', url:'https://www.facebook.com/SanDiegoCarsandCoffee/'},
+  {id:'trapshoot', cat:'industry', tier:3, who:'Gio', name:'BIA Cares Trapshoot',
+   date:'Aug 7, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'Relaxed BIA fundraiser — informal time with builders and trade partners.',
+   cost:'Registration', access:'BIA event', venue:'TBD', url:'https://biasandiego.org/bia-events/'},
+  {id:'jewel', cat:'social', tier:1, who:'Both', name:'Las Patronas Jewel Ball',
+   date:'Aug 8, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'La Jolla’s most prestigious gala — the single densest concentration of La Jolla/RSF old money on the calendar. Real cachet; Kyle should be the face here.',
+   cost:'~$700–$1,000+/ticket', access:'Ticketed, patron-driven', venue:'La Jolla Beach & Tennis Club', url:'https://www.laspatronas.org/jewel-ball'},
+  {id:'salk', cat:'social', tier:2, who:'Both', name:'Symphony at Salk',
+   date:'Aug 15, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'Symphony under the stars in the oceanfront Salk courtyard + champagne dinner. Deep-pocketed La Jolla patrons; a beautiful, high-status room.',
+   cost:'~$250+ concert; patron packages higher', access:'Ticketed (sells out)', venue:'Salk Institute, La Jolla', url:'https://symphony.salk.edu'},
+  {id:'fairbanksgolf', cat:'social', tier:2, who:'Both', name:'Charity golf — Fairbanks Ranch CC (Cal Coast)',
+   date:'Aug 17, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'Sponsor or play to get inside an ultra-private RSF club and meet its members — access you can’t otherwise buy.',
+   cost:'Sponsor / foursome', access:'Sponsor or register', venue:'Fairbanks Ranch Country Club', url:'https://www.calcoastcu.org/news-and-events/charity-golf-tournament/'},
+  {id:'monterey', cat:'cars', tier:3, who:'Both', name:'Monterey Car Week (Pebble Beach) — stretch option',
+   date:'Aug 10–18, 2026', cad:'annual · not local', month:'August 2026', sort:202608,
+   why:'The world’s premier collector-car week. Incredible pool of ultra-wealthy collectors, but they’re national, not SD homeowners. Treat as an aspirational relationship trip, not local lead-gen.',
+   cost:'Free street viewing → five-figure patron access', access:'Varies', venue:'Monterey Peninsula (~short flight)', url:'https://whatsupmonterey.com/events/monterey-car-week/2'},
+  {id:'ljcc-golf', cat:'social', tier:2, who:'Both', name:'Charity golf — La Jolla Country Club (ACS Classic)',
+   date:'Aug 24, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'A sponsor/foursome buys you a day inside La Jolla Country Club with its members — a private room otherwise closed to non-members.',
+   cost:'Sponsor / foursome', access:'Sponsor or register', venue:'La Jolla Country Club', url:'https://sandiegogolfclassic.org/'},
+  {id:'dayraces', cat:'social', tier:3, who:'Gio', name:'Day at the Races (charity)',
+   date:'Aug 27, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'Charity race day at Del Mar — affluent, social, low-pressure.',
+   cost:'Ticketed', access:'Ticketed', venue:'Del Mar', url:'https://dayattheraces2026.causevox.com/'},
+  {id:'biagolf', cat:'industry', tier:2, who:'Gio', name:'BIA Summer "Yacht Rock" Golf Tournament',
+   date:'Aug 31, 2026', cad:'annual', month:'August 2026', sort:202608,
+   why:'BIA’s marquee golf day — where builder/developer/trade relationships actually form. Worth a foursome.',
+   cost:'Registration / sponsor', access:'BIA event', venue:'TBD', url:'https://biasandiego.org/annual-bia-events/'},
+
+  /* ---------- SEPTEMBER 2026 ---------- */
+  {id:'mcasd', cat:'social', tier:2, who:'Both', name:'MCASD "Monte Carlo" Gala',
+   date:'Sep 2026', cad:'annual', month:'September 2026', sort:202609, flag:'Exact date — verify',
+   why:'The contemporary-art museum’s marquee benefit — an art/design/architecture crowd, directly relevant to designers and architects. Oceanfront La Jolla setting.',
+   cost:'Ticketed (gala)', access:'Ticketed', venue:'MCASD La Jolla', url:'https://www.mcasd.org/events'},
+  {id:'countryfriends', cat:'social', tier:2, who:'Both', name:'The Country Friends — "Art of Fashion"',
+   date:'Sep 10, 2026', cad:'annual', month:'September 2026', sort:202609,
+   why:'Rancho Santa Fe’s elite women’s charity luncheon/runway — a quintessential RSF society afternoon and a warm room of decision-influencing homeowners.',
+   cost:'Ticketed', access:'Ticketed', venue:'Rancho Santa Fe', url:'https://countryfriends.org/our-events/'},
+  {id:'designweek', cat:'designers', tier:2, who:'Gio', name:'San Diego Design Week',
+   date:'Sep 15–20, 2026', cad:'annual', month:'September 2026', sort:202609,
+   why:'Five-day citywide design celebration — studio tours, talks, exhibitions. Broad design community; good for presence and meeting designers off the clock.',
+   cost:'Many events free; some ticketed', access:'Open', venue:'Citywide (Mingei-presented)', url:'https://sddesignweek.org/'},
+  {id:'oldglobe', cat:'social', tier:2, who:'Both', name:'The Old Globe Gala',
+   date:'Sep 26, 2026', cad:'annual', month:'September 2026', sort:202609,
+   why:'Black-tie theater gala (Wayne Brady, 2026) — reception, dinner, private performance. One of the higher-net-worth ticketed rooms in the city.',
+   cost:'$1,500 individual / $2,750 VIP', access:'Ticketed', venue:'Old Globe, Balboa Park', url:'https://www.broadwayworld.com/san-diego/article/The-Old-Globe-Will-Host-2026-Gala-With-Wayne-Brady-20260430'},
+
+  /* ---------- OCTOBER 2026 ---------- */
+  {id:'burnham', cat:'social', tier:3, who:'Both', name:'Sanford Burnham Prebys Illumination Gala',
+   date:'Oct 3, 2026', cad:'annual', month:'October 2026', sort:202610,
+   why:'Research-institute gala at the Fairmont Grand Del Mar — affluent, philanthropic North County crowd.',
+   cost:'Ticketed', access:'Ticketed', venue:'Fairmont Grand Del Mar', url:'https://sbpdiscovery.org/gala'},
+  {id:'ljmodernism', cat:'designers', tier:1, who:'Both', name:'La Jolla Modernism Home Tour + Architecture Week',
+   date:'Oct 3, 2026 (tour) · Oct 6–11 (talks)', cad:'annual', month:'October 2026', sort:202610,
+   why:'Ticketed tour of restored modern La Jolla homes + a week of architecture talks. Puts KSH in front of exactly the design-obsessed, affluent coastal homeowner it wants — and the architects too. Sponsorship is a warm, high-fit way to reach the room.',
+   cost:'~$75–$125 tour; sponsorships available', access:'Ticketed (sells out) / sponsor', venue:'La Jolla', url:'https://www.lajollahistory.org/la-jolla-modernism-home-tour'},
+  {id:'police', cat:'social', tier:3, who:'Both', name:'San Diego Police Foundation Annual Soiree',
+   date:'Oct 10, 2026', cad:'annual', month:'October 2026', sort:202610,
+   why:'Establishment fundraiser at Omni La Costa — business-owner and civic-leader crowd.',
+   cost:'Ticketed', access:'Ticketed', venue:'Omni La Costa', url:'https://sdpolicefoundation.org/events/'},
+  {id:'ljartwine', cat:'social', tier:3, who:'Gio', name:'La Jolla Art & Wine Festival',
+   date:'Oct 10–11, 2026', cad:'annual', month:'October 2026', sort:202610,
+   why:'Free street festival with huge foot traffic of local La Jolla homeowners. A soft-networking / booth-sponsor play in the flagship neighborhood.',
+   cost:'Free (wine garden ticketed)', access:'Open', venue:'Girard Ave, La Jolla', url:'https://www.ljawf.com/'},
+  {id:'winewishes', cat:'social', tier:3, who:'Both', name:'Wine & Wishes Gala (Make-A-Wish SD)',
+   date:'Oct 17, 2026', cad:'annual', month:'October 2026', sort:202610,
+   why:'Well-attended charity gala at Park Hyatt Aviara — affluent Carlsbad/North County crowd.',
+   cost:'Ticketed', access:'Ticketed', venue:'Park Hyatt Aviara, Carlsbad', url:'https://wish.org/sandiego/2026-wine-wishes-gala-save-date'},
+  {id:'nkbastar', cat:'designers', tier:2, who:'Both', name:'NKBA Star Design Awards Gala',
+   date:'Oct 2026', cad:'annual', month:'October 2026', sort:202610, flag:'2026 date TBD',
+   why:'NKBA’s annual awards gala + industry showcase — designers, showrooms and trade in one room. A sponsorship/expo slot puts KSH in front of the whole kitchen-and-bath design community.',
+   cost:'Gala ticket ~$75–$150', access:'Open', venue:'TBD (2025 at Lomas Santa Fe CC)', url:'https://kb.nkba.org/chapters/san-diego/events/'},
+
+  /* ---------- NOVEMBER 2026 ---------- */
+  {id:'wild', cat:'social', tier:3, who:'Both', name:'WILD (Safari Park)',
+   date:'Nov 7, 2026', cad:'annual', month:'November 2026', sort:202611,
+   why:'Curated evening on the Safari Park savannas — a distinctive, affluent-donor gala.',
+   cost:'Ticketed', access:'Ticketed', venue:'SD Zoo Safari Park, Escondido', url:'https://sandiegozoowildlifealliance.org/wild'},
+  {id:'jfs', cat:'social', tier:3, who:'Both', name:'JFS Joan Jacobs Signature Brunch',
+   date:'Nov 1, 2026', cad:'annual', month:'November 2026', sort:202611,
+   why:'High-profile philanthropic brunch at La Jolla’s Aventine — establishment donor crowd.',
+   cost:'Ticketed', access:'Ticketed', venue:'Aventine, La Jolla', url:'https://gbsan.com/san-diegos-gala-calendar/'},
+
+  /* ---------- PLAN AHEAD · returns 2027 (marquee, already passed in 2026) ---------- */
+  {id:'ljconcours', cat:'cars', tier:1, who:'Both', name:'La Jolla Concours d’Elegance — VIP tier',
+   date:'Returns ~Apr 2027', cad:'annual · April', month:'Plan ahead · returns 2027', sort:202704,
+   why:'THE flagship. Buy the Sunday VIP Lounge / Ocean Suite (~$449–$565) or the Friday Soirée — you’re paying to stand for hours next to La Jolla/RSF collectors in a drinks-in-hand setting. Highest concentration of coastal wealth on the calendar. Book early.',
+   cost:'GA $129 · VIP $449–$799', access:'Ticketed (buy VIP)', venue:'Scripps Park, La Jolla Cove', url:'https://lajollaconcours.com/'},
+  {id:'tourdeleg', cat:'cars', tier:2, who:'Kyle', name:'Tour d’Elegance (private-estate drive)',
+   date:'Returns ~Apr 2027', cad:'annual · April', month:'Plan ahead · returns 2027', sort:202704,
+   why:'A driving rally that ends with a catered luncheon at a private Rancho Santa Fe estate. The most intimate access to RSF estate owners on this list — but you generally must enter a qualifying car. If Kyle has (or can borrow) one, it buys a whole day inside the set.',
+   cost:'Entry (register a vehicle)', access:'Gated — must enter a car', venue:'La Jolla → Rancho Santa Fe', url:'https://lajollaconcours.com/entrants/tour-delegance-registration/'},
+  {id:'motorcars', cat:'cars', tier:2, who:'Both', name:'MotorCars on MainStreet — Coronado',
+   date:'Returns ~May 2027', cad:'annual · May', month:'Plan ahead · returns 2027', sort:202705,
+   why:'300+ classics down Coronado’s main street — free, walk-up, set on the island among its affluent homeowners. Great for the Coronado segment specifically (a flagship KSH neighborhood).',
+   cost:'Free to attend', access:'Open', venue:'Downtown Coronado', url:'https://www.coronadomainstreet.com/motorcars'},
+  {id:'coronadohome', cat:'designers', tier:2, who:'Both', name:'Coronado Historic Home Tour',
+   date:'Returns ~May 2027 (Mother’s Day)', cad:'annual · May', month:'Plan ahead · returns 2027', sort:202705,
+   why:'Docent-led tour of Coronado’s grand historic homes — affluent, preservation-minded island homeowners. Sponsor/volunteer angle for a luxury GC in a flagship neighborhood.',
+   cost:'~$40–$75', access:'Ticketed (sells out)', venue:'Coronado', url:'https://coronadohistory.org/'},
+  {id:'secretgarden', cat:'designers', tier:3, who:'Gio', name:'La Jolla Secret Garden Tour',
+   date:'Returns ~May 2027', cad:'annual · May', month:'Plan ahead · returns 2027', sort:202705,
+   why:'Tour of premium private La Jolla gardens showcasing landscape designers — affluent homeowners + design pros. Good outdoor-living tie-in; sponsor to get brand exposure.',
+   cost:'~$50+', access:'Ticketed', venue:'La Jolla', url:'https://www.lajollahistory.org/secret-garden-tour'},
+  {id:'sdmaghd', cat:'designers', tier:3, who:'Gio', name:'San Diego Magazine — Home + Design Awards',
+   date:'Returns ~Mar 2027', cad:'annual · spring', month:'Plan ahead · returns 2027', sort:202703,
+   why:'Residential design awards with real media reach. The play: co-enter a KSH-built project WITH the designer — a co-marketing move that reaches SD Magazine’s affluent readership and deepens the designer relationship.',
+   cost:'$75/ticket; ~$18/project entry', access:'Enter + attend', venue:'San Diego', url:'https://sandiegomagazine.com/'},
+  {id:'iida', cat:'designers', tier:3, who:'Gio', name:'IIDA SoCal — San Diego Fashion Show',
+   date:'Returns ~Apr 2027', cad:'annual · April', month:'Plan ahead · returns 2027', sort:202704,
+   why:'The chapter’s big designer social. IIDA skews commercial (softer fit for luxury-residential KSH), but the Fashion Show is a large, energetic designer room worth one appearance.',
+   cost:'~$75–$150', access:'Open to non-members', venue:'House of Blues, San Diego', url:'https://iida-socal.org/san-diego/'},
+
+  /* ---------- AVOID ---------- */
+  {id:'avoid', cat:'industry', tier:3, who:'Gio', name:'⛔ Del Mar consumer Home & Garden Shows — SKIP',
+   date:'Various 2026', cad:'—', month:'Plan ahead · returns 2027', sort:202799, flag:'Avoid — wrong tier',
+   why:'Mass-market, price-shopping general public — the budget/handyman-adjacent audience KSH refuses to be positioned near. Being on this floor signals the wrong tier for a $1M+ whole-home builder. Listed here only so it’s a conscious no.',
+   cost:'—', access:'—', venue:'Del Mar Fairgrounds', url:'https://sandiegohomegardenshows.com/'}
+];
+
+const CATS = {
+  designers:{label:'Designers & Architects', color:'var(--gold)'},
+  cars:{label:'Car culture', color:'#c76b9a'},
+  social:{label:'HNW & social', color:'var(--blue)'},
+  industry:{label:'Building industry', color:'var(--green)'}
+};
+const CAT_ORDER = ['designers','cars','social','industry'];
+
+let view='schedule';
+let fCat=new Set(); // empty = all
+let fWho=new Set();
+
+/* ---- status persistence ---- */
+function getStatus(){try{return JSON.parse(localStorage.getItem('ksh_ev_status')||'{}');}catch(e){return {};}}
+function setStatus(id,v){const s=getStatus();if(v)s[id]=v;else delete s[id];localStorage.setItem('ksh_ev_status',JSON.stringify(s));}
+const STATUS_CYCLE={'':'plan','plan':'going','going':'done','done':''};
+const STATUS_LABEL={plan:'Planning',going:'Going ✓',done:'Done'};
+
+/* ---- filters UI ---- */
+function buildFilters(){
+  const cf=document.getElementById('catFilters');
+  cf.innerHTML='<span class="chipbtn'+(fCat.size===0?' on':'')+'" data-cat="__all">All types</span>'+
+    CAT_ORDER.map(c=>'<span class="chipbtn'+(fCat.has(c)?' on':'')+'" data-cat="'+c+'">'+CATS[c].label+'</span>').join('');
+  cf.querySelectorAll('[data-cat]').forEach(el=>el.onclick=()=>{
+    const c=el.dataset.cat;
+    if(c==='__all'){fCat.clear();}else{if(fCat.has(c))fCat.delete(c);else fCat.add(c);}
+    buildFilters();render();
+  });
+  const wf=document.getElementById('whoFilters');
+  const whos=['Gio','Kyle','Both'];
+  wf.innerHTML='<span class="chipbtn gold'+(fWho.size===0?' on':'')+'" data-who="__all">Anyone</span>'+
+    whos.map(w=>'<span class="chipbtn gold'+(fWho.has(w)?' on':'')+'" data-who="'+w+'">'+w+'</span>').join('');
+  wf.querySelectorAll('[data-who]').forEach(el=>el.onclick=()=>{
+    const w=el.dataset.who;
+    if(w==='__all'){fWho.clear();}else{if(fWho.has(w))fWho.delete(w);else fWho.add(w);}
+    buildFilters();render();
+  });
+}
+
+function passes(e){
+  if(fCat.size && !fCat.has(e.cat)) return false;
+  if(fWho.size){
+    // "Both" events match a Gio or Kyle filter too
+    const ok=[...fWho].some(w=> e.who===w || (e.who==='Both'));
+    if(!ok) return false;
+  }
+  return true;
+}
+
+function evCard(e){
+  const st=getStatus()[e.id]||'';
+  const catT='<span class="t cat" style="border-color:'+CATS[e.cat].color+';color:'+CATS[e.cat].color+'">'+CATS[e.cat].label+'</span>';
+  const tierT = e.tier===1?'<span class="t p1">Priority</span>' : e.tier===2?'<span class="t p2">High value</span>':'';
+  const whoT='<span class="t who">'+ (e.who==='Both'?'Gio + Kyle':e.who) +'</span>';
+  const flagT=e.flag?'<span class="t flag">⚑ '+e.flag+'</span>':'';
+  const stbtnClass = st?('stbtn '+st):'stbtn';
+  const stbtnLabel = st?STATUS_LABEL[st]:'+ Track';
+  const dot = st==='going'?'<span class="statusdot" style="color:var(--green)">● Going</span>' : st==='plan'?'<span class="statusdot" style="color:var(--blue2)">● Planning</span>':'';
+  return '<div class="ev cat-'+e.cat+(st==='done'?' done':'')+'" data-id="'+e.id+'">'+
+    dot+
+    '<div class="toprow"><div class="date">'+e.date+' <span class="cad">· '+e.cad+'</span></div></div>'+
+    '<h3>'+e.name+'</h3>'+
+    '<div class="tags">'+tierT+catT+whoT+flagT+'</div>'+
+    '<div class="why">'+e.why+'</div>'+
+    '<div class="meta"><b>Cost:</b> '+e.cost+'<br><b>Access:</b> '+e.access+'<br><b>Where:</b> '+e.venue+'</div>'+
+    '<div class="actions">'+
+      '<a href="'+e.url+'" target="_blank" rel="noopener">Official page ↗</a>'+
+      '<button class="'+stbtnClass+'" data-track="'+e.id+'">'+stbtnLabel+'</button>'+
+    '</div>'+
+  '</div>';
+}
+
+function wireCards(scope){
+  scope.querySelectorAll('[data-track]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.track;const cur=getStatus()[id]||'';
+    setStatus(id,STATUS_CYCLE[cur]);render();
+  });
+}
+
+function render(){
+  const list=document.getElementById('list');
+  const items=EVENTS.filter(passes);
+  document.getElementById('count').textContent=items.length+' of '+EVENTS.length+' events shown';
+  let html='';
+  if(view==='schedule'){
+    // group by month bucket, ordered by sort
+    const buckets={};const order=[];
+    items.slice().sort((a,b)=>a.sort-b.sort).forEach(e=>{
+      if(!buckets[e.month]){buckets[e.month]=[];order.push(e.month);}
+      buckets[e.month].push(e);
+    });
+    order.forEach(m=>{
+      const note = m==='Ongoing & recurring' ? 'join these and show up on repeat — the real pipeline' :
+                   m.indexOf('Plan ahead')===0 ? 'already passed in 2026 — buy early for next year' : buckets[m].length+' event'+(buckets[m].length>1?'s':'');
+      html+='<div class="monthhead">'+m+' <small>'+note+'</small></div>';
+      html+='<div class="grid sched">'+buckets[m].map(evCard).join('')+'</div>';
+    });
+  } else {
+    // by priority tier
+    [1,2,3].forEach(t=>{
+      const tier=items.filter(e=>e.tier===t);
+      if(!tier.length)return;
+      const lbl=t===1?'Priority — do these first':t===2?'High value':'Opportunistic / plan ahead';
+      const note=t===1?'cheap, recurring, or the densest rooms of your exact buyer':t===2?'strong fit, worth the time and budget':'nice-to-have or seasonal';
+      html+='<div class="monthhead">'+lbl+' <small>'+note+'</small></div>';
+      html+='<div class="grid">'+tier.map(evCard).join('')+'</div>';
+    });
+  }
+  if(!html) html='<div style="padding:30px;text-align:center;color:var(--muted)">No events match these filters.</div>';
+  list.innerHTML=html;
+  wireCards(list);
+}
+
+function setView(v){
+  view=v;
+  document.querySelectorAll('.viewtab').forEach(t=>t.classList.toggle('on',t.dataset.view===v));
+  render();
+}
+
+buildFilters();
+render();
+</script>
+</body>
+</html>
