@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Jul 20 – Jul 24, 2026",
+      "folder": "week-2026-07-20",
+      "manifest": "sdlr-content/week-2026-07-20/manifest.json",
+      "generated": "2026-07-13"
+    },
+    {
       "label": "Week of Jul 6 – Jul 10, 2026 · v3 (new shot mix)",
       "folder": "week-2026-07-06-v3",
       "manifest": "sdlr-content/week-2026-07-06-v3/manifest.json",
