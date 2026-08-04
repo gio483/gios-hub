@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0d0f09">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SDLR Scripts">
+<title>SDLR Video Playbook</title>
+<style>
+  :root{
+    --bg:#0d0f09; --bg2:#14170f; --panel:#191c13; --panel2:#20241a; --line:#2e3324;
+    --ink:#f4f1e6; --muted:#a3a48b; --dim:#7c7d68;
+    --gold:#c8a869; --green:#9fb56a; --sage:#a3b06a; --bronze:#c19a72; --teal:#8bb0b3;
+    --accent:#c8a869;
+    --nav-h:calc(52px + env(safe-area-inset-top));
+    --tab-h:calc(58px + env(safe-area-inset-bottom));
+    --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;overflow:hidden;position:fixed;inset:0;
+    text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;
+  }
+  .app{height:100%;display:flex;flex-direction:column;position:relative}
+
+  /* ---------- top nav ---------- */
+  .nav{position:sticky;top:0;z-index:30;height:var(--nav-h);
+    padding:env(safe-area-inset-top) 16px 0;display:flex;align-items:center;justify-content:center;
+    background:rgba(13,15,9,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+    border-bottom:.5px solid var(--line)}
+  .nav .title{font-size:16px;font-weight:600;letter-spacing:.2px}
+  .nav .left,.nav .right{position:absolute;top:env(safe-area-inset-top);height:52px;display:flex;align-items:center;font-size:15px;color:var(--gold)}
+  .nav .left{left:12px}.nav .right{right:14px}
+  .nav .left button{background:none;border:0;color:var(--gold);font:inherit;font-size:16px;display:flex;align-items:center;gap:3px;padding:8px 4px;cursor:pointer}
+  .nav .right button{background:none;border:0;color:var(--gold);font:inherit;font-size:14px;padding:8px 4px;cursor:pointer}
+  .chev{width:11px;height:19px}
+
+  /* ---------- scroll views ---------- */
+  .views{flex:1;position:relative;overflow:hidden}
+  .view{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:14px 16px calc(var(--tab-h) + 20px);display:none;overscroll-behavior:contain}
+  .view.active{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .largetitle{font-size:32px;font-weight:700;letter-spacing:-.5px;margin:4px 2px 2px}
+  .largesub{color:var(--muted);font-size:14px;margin:0 2px 16px}
+
+  /* ---------- progress header ---------- */
+  .prog{display:flex;align-items:center;gap:16px;background:linear-gradient(135deg,var(--panel),var(--panel2));
+    border:1px solid var(--line);border-radius:18px;padding:16px 18px;margin:2px 0 18px}
+  .ring{position:relative;width:60px;height:60px;flex:none}
+  .ring svg{transform:rotate(-90deg)}
+  .ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700}
+  .prog .lbl{flex:1}
+  .prog .lbl .big{font-size:17px;font-weight:600}
+  .prog .lbl .small{color:var(--muted);font-size:13px;margin-top:2px}
+  .prog .reset{background:var(--panel2);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:12px;
+    padding:7px 11px;border-radius:20px;cursor:pointer}
+
+  /* ---------- filter chips ---------- */
+  .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;margin:0 -16px;padding-left:16px;padding-right:16px;
+    scrollbar-width:none;-ms-overflow-style:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:none;background:var(--panel);border:1px solid var(--line);color:var(--muted);
+    font-size:13px;font-weight:500;padding:7px 14px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:.15s}
+  .chip.on{background:var(--gold);border-color:var(--gold);color:#191307;font-weight:600}
+
+  /* ---------- section header ---------- */
+  .sechead{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--dim);margin:20px 4px 10px;font-weight:600}
+  .sechead .dot{width:8px;height:8px;border-radius:50%}
+
+  /* ---------- script card ---------- */
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:15px 15px 15px 14px;
+    margin-bottom:11px;display:flex;gap:13px;align-items:flex-start;cursor:pointer;position:relative;
+    transition:transform .12s ease,background .15s}
+  .card:active{transform:scale(.985);background:var(--panel2)}
+  .card .check{flex:none;width:27px;height:27px;border-radius:50%;border:2px solid var(--line);margin-top:2px;
+    display:flex;align-items:center;justify-content:center;transition:.18s;background:transparent;cursor:pointer}
+  .card .check svg{width:15px;height:15px;opacity:0;transform:scale(.5);transition:.18s;stroke:#191307}
+  .card.done .check{background:var(--green);border-color:var(--green)}
+  .card.done .check svg{opacity:1;transform:scale(1)}
+  .card .body{flex:1;min-width:0}
+  .card .top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+  .card .num{font-size:12px;font-weight:700;color:var(--dim);font-variant-numeric:tabular-nums}
+  .card .badge{font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;
+    padding:2px 7px;border-radius:5px;color:#141109}
+  .card h3{margin:0;font-size:16px;font-weight:600;letter-spacing:-.1px;line-height:1.3}
+  .card.done h3{color:var(--muted)}
+  .card .meta{color:var(--dim);font-size:12.5px;margin-top:4px}
+  .card .arrow{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#4c4d3d}
+
+  /* ---------- detail view ---------- */
+  #detail{z-index:40;background:var(--bg);transform:translateX(100%);display:block;
+    transition:transform .32s cubic-bezier(.32,.72,0,1);padding-top:0}
+  #detail.in{transform:translateX(0)}
+  .detail-scroll{position:absolute;inset:0;top:0;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:16px 18px calc(var(--tab-h) + 96px);overscroll-behavior:contain}
+  .d-badge{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    padding:3px 9px;border-radius:6px;color:#141109;margin-bottom:12px}
+  .d-title{font-size:26px;font-weight:700;letter-spacing:-.5px;line-height:1.18;margin:0 0 6px}
+  .d-meta{color:var(--muted);font-size:13.5px;margin-bottom:20px}
+  .d-lbl{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:700;margin:22px 0 8px}
+  .hookbox{background:#221d12;border:1px solid #4a3d22;border-left:3px solid var(--gold);border-radius:12px;
+    padding:14px 16px;font-size:17px;color:#f0dcb0;font-weight:500;line-height:1.4}
+  .scriptbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 18px;
+    font-size:18px;line-height:1.62;color:#ece7d8;white-space:pre-line;letter-spacing:.1px}
+  .beats{display:flex;flex-direction:column;gap:8px}
+  .beat{display:flex;gap:10px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);
+    border-radius:11px;padding:11px 13px;font-size:14.5px;color:#dcd6c6}
+  .beat .n{flex:none;width:20px;height:20px;border-radius:6px;background:var(--panel2);color:var(--gold);
+    font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .copybox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;font-size:14.5px;color:#dcd6c6;position:relative}
+  .copybtn{position:absolute;top:9px;right:9px;background:var(--panel2);border:1px solid var(--line);color:var(--gold);
+    font:inherit;font-size:11px;font-weight:600;padding:5px 10px;border-radius:16px;cursor:pointer}
+  .copybtn.copied{background:var(--green);border-color:var(--green);color:#141109}
+  .series{margin-top:18px;background:#1a1f12;border:1px solid #33401f;border-radius:11px;padding:11px 14px;font-size:13.5px;color:var(--sage)}
+
+  /* detail sticky action bar */
+  .actionbar{position:absolute;left:0;right:0;bottom:0;z-index:5;
+    padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    background:rgba(13,15,9,.82);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+    border-top:.5px solid var(--line);display:flex;gap:10px}
+  .btn{flex:1;border:0;border-radius:14px;font:inherit;font-size:16px;font-weight:600;padding:15px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .1s,background .15s}
+  .btn:active{transform:scale(.97)}
+  .btn.primary{background:var(--green);color:#141109}
+  .btn.primary.done{background:var(--panel2);color:var(--green);border:1px solid var(--green)}
+  .btn.ghost{flex:none;width:56px;background:var(--panel2);color:var(--gold);border:1px solid var(--line);font-size:20px}
+  .btn.ghost.on{background:var(--gold);color:#141109;border-color:var(--gold)}
+
+  /* teleprompter hint */
+  .tele-hint{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:6;
+    background:rgba(200,168,105,.16);border:1px solid var(--gold);color:var(--gold);font-size:12px;
+    padding:6px 13px;border-radius:20px;opacity:0;transition:.25s;pointer-events:none}
+  .tele-hint.show{opacity:1}
+
+  /* ---------- tab bar ---------- */
+  .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:35;height:var(--tab-h);
+    padding-bottom:env(safe-area-inset-bottom);display:flex;
+    background:rgba(13,15,9,.8);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);
+    border-top:.5px solid var(--line)}
+  .tab{flex:1;background:none;border:0;color:var(--dim);font:inherit;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;cursor:pointer;padding-top:7px;transition:color .15s}
+  .tab.on{color:var(--gold)}
+  .tab svg{width:24px;height:24px}
+  .tab span{font-size:10.5px;font-weight:500;letter-spacing:.02em}
+
+  /* ---------- guide / plan content ---------- */
+  .prose{font-size:15px;color:#ded9c9}
+  .prose p{margin:11px 0}
+  .prose b{color:var(--ink)}
+  .callout{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);
+    border-radius:12px;padding:14px 16px;margin:14px 0;font-size:14px;color:#e2ddce}
+  .callout.gold{border-left-color:var(--gold)}
+  .callout b{color:var(--gold)}
+  .gcard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin:11px 0}
+  .gcard h4{margin:0 0 7px;font-size:16px;font-weight:600}
+  .gcard ul{margin:6px 0;padding-left:18px}.gcard li{margin:5px 0;font-size:14px;color:#dcd6c6}
+  .pill-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+  .minipill{font-size:12px;padding:5px 11px;border-radius:16px;border:1px solid var(--line);background:var(--panel2);color:var(--muted)}
+  .minipill.no{border-color:#5a3a34;color:#d9a79f}
+  .minipill.yes{border-color:#4a5a3a;color:#bcd0a0}
+  .cal-row{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);
+    border-radius:12px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+  .cal-row:active{background:var(--panel2)}
+  .cal-day{flex:none;width:38px;text-align:center;font-size:12px;color:var(--dim);font-weight:600;line-height:1.15}
+  .cal-day b{display:block;font-size:16px;color:var(--ink)}
+  .cal-mid{flex:1;min-width:0}
+  .cal-mid .t{font-size:14.5px;font-weight:600;line-height:1.25}
+  .cal-mid .p{font-size:12px;color:var(--dim);margin-top:2px}
+  .cal-row.done .cal-mid .t{color:var(--muted)}
+  .cal-check{flex:none;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center}
+  .cal-row.done .cal-check{background:var(--green);border-color:var(--green)}
+  .cal-check svg{width:12px;height:12px;stroke:#141109;opacity:0}
+  .cal-row.done .cal-check svg{opacity:1}
+  .foot{color:var(--dim);font-size:12px;text-align:center;margin:26px 0 8px;line-height:1.6}
+  .hooklist{list-style:none;padding:0;margin:0}
+  .hooklist li{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:14.5px}
+  .hooklist li .tag{display:block;font-size:11.5px;color:var(--dim);margin-top:4px}
+  .toast{position:absolute;bottom:calc(var(--tab-h) + 18px);left:50%;transform:translateX(-50%) translateY(10px);
+    background:#26301a;border:1px solid var(--green);color:#d7e6bf;font-size:13px;font-weight:500;
+    padding:10px 18px;border-radius:22px;opacity:0;transition:.25s;z-index:50;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="nav">
+    <div class="left" id="navLeft"></div>
+    <div class="title" id="navTitle">Scripts</div>
+    <div class="right" id="navRight"></div>
+  </div>
+
+  <div class="views" id="views">
+    <div class="view active" id="v-scripts" data-title="Scripts">
+      <div class="largetitle">Scripts</div>
+      <div class="largesub">20 videos to film. Tap one, read it, mark it filmed.</div>
+      <div class="prog">
+        <div class="ring">
+          <svg width="60" height="60"><circle cx="30" cy="30" r="25" stroke="#2e3324" stroke-width="6" fill="none"/>
+            <circle id="ringFill" cx="30" cy="30" r="25" stroke="#9fb56a" stroke-width="6" fill="none"
+              stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"/></svg>
+          <div class="pct" id="ringPct">0%</div>
+        </div>
+        <div class="lbl"><div class="big" id="progBig">0 of 20 filmed</div><div class="small">Keep the streak going 🎬</div></div>
+        <button class="reset" id="resetBtn">Reset</button>
+      </div>
+      <div class="chips" id="chips"></div>
+      <div id="scriptList"></div>
+      <div class="foot">Tip: add this to your Home Screen — Share → Add to Home Screen — and it opens full-screen like an app.</div>
+    </div>
+
+    <div class="view" id="v-plan" data-title="Plan">
+      <div class="largetitle">Plan</div>
+      <div class="largesub">Batch-film a week in one sitting. Then never scramble.</div>
+      <div class="prose" id="planTop"></div>
+      <div class="sechead"><span class="dot" style="background:var(--gold)"></span>30-Day Calendar</div>
+      <div id="calList"></div>
+    </div>
+
+    <div class="view" id="v-guide" data-title="Guide">
+      <div class="largetitle">Guide</div>
+      <div class="largesub">The strategy, voice, and formats behind every script.</div>
+      <div class="prose" id="guideBody"></div>
+    </div>
+
+    <div class="view" id="detail">
+      <div class="tele-hint" id="teleHint">Tap script to pause</div>
+      <div class="detail-scroll" id="detailScroll"></div>
+      <div class="actionbar">
+        <button class="btn ghost" id="teleBtn" title="Teleprompter">▶</button>
+        <button class="btn primary" id="markBtn">Mark Filmed</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabbar" id="tabbar">
+    <button class="tab on" data-tab="scripts">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18M8 5v4M16 5v4" stroke-linecap="round"/></svg>
+      <span>Scripts</span></button>
+    <button class="tab" data-tab="plan">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke-linecap="round"/><path d="M8 14l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Plan</span></button>
+    <button class="tab" data-tab="guide">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" stroke-linejoin="round"/><path d="M9 7h6M9 11h6" stroke-linecap="round"/></svg>
+      <span>Guide</span></button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const PILLARS = {
+  educate:{label:'Educate', color:'#c8a869', dot:'#c8a869'},
+  react:  {label:'React & Rate', color:'#9fb56a', dot:'#9fb56a'},
+  design: {label:'Design & Taste', color:'#8bb0b3', dot:'#8bb0b3'},
+  brand:  {label:'Behind the Brand', color:'#c19a72', dot:'#c19a72'},
+  local:  {label:'Local San Diego', color:'#a3b06a', dot:'#a3b06a'},
+};
+const SCRIPTS = [
+ {id:1,pillar:'educate',fmt:'Talking head · office · ~40s',
+  title:'What a backyard remodel actually costs in San Diego',
+  hook:"Nobody will give you a real number, so I will. What a backyard actually costs in San Diego.",
+  body:`Everyone dances around this, so here's the honest version. In San Diego, a single-scope project — a paver patio, a retaining wall, turf — lands roughly twenty to fifty thousand. A real, coordinated outdoor room — patio, fire feature, shade, lighting, designed to work as one — that's usually eighty to a hundred sixty. And a full-property transformation — outdoor kitchen, pool deck, architectural lighting, the whole thing — starts around one-sixty and goes up.
+
+Here's what actually moves that number: scope, material grade, and whether the crew has done it a hundred times or ten. The cheapest bid is almost never the cheapest project — it's the one you pay to fix later. Build it right, once.`,
+  beats:["The honest numbers ↓","Single scope: $20–50K","Full outdoor room: $80–160K","Full transformation: $160K+","Cheapest bid ≠ cheapest project"],
+  caption:"The number nobody will say out loud. Built with intention — by design, not by dispatch. 📍 San Diego County. Licensed & insured GC, CSLB #1139785.",
+  cta:"Comment your neighborhood and I'll tell you what's realistic there."},
+ {id:2,pillar:'educate',fmt:'Talking head + b-roll · ~30s',
+  title:'The #1 mistake that makes a backyard feel cheap',
+  hook:"The number one thing that makes an expensive backyard still feel cheap.",
+  body:`It's not the budget. It's the order of operations. Most people start with the pretty stuff — plants, furniture, a big-box fire pit — and skip the part that makes a space feel finished: structure. Grading, drainage, the hardscape layout, how you move from one zone to the next. Structure before landscaping. Get the bones right and a modest budget looks intentional. Get them wrong and no amount of nice furniture saves it. That's the difference between a yard that was decorated and a room that was designed.`,
+  beats:["Why $$$ backyards still look cheap","They decorated. They didn't design.","Structure before landscaping.","Bones first. Always."],
+  caption:"Structure before landscaping. The bones are the whole game.",
+  cta:"Save this before you spend a dollar on furniture."},
+ {id:3,pillar:'educate',fmt:'Talking head · listicle · ~40s',
+  title:'How to hire an outdoor living contractor (from the inside)',
+  hook:"Three questions that instantly tell you if a backyard contractor is any good.",
+  body:`I'm on the inside of this industry, so let me save you a bad hire. Question one: "Walk me through how you handle drainage and grading." If they get vague, leave — that's where projects fail. Question two: "Who's actually on my crew, and do they change?" You want one crew start to finish, not a rotating cast of subs. Question three: "What happens after you're done?" The good ones have an answer. We come back at ten months and inspect the whole thing — no charge — because that's when you find out if it was built right. If a contractor's plan ends the day they cash the check, that tells you everything.`,
+  beats:["3 questions before you hire","1. How do you handle drainage?","2. One crew or rotating subs?","3. What happens after you finish?","We come back at 10 months."],
+  caption:"Steal these before you sign anything. By design, not by dispatch.",
+  cta:"Which one would've saved you? 👇"},
+ {id:4,pillar:'educate',fmt:'Talking head + material close-ups · ~35s',
+  title:"Turf vs. pavers vs. natural stone — what I'd actually pick",
+  hook:"Turf, pavers, or natural stone — here's what I'd put in my own backyard, and what I'd skip.",
+  body:`Everybody asks me this. Artificial turf: great for a low-maintenance play zone or a dog run — but wall-to-wall green plastic reads cheap fast, so use it with intention, not everywhere. Pavers: the workhorse — durable, permeable, and on the right base they outlast concrete and never crack the same way. Natural stone: the top of the range — nothing else has that depth, but it's a real investment and needs a crew that knows how to lay it. My honest take? Spend on the hardscape you walk on every day. That's the surface your whole space lives or dies on.`,
+  beats:["Turf vs pavers vs stone","Turf: with intention, not everywhere","Pavers: the workhorse","Stone: top of the range","Spend on what you walk on daily."],
+  caption:"The material question, answered honestly.",
+  cta:"Which one's going in your yard? Tell me your climate zone."},
+ {id:5,pillar:'educate',fmt:'Hot-take · office · ~30s · attacks "doing nothing"',
+  title:'Why "we\'ll do it next year" costs you more than doing it now',
+  hook:"The most expensive decision in a backyard remodel is waiting.",
+  body:`I get it — the backyard's been on the list for three years and there's no emergency, so it keeps sliding. But here's the math nobody runs. Material and labor don't get cheaper — they've gone one direction for a decade. The good crews book out months ahead, so "next spring" is really next fall. And every season you wait is a season you didn't live in the space you're paying a mortgage on. This isn't urgency — we don't do same-day, we plan months out on purpose. It's just the honest cost of "later." The best yards I've seen belong to people who stopped waiting.`,
+  beats:["The real cost of waiting","Prices don't drop. They climb.","Good crews book months out.","You're paying for space you don't use.","Stop waiting."],
+  caption:'"Next year" is the most expensive contractor in San Diego. By design, not by dispatch.',
+  cta:"How many years has yours been 'on the list'? Be honest. 👇"},
+ {id:6,pillar:'react',fmt:'Screen-record listings + face overlay · SERIES · ~40s',
+  title:'Rating San Diego backyards until I find a 10',
+  hook:"Rating San Diego backyards one to ten until I find a perfect one. This one's… interesting.",
+  body:`Okay — La Jolla, listed at four million. Beautiful house. And then the backyard is… a concrete slab and a plastic chair. Six-million-dollar view, ninety-nine-dollar patio. That's a four — and only because of the view. See how there's no zones? Nowhere to eat, nowhere to gather, no shade. This is what I mean when I say most San Diego backyards are underbuilt. The house is finished. The backyard is an afterthought. Give me this lot and I'd design three zones and a fire feature and it becomes the reason you bought the house. Next.`,
+  beats:["Rating SD backyards till I find a 10","$4M house…","…$99 patio","Underbuilt. Every time.","Score: 4/10"],
+  caption:"Part 1. The house is finished — the backyard never is.",
+  cta:"Drop a listing link and I'll rate your backyard.",
+  series:"Make it a recurring series — Part 1, 2, 3… viewers come back for it."},
+ {id:7,pillar:'react',fmt:'Screen-record a finished-project photo · ~30s',
+  title:'Guess how much this backyard cost',
+  hook:"Guess how much this backyard cost. I'll wait. Comment before I say it.",
+  body:`Alright, look at this. Full outdoor kitchen, board-formed concrete fire feature, porcelain pavers, built-in seating, layered lighting. Take a guess. … Most people lowball this by half. This is a two-hundred-thousand-dollar space, and here's why it's worth it — every element was designed to work together, not bought separately and crammed in. The kitchen flows to the dining zone, the dining flows to the fire. That's not luck, that's layout. You're not paying for pavers. You're paying for someone to make it feel like one room.`,
+  beats:["Guess the price 👇","Kitchen + fire + pavers + lighting","…","$200K","You pay for the layout, not the pavers."],
+  caption:"Did you guess right? The price is in the flow.",
+  cta:"How close was your guess? 👇"},
+ {id:8,pillar:'react',fmt:'Screen-record bad DIY/reno posts · ~35s',
+  title:'Reacting to the worst backyard "upgrades" on the internet',
+  hook:"Someone spent real money on this and I have questions.",
+  body:`People send me these and I can't look away. Okay — pavers laid straight onto dirt, no base. That's going to sink and heave within one rainy season, guaranteed. This one: a fire pit two feet from a wood fence. That's not a design choice, that's a call to the fire department. And this — gorgeous furniture on a slab with zero drainage, so it's a pond every time it rains. None of this is a money problem. It's a "nobody thought about it first" problem. Structure before landscaping. Every time.`,
+  beats:["Money ≠ good","Pavers on bare dirt 💀","Fire pit + wood fence 😬","No drainage = pond","Structure before landscaping."],
+  caption:"It's never a budget problem. It's a planning problem.",
+  cta:"Send me the worst one you've seen."},
+ {id:9,pillar:'react',fmt:'Screen-record + mark up a photo · ~45s',
+  title:'Redesigning a viral backyard live',
+  hook:"This backyard has good bones and a bad plan. Let me fix it in 45 seconds.",
+  body:`Look at this lot — flat, private, great light. Whoever owns it is wasting it. Here's what I'd do. First, I'm killing this random patch of lawn and pulling a paver terrace off the back door so the inside flows straight out — that's your main room. Over here, against the wall, a linear fire feature with built-in seating, so you gather without hauling furniture around. Shade structure on the west side for the afternoon sun — this is San Diego, you'll use it year-round. And lighting layered low so it works at night, not just at noon. Same lot. Completely different life. That's design versus decoration.`,
+  beats:["Good bones, bad plan","1. Paver terrace off the door","2. Fire + built-in seating","3. West-side shade","4. Layered lighting","Design > decoration"],
+  caption:"Same lot, completely different life. Concept — this is how I'd approach it.",
+  cta:"Want me to redesign yours? Post a photo below."},
+ {id:10,pillar:'react',fmt:'Screen-record trend photos/articles · ~40s',
+  title:'Rating 2026 outdoor design trends: buy, skip, or overrated',
+  hook:"2026 backyard trends — I'm calling buy, skip, or overrated. No fence-sitting.",
+  body:`Let's go. Outdoor living rooms — full sofas, rugs, fireplaces outside: buy. That's the whole philosophy, a real room outdoors. Zoned backyards — lounge, dining, a quiet retreat: buy, that's how good design has always worked. Wall-to-wall artificial turf: overrated — use it with intention, not as a carpet. Outdoor TVs over the grill: skip for most people, they date fast and pull you out of the reason you built the space. And low-maintenance native, drought-tolerant planting: hard buy — it's San Diego, work with the climate, not against it. Trends come and go. Intentional never does.`,
+  beats:["2026 trends: buy / skip / overrated","Outdoor living rooms → BUY","Zoned yards → BUY","Wall-to-wall turf → OVERRATED","Outdoor TVs → SKIP","Native planting → BUY"],
+  caption:"The 2026 list, rated honestly. Which one are you doing?",
+  cta:"Which call did I get wrong? Fight me in the comments."},
+ {id:11,pillar:'design',fmt:'POV walk-with-me · stone yard · ~35s',
+  title:'Come pick pavers with me',
+  hook:"Come pick pavers with me — and I'll show you how the pros actually choose.",
+  body:`Most people pick a paver by color. That's the last thing I look at. First: format and size — larger-format pavers read more modern and make a space feel bigger; smaller units feel more traditional. Then finish — smooth for a clean contemporary look, tumbled for something warmer and old-world. Then the base and permeability, because that's what keeps it flat for twenty years. Color's the easy part, and honestly? Go quieter than you think. The paver is the backdrop — you want the space to feel calm, not busy. Restraint is what makes it look expensive.`,
+  beats:["How pros pick pavers","1. Format & size","2. Finish","3. Base & permeability","Color = last. Go quieter."],
+  caption:"Restraint is what makes it look expensive.",
+  cta:"Team large-format or team classic? 👇"},
+ {id:12,pillar:'design',fmt:'Walking / talking head + b-roll · ~35s',
+  title:'What makes a backyard look "expensive" (it\'s not the budget)',
+  hook:"Five things that make a backyard look expensive — and only one of them costs real money.",
+  body:`You can fake luxury in a backyard if you understand what actually signals it. One: continuous materials — the fewer different surfaces, the more expensive it reads. Two: hidden lighting, never bare fixtures — light the space, hide the source. Three: clean sightlines — nothing cluttered, everything intentional. Four: mature planting — even a single specimen tree makes a space feel established. And five, the only one that really costs — natural stone or large-format hardscape done right. Four of the five are about restraint and intention, not spending. Expensive is a look you design, not a number you hit.`,
+  beats:["5 ways to look expensive","Continuous materials","Hidden lighting","Clean sightlines","Mature planting","Great hardscape"],
+  caption:"4 of the 5 are free. Expensive is designed, not bought.",
+  cta:"Save this for your next project."},
+ {id:13,pillar:'design',fmt:'Talking head / walking + b-roll · ~30s',
+  title:'The one feature I put in almost every backyard',
+  hook:"There's one feature I recommend in almost every backyard, and it's not what you'd guess.",
+  body:`It's not the fire pit and it's not the kitchen. It's layered lighting. Here's why. You can build the most beautiful space in San Diego, and if it only works at noon, you've paid for a backyard you use three hours a day. Lighting is what turns it into a place you live in at seven, eight, nine at night — which, if you work all day, is the only time you're actually out there. Path lights low, uplights on the trees, warm glow on the walls. Usually the smallest line on the budget and the biggest change in how much you use the space. Design for the hours you're home.`,
+  beats:["The feature I always recommend","Not the fire pit.","Layered lighting.","Design for 8pm, not noon.","Smallest cost, biggest change."],
+  caption:"Design for the hours you're actually home.",
+  cta:"What time do you actually use your backyard? 👇"},
+ {id:14,pillar:'design',fmt:'Walking a driveway / front yard · ~30s',
+  title:'Driveways: the curb-appeal upgrade nobody talks about',
+  hook:"Everyone remodels the backyard and ignores the first thing every guest sees — the driveway.",
+  body:`Think about it — the driveway and front approach are the very first impression of your entire home, and most people leave it as a cracked slab of gray concrete. A paver driveway in a herringbone or large-format pattern does something a backyard can't: it changes how the whole house presents from the street. Stamped concrete, real pavers, a stone border tying it to the architecture — high-ROI, high-visibility, and it's the one upgrade your neighbors notice immediately. Curb appeal isn't vanity. It's the frame around everything else you've built.`,
+  beats:["The upgrade everyone skips","Your driveway = first impression","Pavers > cracked gray slab","Herringbone. Stone border.","Curb appeal is the frame."],
+  caption:"The first thing every guest sees. Front-yard curb appeal, done with intention.",
+  cta:"Backyard first or driveway first? 👇"},
+ {id:15,pillar:'brand',fmt:'Talking head · office · ~35s · signature',
+  title:'Why we come back 10 months after we finish',
+  hook:"We're the only ones I know who come back ten months after the job is done. Here's why.",
+  body:`Most contractors' relationship with you ends the day they cash the final check. Ours doesn't. Ten months after we finish, we come back — no charge — and inspect the entire thing with a fine-tooth comb. Why ten months? Because that's a full cycle of San Diego seasons — the dry summer, the rains, the settling. If something's going to move or show, it shows by then. We'd rather be the ones who catch it than have you living with it. That's what "built with intention" actually means — we're accountable to the work long after we're gone. Anyone can build it. We stand behind it.`,
+  beats:["We come back at 10 months","No charge. Every project.","Why 10? A full year of SD seasons.","We catch it before you live with it.","Accountable after we're gone."],
+  caption:"Anyone can build it. We stand behind it. By design, not by dispatch.",
+  cta:"Would you want your contractor coming back? 👇"},
+ {id:16,pillar:'brand',fmt:'Talking head / truck · ~30s',
+  title:'Why we only run one crew per project',
+  hook:"We turn down work to protect one thing most contractors give up on day one.",
+  body:`Here's a decision that costs us jobs and we make it anyway. One crew per project, start to finish. No rotating subs, no "the drainage guy will be here Tuesday, the paver guy Thursday, good luck." The same lead craftsman — twenty-five-plus years in the field — is there from the first cut to the final sweep. That's why the details line up, that's why nothing gets lost in a handoff, and that's why we can only take a certain number of projects at a time. We plan months ahead and build with intention. By design, not by dispatch. If someone can start your job tomorrow, ask yourself who they pulled off another one to do it.`,
+  beats:["We turn down work on purpose","One crew. Start to finish.","No rotating subs.","25+ yr lead, every day","By design, not by dispatch."],
+  caption:"If they can start tomorrow, who'd they pull off another job?",
+  cta:"Ever been handed off mid-project? Tell me. 👇"},
+ {id:17,pillar:'brand',fmt:'Walk-with-me · your own yard · ~35s',
+  title:'My own backyard is a work in progress — and that\'s the point',
+  hook:"People are surprised my own backyard isn't finished yet. Here's why that's on purpose.",
+  body:`I do this for a living and even I don't rush my own space. Because the biggest mistake I see is people doing it in a hurry, piece by piece, with no plan — and then paying to redo it. I'd rather live with it a little longer and design the whole thing as one cohesive space than slap in a patio this month and regret the layout next year. Built with intention, not rushed — that's not a slogan, it's how I treat my own home. The best backyards aren't the fastest ones. They're the ones somebody actually thought about first.`,
+  beats:["Even mine isn't done yet","On purpose.","Rushed = redone","Design the whole, not the pieces","Built with intention. Not rushed."],
+  caption:"Built with intention, not rushed — even at my own house.",
+  cta:"'Do it all at once' or 'piece by piece' person? 👇"},
+ {id:18,pillar:'brand',fmt:'Screen-record your render process + face overlay · ~35s · label concept',
+  title:'The renderings we make before we build a single thing',
+  hook:"Before we touch your yard, you see it finished — photoreal, your actual property. Here's how.",
+  body:`Most contractors hand you a napkin sketch and ask you to trust them. We do the opposite. Before a single paver is set, we render your actual property in photorealistic 2D and 3D — your house, your lot, the real light — so you can walk the finished space before we build it. You move the fire feature, we move it on screen. Want to see it at dusk? We show you dusk. It takes the guessing out of a six-figure decision. This is what it looks like when technology finally shows up to an industry that's run on paper for fifty years. You approve the vision. Then we build exactly that.`,
+  beats:["You see it finished — first","Photoreal 2D + 3D of YOUR property","Move it on screen before we build","No guessing on a 6-figure call","Approve the vision. Then we build."],
+  caption:"You approve the vision before we build it. Concept visualization of the real property.",
+  cta:"Would you want to see it before you build it? 👇"},
+ {id:19,pillar:'local',fmt:'Walking/driving an area · REPEATABLE per neighborhood · ~35s',
+  title:'What backyards should look like in [neighborhood]',
+  hook:"Every San Diego neighborhood has a backyard style that just works. Del Mar's is not La Mesa's.",
+  body:`Design should answer the place it's in. Take Del Mar — coastal light, ocean air, that relaxed North County feel. The backyards that work here lean into it: weathered natural stone, teak that greys beautifully, open sightlines to the sky, planting that can take the salt air. Now go inland to Mount Helix or Rancho San Diego — bigger lots, more privacy, hotter afternoons — and the right move is shade structures, fire for the cool evenings, and materials that hold up to real sun. Same company, completely different design language. A backyard should feel like it belongs exactly where it is. That's the difference between designed and generic.`,
+  beats:["Every SD neighborhood has a style","Del Mar: coastal stone, teak, open sky","Mt. Helix: shade, fire, big lots","Design answers the place.","Belongs where it is."],
+  caption:"A backyard should feel like it belongs where it is. Which neighborhood next?",
+  cta:"Comment your neighborhood and I'll break down what works there.",
+  series:"One per area — Bonita, La Mesa, Rancho Santa Fe, Encinitas, Coronado, Poway. Great for local SEO."},
+ {id:20,pillar:'local',fmt:'Walking outside / golden hour · ~30s',
+  title:'San Diego lets you build a backyard you use all year',
+  hook:"San Diego homeowners are sitting on something most of the country would kill for — and not using it.",
+  body:`Think about where we live. There's maybe a handful of places in the entire country where you can genuinely use an outdoor space three-hundred-plus days a year — and this is the best of them. In most of America a backyard is a summer thing. Here it's a February-morning-coffee thing, a Tuesday-night-dinner thing, a year-round room. And yet most San Diego backyards are built like an afterthought. If you're going to live somewhere with this climate, build the space to match it. That's not a luxury here — it's the whole reason you pay to live in San Diego.`,
+  beats:["SD = 300+ usable days a year","Most of the US: summer only","Here: a year-round room","…and most yards waste it","Build to match the climate."],
+  caption:"You pay for the climate. Build the backyard that uses it.",
+  cta:"How many months a year do you actually use yours? 👇"},
+];
+
+const CAL = [
+ [1,'educate',1],[2,'react',6],[3,'design',12],[4,'brand',15],[5,'local',20],
+ [8,'educate',2],[9,'react',7],[10,'design',11],[11,'educate',3],[12,'local',19],
+ [15,'react',8],[16,'educate',5],[17,'design',13],[18,'brand',16],[19,'react',10],
+ [22,'design',14],[23,'react',9],[24,'educate',4],[25,'brand',18],[26,'local',19],
+ [29,'brand',17],[30,'react',6],
+];
+
+const LS='sdlr_playbook_done';
+let done=new Set();
+try{const s=localStorage.getItem(LS); if(s) done=new Set(JSON.parse(s));}catch(e){}
+function save(){try{localStorage.setItem(LS,JSON.stringify([...done]));}catch(e){}}
+let filter='all', curId=null, tele=null, teleSpeed=0.55, tT;
+
+const $=s=>document.querySelector(s);
+const el=(t,c)=>{const e=document.createElement(t); if(c)e.className=c; return e;};
+
+function renderChips(){
+  const box=$('#chips'); box.innerHTML='';
+  const defs=[['all','All'],['todo','To Film'],['done','Filmed'],
+    ...Object.entries(PILLARS).map(([k,v])=>[k,v.label])];
+  defs.forEach(([k,l])=>{
+    const c=el('button','chip'+(filter===k?' on':'')); c.textContent=l;
+    c.onclick=()=>{filter=k; renderChips(); renderList();}; box.appendChild(c);
+  });
+}
+function visible(s){
+  if(filter==='all')return true;
+  if(filter==='todo')return !done.has(s.id);
+  if(filter==='done')return done.has(s.id);
+  return s.pillar===filter;
+}
+function renderList(){
+  const list=$('#scriptList'); list.innerHTML='';
+  let lastP=null;
+  const items=SCRIPTS.filter(visible);
+  if(!items.length){const e=el('div','foot'); e.textContent='Nothing here yet.'; list.appendChild(e); return;}
+  const grouped=(filter==='all');
+  items.forEach(s=>{
+    if(grouped && s.pillar!==lastP){
+      lastP=s.pillar; const P=PILLARS[s.pillar];
+      const h=el('div','sechead');
+      h.innerHTML='<span class="dot" style="background:'+P.dot+'"></span>'+P.label;
+      list.appendChild(h);
+    }
+    const P=PILLARS[s.pillar];
+    const card=el('div','card'+(done.has(s.id)?' done':''));
+    card.innerHTML=
+      '<button class="check" aria-label="toggle"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></button>'+
+      '<div class="body"><div class="top">'+
+        '<span class="num">'+String(s.id).padStart(2,'0')+'</span>'+
+        '<span class="badge" style="background:'+P.color+'">'+P.label+'</span></div>'+
+        '<h3>'+s.title+'</h3><div class="meta">'+s.fmt+'</div></div>'+
+      '<span class="arrow"><svg width="9" height="16" viewBox="0 0 9 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 1l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
+    card.querySelector('.check').onclick=(ev)=>{ev.stopPropagation(); toggle(s.id);};
+    card.onclick=()=>openDetail(s.id);
+    list.appendChild(card);
+  });
+}
+function updateProgress(){
+  const n=done.size, total=SCRIPTS.length, pct=Math.round(n/total*100);
+  $('#ringPct').textContent=pct+'%';
+  $('#progBig').textContent=n+' of '+total+' filmed';
+  const C=157; $('#ringFill').style.strokeDashoffset=C-(C*pct/100);
+}
+function toggle(id){
+  if(done.has(id))done.delete(id); else {done.add(id); toast('Filmed ✓ — nice work');}
+  save(); updateProgress(); renderList(); renderCal();
+  if(navigator.vibrate)try{navigator.vibrate(8)}catch(e){}
+}
+
+function openDetail(id){
+  curId=id; const s=SCRIPTS.find(x=>x.id===id); const P=PILLARS[s.pillar];
+  const beats=s.beats.map((b,i)=>'<div class="beat"><span class="n">'+(i+1)+'</span><span>'+b+'</span></div>').join('');
+  $('#detailScroll').innerHTML=
+    '<span class="d-badge" style="background:'+P.color+'">'+String(s.id).padStart(2,'0')+' · '+P.label+'</span>'+
+    '<div class="d-title">'+s.title+'</div>'+
+    '<div class="d-meta">'+s.fmt+'</div>'+
+    '<div class="d-lbl">Hook — first 2 seconds</div><div class="hookbox">'+s.hook+'</div>'+
+    '<div class="d-lbl">Script</div><div class="scriptbox" id="teleTarget">'+s.body+'</div>'+
+    '<div class="d-lbl">On-screen text beats</div><div class="beats">'+beats+'</div>'+
+    '<div class="d-lbl">Caption</div><div class="copybox"><button class="copybtn" data-c="'+encodeURIComponent(s.caption)+'">Copy</button>'+s.caption+'</div>'+
+    '<div class="d-lbl">Call to action</div><div class="copybox"><button class="copybtn" data-c="'+encodeURIComponent(s.cta)+'">Copy</button>'+s.cta+'</div>'+
+    (s.series?'<div class="series">⟳ Series: '+s.series+'</div>':'');
+  $('#detailScroll').querySelectorAll('.copybtn').forEach(b=>{
+    b.onclick=()=>{try{navigator.clipboard.writeText(decodeURIComponent(b.dataset.c));}catch(e){}
+      b.textContent='Copied'; b.classList.add('copied'); toast('Copied to clipboard');
+      setTimeout(()=>{b.textContent='Copy'; b.classList.remove('copied');},1400);};
+  });
+  syncMark(); stopTele();
+  $('#detailScroll').scrollTop=0;
+  const d=$('#detail'); d.classList.add('active'); requestAnimationFrame(()=>d.classList.add('in'));
+  setNav(true);
+}
+function closeDetail(){
+  const d=$('#detail'); d.classList.remove('in'); stopTele();
+  setTimeout(()=>{d.classList.remove('active');},320);
+  setNav(false); curId=null;
+}
+function syncMark(){
+  const b=$('#markBtn'); const isDone=done.has(curId);
+  b.textContent=isDone?'✓ Filmed — undo':'Mark Filmed';
+  b.classList.toggle('done',isDone);
+}
+$('#markBtn').onclick=()=>{ toggle(curId); syncMark(); };
+
+$('#teleBtn').onclick=()=>{ tele?stopTele():startTele(); };
+function startTele(){
+  const sc=$('#detailScroll'); $('#teleBtn').classList.add('on'); $('#teleBtn').textContent='❚❚';
+  $('#teleHint').classList.add('show'); setTimeout(()=>$('#teleHint').classList.remove('show'),1800);
+  let acc=0;
+  tele=setInterval(()=>{
+    acc+=teleSpeed; if(acc>=1){sc.scrollTop+=Math.floor(acc); acc-=Math.floor(acc);}
+    if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-2)stopTele();
+  },16);
+}
+function stopTele(){ if(tele){clearInterval(tele);tele=null;} $('#teleBtn').classList.remove('on'); $('#teleBtn').textContent='▶'; }
+$('#detailScroll').addEventListener('pointerdown',()=>{ if(tele)stopTele(); });
+
+function setNav(inDetail){
+  const s=curId?SCRIPTS.find(x=>x.id===curId):null;
+  if(inDetail){
+    $('#navLeft').innerHTML='<button id="backBtn"><svg class="chev" viewBox="0 0 12 20" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M11 1L2 10l9 9" stroke-linecap="round" stroke-linejoin="round"/></svg>Scripts</button>';
+    $('#navTitle').textContent='Script '+String(s.id).padStart(2,'0');
+    $('#navRight').innerHTML='';
+    $('#backBtn').onclick=closeDetail;
+  }else{
+    $('#navLeft').innerHTML=''; $('#navRight').innerHTML='';
+    const av=$('.view.active[data-title]'); $('#navTitle').textContent=av?av.dataset.title:'Scripts';
+  }
+}
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.onclick=()=>{
+    if(curId)closeDetail();
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on');
+    document.querySelectorAll('.views > .view[data-title]').forEach(v=>v.classList.remove('active'));
+    const v=$('#v-'+t.dataset.tab); v.classList.add('active');
+    $('#navTitle').textContent=v.dataset.title; v.scrollTop=0;
+  };
+});
+
+$('#resetBtn').onclick=()=>{
+  if(!done.size){toast('Nothing to reset');return;}
+  if(confirm('Reset all filmed progress?')){done.clear();save();updateProgress();renderList();renderCal();toast('Progress reset');}
+};
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1600);}
+
+$('#planTop').innerHTML=
+  '<div class="callout gold"><b>The goal:</b> film a week of content — 5 videos — in one 90-minute block. Repeat weekly and you build a month-plus buffer fast.</div>'+
+  '<div class="gcard"><h4>Weekly rhythm</h4><ul>'+
+    '<li><b>Mon (30 min) — Prep.</b> Pick 5 scripts. For reactions, screenshot 5–10 listings/photos into a folder. Load scripts here.</li>'+
+    '<li><b>Tue (90 min) — Batch film.</b> 2 shirts to fake different days. Talking-heads + walking first, then screen-record reactions at the desk. 2 takes each, move on.</li>'+
+    '<li><b>Wed–Thu — Edit + caption.</b> CapCut for face-overlay reactions + text beats. Batch all 5.</li>'+
+    '<li><b>Fri — Schedule next week.</b> Front-load so posting is automatic.</li></ul></div>'+
+  '<div class="gcard"><h4>Reaction setup (once)</h4><ul>'+
+    '<li>Screen-record the source (computer or phone) with audio.</li>'+
+    '<li>Record your face reacting separately, vertical.</li>'+
+    '<li>CapCut: source fills frame, your face a small corner overlay — or use Reels native Green Screen.</li>'+
+    '<li>Add the on-screen beats. Export 9:16. Cross-post to TikTok + YT Shorts free.</li></ul></div>'+
+  '<div class="callout"><b>Kit:</b> phone + small tripod · a clip-on lav mic ($20–30 — audio matters more than camera) · window light or a ring light · a teleprompter (this app has one — open any script and tap ▶).</div>'+
+  '<div class="gcard"><h4>What to track</h4><ul>'+
+    '<li>Retention / watch-time first, saves + shares second, comments third, likes last.</li>'+
+    '<li><b>Saves</b> (cost breakdowns, how-to-hire) = buying intent → make more.</li>'+
+    '<li><b>Shares</b> (reactions, ratings) = reach → make more. Run both engines.</li></ul></div>';
+
+function renderCal(){
+  const box=$('#calList'); box.innerHTML='';
+  CAL.forEach(([day,pillar,sid])=>{
+    const s=SCRIPTS.find(x=>x.id===sid); const P=PILLARS[pillar];
+    const row=el('div','cal-row'+(done.has(sid)?' done':''));
+    row.innerHTML=
+      '<div class="cal-day">Day<b>'+day+'</b></div>'+
+      '<div class="cal-mid"><div class="t">'+String(sid).padStart(2,'0')+' · '+s.title+'</div>'+
+        '<div class="p" style="color:'+P.color+'">'+P.label+'</div></div>'+
+      '<div class="cal-check"><svg viewBox="0 0 24 24" fill="none" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg></div>';
+    row.onclick=()=>openDetail(sid);
+    box.appendChild(row);
+  });
+}
+
+$('#guideBody').innerHTML=
+  '<div class="callout gold"><b>The situation this solves:</b> no active job sites, no testimonials yet — and that\'s fine. This builds authority the way a person does: taste, knowledge, opinion. You don\'t need a finished $300K backyard behind you to be the most trusted outdoor-living expert a homeowner has ever watched.</div>'+
+  '<div class="gcard"><h4>Who you\'re talking to</h4><p style="margin:0;font-size:14px;color:#dcd6c6">Higher-income SD homeowners — mid-50s–60s grandparents or 30s–40s families in Del Mar, Encinitas, Rancho Santa Fe, Mount Helix, La Mesa, Bonita. Problem-aware, quality-shopping — not price-shopping. The real #1 competitor is <b style="color:#c8a869">doing nothing / "next year."</b> Half your content quietly attacks that.</p></div>'+
+  '<div class="gcard"><h4>The one rule</h4><p style="margin:0;font-size:14px;color:#dcd6c6">Sell the experience, not the product. Rolls-Royce / private-jet energy, delivered by a real person who cares about your home. Never "we do pavers cheap." Always "here\'s what makes a backyard feel finished instead of assembled."</p></div>'+
+  '<div class="sechead"><span class="dot" style="background:var(--green)"></span>Say this</div>'+
+  '<div class="pill-row"><span class="minipill yes">intentional</span><span class="minipill yes">cohesive</span><span class="minipill yes">structured</span><span class="minipill yes">designed</span><span class="minipill yes">built</span><span class="minipill yes">refined</span><span class="minipill yes">complete</span><span class="minipill yes">layout</span><span class="minipill yes">flow</span><span class="minipill yes">finished</span></div>'+
+  '<div class="sechead"><span class="dot" style="background:#a9694f"></span>Never say</div>'+
+  '<div class="pill-row"><span class="minipill no">cheap</span><span class="minipill no">affordable</span><span class="minipill no">best prices</span><span class="minipill no">free estimate</span><span class="minipill no">dream backyard</span><span class="minipill no">quality guaranteed</span><span class="minipill no">act now</span><span class="minipill no">we do it all</span></div>'+
+  '<div class="callout"><b>Reuse these lines:</b> "Built with intention. Not rushed." · "By design, not by dispatch." · "A room you actually live in." · "Structure before landscaping." · "Get it done right, once."</div>'+
+  '<div class="callout" style="border-left-color:#a9694f"><b>Honesty rule:</b> no testimonials you don\'t have; never imply an AI render is a finished job (call it "concept"). You <i>can</i> cite licensed &amp; insured GC, CSLB #1139785. First names Gio &amp; Mike OK; never name Mike\'s other companies or the field lead\'s full name ("our lead craftsman, 25+ years").</div>'+
+  '<div class="sechead"><span class="dot" style="background:var(--gold)"></span>Formats that work</div>'+
+  '<div class="prose" style="font-size:14px">'+
+    '<p><b>Screen-record reaction</b> (green-screen / face overlay) — react to listings, viral backyards, trends. Endless supply, film 10 in an hour. Your workhorse.</p>'+
+    '<p><b>"Here\'s what this costs"</b> — real numbers nobody says. Instant trust.</p>'+
+    '<p><b>Rating format</b> — "Rating SD backyards 1–10." Repeatable, teaches taste.</p>'+
+    '<p><b>Talking-head + hard hook + b-roll</b> — best for education and hot takes.</p>'+
+    '<p><b>"Things I\'d never do / stop doing this"</b> — confident, contrarian, shareable.</p></div>'+
+  '<div class="callout gold"><b>Hook rule:</b> the first 2 seconds decide everything. Boldest, most specific line first — numbers + stakes beat vague. Put a text hook on screen that\'s <i>different</i> from what you say out loud.</div>'+
+  '<div class="sechead"><span class="dot" style="background:var(--sage)"></span>10 bonus hooks</div>'+
+  '<ul class="hooklist">'+
+    '<li>"I estimated a backyard today — here\'s what I saw the second I walked in."<span class="tag">POV at-estimate</span></li>'+
+    '<li>"Stop putting a fire pit here."<span class="tag">placement myth-bust</span></li>'+
+    '<li>"$50K vs $150K backyard — what actually changes."<span class="tag">screen-record compare</span></li>'+
+    '<li>"The order we build a backyard in — and why it matters."<span class="tag">process explainer</span></li>'+
+    '<li>"Concrete is cracking all over San Diego. Here\'s what I use instead."<span class="tag">material authority</span></li>'+
+    '<li>"Rating celebrity backyards."<span class="tag">reaction, high reach</span></li>'+
+    '<li>"3 backyard features that add the most home value."<span class="tag">resale mindset</span></li>'+
+    '<li>"What \'design-build\' actually means (and why it saves you)."<span class="tag">positioning</span></li>'+
+    '<li>"The plants I\'d never put in a San Diego backyard."<span class="tag">contrarian, local</span></li>'+
+    '<li>"Come to an estimate with me."<span class="tag">walk a property start to finish</span></li></ul>'+
+  '<div class="foot">SDLR · Licensed &amp; insured GC, CSLB #1139785 · Editorial-luxury, founder-led, honest.</div>';
+
+renderChips(); renderList(); updateProgress(); renderCal();
+</script>
+</body>
+</html>
