@@ -278,6 +278,16 @@
   .jstat.bad{background:#2a1613;color:#d9a79f;border:1px solid #5a3a34}
   .jstat .spin{width:11px;height:11px;border:2px solid rgba(232,201,138,.3);border-top-color:#e8c98a;border-radius:50%;animation:spin .8s linear infinite}
   .jsave{background:var(--green);border:0;color:#141109;font:inherit;font-size:13px;font-weight:700;padding:9px 15px;border-radius:12px;cursor:pointer}
+  /* caption style picker */
+  .styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:4px}
+  .sty{background:var(--panel);border:2px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;
+    padding:0;text-align:left;position:relative;transition:transform .12s}
+  .sty:active{transform:scale(.97)}
+  .sty.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,168,105,.18)}
+  .sty img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:#000}
+  .sty .nm{padding:8px 10px;font-size:13px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .sty .tick{color:var(--gold);font-size:14px;opacity:0}
+  .sty.on .tick{opacity:1}
 </style>
 </head>
 <body>
@@ -326,6 +336,9 @@
       <div class="largetitle">Library</div>
       <div class="largesub">Auto-edited videos land here. Tap Save when Ready.</div>
       <div id="jobList"></div>
+      <div class="sechead"><span class="dot" style="background:var(--gold)"></span>Caption Style</div>
+      <div class="largesub" style="margin-bottom:10px">Tap a style to use it on every new edit. Previews are live.</div>
+      <div class="styles" id="styleGrid"></div>
     </div>
 
     <div class="view" id="detail">
@@ -964,6 +977,38 @@ window.addEventListener('orientationchange',()=>{if(rc('recorder').classList.con
 const LSJ='sdlr_edit_jobs';
 let jobs=[];try{jobs=JSON.parse(localStorage.getItem(LSJ)||'[]');}catch(e){}
 function saveJobs(){try{localStorage.setItem(LSJ,JSON.stringify(jobs));}catch(e){}}
+
+/* caption style picker — curated from the 53 ZapCap templates,
+   all with keyword highlighting (the look Gio wants) */
+const STYLES=[
+ {id:'a51c5222-47a7-4c37-b052-7b9853d66bf6',name:'Hormozi 1'},
+ {id:'a5619dcb-199d-4c6d-af05-6e5d5daef601',name:'Hormozi 5'},
+ {id:'143d51b4-d317-4be1-9863-ce1582815d4f',name:'Hormozi 6'},
+ {id:'cfa6a20f-cacc-4fb6-b1d0-464a81fed6cf',name:'Gstaad'},
+ {id:'55267be2-9eec-4d06-aff8-edcb401b112e',name:'Sage'},
+ {id:'7b946549-ae16-4085-9dd3-c20c82504daa',name:'Maya'},
+ {id:'a104df87-5b1a-4490-8cca-62e504a84615',name:'Noah'},
+ {id:'e511ecc2-70e0-4bd4-a478-85827f2dfc1f',name:'Ivy'},
+ {id:'d182f3a5-34b3-469b-b40e-8a7d68cfa00f',name:'Milo'},
+ {id:'50cdfac1-0a7a-48dd-af14-4d24971e213a',name:'Jason'},
+ {id:'07ffd4b8-4e1a-4ee3-8921-d58802953bcd',name:'Celine'},
+ {id:'221a34e3-da11-4e87-b8bd-1ef39d78ed23',name:'Cora'},
+ {id:'46d20d67-255c-4c6a-b971-31fddcfea7f0',name:'Beast'},
+ {id:'20fe5f77-1627-4993-86b4-8d6e2c0f2280',name:'Miles'},
+];
+const LSS='sdlr_caption_style';
+let styleId='a51c5222-47a7-4c37-b052-7b9853d66bf6';
+try{const v=localStorage.getItem(LSS);if(v)styleId=v;}catch(e){}
+function renderStyles(){
+  const box=rc('styleGrid');if(!box)return;box.innerHTML='';
+  STYLES.forEach(s=>{
+    const b=el('button','sty'+(s.id===styleId?' on':''));
+    b.innerHTML='<img loading="lazy" src="https://cdn.zapcap.ai/template-gifs/'+s.id+'.gif" alt="">'+
+      '<div class="nm"><span>'+s.name+'</span><span class="tick">✓</span></div>';
+    b.onclick=()=>{styleId=s.id;try{localStorage.setItem(LSS,styleId);}catch(e){}renderStyles();toast(s.name+' style selected');};
+    box.appendChild(b);
+  });
+}
 function fmtDate(ts){const d=new Date(ts);return (d.getMonth()+1)+'/'+d.getDate()+' '+d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
 function renderJobs(){
   const box=rc('jobList');if(!box)return;box.innerHTML='';
@@ -1018,7 +1063,7 @@ async function autoEdit(){
     const name='sdlr-raw/script-'+String(curId).padStart(2,'0')+'-'+Date.now()+'.'+rExt;
     const put=await mod.upload(name,rBlob,{access:'public',handleUploadUrl:'/api/edit-blob',contentType:rBlob.type||'video/mp4'});
     btn.textContent='Starting edit…';
-    const sr=await fetch('/api/edit-submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({blobUrl:put.url,scriptId:curId})});
+    const sr=await fetch('/api/edit-submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({blobUrl:put.url,scriptId:curId,templateId:styleId})});
     const d=await sr.json().catch(()=>({}));
     if(!sr.ok||!d.taskId){
       if(d&&d.error==='missing_key'){
@@ -1041,7 +1086,7 @@ async function autoEdit(){
   }
 }
 rc('recEdit').onclick=autoEdit;
-renderJobs();
+renderJobs();renderStyles();
 
 renderChips(); renderList(); updateProgress(); renderCal();
 </script>
