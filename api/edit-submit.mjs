@@ -11,7 +11,7 @@ export default async function handler(req, res) {
       message: 'Add ZAPCAP_API_KEY in Vercel → Settings → Environment Variables, then redeploy.',
     });
   }
-  const { blobUrl } = req.body || {};
+  const { blobUrl, templateId: chosenTemplate } = req.body || {};
   if (!blobUrl) return res.status(400).json({ error: 'blobUrl required' });
 
   try {
@@ -26,19 +26,11 @@ export default async function handler(req, res) {
     const videoId = vj.id || vj.videoId;
     if (!videoId) return res.status(502).json({ error: 'zapcap_no_video_id', detail: JSON.stringify(vj).slice(0, 300) });
 
-    // 2. Pick a template: env override → first available → documented example
-    let templateId = process.env.ZAPCAP_TEMPLATE_ID;
-    if (!templateId) {
-      try {
-        const tr = await fetch(ZAP + '/templates', { headers: { 'x-api-key': key } });
-        if (tr.ok) {
-          const t = await tr.json();
-          const list = Array.isArray(t) ? t : t.templates || t.data || [];
-          if (list.length) templateId = list[0].id;
-        }
-      } catch (e) {}
-    }
-    if (!templateId) templateId = 'a51c5222-47a7-4c37-b052-7b9853d66bf6';
+    // 2. Template: user's chosen style → env override → "Hormozi 1" default
+    const templateId =
+      chosenTemplate ||
+      process.env.ZAPCAP_TEMPLATE_ID ||
+      'a51c5222-47a7-4c37-b052-7b9853d66bf6'; // Hormozi 1 (animated + highlighted)
 
     // 3. Create the editing task — SDLR house style
     const styled = {
