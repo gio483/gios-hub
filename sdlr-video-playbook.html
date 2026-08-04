@@ -209,6 +209,13 @@
   @keyframes spin{to{transform:rotate(360deg)}}
   .rec-hint{position:absolute;left:0;right:0;bottom:calc(122px + env(safe-area-inset-bottom));text-align:center;z-index:4;
     color:rgba(255,255,255,.92);font-size:13.5px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.9);pointer-events:none}
+  .rec-speed{position:absolute;top:calc(env(safe-area-inset-top) + 90px);left:50%;transform:translateX(-50%);z-index:5;
+    display:flex;align-items:center;gap:5px;background:rgba(0,0,0,.52);border:1px solid rgba(255,255,255,.22);
+    border-radius:26px;padding:5px 6px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .rec-speed button{background:rgba(255,255,255,.15);border:0;color:#fff;font:inherit;font-size:13px;font-weight:600;
+    padding:9px 15px;border-radius:20px;cursor:pointer}
+  .rec-speed button:active{background:rgba(255,255,255,.32)}
+  .rec-speed-val{color:#ffdf9e;font-size:15px;font-weight:700;min-width:50px;text-align:center}
 
   /* ---------- tab bar ---------- */
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:35;height:var(--tab-h);
@@ -337,10 +344,13 @@
     <div class="rec-top">
       <button id="recClose" aria-label="close">✕</button>
       <div class="rec-topright">
-        <button id="recSpeedDown" aria-label="slower">A−</button>
-        <button id="recSpeedUp" aria-label="faster">A+</button>
         <button id="recFlip" aria-label="flip camera">⟲ Flip</button>
       </div>
+    </div>
+    <div class="rec-speed">
+      <button id="recSlower">− Slower</button>
+      <span class="rec-speed-val" id="recSpeedVal">1.0×</span>
+      <button id="recFaster">Faster +</button>
     </div>
     <div class="rec-timer" id="recTimer" hidden><span class="reddot"></span><span id="recTime">0:00</span></div>
     <div class="rec-count" id="recCount" hidden></div>
@@ -768,6 +778,17 @@ let rStream=null,rRec=null,rChunks=[],rBlob=null,rFile=null,rMime='',rExt='mp4',
     rFacing='user',rScroll=null,rTimer=null,rSecs=0,rState='idle',rSpeed=0.6,rUrl=null;
 const rc=id=>document.getElementById(id);
 
+/* teleprompter scroll speed — remembered across all scripts */
+const LS3='sdlr_tele_speed';
+let speedMult=1.0;
+try{const v=parseFloat(localStorage.getItem(LS3));if(v>0)speedMult=v;}catch(e){}
+function applySpeed(){
+  speedMult=Math.max(0.4,Math.min(2.4,Math.round(speedMult*10)/10));
+  rSpeed=0.6*speedMult;
+  const el=rc('recSpeedVal');if(el)el.textContent=speedMult.toFixed(1)+'×';
+  try{localStorage.setItem(LS3,String(speedMult));}catch(e){}
+}
+
 function pickMime(){
   if(!('MediaRecorder' in window))return null;
   const cands=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
@@ -833,6 +854,7 @@ async function openRecorder(id){
     s.body.split('\n').map(p=>p.trim()?'<p>'+p+'</p>':'').join('');
   rc('recTitle').textContent=String(s.id).padStart(2,'0')+' · '+s.title;
   rc('recorder').classList.add('open');
+  applySpeed();
   resetRecUI();rc('recErr').hidden=true;
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){
     recError("This browser can't reach the camera. Open the hub in <b>Safari</b> (not the home-screen icon) and try again.");return;}
@@ -904,8 +926,9 @@ rc('recToggle').onclick=()=>{if(rState==='idle')startRecording();else if(rState=
 rc('recRetake').onclick=async()=>{resetRecUI();try{if(!rStream)await startStream();else rc('recPreview').srcObject=rStream;}catch(e){}};
 rc('recSave').onclick=saveRecording;
 rc('recFlip').onclick=async()=>{rFacing=rFacing==='user'?'environment':'user';try{await startStream();}catch(e){recError("Couldn't switch camera.");}};
-rc('recSpeedUp').onclick=()=>{rSpeed=Math.min(2,rSpeed+0.15);};
-rc('recSpeedDown').onclick=()=>{rSpeed=Math.max(0.2,rSpeed-0.15);};
+rc('recSlower').onclick=()=>{speedMult-=0.2;applySpeed();};
+rc('recFaster').onclick=()=>{speedMult+=0.2;applySpeed();};
+applySpeed();
 rc('recRetry').onclick=async()=>{rc('recErr').hidden=true;try{await startStream();}catch(e){showCamError(e);}};
 window.addEventListener('orientationchange',()=>{if(rc('recorder').classList.contains('open')&&rState!=='recording')centerTele();});
 
