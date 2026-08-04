@@ -167,12 +167,12 @@
   .rec-preview.mirror{transform:scaleX(-1)}
   .rec-scrim{position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 52%,rgba(0,0,0,.65) 100%)}
-  .rec-tele{position:absolute;left:0;right:0;top:12%;height:52%;overflow-y:auto;-webkit-overflow-scrolling:touch;
-    padding:0 22px;z-index:2;
-    -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent);
-    mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent)}
-  .rec-tele-inner{font-size:27px;line-height:1.5;font-weight:600;color:#fff;text-align:center;
-    text-shadow:0 2px 14px rgba(0,0,0,.9);padding-bottom:75%}
+  .rec-tele{position:absolute;left:0;right:0;top:0;bottom:150px;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:0 24px;z-index:2;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent);
+    mask-image:linear-gradient(180deg,transparent,#000 18%,#000 82%,transparent)}
+  .rec-tele-inner{font-size:28px;line-height:1.5;font-weight:600;color:#fff;text-align:center;
+    text-shadow:0 2px 16px rgba(0,0,0,.95);padding:0 2px}
   .rec-tele-inner .rt-hook{color:#ffdf9e;margin-bottom:16px}
   .rec-tele-inner p{margin:0 0 15px}
   .rec-top{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;justify-content:space-between;
@@ -199,7 +199,15 @@
   .btn.save{flex:1;background:var(--green);color:#141109;max-width:260px}
   .btn.ghost2{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.32);color:#fff;flex:none;padding:15px 22px}
   .rec-err{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;text-align:center;
-    padding:40px;color:#fff;font-size:15.5px;line-height:1.5;background:rgba(0,0,0,.82)}
+    padding:34px;color:#fff;font-size:15.5px;line-height:1.5;background:rgba(0,0,0,.88)}
+  .rec-err-box{max-width:330px}
+  .rec-status{position:absolute;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%);z-index:6;
+    display:flex;align-items:center;gap:8px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;font-weight:600;
+    padding:7px 14px;border-radius:20px}
+  .rec-status .spin{width:12px;height:12px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .rec-hint{position:absolute;left:0;right:0;bottom:calc(122px + env(safe-area-inset-bottom));text-align:center;z-index:4;
+    color:rgba(255,255,255,.92);font-size:13.5px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.9);pointer-events:none}
 
   /* ---------- tab bar ---------- */
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:35;height:var(--tab-h);
@@ -335,6 +343,7 @@
     </div>
     <div class="rec-timer" id="recTimer" hidden><span class="reddot"></span><span id="recTime">0:00</span></div>
     <div class="rec-count" id="recCount" hidden></div>
+    <div class="rec-hint" id="recHint">Tap the red button when you're ready</div>
     <div class="rec-bottom" id="recBottomRecord">
       <button class="rec-btn" id="recToggle"><span class="rec-btn-inner"></span></button>
     </div>
@@ -342,7 +351,8 @@
       <button class="btn ghost2" id="recRetake">Retake</button>
       <button class="btn save" id="recSave">Save to Camera Roll</button>
     </div>
-    <div class="rec-err" id="recErr" hidden></div>
+    <div class="rec-status" id="recStatus" hidden></div>
+    <div class="rec-err" id="recErr" hidden><div class="rec-err-box"><div id="recErrMsg"></div><button class="btn save" id="recRetry" style="margin-top:16px">Try again</button></div></div>
   </div>
 </div>
 
@@ -763,13 +773,44 @@ function pickMime(){
   for(const t of cands){try{if(MediaRecorder.isTypeSupported(t))return t;}catch(e){}}
   return '';
 }
-function recError(msg){const e=rc('recErr');e.innerHTML=msg;e.hidden=false;}
+function setStatus(msg){const s=rc('recStatus');if(!msg){s.hidden=true;s.innerHTML='';}else{s.innerHTML='<span class="spin"></span>'+msg;s.hidden=false;}}
+function recError(msg){setStatus('');rc('recErrMsg').innerHTML=msg;rc('recErr').hidden=false;}
+function showCamError(e){
+  const n=(e&&e.name)||'';
+  let m;
+  if(n==='NotAllowedError'||n==='SecurityError') m="Camera & microphone access is turned off for this site.<br><br>On iPhone: tap <b>aA</b> in Safari's address bar → <b>Website Settings</b> → set Camera & Microphone to <b>Allow</b> — or Settings → Safari → Camera. Then tap Try again.";
+  else if(n==='NotFoundError'||n==='OverconstrainedError') m="No camera was found on this device.";
+  else if(n==='NotReadableError') m="The camera is busy in another app. Close that app, then tap Try again.";
+  else m="Couldn't start the camera. If this keeps happening, open the hub in <b>Safari</b> directly (not the home-screen icon), then try again.";
+  recError(m);
+}
 async function startStream(){
   if(rStream){rStream.getTracks().forEach(t=>t.stop());rStream=null;}
-  rStream=await navigator.mediaDevices.getUserMedia({
-    video:{facingMode:rFacing,width:{ideal:1080},height:{ideal:1920}},audio:true});
-  const pv=rc('recPreview');pv.srcObject=rStream;pv.classList.toggle('mirror',rFacing==='user');
-  try{await pv.play();}catch(e){}
+  setStatus('Starting camera…');
+  const tries=[
+    {video:{facingMode:rFacing,width:{ideal:1280},height:{ideal:720}},audio:true},
+    {video:{facingMode:rFacing},audio:true},
+    {video:true,audio:true},
+    {video:true,audio:false}
+  ];
+  let s=null,err=null;
+  for(const c of tries){try{s=await navigator.mediaDevices.getUserMedia(c);break;}catch(e){err=e;}}
+  if(!s)throw err||new Error('no-stream');
+  rStream=s;
+  const pv=rc('recPreview');
+  pv.srcObject=s;pv.muted=true;pv.setAttribute('playsinline','');pv.setAttribute('autoplay','');
+  pv.classList.toggle('mirror',rFacing==='user');
+  pv.onloadedmetadata=()=>{pv.play().then(()=>setStatus('')).catch(()=>{});};
+  try{await pv.play();setStatus('');}catch(e){/* plays on loadedmetadata */}
+}
+function centerTele(){
+  const tele=rc('recTele'),inner=rc('recTeleInner');
+  requestAnimationFrame(()=>{
+    const h=tele.clientHeight||Math.round(window.innerHeight*0.7);
+    inner.style.paddingTop=Math.round(h*0.42)+'px';
+    inner.style.paddingBottom=Math.round(h*0.95)+'px';
+    tele.scrollTop=0;
+  });
 }
 function resetRecUI(){
   rState='idle';rSecs=0;rChunks=[];rBlob=null;rFile=null;
@@ -777,10 +818,12 @@ function resetRecUI(){
   rc('recTele').scrollTop=0;
   rc('recTimer').hidden=true;rc('recTime').textContent='0:00';rc('recCount').hidden=true;
   rc('recBottomRecord').hidden=false;rc('recBottomDone').hidden=true;
+  rc('recHint').hidden=false;
   rc('recToggle').classList.remove('recording');
   rc('recPreview').hidden=false;rc('recTele').hidden=false;
   const pb=rc('recPlayback');pb.hidden=true;
   if(rUrl){URL.revokeObjectURL(rUrl);rUrl=null;}
+  centerTele();
 }
 async function openRecorder(id){
   const s=SCRIPTS.find(x=>x.id===id);if(!s)return;
@@ -788,13 +831,13 @@ async function openRecorder(id){
   rc('recTeleInner').innerHTML='<div class="rt-hook">'+s.hook+'</div>'+
     s.body.split('\n').map(p=>p.trim()?'<p>'+p+'</p>':'').join('');
   rc('recTitle').textContent=String(s.id).padStart(2,'0')+' · '+s.title;
-  resetRecUI();rc('recErr').hidden=true;
   rc('recorder').classList.add('open');
+  resetRecUI();rc('recErr').hidden=true;
   if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){
-    recError("This browser can't reach the camera.<br>Open the hub in <b>Safari</b> and try again.");return;}
+    recError("This browser can't reach the camera. Open the hub in <b>Safari</b> (not the home-screen icon) and try again.");return;}
   rMime=pickMime();
   try{await startStream();}
-  catch(e){recError("Camera + mic access is needed.<br>Allow it for this site (or in iOS Settings → the app), then reopen.");}
+  catch(e){showCamError(e);}
 }
 function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
 function startScroll(){const el=rc('recTele');let acc=0;
@@ -812,7 +855,7 @@ async function startRecording(){
   rRec.ondataavailable=e=>{if(e.data&&e.data.size)rChunks.push(e.data);};
   rRec.onstop=finishRecording;
   rRec.start();
-  rState='recording';rc('recToggle').classList.add('recording');
+  rState='recording';rc('recToggle').classList.add('recording');rc('recHint').hidden=true;
   rc('recTimer').hidden=false;rSecs=0;rc('recTime').textContent='0:00';
   rTimer=setInterval(()=>{rSecs++;rc('recTime').textContent=fmt(rSecs);},1000);
   rc('recTele').scrollTop=0;startScroll();
@@ -862,6 +905,8 @@ rc('recSave').onclick=saveRecording;
 rc('recFlip').onclick=async()=>{rFacing=rFacing==='user'?'environment':'user';try{await startStream();}catch(e){recError("Couldn't switch camera.");}};
 rc('recSpeedUp').onclick=()=>{rSpeed=Math.min(2,rSpeed+0.15);};
 rc('recSpeedDown').onclick=()=>{rSpeed=Math.max(0.2,rSpeed-0.15);};
+rc('recRetry').onclick=async()=>{rc('recErr').hidden=true;try{await startStream();}catch(e){showCamError(e);}};
+window.addEventListener('orientationchange',()=>{if(rc('recorder').classList.contains('open')&&rState!=='recording')centerTele();});
 
 renderChips(); renderList(); updateProgress(); renderCal();
 </script>
