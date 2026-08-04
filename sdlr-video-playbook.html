@@ -154,6 +154,53 @@
     padding:6px 13px;border-radius:20px;opacity:0;transition:.25s;pointer-events:none}
   .tele-hint.show{opacity:1}
 
+  /* ---------- record button + stacked action bar ---------- */
+  .actionbar{flex-direction:column;gap:9px}
+  .actionrow{display:flex;gap:10px}
+  .btn.record{background:#ff3b30;color:#fff;font-size:16px}
+  .detail-scroll{padding-bottom:calc(var(--tab-h) + 158px)}
+
+  /* ---------- recorder overlay ---------- */
+  .recorder{position:fixed;inset:0;z-index:60;background:#000;display:none;overflow:hidden}
+  .recorder.open{display:block}
+  .rec-preview,.rec-playback{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+  .rec-preview.mirror{transform:scaleX(-1)}
+  .rec-scrim{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 52%,rgba(0,0,0,.65) 100%)}
+  .rec-tele{position:absolute;left:0;right:0;top:12%;height:52%;overflow-y:auto;-webkit-overflow-scrolling:touch;
+    padding:0 22px;z-index:2;
+    -webkit-mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent);
+    mask-image:linear-gradient(180deg,transparent,#000 14%,#000 84%,transparent)}
+  .rec-tele-inner{font-size:27px;line-height:1.5;font-weight:600;color:#fff;text-align:center;
+    text-shadow:0 2px 14px rgba(0,0,0,.9);padding-bottom:75%}
+  .rec-tele-inner .rt-hook{color:#ffdf9e;margin-bottom:16px}
+  .rec-tele-inner p{margin:0 0 15px}
+  .rec-top{position:absolute;top:0;left:0;right:0;z-index:4;display:flex;align-items:center;justify-content:space-between;
+    padding:calc(env(safe-area-inset-top) + 10px) 16px 10px}
+  .rec-top button{background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.28);color:#fff;font:inherit;font-size:15px;font-weight:600;
+    min-width:40px;height:40px;padding:0 10px;border-radius:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .rec-topright{display:flex;gap:8px}
+  .rec-title{position:absolute;top:calc(env(safe-area-inset-top) + 60px);left:0;right:0;text-align:center;z-index:4;
+    color:rgba(255,255,255,.9);font-size:12px;letter-spacing:.05em;text-shadow:0 1px 8px rgba(0,0,0,.9);pointer-events:none}
+  .rec-timer{position:absolute;top:calc(env(safe-area-inset-top) + 12px);left:50%;transform:translateX(-50%);z-index:5;
+    display:flex;align-items:center;gap:7px;background:rgba(0,0,0,.55);padding:6px 13px;border-radius:20px;color:#fff;font-size:14px;font-weight:700}
+  .reddot{width:9px;height:9px;border-radius:50%;background:#ff3b30;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  .rec-count{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;
+    font-size:120px;font-weight:800;color:#fff;text-shadow:0 4px 34px rgba(0,0,0,.8)}
+  .rec-bottom{position:absolute;left:0;right:0;bottom:0;z-index:5;display:flex;align-items:center;justify-content:center;
+    gap:14px;padding:18px 20px calc(26px + env(safe-area-inset-bottom))}
+  .rec-btn{width:74px;height:74px;border-radius:50%;background:rgba(255,255,255,.16);border:4px solid #fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+  .rec-btn-inner{width:56px;height:56px;border-radius:50%;background:#ff3b30;transition:.2s}
+  .rec-btn.recording .rec-btn-inner{border-radius:9px;width:30px;height:30px}
+  .rec-bottom.done{gap:12px}
+  .btn.save{flex:1;background:var(--green);color:#141109;max-width:260px}
+  .btn.ghost2{background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.32);color:#fff;flex:none;padding:15px 22px}
+  .rec-err{position:absolute;inset:0;z-index:7;display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:40px;color:#fff;font-size:15.5px;line-height:1.5;background:rgba(0,0,0,.82)}
+
   /* ---------- tab bar ---------- */
   .tabbar{position:absolute;left:0;right:0;bottom:0;z-index:35;height:var(--tab-h);
     padding-bottom:env(safe-area-inset-bottom);display:flex;
@@ -249,8 +296,11 @@
       <div class="tele-hint" id="teleHint">Tap script to pause</div>
       <div class="detail-scroll" id="detailScroll"></div>
       <div class="actionbar">
-        <button class="btn ghost" id="teleBtn" title="Teleprompter">▶</button>
-        <button class="btn primary" id="markBtn">Mark Filmed</button>
+        <button class="btn record" id="recordBtn">🔴 Record with teleprompter</button>
+        <div class="actionrow">
+          <button class="btn ghost" id="teleBtn" title="Teleprompter">▶</button>
+          <button class="btn primary" id="markBtn">Mark Filmed</button>
+        </div>
       </div>
     </div>
   </div>
@@ -268,6 +318,32 @@
   </div>
 
   <div class="toast" id="toast"></div>
+
+  <div class="recorder" id="recorder">
+    <video class="rec-preview" id="recPreview" playsinline muted autoplay></video>
+    <video class="rec-playback" id="recPlayback" playsinline controls hidden></video>
+    <div class="rec-scrim"></div>
+    <div class="rec-tele" id="recTele"><div class="rec-tele-inner" id="recTeleInner"></div></div>
+    <div class="rec-title" id="recTitle"></div>
+    <div class="rec-top">
+      <button id="recClose" aria-label="close">✕</button>
+      <div class="rec-topright">
+        <button id="recSpeedDown" aria-label="slower">A−</button>
+        <button id="recSpeedUp" aria-label="faster">A+</button>
+        <button id="recFlip" aria-label="flip camera">⟲ Flip</button>
+      </div>
+    </div>
+    <div class="rec-timer" id="recTimer" hidden><span class="reddot"></span><span id="recTime">0:00</span></div>
+    <div class="rec-count" id="recCount" hidden></div>
+    <div class="rec-bottom" id="recBottomRecord">
+      <button class="rec-btn" id="recToggle"><span class="rec-btn-inner"></span></button>
+    </div>
+    <div class="rec-bottom done" id="recBottomDone" hidden>
+      <button class="btn ghost2" id="recRetake">Retake</button>
+      <button class="btn save" id="recSave">Save to Camera Roll</button>
+    </div>
+    <div class="rec-err" id="recErr" hidden></div>
+  </div>
 </div>
 
 <script>
@@ -675,6 +751,117 @@ $('#guideBody').innerHTML=
     '<li>"The plants I\'d never put in a San Diego backyard."<span class="tag">contrarian, local</span></li>'+
     '<li>"Come to an estimate with me."<span class="tag">walk a property start to finish</span></li></ul>'+
   '<div class="foot">SDLR · Licensed &amp; insured GC, CSLB #1139785 · Editorial-luxury, founder-led, honest.</div>';
+
+/* ============ RECORD + TELEPROMPTER ============ */
+let rStream=null,rRec=null,rChunks=[],rBlob=null,rFile=null,rMime='',rExt='mp4',
+    rFacing='user',rScroll=null,rTimer=null,rSecs=0,rState='idle',rSpeed=0.6,rUrl=null;
+const rc=id=>document.getElementById(id);
+
+function pickMime(){
+  if(!('MediaRecorder' in window))return null;
+  const cands=['video/mp4;codecs=h264,aac','video/mp4','video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];
+  for(const t of cands){try{if(MediaRecorder.isTypeSupported(t))return t;}catch(e){}}
+  return '';
+}
+function recError(msg){const e=rc('recErr');e.innerHTML=msg;e.hidden=false;}
+async function startStream(){
+  if(rStream){rStream.getTracks().forEach(t=>t.stop());rStream=null;}
+  rStream=await navigator.mediaDevices.getUserMedia({
+    video:{facingMode:rFacing,width:{ideal:1080},height:{ideal:1920}},audio:true});
+  const pv=rc('recPreview');pv.srcObject=rStream;pv.classList.toggle('mirror',rFacing==='user');
+  try{await pv.play();}catch(e){}
+}
+function resetRecUI(){
+  rState='idle';rSecs=0;rChunks=[];rBlob=null;rFile=null;
+  clearInterval(rTimer);rTimer=null;if(rScroll){clearInterval(rScroll);rScroll=null;}
+  rc('recTele').scrollTop=0;
+  rc('recTimer').hidden=true;rc('recTime').textContent='0:00';rc('recCount').hidden=true;
+  rc('recBottomRecord').hidden=false;rc('recBottomDone').hidden=true;
+  rc('recToggle').classList.remove('recording');
+  rc('recPreview').hidden=false;rc('recTele').hidden=false;
+  const pb=rc('recPlayback');pb.hidden=true;
+  if(rUrl){URL.revokeObjectURL(rUrl);rUrl=null;}
+}
+async function openRecorder(id){
+  const s=SCRIPTS.find(x=>x.id===id);if(!s)return;
+  stopTele();
+  rc('recTeleInner').innerHTML='<div class="rt-hook">'+s.hook+'</div>'+
+    s.body.split('\n').map(p=>p.trim()?'<p>'+p+'</p>':'').join('');
+  rc('recTitle').textContent=String(s.id).padStart(2,'0')+' · '+s.title;
+  resetRecUI();rc('recErr').hidden=true;
+  rc('recorder').classList.add('open');
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){
+    recError("This browser can't reach the camera.<br>Open the hub in <b>Safari</b> and try again.");return;}
+  rMime=pickMime();
+  try{await startStream();}
+  catch(e){recError("Camera + mic access is needed.<br>Allow it for this site (or in iOS Settings → the app), then reopen.");}
+}
+function fmt(s){return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');}
+function startScroll(){const el=rc('recTele');let acc=0;
+  rScroll=setInterval(()=>{acc+=rSpeed;if(acc>=1){el.scrollTop+=Math.floor(acc);acc-=Math.floor(acc);}},16);}
+function countdown(n){return new Promise(res=>{const c=rc('recCount');c.hidden=false;c.textContent=n;let i=n;
+  const iv=setInterval(()=>{i--;if(i<=0){clearInterval(iv);c.hidden=true;res();}else c.textContent=i;},750);});}
+async function startRecording(){
+  if(!rStream){try{await startStream();}catch(e){recError("Camera unavailable.");return;}}
+  if(pickMime()===null){recError("Recording isn't supported in this browser.<br>Open the hub in <b>Safari</b>.");return;}
+  await countdown(3);
+  rChunks=[];
+  try{rRec=rMime?new MediaRecorder(rStream,{mimeType:rMime}):new MediaRecorder(rStream);}
+  catch(e){try{rRec=new MediaRecorder(rStream);}catch(e2){recError("Recording failed to start. Try Safari.");return;}}
+  rExt=(rRec.mimeType||rMime||'').indexOf('mp4')>=0?'mp4':'webm';
+  rRec.ondataavailable=e=>{if(e.data&&e.data.size)rChunks.push(e.data);};
+  rRec.onstop=finishRecording;
+  rRec.start();
+  rState='recording';rc('recToggle').classList.add('recording');
+  rc('recTimer').hidden=false;rSecs=0;rc('recTime').textContent='0:00';
+  rTimer=setInterval(()=>{rSecs++;rc('recTime').textContent=fmt(rSecs);},1000);
+  rc('recTele').scrollTop=0;startScroll();
+}
+function stopRecording(){
+  rState='processing';
+  clearInterval(rTimer);rTimer=null;if(rScroll){clearInterval(rScroll);rScroll=null;}
+  if(rRec){try{rRec.stop();}catch(e){}}
+}
+function finishRecording(){
+  rBlob=new Blob(rChunks,{type:(rRec&&rRec.mimeType)||rMime||'video/mp4'});
+  const name='SDLR-Script-'+(curId?String(curId).padStart(2,'0'):'clip')+'.'+rExt;
+  try{rFile=new File([rBlob],name,{type:rBlob.type});}catch(e){rFile=null;}
+  rUrl=URL.createObjectURL(rBlob);
+  const pb=rc('recPlayback');pb.src=rUrl;pb.hidden=false;pb.muted=false;
+  rc('recPreview').hidden=true;rc('recTele').hidden=true;
+  rc('recBottomRecord').hidden=true;rc('recBottomDone').hidden=false;
+  rc('recToggle').classList.remove('recording');rState='done';
+}
+async function saveRecording(){
+  if(!rBlob)return;
+  const file=rFile||(function(){try{return new File([rBlob],'SDLR-clip.'+rExt,{type:rBlob.type});}catch(e){return null;}})();
+  let shared=false;
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:'SDLR clip'});shared=true;}
+    catch(e){if(e&&e.name==='AbortError')return;}
+  }
+  if(!shared){
+    const a=document.createElement('a');a.href=rUrl;a.download=(rFile&&rFile.name)||('SDLR-clip.'+rExt);
+    document.body.appendChild(a);a.click();a.remove();
+  }
+  if(curId&&!done.has(curId)){done.add(curId);bumpStreak();save();updateProgress();renderList();renderCal();}
+}
+function closeRecorder(){
+  if(rRec&&rState==='recording'){try{rRec.stop();}catch(e){}}
+  clearInterval(rTimer);rTimer=null;if(rScroll){clearInterval(rScroll);rScroll=null;}
+  if(rStream){rStream.getTracks().forEach(t=>t.stop());rStream=null;}
+  if(rUrl){URL.revokeObjectURL(rUrl);rUrl=null;}
+  rc('recPreview').srcObject=null;rc('recPlayback').src='';
+  rc('recorder').classList.remove('open');rState='idle';
+}
+if(rc('recordBtn'))rc('recordBtn').onclick=()=>openRecorder(curId);
+rc('recClose').onclick=closeRecorder;
+rc('recToggle').onclick=()=>{if(rState==='idle')startRecording();else if(rState==='recording')stopRecording();};
+rc('recRetake').onclick=async()=>{resetRecUI();try{if(!rStream)await startStream();else rc('recPreview').srcObject=rStream;}catch(e){}};
+rc('recSave').onclick=saveRecording;
+rc('recFlip').onclick=async()=>{rFacing=rFacing==='user'?'environment':'user';try{await startStream();}catch(e){recError("Couldn't switch camera.");}};
+rc('recSpeedUp').onclick=()=>{rSpeed=Math.min(2,rSpeed+0.15);};
+rc('recSpeedDown').onclick=()=>{rSpeed=Math.max(0.2,rSpeed-0.15);};
 
 renderChips(); renderList(); updateProgress(); renderCal();
 </script>
