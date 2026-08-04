@@ -1,7 +1,23 @@
 // Polls ZapCap for a task's status; returns downloadUrl when the edit is done.
+// Also serves a template list at /api/edit-status?templates=1 (folded in here to
+// stay under the Hobby plan's 12-serverless-function limit).
 export default async function handler(req, res) {
   const key = process.env.ZAPCAP_API_KEY;
   if (!key) return res.status(500).json({ error: 'missing_key' });
+
+  // Diagnostic mode: list available caption templates
+  if (req.query && req.query.templates) {
+    try {
+      const r = await fetch('https://api.zapcap.ai/templates', { headers: { 'x-api-key': key } });
+      const text = await r.text();
+      let j;
+      try { j = JSON.parse(text); } catch (e) { j = { raw: text.slice(0, 2000) }; }
+      return res.status(200).json({ ok: r.ok, status: r.status, templates: j });
+    } catch (e) {
+      return res.status(500).json({ error: String(e && e.message || e) });
+    }
+  }
+
   const { videoId, taskId } = req.query || {};
   if (!videoId || !taskId) return res.status(400).json({ error: 'videoId and taskId required' });
   try {
