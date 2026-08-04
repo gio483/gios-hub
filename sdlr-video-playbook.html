@@ -1057,11 +1057,27 @@ async function autoEdit(){
   const s=SCRIPTS.find(x=>x.id===curId);
   const btn=rc('recEdit');
   const idle=()=>{btn.disabled=false;btn.textContent='✨ Auto-Edit (captions + b-roll)';};
-  btn.disabled=true;btn.textContent='Uploading…';
+  const mb=(rBlob.size/1048576).toFixed(1);
+  btn.disabled=true;btn.textContent='Uploading '+mb+' MB…';
+  let stage='loading uploader';
   try{
-    const mod=await import('https://esm.sh/@vercel/blob/client');
+    // Load the uploader from whichever CDN the device can reach
+    let mod=null,modErr='';
+    for(const src of ['https://esm.sh/@vercel/blob@0.27.0/client',
+                      'https://esm.sh/@vercel/blob/client',
+                      'https://cdn.jsdelivr.net/npm/@vercel/blob@0.27.0/+esm',
+                      'https://unpkg.com/@vercel/blob@0.27.0/dist/client.js']){
+      try{const m=await import(src); if(m&&typeof m.upload==='function'){mod=m;break;} modErr='no upload fn';}
+      catch(e){modErr=(e&&e.message)||'blocked';}
+    }
+    if(!mod){
+      recError("Couldn't load the uploader on this device"+(modErr?' ('+modErr+')':'')+".<br><br>This is usually a content blocker or a private-network setting. Try Safari with blockers off — or Save the raw clip and edit it later.");
+      idle();return;
+    }
+    stage='uploading';
     const name='sdlr-raw/script-'+String(curId).padStart(2,'0')+'-'+Date.now()+'.'+rExt;
     const put=await mod.upload(name,rBlob,{access:'public',handleUploadUrl:'/api/edit-blob',contentType:rBlob.type||'video/mp4'});
+    stage='starting edit';
     btn.textContent='Starting edit…';
     const sr=await fetch('/api/edit-submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({blobUrl:put.url,scriptId:curId,templateId:styleId})});
     const d=await sr.json().catch(()=>({}));
@@ -1081,7 +1097,9 @@ async function autoEdit(){
     renderJobs();toast('Editing started — usually 1–5 min');
     setTimeout(pollJobs,20000);
   }catch(e){
-    recError('Upload failed ('+((e&&e.message)||'network')+').<br>Check your connection and try again — or Save the raw clip and keep moving.');
+    recError('Failed while '+stage+'.<br><br><b>'+((e&&e.name)||'Error')+':</b> '+
+      String((e&&e.message)||'unknown').slice(0,220)+
+      '<br><br>Clip size: '+mb+' MB. On cellular, try Wi-Fi — or Save the raw clip and keep filming.');
     idle();
   }
 }
