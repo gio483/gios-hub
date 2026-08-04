@@ -1075,8 +1075,13 @@ async function autoEdit(){
       idle();return;
     }
     stage='uploading';
-    const name='sdlr-raw/script-'+String(curId).padStart(2,'0')+'-'+Date.now()+'.'+rExt;
-    const put=await mod.upload(name,rBlob,{access:'public',handleUploadUrl:'/api/edit-blob',contentType:rBlob.type||'video/mp4'});
+    // iOS reports e.g. "video/mp4;codecs=avc1.42E01E,mp4a.40.2" — send only the base
+    // MIME type, or Vercel Blob rejects it as a content-type mismatch.
+    let ct=String(rBlob.type||'').split(';')[0].trim().toLowerCase();
+    if(ct!=='video/mp4'&&ct!=='video/webm'&&ct!=='video/quicktime')ct=(rExt==='mp4'?'video/mp4':'video/webm');
+    const ext=ct==='video/mp4'?'mp4':ct==='video/quicktime'?'mov':'webm';
+    const name='sdlr-raw/script-'+String(curId).padStart(2,'0')+'-'+Date.now()+'.'+ext;
+    const put=await mod.upload(name,rBlob,{access:'public',handleUploadUrl:'/api/edit-blob',contentType:ct});
     stage='starting edit';
     btn.textContent='Starting edit…';
     const sr=await fetch('/api/edit-submit',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({blobUrl:put.url,scriptId:curId,templateId:styleId})});
