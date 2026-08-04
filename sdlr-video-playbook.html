@@ -61,6 +61,20 @@
   .prog .lbl .small{color:var(--muted);font-size:13px;margin-top:2px}
   .prog .reset{background:var(--panel2);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:12px;
     padding:7px 11px;border-radius:20px;cursor:pointer}
+  .streakwrap{display:inline-flex;align-items:center;gap:5px}
+  .streakwrap .flame{filter:saturate(1.2)}
+
+  /* ---------- film next ---------- */
+  .filmnext{display:flex;align-items:center;gap:12px;width:100%;text-align:left;margin:0 0 16px;
+    background:linear-gradient(135deg,#2a2412,#1d1a10);border:1px solid var(--gold);border-radius:16px;
+    padding:14px 16px;cursor:pointer;color:var(--ink);font:inherit;transition:transform .12s}
+  .filmnext:active{transform:scale(.985)}
+  .filmnext .fn-play{flex:none;width:38px;height:38px;border-radius:50%;background:var(--gold);color:#141109;
+    display:flex;align-items:center;justify-content:center;font-size:15px}
+  .filmnext .fn-txt{font-size:14.5px;line-height:1.32;color:var(--ink);min-width:0}
+  .filmnext .fn-txt b{display:block;color:var(--gold);font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;font-weight:700}
+  .filmnext.alldone{border-color:var(--green);background:linear-gradient(135deg,#1c2612,#161d10);
+    justify-content:center;text-align:center;color:var(--green);font-weight:600;font-size:15px}
 
   /* ---------- filter chips ---------- */
   .chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;margin:0 -16px;padding-left:16px;padding-right:16px;
@@ -208,9 +222,10 @@
               stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="157"/></svg>
           <div class="pct" id="ringPct">0%</div>
         </div>
-        <div class="lbl"><div class="big" id="progBig">0 of 20 filmed</div><div class="small">Keep the streak going 🎬</div></div>
+        <div class="lbl"><div class="big" id="progBig">0 of 20 filmed</div><div class="small" id="progSmall">Film one today to start a streak 🔥</div></div>
         <button class="reset" id="resetBtn">Reset</button>
       </div>
+      <button class="filmnext" id="filmNextBtn"></button>
       <div class="chips" id="chips"></div>
       <div id="scriptList"></div>
       <div class="foot">Tip: add this to your Home Screen — Share → Add to Home Screen — and it opens full-screen like an app.</div>
@@ -424,6 +439,25 @@ try{const s=localStorage.getItem(LS); if(s) done=new Set(JSON.parse(s));}catch(e
 function save(){try{localStorage.setItem(LS,JSON.stringify([...done]));}catch(e){}}
 let filter='all', curId=null, tele=null, teleSpeed=0.55, tT;
 
+/* streak tracking (consecutive days you film at least one) */
+const LS2='sdlr_streak';
+let streak={count:0,last:''};
+try{const s=localStorage.getItem(LS2); if(s) streak=JSON.parse(s);}catch(e){}
+function saveStreak(){try{localStorage.setItem(LS2,JSON.stringify(streak));}catch(e){}}
+function todayStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function ymdShift(str,days){const p=str.split('-').map(Number);const d=new Date(p[0],p[1]-1,p[2]);d.setDate(d.getDate()+days);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function bumpStreak(){
+  const t=todayStr();
+  if(streak.last===t) return;                       // already counted today
+  if(streak.last===ymdShift(t,-1)) streak.count+=1; // consecutive day
+  else streak.count=1;                              // first or after a gap
+  streak.last=t; saveStreak();
+}
+function currentStreak(){
+  const t=todayStr();
+  return (streak.last===t||streak.last===ymdShift(t,-1)) ? streak.count : 0; // 0 if broken
+}
+
 const $=s=>document.querySelector(s);
 const el=(t,c)=>{const e=document.createElement(t); if(c)e.className=c; return e;};
 
@@ -474,9 +508,27 @@ function updateProgress(){
   $('#ringPct').textContent=pct+'%';
   $('#progBig').textContent=n+' of '+total+' filmed';
   const C=157; $('#ringFill').style.strokeDashoffset=C-(C*pct/100);
+  const st=currentStreak();
+  $('#progSmall').innerHTML = st>0
+    ? '<span class="streakwrap"><span class="flame">🔥</span> '+st+'-day filming streak</span>'
+    : (n>=total ? 'Every script filmed 🎉' : 'Film one today to start a streak 🔥');
+  updateFilmNext();
+}
+function updateFilmNext(){
+  const btn=$('#filmNextBtn'); if(!btn) return;
+  const next=SCRIPTS.find(s=>!done.has(s.id));
+  if(!next){
+    btn.classList.add('alldone');
+    btn.textContent='🎉 All 20 filmed — tap to review';
+    btn.onclick=()=>{filter='done';renderChips();renderList();$('#v-scripts').scrollTo({top:0,behavior:'smooth'});};
+    return;
+  }
+  btn.classList.remove('alldone');
+  btn.innerHTML='<span class="fn-play">▶</span><span class="fn-txt"><b>Film next</b>'+String(next.id).padStart(2,'0')+' · '+next.title+'</span>';
+  btn.onclick=()=>openDetail(next.id);
 }
 function toggle(id){
-  if(done.has(id))done.delete(id); else {done.add(id); toast('Filmed ✓ — nice work');}
+  if(done.has(id))done.delete(id); else {done.add(id); bumpStreak(); toast('Filmed ✓ — nice work');}
   save(); updateProgress(); renderList(); renderCal();
   if(navigator.vibrate)try{navigator.vibrate(8)}catch(e){}
 }
@@ -554,7 +606,7 @@ document.querySelectorAll('.tab').forEach(t=>{
 
 $('#resetBtn').onclick=()=>{
   if(!done.size){toast('Nothing to reset');return;}
-  if(confirm('Reset all filmed progress?')){done.clear();save();updateProgress();renderList();renderCal();toast('Progress reset');}
+  if(confirm('Reset all filmed progress?')){done.clear();save();streak={count:0,last:''};saveStreak();updateProgress();renderList();renderCal();toast('Progress reset');}
 };
 
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1600);}
