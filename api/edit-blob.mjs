@@ -8,8 +8,14 @@ export default async function handler(req, res) {
     const jsonResponse = await handleUpload({
       body: req.body,
       request: req,
+      // Devices report codec-qualified types (e.g. "video/mp4;codecs=avc1,mp4a").
+      // Keep this list broad so a valid recording is never rejected as a mismatch.
       onBeforeGenerateToken: async () => ({
-        allowedContentTypes: ['video/mp4', 'video/webm', 'video/quicktime'],
+        allowedContentTypes: [
+          'video/mp4', 'video/webm', 'video/quicktime',
+          'video/x-m4v', 'video/mpeg', 'video/3gpp',
+          'application/octet-stream',
+        ],
         addRandomSuffix: true,
         maximumSizeInBytes: 300 * 1024 * 1024,
       }),
