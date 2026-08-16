@@ -7,8 +7,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Part 107">
-<meta name="description" content="Daily sortie trainer for the FAA Part 107 remote pilot knowledge test (UAG), with a procedural sectional chart lab.">
-<title>Part 107 Sortie</title>
+<meta name="description" content="Learn and test for the FAA Part 107 remote pilot knowledge test (UAG). 55 lessons, spaced repetition, mock exams and a procedural sectional chart lab.">
+<title>Part 107 Trainer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Barlow:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -192,14 +192,51 @@ table.by th,table.by td{text-align:left;padding:7px 4px;border-bottom:1px solid 
 table.by th{font-family:var(--f-head);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 table.by td.n{font-family:var(--f-mono);text-align:right}
 
+
+/* ---------- course ---------- */
+.mod{border:1px solid var(--line);border-radius:12px;background:#fbf7ee;margin:11px 0;overflow:hidden}
+.mod > .head{display:flex;align-items:center;gap:10px;width:100%;padding:13px 14px;background:none;border:0;cursor:pointer;text-align:left;min-height:var(--tap)}
+.mod > .head b{font-family:var(--f-head);font-size:1.02rem;display:block}
+.mod > .head p{margin:2px 0 0;font-size:.84rem;color:var(--muted)}
+.mod > .head .cnt{margin-left:auto;font-family:var(--f-mono);font-size:.72rem;color:var(--muted);flex:none}
+.mod > .head .chev{flex:none;width:14px;transition:transform .2s}
+.mod.open > .head .chev{transform:rotate(90deg)}
+.mod .body{display:none;border-top:1px solid var(--line2);padding:2px 14px 8px}
+.mod.open .body{display:block}
+.les{display:flex;align-items:center;gap:11px;width:100%;padding:11px 0;background:none;border:0;border-bottom:1px solid var(--line2);
+  cursor:pointer;text-align:left;min-height:var(--tap);font:inherit;color:inherit}
+.les:last-child{border-bottom:0}
+.les .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:var(--f-mono);font-size:.6rem;font-weight:600}
+.les.read .dot{border-color:var(--blu);color:var(--blu)}
+.les.done .dot{background:var(--good);border-color:var(--good);color:#fff}
+.les span.t{flex:1;font-size:.95rem;line-height:1.35}
+.les.done span.t{color:var(--muted)}
+.lesson h2{font-size:1.24rem;line-height:1.22;margin-bottom:4px}
+.lesson .body p{font-size:1rem;line-height:1.6;margin:0 0 13px}
+.lesson .body p:last-child{margin-bottom:0}
+.keytab{width:100%;border-collapse:collapse;margin:14px 0 4px;font-size:.92rem}
+.keytab td{padding:8px 0;border-bottom:1px solid var(--line2);vertical-align:top}
+.keytab tr:last-child td{border-bottom:0}
+.keytab td.k{color:var(--muted);width:44%;padding-right:12px}
+.keytab td.v{font-family:var(--f-mono);font-size:.87rem;font-weight:500}
+details.reg{margin-top:14px;border:1px solid var(--line);border-radius:10px;background:var(--paper2)}
+details.reg summary{list-style:none;cursor:pointer;padding:12px 13px;min-height:var(--tap);display:flex;align-items:center;gap:8px;
+  font-family:var(--f-head);font-size:.82rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ink2)}
+details.reg summary::-webkit-details-marker{display:none}
+details.reg summary::after{content:"+";margin-left:auto;font-family:var(--f-mono);font-size:1.1rem;line-height:1}
+details.reg[open] summary::after{content:"\2013"}
+details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(--ink2)}
+.crumb{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}
+
 /* ---------- tab bar ---------- */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--paper2);border-top:2px solid var(--ink);
   padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 14px rgba(29,27,23,.08)}
 .tabs-in{max-width:720px;margin:0 auto;display:flex}
-.tab{flex:1;background:none;border:0;padding:8px 2px 9px;min-height:64px;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:4px;cursor:pointer;color:var(--muted);border-top:3px solid transparent;margin-top:-2px}
-.tab svg{width:22px;height:22px;display:block}
-.tab span{font-family:var(--f-head);font-size:.6rem;letter-spacing:.11em;text-transform:uppercase;font-weight:600}
+.tab{flex:1;background:none;border:0;padding:7px 1px 8px;min-height:62px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;cursor:pointer;color:var(--muted);border-top:3px solid transparent;margin-top:-2px;min-width:0}
+.tab svg{width:20px;height:20px;display:block;flex:none}
+.tab span{font-family:var(--f-head);font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600;white-space:nowrap}
 .tab.on{color:var(--mag);border-top-color:var(--mag)}
 .view{display:none;padding-top:14px}
 .view.on{display:block}
@@ -227,25 +264,48 @@ table.by td.n{font-family:var(--f-mono);text-align:right}
     <div class="cell cool"><span class="lab">Ready</span><span class="val" id="sReady">0<small>%</small></span></div>
     <div class="cell"><span class="lab">To test</span><span class="val" id="sDays">&ndash;&ndash;</span></div>
   </div>
-  <div class="strip-title"><b>Part 107 Sortie</b><span id="sBlueprint">UAG blueprint 29 SEP 2025</span></div>
+  <div class="strip-title"><b>Part 107 Trainer</b><span id="sBlueprint">UAG blueprint 29 SEP 2025</span></div>
 </header>
 
 <main class="wrap">
 
-<!-- ============ SORTIE ============ -->
-<section class="view on" id="v-sortie" aria-labelledby="h-sortie">
+<!-- ============ LEARN ============ -->
+<section class="view on" id="v-learn" aria-labelledby="h-learn">
+  <div id="learnHome">
+    <div class="card">
+      <p class="eyebrow">The course</p>
+      <h2 id="h-learn">Learn it first</h2>
+      <p class="lede" id="learnLede">55 lessons across 11 modules. Every rule the exam can ask about is taught by one of them, and each lesson ends by checking what you just read.</p>
+      <div class="meter" style="margin-top:13px">
+        <div class="top"><b>Course progress</b><span class="w" id="courseCount"></span><span class="v" id="coursePct">0%</span></div>
+        <div class="bar"><i id="courseBar" style="width:0%"></i></div>
+      </div>
+      <div class="btnrow" style="margin-top:14px"><button class="btn mag" id="btnContinue">Start lesson 1</button></div>
+      <p class="note">Read a lesson and its material joins your review queue, so the daily drill only tests what you have actually covered.</p>
+    </div>
+    <div id="moduleList"></div>
+  </div>
+  <div id="lessonView" style="display:none"></div>
+</section>
+
+<!-- ============ DAILY DRILL ============ -->
+<section class="view" id="v-sortie" aria-labelledby="h-sortie">
   <div id="sortieHome">
     <div class="card">
       <p class="eyebrow">Today</p>
-      <h2 id="h-sortie">Daily sortie</h2>
+      <h2 id="h-sortie">Daily session</h2>
       <p class="lede" id="sortieLede">22 items. About 18 minutes. Rapid recall cards mixed with exam style questions, drawn from what you are due to review.</p>
+      <p class="note" id="poolNote"></p>
       <div class="prog" id="sortiePreview" aria-hidden="true"></div>
       <div class="btnrow" style="margin-top:14px">
-        <button class="btn mag" id="btnStartSortie">Start sortie</button>
+        <button class="btn mag" id="btnStartSortie">Start today's session</button>
       </div>
       <div class="btnrow" style="margin-top:9px">
         <button class="btn ghost sm" id="btnFreeDrill" style="flex:1">Extra drill, 10 items</button>
         <button class="btn ghost sm" id="btnWeakDrill" style="flex:1">Drill my weak areas</button>
+      </div>
+      <div class="btnrow" style="margin-top:9px">
+        <button class="btn ghost sm" id="btnPoolToggle" style="flex:1"></button>
       </div>
     </div>
 
@@ -271,7 +331,7 @@ table.by td.n{font-family:var(--f-mono);text-align:right}
       <div id="runBody"></div>
       <div id="runFoot"></div>
     </div>
-    <button class="btn ghost sm" id="btnQuitRun" style="margin:4px auto 0">End sortie</button>
+    <button class="btn ghost sm" id="btnQuitRun" style="margin:4px auto 0">End session</button>
   </div>
 
   <div id="sortieDone" style="display:none"></div>
@@ -373,6 +433,11 @@ table.by td.n{font-family:var(--f-mono);text-align:right}
     </div>
   </div>
   <div class="card">
+    <p class="eyebrow">The course</p>
+    <h3>Lessons read and checked</h3>
+    <div id="courseMeters" style="margin-top:10px"></div>
+  </div>
+  <div class="card">
     <p class="eyebrow">Mastery by content area</p>
     <h3>Each bar is weighted by how much of the exam it carries</h3>
     <div id="areaMeters" style="margin-top:10px"></div>
@@ -439,14 +504,16 @@ table.by td.n{font-family:var(--f-mono);text-align:right}
 
 <nav class="tabs" aria-label="Sections">
   <div class="tabs-in">
-    <button class="tab on" data-view="sortie" aria-current="page">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 20l8-4 8 4Z"/></svg><span>Sortie</span></button>
+    <button class="tab on" data-view="learn" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5A1.5 1.5 0 0 1 4.5 4H10a2 2 0 0 1 2 2v14a2 2 0 0 0-2-2H4.5A1.5 1.5 0 0 1 3 16.5Z"/><path d="M21 5.5A1.5 1.5 0 0 0 19.5 4H14a2 2 0 0 0-2 2v14a2 2 0 0 1 2-2h5.5a1.5 1.5 0 0 0 1.5-1.5Z"/></svg><span>Learn</span></button>
+    <button class="tab" data-view="sortie">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 20l8-4 8 4Z"/></svg><span>Drill</span></button>
     <button class="tab" data-view="chart">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></svg><span>Chart lab</span></button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"/><path d="M9 3v15M15 6v15"/></svg><span>Charts</span></button>
     <button class="tab" data-view="mock">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg><span>Mock</span></button>
     <button class="tab" data-view="prog">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Progress</span></button>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Stats</span></button>
     <button class="tab" data-view="plan">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Plan</span></button>
   </div>
@@ -833,6 +900,10 @@ var QUESTIONS = [
 {id:'R092',a:'REG',q:'Which identification details does the knowledge testing rule require an applicant to present?',
  o:['A photograph, a signature, a date of birth and a permanent mailing address','A photograph and a signature only','A photograph, a signature and a pilot certificate number'],c:0,
  e:'If the permanent mailing address is a post office box, a current residential address must also be shown. One document may carry all of the elements, or a second document can fill a gap.',s:'14 CFR 107.67(b)'},
+
+{id:'R093',a:'REG',q:'Any document, record or report that Part 107 requires you to keep must be made available on request to whom?',
+ o:['The Administrator','Any Federal, State or local law enforcement officer','Any representative of the Transportation Security Administration'],c:0,
+ e:'The audience for records is narrower than the audience for your certificate. Records go to the Administrator. The certificate and your identification must also be shown to the NTSB, law enforcement and the TSA.',s:'14 CFR 107.7(a)(3)'},
 /* ---------- OPERATIONS, 25 percent of the exam ---------- */
 {id:'O001',a:'OPS',q:'What is the antidote for the hazardous attitude of anti authority?',
  o:['Follow the rules. They are usually right.','Not so fast. Think first.','Taking chances is foolish.'],c:0,
@@ -1862,6 +1933,418 @@ function chartLegend(meta){
   return L;
 }
 /* ===== CHART LAB END ===== */
+/* ===== COURSE START =====
+   Read first, then get checked. Every question and card in the bank is taught by
+   exactly one lesson, and the check script enforces that coverage.              */
+var MODULES = [
+  { id:'REG-A', a:'REG', t:'Ground rules',                    d:'The limits that bind every single flight you make.' },
+  { id:'REG-B', a:'REG', t:'Your certificate',                d:'Getting it, keeping it, and carrying it.' },
+  { id:'REG-C', a:'REG', t:'Registration and remote ID',      d:'Part 48 and Part 89, the two rules that live outside Part 107.' },
+  { id:'REG-D', a:'REG', t:'People and permission',           d:'Flying over human beings, and getting into controlled airspace.' },
+  { id:'REG-E', a:'REG', t:'Every flight, start to finish',   d:'Preflight, in flight problems, and what you owe the FAA afterwards.' },
+  { id:'OPS-A', a:'OPS', t:'The pilot',                       d:'Judgement, attitude and the state of your own body.' },
+  { id:'OPS-B', a:'OPS', t:'Airports and access',             d:'Radio, traffic patterns and getting authorization.' },
+  { id:'AIR-A', a:'AIR', t:'The classes of airspace',         d:'What each class is and where it sits.' },
+  { id:'AIR-B', a:'AIR', t:'Reading a sectional',             d:'The eight passes that turn a chart into an answer.' },
+  { id:'WX-A',  a:'WX',  t:'Weather',                         d:'Only 5 percent of the exam, but it decides whether you fly.' },
+  { id:'LP-A',  a:'LP',  t:'Loading and performance',         d:'The smallest slice of the exam. One sitting covers it.' }
+];
+
+var LESSONS = [
+/* ---------- REG-A, ground rules ---------- */
+{id:'L01',m:'REG-A',t:'What Part 107 actually covers',
+ lead:'Part 107 is the rulebook for flying a small unmanned aircraft for any purpose that is not purely recreational. The moment money, a client, a listing, a marketing video or a business errand is involved, you are under Part 107 and not under the recreational rules.\n\nSmall means less than 55 pounds on takeoff, and that weight includes everything on board or attached: battery, camera, gimbal, lights, a dropped payload, tape holding something on. At 55 pounds and above you leave Part 107 entirely.\n\nThe rule also does not apply to air carrier operations, to flying under a section 44807 exemption, or to an aircraft holding an airworthiness certificate flown under Part 91.',
+ keys:[['Upper weight limit','Less than 55 pounds on takeoff'],['What counts toward weight','Everything on board or attached'],['Recreational flying','Not Part 107, it is 49 U.S.C. 44809']],
+ reg:'14 CFR 107.3 defines a small unmanned aircraft as an unmanned aircraft weighing less than 55 pounds on takeoff, including everything that is on board or otherwise attached. A small unmanned aircraft system is that aircraft plus its associated elements, including communication links and the components that control it. Where a Part 107 definition conflicts with 14 CFR 1.1, Part 107 controls. 14 CFR 107.1(b) excludes air carrier operations, recreational operations under 49 U.S.C. 44809, operations under a 44807 exemption, and operations elected under Part 91 with an airworthiness certificate. 14 CFR 107.2 says Part 21 does not apply unless the aircraft will operate over human beings as a Category 4 aircraft.',
+ s:'14 CFR 107.1, 107.2 and 107.3',
+ q:['R064','R069','R070'],c:['F014']},
+
+{id:'L02',m:'REG-A',t:'How high and how fast',
+ lead:'Two numbers, and one exception that the exam loves.\n\nGroundspeed may not exceed 87 knots. The rule states that as 100 miles per hour, so both figures are correct and you should recognise either.\n\nAltitude is capped at 400 feet above the ground. The exception exists for inspection work: if you stay within a 400 foot radius of a structure, you may climb to 400 feet above that structure. A 610 foot tower therefore lets you reach 1,010 feet AGL, but only while you remain inside that 400 foot bubble around it. Step outside the bubble and you are back to 400 feet.\n\nBoth limits bind the remote pilot in command and the person actually holding the controls.',
+ keys:[['Maximum groundspeed','87 knots, stated as 100 miles per hour'],['Maximum altitude','400 feet AGL'],['Structure exception','Within a 400 foot radius, up to 400 feet above it'],['Worked example','610 foot tower gives 1,010 feet AGL']],
+ reg:'14 CFR 107.51(a) sets groundspeed at no more than 87 knots (100 miles per hour). 14 CFR 107.51(b) sets altitude at no higher than 400 feet above ground level, unless the aircraft is flown within a 400 foot radius of a structure and does not fly higher than 400 feet above the structure immediate uppermost limit. The whole of 107.51 is waivable under 14 CFR 107.205(i).',
+ s:'14 CFR 107.51(a) and (b)',
+ q:['R001','R002'],c:['F001','F002']},
+
+{id:'L03',m:'REG-A',t:'Visibility and distance from cloud',
+ lead:'You need at least 3 statute miles of flight visibility, and here is the trap: it is measured from the location of the control station, not from the aircraft. You are reporting what you can see from where you are standing.\n\nCloud clearance under Part 107 has only two numbers. Stay 500 feet below cloud and 2,000 feet horizontally from it. There is deliberately no figure for flying above cloud, because you would not be able to see your aircraft anyway.\n\nManned aviation uses a different table in 14 CFR 91.155, which includes a 1,000 feet above figure. That table is not yours. If a question shows you 1,000 feet above as an option for a Part 107 flight, it is wrong.',
+ keys:[['Minimum flight visibility','3 statute miles'],['Measured from','The location of the control station'],['Below cloud','500 feet'],['Horizontally from cloud','2,000 feet'],['Above cloud','No figure exists in Part 107']],
+ reg:'14 CFR 107.51(c) requires minimum flight visibility, as observed from the location of the control station, of no less than 3 statute miles. Flight visibility here means the average slant distance from the control station at which prominent unlighted objects may be seen and identified by day and prominent lighted objects by night. 14 CFR 107.51(d) requires the aircraft to remain 500 feet below the cloud and 2,000 feet horizontally from the cloud.',
+ s:'14 CFR 107.51(c) and (d)',
+ q:['R003','R004'],c:['F003','F004']},
+
+{id:'L04',m:'REG-A',t:'Seeing and avoiding',
+ lead:'Visual line of sight is the spine of Part 107. Throughout the entire flight, somebody must be able to see the aircraft with vision unaided by anything other than corrective lenses. Binoculars do not count. A first person view headset does not count. Both may be used as a supplement, never as the means of compliance.\n\nWhat that person must be able to do is specific: know the location of the aircraft, determine its attitude, altitude and direction of flight, watch the airspace for other traffic and hazards, and confirm it is not endangering anyone.\n\nA visual observer may satisfy that requirement in place of the remote pilot. If you use one, all three of you must maintain effective communication at all times.\n\nAnd whatever else is in the sky, you yield. A small unmanned aircraft gives way to every aircraft, airborne vehicle, and launch or reentry vehicle. Yielding means you may not pass over, under or ahead of it unless you are well clear.',
+ keys:[['Vision aids allowed','Corrective lenses only'],['Must be able to determine','Location, attitude, altitude and direction'],['Visual observer','May satisfy the requirement instead of the pilot'],['Right of way','The small unmanned aircraft always yields']],
+ reg:'14 CFR 107.31(a) requires that with vision unaided by any device other than corrective lenses, the remote pilot in command, the visual observer if used, and the person manipulating the controls be able to see the aircraft throughout the entire flight. 107.31(b) allows that ability to be exercised by either the remote pilot and the person manipulating the controls, or by a visual observer. 14 CFR 107.33 requires effective communication among all of them at all times, and coordination to scan for collision hazards. 14 CFR 107.37(a) requires the aircraft to yield the right of way to all aircraft, airborne vehicles and launch and reentry vehicles, and 107.37(b) forbids operating so close to another aircraft as to create a collision hazard. 107.37(b) is not waivable.',
+ s:'14 CFR 107.31, 107.33 and 107.37',
+ q:['R024','R025','R026','R065','R029'],c:[]},
+
+{id:'L05',m:'REG-A',t:'Flying at night',
+ lead:'Night flying no longer needs a waiver. It needs two things instead.\n\nFirst, you must have taken your initial knowledge test or completed training under 14 CFR 107.65 after 6 April 2021. If you are testing now, you satisfy this automatically.\n\nSecond, the aircraft must carry lighted anticollision lighting visible for at least 3 statute miles, flashing fast enough to avoid a collision. You may dim it if conditions make that safer, but you may never turn it off.\n\nThe same lighting requirement applies during civil twilight. Outside Alaska, civil twilight runs from 30 minutes before official sunrise to official sunrise, and from official sunset to 30 minutes after official sunset. In Alaska it is whatever the Air Almanac says.\n\nNote what is waivable and what is not: the lighting requirement can be waived, night operation itself cannot.',
+ keys:[['Light visibility','At least 3 statute miles'],['May you dim it','Yes'],['May you switch it off','No'],['Evening civil twilight','Sunset to 30 minutes after sunset'],['Morning civil twilight','30 minutes before sunrise to sunrise']],
+ reg:'14 CFR 107.29(a) permits night operation when the remote pilot has completed an initial knowledge test or training under 107.65 after 6 April 2021 and the aircraft has lighted anticollision lighting visible for at least 3 statute miles with a flash rate sufficient to avoid a collision. The remote pilot may reduce the intensity but may not extinguish it. 107.29(b) applies the same lighting rule during civil twilight and 107.29(c) defines civil twilight. Only 107.29(a)(2) and (b), the lighting requirement, appear on the waivable list at 107.205(b).',
+ s:'14 CFR 107.29',
+ q:['R022','R023'],c:['F011','F012']},
+
+{id:'L06',m:'REG-A',t:'The things you must not do',
+ lead:'A short list of hard prohibitions.\n\nOne aircraft at a time. You may not manipulate the controls of, act as remote pilot for, or act as visual observer for more than one unmanned aircraft simultaneously. This one is waivable.\n\nNo hazardous material, ever, and that prohibition is not waivable.\n\nDropping objects is not banned. Dropping them in a way that creates an undue hazard to persons or property is. So is operating in a careless or reckless manner.\n\nFrom a moving vehicle you may only fly over a sparsely populated area, and never while carrying another person property for compensation or hire. From a moving aircraft, never.\n\nTransponders and ADS-B Out in transmit mode are both prohibited unless the Administrator authorizes otherwise. This surprises people who assume more electronic visibility is always better.',
+ keys:[['Aircraft per person','One'],['Hazardous material','Prohibited, and not waivable'],['Dropping objects','Allowed unless it creates an undue hazard'],['Moving land vehicle','Sparsely populated areas only, no property of another for hire'],['Moving aircraft','Never'],['Transponder and ADS-B Out','Prohibited unless authorized']],
+ reg:'14 CFR 107.35 limits a person to one unmanned aircraft at a time and is waivable under 107.205(e). 14 CFR 107.36 prohibits carriage of hazardous material as defined in 49 CFR 171.8 and is not waivable. 14 CFR 107.23 prohibits careless or reckless operation and prohibits allowing an object to be dropped in a manner that creates an undue hazard. 14 CFR 107.25 prohibits operation from a moving aircraft, and from a moving land or water borne vehicle unless the flight is over a sparsely populated area and is not transporting another person property for compensation or hire. 14 CFR 107.52 and 107.53 prohibit operating with a transponder on or with ADS-B Out in transmit mode unless otherwise authorized.',
+ s:'14 CFR 107.23, 107.25, 107.35, 107.36, 107.52 and 107.53',
+ q:['R017','R018','R027','R028','R046'],c:['F015','F032']},
+
+/* ---------- REG-B, your certificate ---------- */
+{id:'L07',m:'REG-B',t:'Who can hold a remote pilot certificate',
+ lead:'Three eligibility requirements, and no medical certificate anywhere.\n\nYou must be at least 16 years of age. You must be able to read, speak, write and understand English, although the FAA may issue with operating limitations if you cannot meet one of those for medical reasons. And you must not know of any physical or mental condition that would interfere with safe operation.\n\nThere are two routes to demonstrating knowledge. Most people pass the initial aeronautical knowledge test. A Part 61 pilot who is not a student pilot and who meets the 14 CFR 61.56 flight review requirement can instead complete free online initial training covering 14 CFR 107.74.\n\nSeparately, an uncertificated person may fly the aircraft under the direct supervision of a remote pilot in command who has the ability to immediately take direct control. That is how you can let a colleague fly on your job.',
+ keys:[['Minimum age','16'],['Medical certificate','Not required'],['Part 61 pilot route','Online training covering 14 CFR 107.74'],['Uncertificated person','May fly under direct supervision only']],
+ reg:'14 CFR 107.61 requires an applicant to be at least 16 years of age, be able to read, speak, write and understand English, not know of an interfering physical or mental condition, and demonstrate knowledge by passing the initial test covering 107.73 or, for a qualifying Part 61 certificate holder meeting 61.56, by completing training covering 107.74. 14 CFR 107.12(a) allows a person without a certificate to manipulate the controls when under the direct supervision of a remote pilot in command who has the ability to immediately take direct control.',
+ s:'14 CFR 107.12 and 107.61',
+ q:['R009','R066','R012'],c:['F008']},
+
+{id:'L08',m:'REG-B',t:'The knowledge test itself',
+ lead:'The test you are studying for is the Unmanned Aircraft General, Small, known as UAG. It covers thirteen subject areas listed in 14 CFR 107.73, from regulations and airspace through weather, loading, emergency procedures, crew resource management, radio, performance, drugs and alcohol, decision making, airport operations, maintenance, and night operations.\n\nBring identification that is valid and current and that establishes four things: a photograph, your date of birth, your signature and a permanent mailing address. One document usually covers all four. If your permanent address is a post office box, you also need a current residential address.\n\nFail it and you wait 14 calendar days before reapplying. No instructor endorsement is required.\n\nCheating carries a heavy penalty: a one year bar from applying for any certificate, rating or authorization and from taking any test, plus possible suspension or revocation of anything you already hold.',
+ keys:[['Test code','UAG'],['Subject areas','13, listed at 14 CFR 107.73'],['Identification must show','Photo, date of birth, signature, address'],['Retest wait','14 calendar days'],['Cheating penalty','1 year bar']],
+ reg:'14 CFR 107.73 lists the thirteen knowledge areas covered by the initial test and by recurrent training. 14 CFR 107.67(b) sets the identification requirements. 14 CFR 107.71 requires an applicant who fails to wait 14 calendar days before reapplying. 14 CFR 107.69 lists the prohibited acts and imposes a one year bar plus possible suspension or revocation.',
+ s:'14 CFR 107.67, 107.69, 107.71 and 107.73',
+ q:['R010','R061','R092','R075'],c:['F009']},
+
+{id:'L09',m:'REG-B',t:'Staying current after you pass',
+ lead:'Your remote pilot certificate does not expire, but your currency does.\n\nWithin the previous 24 calendar months you must have passed an initial knowledge test, or completed recurrent training covering 14 CFR 107.73. In practice that means the free online course ALC-677, taken at home, with no test centre and no fee. The old proctored recurrent knowledge test was removed in 2021 and any question offering it as the answer is out of date.\n\nWhen you first pass, you receive a temporary certificate valid for up to 120 calendar days while the permanent card is produced. The temporary one expires on its printed date, on receipt of the permanent certificate, or on notice that your certificate has been denied or revoked.',
+ keys:[['Currency interval','24 calendar months'],['How you stay current','Free online recurrent training, ALC-677'],['Recurrent knowledge test','No longer exists'],['Temporary certificate','Up to 120 calendar days']],
+ reg:'14 CFR 107.65 requires that within the previous 24 calendar months a person has passed an initial aeronautical knowledge test, completed recurrent training covering 107.73, or, for a qualifying Part 61 holder, completed training covering 107.74. 14 CFR 107.64 provides for a temporary certificate issued for up to 120 calendar days.',
+ s:'14 CFR 107.64 and 107.65',
+ q:['R011','R063'],c:['F010','F034']},
+
+{id:'L10',m:'REG-B',t:'What you carry and who may ask',
+ lead:'While exercising the privileges of your certificate you must have the certificate and identification in your physical possession and readily accessible. Not at home, not in the car across the field, on you.\n\nFour categories of people may demand to see it: the Administrator, an authorized representative of the National Transportation Safety Board, any Federal, State or local law enforcement officer, and an authorized representative of the Transportation Security Administration. Learn that list, because the exam tests it by omission.\n\nA narrower duty applies to records. Any document, record or report required to be kept must be made available on request to the Administrator only, not to the wider list.\n\nSeparately, you must allow the Administrator to test or inspect the aircraft, yourself, the person flying and any visual observer.',
+ keys:[['On your person','Certificate and identification, readily accessible'],['May inspect the certificate','FAA, NTSB, any law enforcement officer, TSA'],['May demand records','The Administrator only']],
+ reg:'14 CFR 107.7(a)(1) requires the remote pilot in command, owner or person manipulating the controls to have the certificate and identification in physical possession and readily accessible. 107.7(a)(2) requires presentation on request from the Administrator, an authorized NTSB representative, any Federal, State or local law enforcement officer, and an authorized TSA representative. 107.7(a)(3) requires records to be made available on request to the Administrator. 107.7(b) requires cooperation with any test or inspection by the Administrator.',
+ s:'14 CFR 107.7',
+ q:['R013','R014','R093'],c:['F030']},
+
+{id:'L11',m:'REG-B',t:'Keeping your record honest',
+ lead:'Move house and you have 30 days. After that you may not exercise the privileges of your certificate until you have told the FAA, either by letter to the Airman Certification Branch in Oklahoma City or through the FAA website. Post office box as your new mailing address means you must also supply a current residential address.\n\nYou can hand the certificate back voluntarily. The FAA requires a signed statement acknowledging that it will not be reissued unless you complete the requirements of 14 CFR 107.61 and 107.63 again.\n\nAnd the big one, which almost no study material has caught up with. The old falsification rule at 14 CFR 107.5 was reserved on 3 November 2025 and moved into 14 CFR 3.403. Lying on an application can now cost you a civil penalty as well as the certificate. A related rule, 14 CFR 3.405, reaches statements that were simply incorrect and material, with no fraudulent intent at all.',
+ keys:[['Address change','Notify within 30 days'],['Voluntary surrender','Signed statement required'],['Falsification rule now','14 CFR 3.403, effective 3 November 2025'],['New exposure','Civil penalty, plus non fraudulent material errors under 3.405']],
+ reg:'14 CFR 107.77(c) prohibits exercising certificate privileges more than 30 days after an address change without notifying the FAA Airman Certification Branch or using the FAA website. 14 CFR 107.79 sets out the voluntary surrender statement. The FAA final rule at 90 FR 42517, effective 3 November 2025, consolidated falsification across Title 14 into Part 3 Subpart D and reserved 107.5, 48.5 and 89.5. 14 CFR 3.403 prohibits fraudulent or intentionally false statements, fraudulent reproduction or alteration, and knowing omission of a material fact, and allows either adverse certificate action or a civil penalty. 14 CFR 3.405 covers an incorrect statement or omission that was material even without fraudulent intent.',
+ s:'14 CFR 3.403, 3.405, 107.77 and 107.79',
+ q:['R062','R076','R059','R060','R088'],c:['F028','F029']},
+
+/* ---------- REG-C, registration and remote identification ---------- */
+{id:'L12',m:'REG-C',t:'Registering the aircraft',
+ lead:'Here is the single most mistaught fact in drone regulation. Under Part 107 every aircraft must be registered, whatever it weighs. The famous 0.55 pound threshold is a recreational exemption under 49 U.S.C. 44809 and has nothing to do with commercial flying. Your sub 250 gram aircraft still needs a registration number the moment you use it for work.\n\nRegistration costs $5.00 per aircraft under the Part 107 pathway and lasts 3 years from the date of issue. You may verify and renew at any time in the six months before the expiry month, and a renewed certificate runs three years from the previous expiry date rather than from the day you renewed.\n\nYou must be a United States citizen, a resident alien, or a qualifying non citizen corporation whose aircraft is based and primarily used in the United States. If the owner is under 13, someone at least 13 registers it for them.',
+ keys:[['Part 107 weight exemption','None. Everything registers.'],['Fee','$5.00 per aircraft'],['Validity','3 years from the date of issue'],['Renewal window','Any time in the six months before expiry'],['Owner under 13','A person at least 13 registers it']],
+ reg:'14 CFR 48.15 requires registration unless the aircraft is operated exclusively under 49 U.S.C. 44809 and weighs 0.55 pounds or less on takeoff, or is an aircraft of the Armed Forces. 14 CFR 107.13 requires compliance with 91.203(a)(2). 14 CFR 48.100(c) sets a 3 year expiry with a six month renewal verification window, and a renewed certificate expiring three years from the previous expiry date. 14 CFR 48.30 sets $5.00 per aircraft under 48.100. 14 CFR 48.20 sets eligibility and 48.25(b) covers owners under 13 years of age.',
+ s:'14 CFR 48.15, 48.20, 48.25, 48.30 and 48.100',
+ q:['R047','R048','R050','R079','R080'],c:['F016','F019','F020']},
+
+{id:'L13',m:'REG-C',t:'Marking it and keeping the registry current',
+ lead:'The registration number must be legibly displayed on an external surface of the aircraft, affixed well enough to stay put for the duration of every operation. Since 2019 you may no longer hide it inside a battery compartment. There is no minimum character height in Part 48, unlike the marking rules for manned aircraft.\n\nAnything that changes must reach the registry within 14 calendar days. That covers a change of address, and it covers cancellation for sale, transfer, destruction or export. Sell the aircraft and the clock is already running.\n\nThe application itself asks for your name, physical address, email, telephone, the manufacturer and model, and for a standard remote identification aircraft or a broadcast module, the serial number. A serial number may not appear on two certificates of registration at the same time.',
+ keys:[['Where the number goes','Legibly on an external surface'],['Battery compartment','No longer permitted'],['Deadline for any change','14 calendar days'],['Serial number','May appear on only one certificate at a time']],
+ reg:'14 CFR 48.200 requires a registered aircraft to display a unique identifier, either the registration number or, if authorized, the serial number. 14 CFR 48.205 requires the identifier to be maintained legible, affixed so it remains for the duration of each operation, and legibly displayed on an external surface. 14 CFR 48.115(b) requires updates through the web based system within 14 calendar days of a change or of a cancellation event. 14 CFR 48.110(a) lists the required application information, including the serial number restriction.',
+ s:'14 CFR 48.110, 48.115, 48.200 and 48.205',
+ q:['R049','R051','R081','R082'],c:['F017','F018']},
+
+{id:'L14',m:'REG-C',t:'What remote identification is',
+ lead:'Remote identification is a broadcast from your aircraft that lets anyone with a receiver see who is flying and where. It became mandatory on 16 September 2023.\n\nEvery unmanned aircraft that is registered, or required to be registered, must meet one of two standards. Either the aircraft is a standard remote identification aircraft that broadcasts from takeoff to shutdown, or it carries a remote identification broadcast module.\n\nIf the broadcast fails in flight, you land as soon as practicable. A standard aircraft goes further than that: it must not be able to take off at all if its remote identification equipment is not functional.\n\nThe serial number has to be on your certificate of aircraft registration, or supplied to the FAA in a notice of identification before you fly.\n\nOne narrow exclusion exists: Part 89 does not apply to unmanned aircraft operating under Part 91 while transmitting ADS-B Out. That is not a route out for a Part 107 flight.',
+ keys:[['Mandatory since','16 September 2023'],['Broadcast window','Takeoff to shutdown'],['If broadcast stops','Land as soon as practicable'],['Standard aircraft','Must not be able to take off if the equipment is not working']],
+ reg:'14 CFR 89.105 requires that after 16 September 2023 no person may operate an unmanned aircraft unless the operation meets 89.110 or 89.115, except as authorized or as provided in 89.120. 14 CFR 89.110(a) requires broadcast of the 89.305 message elements from takeoff to shutdown, and landing as soon as practicable if broadcast stops. 89.110(b)(4) requires the serial number to be on the certificate of registration or supplied under 89.130. 14 CFR 89.310 requires that a standard remote identification aircraft not be able to take off if its equipment is not functional. 14 CFR 89.101(b) excludes Part 91 operations transmitting ADS-B Out under 91.225.',
+ s:'14 CFR 89.101, 89.105, 89.110 and 89.310',
+ q:['R084','R085','R058','R083'],c:[]},
+
+{id:'L15',m:'REG-C',t:'Standard aircraft or broadcast module',
+ lead:'The exam wants you to know the difference between the two, and the difference is what each one broadcasts.\n\nA standard remote identification aircraft broadcasts the position and geometric altitude of the control station, that is, where you are standing. It also broadcasts an emergency status indication, and its identity may be either a serial number or a session identifier.\n\nA broadcast module broadcasts the takeoff location instead of the control station. It has no emergency status element and no session identifier option, only its own serial number.\n\nA module also drags one extra operating limitation with it: the person flying must be able to see the aircraft at all times throughout the operation. That is written into Part 89 independently of the Part 107 visual line of sight rule, so a visual line of sight waiver does not release you from it.\n\nAnd whatever anyone tells you, ADS-B Out cannot be used to comply with remote identification.',
+ keys:[['Standard broadcasts','Control station position and altitude, emergency status'],['Module broadcasts','Takeoff location, no emergency status'],['Module identity','Serial number only, no session identifier'],['Module limitation','Pilot must see the aircraft at all times'],['ADS-B Out','Cannot satisfy remote identification']],
+ reg:'14 CFR 89.305 lists the eight message elements a standard remote identification aircraft broadcasts: identity as a serial number or session identifier, latitude and longitude of the control station, geometric altitude of the control station, latitude and longitude of the aircraft, geometric altitude of the aircraft, velocity, a time mark in Coordinated Universal Time, and an indication of emergency status. 14 CFR 89.315 lists the seven elements for a broadcast module, substituting the takeoff location for the control station and omitting emergency status and the session identifier. 14 CFR 89.115(a)(2)(ii) requires the person manipulating the controls to be able to see the aircraft at all times. 14 CFR 89.125 states that ADS-B Out equipment cannot be used to comply with Part 89.',
+ s:'14 CFR 89.115, 89.125, 89.305 and 89.315',
+ q:['R052','R053','R054','R057','R086'],c:['F024','F025','F027']},
+
+{id:'L16',m:'REG-C',t:'The way out: recognized identification areas',
+ lead:'There is exactly one routine way to fly with no remote identification equipment at all, and it is geographic.\n\nAn FAA recognized identification area is a defined patch of ground where unequipped aircraft may fly. Both the aircraft and the person holding the controls must remain inside its boundaries for the whole operation, and the aircraft must stay visible throughout.\n\nOnly two kinds of organisation may apply to establish one: a community based organisation recognized by the Administrator, and an educational institution, which includes schools, trade schools, colleges and universities. An individual pilot cannot create one.\n\nOnce approved, the area is in effect for 48 calendar months, and a renewal request must be in no later than 120 days before it expires.\n\nSeparately, 14 CFR 89.120 lets the Administrator authorize operations without remote identification purely for aeronautical research or to show compliance with regulations. That is not a general purpose exemption.',
+ keys:[['Both must stay inside','The aircraft and the person flying it'],['Who may apply','A recognized community based organization or an educational institution'],['Duration','48 calendar months'],['Renewal deadline','No later than 120 days before expiry']],
+ reg:'14 CFR 89.115(b) permits operation without remote identification equipment only if the aircraft and the person manipulating the controls remain within the boundaries of an FAA recognized identification area throughout the operation and the aircraft remains visible at all times. 14 CFR 89.205 limits eligibility to apply to a community based organization recognized by the Administrator and to educational institutions. 14 CFR 89.225 sets 48 calendar months of effect and a renewal request no later than 120 days before expiry. 14 CFR 89.120 covers authorizations for aeronautical research or to show compliance.',
+ s:'14 CFR 89.115(b), 89.120, 89.205 and 89.225',
+ q:['R055','R056','R087'],c:['F026']},
+
+/* ---------- REG-D, people and permission ---------- */
+{id:'L17',m:'REG-D',t:'Flying over people, and the four categories',
+ lead:'The default is simple: you may not fly a small unmanned aircraft over a human being. Three things lift that.\n\nThe person is directly participating in the operation. Or the person is under a covered structure, or inside a stationary vehicle, that would give reasonable protection from a falling aircraft. Or the operation meets one of the four categories in Subpart D.\n\nCategory 1 turns entirely on the aircraft: 0.55 pounds or less on takeoff including everything attached, with no exposed rotating parts that could lacerate skin. No paperwork.\n\nCategory 2 and Category 3 turn on injury severity. Category 2 must not cause injury equal to or greater than the transfer of 11 foot pounds of kinetic energy from a rigid object. Category 3 uses 25 foot pounds. Both need an FAA accepted declaration of compliance and a label.\n\nCategory 4 is the heavy end: an airworthiness certificate issued under Part 21, operated within its Flight Manual limitations, with maintenance records kept for 1 year.',
+ keys:[['Category 1','0.55 pounds or less, no exposed lacerating parts'],['Category 2','Under 11 foot pounds of kinetic energy'],['Category 3','Under 25 foot pounds of kinetic energy'],['Category 4','Airworthiness certificate under Part 21'],['Category 4 records','Kept 1 year from completion of the work']],
+ reg:'14 CFR 107.39 prohibits operating over a human being unless that person is directly participating, is under a covered structure or inside a stationary vehicle providing reasonable protection, or the operation meets a Subpart D category. 14 CFR 107.110(a) sets the Category 1 criteria. 107.120(a) sets Category 2 at 11 foot pounds and 107.130(a) sets Category 3 at 25 foot pounds, both requiring no exposed lacerating rotating parts and no safety defects. 107.140(b) requires a Part 21 airworthiness certificate for Category 4, and 107.140(c)(4) requires maintenance records retained 1 year from completion of the work or until superseded.',
+ s:'14 CFR 107.39, 107.110, 107.120, 107.130 and 107.140',
+ q:['R030','R031','R032','R089','R090'],c:['F021','F022']},
+
+{id:'L18',m:'REG-D',t:'Assemblies, moving vehicles and labels',
+ lead:'Two situations get their own treatment, and the distinctions are exactly what the exam probes.\n\nSustained flight over an open air assembly of human beings is available to Categories 1, 2 and 4, but only if the aircraft satisfies remote identification under 14 CFR 89.110 or 89.115(a). Category 3 may never operate over an open air assembly at all. That single fact is the sharpest thing separating Category 3 from the rest.\n\nCategory 3 also has a tight siting rule anywhere it flies over people: either the operation stays within a closed or restricted access site where everyone inside is on notice, or it does not maintain sustained flight over any person who is not participating or sheltered.\n\nOver a human being inside a moving vehicle, Categories 1, 2 and 3 must either stay within a closed or restricted access site with the occupants on notice, or must not maintain sustained flight over the moving vehicles.\n\nIf the Category 2 or 3 label is damaged or missing, you must relabel the aircraft in English, legibly and prominently, before you fly over anyone.',
+ keys:[['Open air assemblies','Categories 1, 2 and 4 only, with remote identification'],['Category 3 over an assembly','Never'],['Over moving vehicles','Closed site with notice, or no sustained flight'],['Missing label','The remote pilot must relabel in English before flying over people']],
+ reg:'14 CFR 107.110(b), 107.115(b) and 107.140(a)(2) allow sustained flight over open air assemblies only where the operation meets 89.110 or 89.115(a). 14 CFR 107.125(b) forbids Category 3 from operating over open air assemblies, and 107.125(c) sets the closed site or no sustained flight condition. 14 CFR 107.145 governs operations over human beings inside moving vehicles, with 107.145(b) applying the closed site or no sustained flight condition to Categories 1, 2 and 3. 14 CFR 107.135 requires the remote pilot to relabel a Category 2 or 3 aircraft in English, legibly, prominently and durably if the label is damaged, destroyed or missing.',
+ s:'14 CFR 107.125, 107.135 and 107.145',
+ q:['R033','R034','R068','R091','R067'],c:['F023']},
+
+{id:'L19',m:'REG-D',t:'Getting permission for controlled airspace',
+ lead:'Prior authorization from Air Traffic Control is required before you operate in Class B, Class C, Class D, or within the lateral boundaries of the surface area of Class E designated for an airport.\n\nRead that last clause carefully. Class E only counts when it is a surface area attached to an airport, drawn on the chart with a dashed magenta line. Class E that starts at 700 or 1,200 feet above the ground does not trigger the rule, because you are underneath it. Class G never does.\n\nAltitude does not release you. Flying at 50 feet inside a Class D surface area still needs authorization.\n\nThree other permissions live nearby. Prohibited and restricted areas need permission from the using or controlling agency. Notice to airmen restrictions under 14 CFR 91.137 through 91.145 and 99.7 must be obeyed. And in every class of airspace including Class G, you may not operate in a way that interferes with operations and traffic patterns at any airport, heliport or seaplane base.',
+ keys:[['Authorization needed','Class B, C, D and Class E surface areas'],['Not needed','Class G, and Class E starting above the ground'],['Does altitude help','No'],['Restricted areas','Permission from the using or controlling agency'],['Near any airport','Never interfere with operations or traffic patterns']],
+ reg:'14 CFR 107.41 requires prior authorization from Air Traffic Control before operating in Class B, Class C or Class D airspace or within the lateral boundaries of the surface area of Class E airspace designated for an airport. 14 CFR 107.43 prohibits operating in a manner that interferes with operations and traffic patterns at any airport, heliport or seaplane base, and is not waivable. 14 CFR 107.45 requires permission from the using or controlling agency for prohibited and restricted areas, and is not waivable. 14 CFR 107.47 requires compliance with 91.137 through 91.145 and 99.7.',
+ s:'14 CFR 107.41, 107.43, 107.45 and 107.47',
+ q:['R005','R043','R044','R045'],c:['F005']},
+
+{id:'L20',m:'REG-D',t:'Waivers, and what will never bend',
+ lead:'The FAA may waive only the rules listed in 14 CFR 107.205. There are exactly ten entries, and knowing the list is easier than it sounds because the theme is consistent: everything on it is an operating technique, and everything off it is a duty of care.\n\nWaivable: operation from a moving vehicle, the anticollision lighting requirement, visual line of sight, the visual observer rule, multiple aircraft, yielding the right of way, operation over people, operation in certain airspace, the operating limitations of 107.51, and operations over moving vehicles.\n\nNot waivable, and often tested by omission: the inspection and documents rule, safety event reporting, the certificate and registration requirements, condition for safe operation, medical condition, remote pilot responsibility, careless or reckless operation, alcohol and drugs, hazardous material, creating a collision hazard, operation near airports, prohibited and restricted areas, notice to airmen restrictions, and preflight.\n\nTwo waivers carry an explicit refusal built in: neither 107.25 nor 107.31 will ever be waived to allow carriage of the property of another for compensation or hire.',
+ keys:[['How many waivable rules','Ten, at 14 CFR 107.205'],['Never waivable, examples','107.43 near airports, 107.45 restricted areas, 107.49 preflight'],['Explicit refusal','Carriage of the property of another for hire'],['Requesting one','A complete description of the operation and its justification']],
+ reg:'14 CFR 107.200 allows a certificate of waiver authorizing deviation from any regulation specified in 107.205 if the proposed operation can safely be conducted, and requires a complete description of the operation and justification. 14 CFR 107.205 lists 107.25, 107.29(a)(2) and (b), 107.31, 107.33, 107.35, 107.37(a), 107.39, 107.41, 107.51 and 107.145. Both 107.205(a) and (c) state that no waiver will be issued to allow the carriage of the property of another by aircraft for compensation or hire. 14 CFR 107.150 requires that a pilot cannot inadvertently switch between category modes, and 107.155(a) requires a means of compliance to consist of test, analysis or inspection.',
+ s:'14 CFR 107.150, 107.155, 107.200 and 107.205',
+ q:['R035','R036','R037','R077','R078'],c:['F033']},
+
+/* ---------- REG-E, every flight start to finish ---------- */
+{id:'L21',m:'REG-E',t:'The preflight assessment',
+ lead:'Before every flight the remote pilot in command must assess the operating environment, considering the risk to people and property both on the surface and in the air. Four things are named explicitly: local weather, local airspace and any flight restrictions, the location of persons and property on the surface, and other ground hazards.\n\nThen you brief everyone directly participating on five things: operating conditions, emergency procedures, contingency procedures, roles and responsibilities, and potential hazards.\n\nThen three checks on the machine. All control links between the control station and the aircraft are working. There is enough available power for the intended operational time. And anything attached or carried is secure and does not adversely affect flight characteristics or controllability.\n\nIf you are flying over human beings under Subpart D, you also confirm the aircraft meets the applicable category requirement.\n\nNone of this is waivable.',
+ keys:[['Assess','Weather, airspace, people and property, ground hazards'],['Brief','Conditions, emergency, contingency, roles, hazards'],['Check','Control links, available power, attached objects'],['Waivable','No']],
+ reg:'14 CFR 107.49(a) requires assessment of the operating environment including local weather conditions, local airspace and any flight restrictions, the location of persons and property on the surface, and other ground hazards. 107.49(b) requires briefing of all directly participating persons on operating conditions, emergency procedures, contingency procedures, roles and responsibilities and potential hazards. 107.49(c) requires the control links to be working, 107.49(d) requires enough available power, 107.49(e) requires attached objects to be secure and not adversely affect flight characteristics or controllability, and 107.49(f) requires confirmation of the applicable Subpart D category.',
+ s:'14 CFR 107.49',
+ q:['R039','R040','R073','R074'],c:[]},
+
+{id:'L22',m:'REG-E',t:'Condition for safe operation, and who is in charge',
+ lead:'Prior to each flight the remote pilot in command must check the aircraft system to determine whether it is in a condition for safe operation. That is a per flight duty, not a per day duty.\n\nThe rule has a second half that matters more in practice: you may not continue a flight when you know, or have reason to know, that the system is no longer in a condition for safe operation. Spot a cracked arm mid flight and the correct answer is to bring it down, not to press on to the planned landing point.\n\nA remote pilot in command must be designated before or during every flight. That person is directly responsible for, and is the final authority as to, the operation. They must ensure the aircraft would pose no undue hazard to people, aircraft or property in the event of a loss of control for any reason, ensure the operation complies with every applicable regulation, and have the ability to direct the aircraft to keep it that way.',
+ keys:[['Check the aircraft','Prior to each flight'],['Knowing it is unsafe','You may not continue the flight'],['Designated','Before or during the flight'],['Responsibility','Directly responsible and the final authority']],
+ reg:'14 CFR 107.15(a) prohibits operating a small unmanned aircraft system unless it is in a condition for safe operation and requires the remote pilot in command to check it prior to each flight. 107.15(b) prohibits continuing flight when the person knows or has reason to know it is no longer in a condition for safe operation. 14 CFR 107.19 requires a remote pilot in command to be designated before or during the flight, makes that person directly responsible and the final authority, and requires them to ensure no undue hazard in the event of a loss of control for any reason, ensure regulatory compliance, and have the ability to direct the aircraft.',
+ s:'14 CFR 107.15 and 107.19',
+ q:['R038','R042','R071','R072'],c:[]},
+
+{id:'L23',m:'REG-E',t:'When something goes wrong in flight',
+ lead:'In an in flight emergency that requires immediate action, the remote pilot in command may deviate from any rule of Part 107 to the extent necessary to meet that emergency. Any rule. Altitude, speed, airspace, all of it, for as long as the emergency demands.\n\nThe catch is what happens afterwards, and this is where people lose the point. A written report of the deviation is required only upon request of the Administrator. Nothing is filed automatically. There is no deadline to remember because there is no automatic obligation.\n\nContrast that with a safety event report, which is automatic and has a deadline, and you can see why the exam pairs them. One is triggered by a request, the other by the event itself.',
+ keys:[['What you may deviate from','Any rule of Part 107'],['How far','To the extent necessary to meet the emergency'],['Written report','Only upon request of the Administrator'],['Automatic filing','None']],
+ reg:'14 CFR 107.21(a) permits the remote pilot in command, in an in flight emergency requiring immediate action, to deviate from any rule of this part to the extent necessary to meet that emergency. 107.21(b) requires that person, upon request of the Administrator, to send a written report of the deviation.',
+ s:'14 CFR 107.21',
+ q:['R015','R016'],c:['F031']},
+
+{id:'L24',m:'REG-E',t:'Reporting a safety event',
+ lead:'Two triggers, one deadline.\n\nSerious injury to any person, or any loss of consciousness, is reportable on its own. No dollar figure attaches.\n\nDamage to property other than the small unmanned aircraft is reportable unless one of two escapes applies: the cost of repair including materials and labour does not exceed $500, or the fair market value does not exceed $500 in the event of total loss. Damage to your own aircraft never counts, however expensive it was.\n\nThe deadline is no later than 10 calendar days after the operation, and the duty sits with the remote pilot in command.\n\nThe section used to be titled Accident reporting. Since December 2022 it is called Safety event reporting. The thresholds did not change.',
+ keys:[['Injury trigger','Serious injury, or any loss of consciousness'],['Property trigger','More than $500 to repair, or more than $500 fair market value'],['Your own aircraft','Never counts'],['Deadline','10 calendar days after the operation']],
+ reg:'14 CFR 107.9 requires the remote pilot in command, no later than 10 calendar days after the operation, to report to the FAA any operation involving at least serious injury to any person or any loss of consciousness, or damage to any property other than the small unmanned aircraft unless the cost of repair including materials and labour does not exceed $500 or the fair market value does not exceed $500 in the event of total loss.',
+ s:'14 CFR 107.9',
+ q:['R006','R007','R008'],c:['F006','F007']},
+
+{id:'L25',m:'REG-E',t:'Fit to fly',
+ lead:'Part 107 requires no medical certificate. It replaces one with a personal duty.\n\nNo person may manipulate the controls, or act as remote pilot in command, visual observer or direct participant, if they know or have reason to know of a physical or mental condition that would interfere with safe operation. You are your own medical examiner, and the standard is what you know.\n\nAlcohol and drugs come in from Part 91. Eight hours must pass between the last alcoholic beverage and acting as a crewmember. You may not act while under the influence, and you may not act with an alcohol concentration of 0.04 or greater. Note that under the influence has no number attached, so you can breach it below 0.04 and beyond 8 hours.\n\nAll three of these bind the person flying, the remote pilot in command and the visual observer.\n\nConvictions for drug offences, and refusing a lawful alcohol test, are separate grounds for denial for up to 1 year, or for suspension or revocation.',
+ keys:[['Medical certificate','Not required'],['Bottle to throttle','8 hours'],['Alcohol concentration limit','0.04 or greater'],['Who is bound','Pilot, remote pilot in command and visual observer']],
+ reg:'14 CFR 107.17 prohibits acting as remote pilot in command, visual observer, direct participant or person manipulating the controls when the person knows or has reason to know of a physical or mental condition that would interfere with safe operation. 14 CFR 107.27 requires compliance with 91.17 and 91.19. 14 CFR 91.17(a) prohibits acting as a crewmember within 8 hours after consuming any alcoholic beverage, while under the influence of alcohol, while using any drug that affects the person faculties contrary to safety, or with an alcohol concentration of 0.04 or greater. 14 CFR 107.57 and 107.59 make drug convictions and refusal of an alcohol test grounds for denial for up to 1 year or for suspension or revocation.',
+ s:'14 CFR 107.17, 107.27, 107.57, 107.59 and 91.17',
+ q:['R019','R020','R021','R041'],c:['F013']},
+/* ---------- OPS-A, the pilot ---------- */
+{id:'L26',m:'OPS-A',t:'Aeronautical decision making',
+ lead:'Roughly 80 percent of aviation accidents are related to human factors, and the vast majority happen during landing and takeoff. That statistic is the reason a quarter of your exam is about you rather than the aircraft.\n\nAeronautical decision making is the FAA name for a systematic approach to choosing the best course of action. The model you must know by name is DECIDE, six steps run as a loop: Detect the change, Estimate the need to react, Choose a desirable outcome, Identify actions to control the change, Do the necessary actions, Evaluate the effect.\n\nAlongside it sit three smaller acronyms. PAVE identifies hazards across Pilot, Aircraft, enVironment and External pressures. CARE reviews hazards and evaluates risk. TEAM chooses how to handle each one: Transfer, Eliminate, Accept, Mitigate.',
+ keys:[['Human factors share','About 80 percent of accidents'],['DECIDE','Detect, Estimate, Choose, Identify, Do, Evaluate'],['PAVE','Pilot, Aircraft, enVironment, External pressures'],['TEAM','Transfer, Eliminate, Accept, Mitigate']],
+ reg:'Aeronautical decision making is defined in FAA-G-8082-22 Chapter 10 as a systematic approach to the mental process used by pilots to consistently determine the best course of action in response to a given set of circumstances. The same chapter states that approximately 80 percent of all aviation accidents are related to human factors, with landing at 24.1 percent and takeoff at 23.4 percent. The DECIDE model, PAVE, CARE, TEAM and the risk assessment matrix are set out in FAA-H-8083-25C Chapter 2.',
+ s:'FAA-G-8082-22 Chapter 10 and FAA-H-8083-25C Chapter 2',
+ q:['O006','O014'],c:['F058']},
+
+{id:'L27',m:'OPS-A',t:'The five hazardous attitudes',
+ lead:'Five recurring patterns of thought get pilots killed. The FAA gives each one a name, a phrase it sounds like, and a memorised antidote. The exam asks for the antidote in almost exactly the published wording, so learn the strings rather than the sense.\n\nAnti authority sounds like do not tell me. Antidote: follow the rules, they are usually right.\n\nImpulsivity sounds like do it quickly. Antidote: not so fast, think first.\n\nInvulnerability sounds like it will not happen to me. Antidote: it could happen to me.\n\nMacho sounds like I can do it. Antidote: taking chances is foolish.\n\nResignation sounds like what is the use. Antidote: I am not helpless, I can make a difference.\n\nThe procedure is recognise the thought, label it as hazardous, then state the antidote.',
+ keys:[['Anti authority','Follow the rules. They are usually right.'],['Impulsivity','Not so fast. Think first.'],['Invulnerability','It could happen to me.'],['Macho','Taking chances is foolish.'],['Resignation','I am not helpless. I can make a difference.']],
+ reg:'FAA-H-8083-25C Chapter 2 Figure 2-4 lists the five hazardous attitudes and their antidotes, reproduced at FAA-G-8082-22 Chapter 10 Figure 10-2. The handbook notes that recognition of hazardous thoughts is the first step toward neutralizing them, that the pilot should label the thought as hazardous and then state the corresponding antidote, and that antidotes should be memorized. It also notes that although macho is often thought of as a male characteristic, women are equally susceptible.',
+ s:'FAA-H-8083-25C Chapter 2, Figure 2-4',
+ q:['O001','O002','O003','O004','O034'],c:['F052','F053','F054','F055','F056']},
+
+{id:'L28',m:'OPS-A',t:'Are you fit to fly today',
+ lead:'IMSAFE is the personal readiness checklist: Illness, Medication, Stress, Alcohol, Fatigue, Emotion. Run it before you fly, honestly, and treat a failure as a cancellation rather than a challenge.\n\nMedication deserves specific attention. The FAA singles out over the counter antihistamines and decongestants as examples that may cause drowsiness, and notes that ordinary medical conditions such as epilepsy can create risk. Part 107 gives you no medical examiner, so determining that your condition is under control is your job.\n\nThe responsibility does not stop at yourself. It is the remote pilot in command duty to ensure that no crewmember is participating in the operation while impaired. If your visual observer turns up unfit, that is your problem to solve before the aircraft leaves the ground.',
+ keys:[['IMSAFE','Illness, Medication, Stress, Alcohol, Fatigue, Emotion'],['Flagged medicines','Antihistamines and decongestants'],['Who checks the crew','The remote pilot in command']],
+ reg:'FAA-G-8082-22 Chapter 10 sets out the IMSAFE checklist for determining physical and mental readiness to fly. Chapter 9 states that Part 107 does not allow operation if the remote pilot in command, the person manipulating the controls or the visual observer is unable to safely carry out their responsibilities, and that it is the remote pilot in command responsibility to ensure all crewmembers are not participating while impaired. It names antihistamines and decongestants as over the counter medications that may cause drowsiness and epilepsy as an example condition requiring the pilot to determine it is under control.',
+ s:'FAA-G-8082-22 Chapters 9 and 10',
+ q:['O005','O035','O036'],c:['F057']},
+
+{id:'L29',m:'OPS-A',t:'Fatigue, dehydration and heat',
+ lead:'Fatigue is frequently associated with pilot error, and it comes in two forms. Acute fatigue is short term and fixed by rest. Chronic fatigue extends over a long period and usually has psychological roots, so it needs a doctor rather than a nap.\n\nThe FAA position on acute fatigue is unambiguous: do not operate. Once it appears during a flight, no amount of training or experience overcomes it, and adequate rest is the only prevention.\n\nDehydration is the one people underestimate. The first noticeable effect is fatigue, which then makes good performance impossible. Left unreplaced it progresses to dizziness, weakness, nausea, tingling in hands and feet, abdominal cramps and extreme thirst. Drink two to four quarts of water every 24 hours. Do not rely on thirst as your alarm, because it arrives too late and is switched off too easily. Coffee and alcohol are diuretics and work against you.\n\nHeatstroke is the body losing the ability to control its own temperature, and it has been recognised only on complete collapse.\n\nHyperventilation is excessive rate and depth of breathing, which strips carbon dioxide from the blood. It causes visual impairment, lightheadedness, tingling, and can end in unconsciousness.',
+ keys:[['Acute fatigue','Do not operate. Rest is the only prevention.'],['Chronic fatigue','See a physician'],['First effect of dehydration','Fatigue'],['Daily water','Two to four quarts'],['Hyperventilation','Loss of carbon dioxide, not lack of oxygen']],
+ reg:'FAA-G-8082-22 Chapter 9 states that fatigue is frequently associated with pilot error, distinguishes acute from chronic fatigue, and states that a remote pilot suffering from acute fatigue should not operate, that no amount of training or experience overcomes fatigue once it occurs, and that adequate rest is the only prevention. The same chapter defines dehydration as a critical loss of water from the body, identifies fatigue as the first noticeable effect, recommends two to four quarts of water every 24 hours, and warns that the thirst mechanism arrives too late and is turned off too easily. It defines heatstroke and defines hyperventilation as the excessive rate and depth of respiration leading to abnormal loss of carbon dioxide from the blood.',
+ s:'FAA-G-8082-22 Chapter 9',
+ q:['O007','O008','O009','O010'],c:['F059']},
+
+{id:'L30',m:'OPS-A',t:'Workload, awareness and using your crew',
+ lead:'The first effect of a high workload is counterintuitive and worth remembering as a phrase: the pilot may be working harder but accomplishing less. As the load rises, attention narrows to one item. Task saturated, you stop taking in information from other sources, and decisions get made on incomplete pictures.\n\nThe remedy the FAA gives is a sequence: stop, think, slow down and prioritise. A preemptive version is to listen to the automated weather and monitor the tower or common traffic advisory frequency before you are busy, so the traffic picture is already in your head.\n\nSituational awareness is the accurate perception of the five fundamental risk elements: flight, pilot, aircraft, environment and type of operation. Fatigue, stress and work overload erode it by causing fixation, and a distraction that pulls attention away from monitoring the aircraft is a contributing factor in many accidents.\n\nCrew resource management is the effective use of all available resources, grouped as human resources, hardware and information. Its principles apply even alone, and the FAA notes that a single pilot with nobody to consult has greater vulnerability than a full crew.',
+ keys:[['First effect of high workload','Working harder but accomplishing less'],['The remedy','Stop, think, slow down, prioritise'],['Five risk elements','Flight, pilot, aircraft, environment, type of operation'],['CRM resources','Human resources, hardware, information'],['Stressor categories','Environmental, physiological, psychological']],
+ reg:'FAA-G-8082-22 Chapter 10 states that the first effect of high workload is that the pilot may be working harder but accomplishing less, that a task saturated pilot has no awareness of input from various sources, and that the response is to stop, think, slow down and prioritise. It defines situational awareness across the five fundamental risk elements of flight, pilot, aircraft, environment and type of operation, and identifies fatigue, stress and work overload as causes of fixation. It defines crew resource management as the effective use of human resources, hardware and information, notes that the principles apply to single pilot operations, and states that the single pilot with no other crewmember for consultation has greater vulnerability than a full crew. Figure 10-7 groups stressors as environmental, physiological and psychological.',
+ s:'FAA-G-8082-22 Chapter 10',
+ q:['O012','O013','O031','O032','O037','O040'],c:[]},
+
+{id:'L31',m:'OPS-A',t:'Seeing traffic and avoiding structures',
+ lead:'Scanning is a technique with four numbers in it. Look right to left or left to right. Start at the greatest distance an object can be perceived and work inward toward your own position. Each stop covers a sector about 30 degrees wide. No stop lasts longer than 2 to 3 seconds. Overlap the previous field of view by 10 degrees when you move.\n\nStructures deserve a wider berth than they look. Guy wires can extend about 1,500 feet horizontally from a skeletal tower, which is why the guidance is to avoid all such structures horizontally by at least 2,000 feet. The wires are effectively invisible from a camera feed.\n\nAnd do not treat your chart as complete. A newly built tower may not appear on the current edition because the information arrived after printing. This is the practical reason the preflight assessment of the operating environment exists as a separate duty from reading the chart.',
+ keys:[['Sector width','About 30 degrees'],['Stop duration','No longer than 2 to 3 seconds'],['Overlap','10 degrees'],['Guy wires reach','About 1,500 feet horizontally'],['Recommended clearance','At least 2,000 feet horizontally']],
+ reg:'FAA-G-8082-22 Chapter 9 sets out the scanning technique: look right to left or left to right, begin at the greatest distance an object can be perceived and move inward, scan an area approximately 30 degrees wide at each stop, hold no stop longer than 2 to 3 seconds, and overlap the previous field of view by 10 degrees. Chapter 11 states that guy wires can extend about 1,500 feet horizontally from a structure and that all skeletal structures should be avoided horizontally by at least 2,000 feet, and warns that new towers may not appear on a current chart because the information was not received before printing.',
+ s:'FAA-G-8082-22 Chapters 9 and 11',
+ q:['O011','O038','O039'],c:['F060','F068']},
+
+/* ---------- OPS-B, airports and access ---------- */
+{id:'L32',m:'OPS-B',t:'The common traffic advisory frequency',
+ lead:'At an airport with no operating control tower, pilots coordinate with each other rather than with a controller. The frequency they use is the common traffic advisory frequency, usually written CTAF. On a sectional it is the frequency followed by a letter C inside a magenta circle.\n\nThe distance to remember is 10 miles. Inbound aircraft monitor and communicate on the frequency from 10 miles out until landing. Departing aircraft use it from start up, through taxi, until 10 miles from the field.\n\nWhere there is no tower, no flight service station and no UNICOM, the frequency to self announce on is MULTICOM 122.9.\n\nTwo way radio is not legally required at a non towered airport, but monitoring is good practice, and for a remote pilot it is the cheapest situational awareness available.',
+ keys:[['CTAF chart symbol','A letter C in a magenta circle after the frequency'],['Inbound','Monitor from 10 miles to landing'],['Outbound','From start up until 10 miles out'],['MULTICOM','122.9'],['Radio at a non towered field','Not required, but recommended']],
+ reg:'AIM 4-1-9 defines the common traffic advisory frequency as a frequency designated for carrying out airport advisory practices while operating to or from an airport without an operating control tower, and gives the 10 mile inbound and outbound practice. It designates 122.9 as the MULTICOM frequency for self announcing where there is no tower, flight service station or UNICOM. The Aeronautical Chart Users Guide shows the CTAF as a letter C in a magenta circle following the frequency. FAA-G-8082-22 Chapter 11 states that two way radio communications are not required at a non towered airport although monitoring is good practice.',
+ s:'AIM 4-1-9 and the Aeronautical Chart Users Guide',
+ q:['O015','O016','O017','O018'],c:['F061','F062']},
+
+{id:'L33',m:'OPS-B',t:'The traffic pattern',
+ lead:'Manned aircraft fly a rectangle around the runway, and knowing its shape tells you where they will be and at what height.\n\nThe legs in order after takeoff are departure, upwind, crosswind, downwind, base and final. Downwind runs parallel to the runway in the opposite direction to landing. Base is the right angle turn that connects downwind to the extended centreline.\n\nAll turns are to the left unless the chart says otherwise. Right traffic is charted in the airport data block as RP followed by the runway number, and an asterisk before RP means special conditions apply.\n\nPattern altitude is 1,000 feet above the ground for propeller driven aircraft, not less than 1,500 feet for large and turbine powered aircraft, and helicopters may work at 500 feet closer to the runway. Helicopters are also exempt from the left turn convention.\n\nThat 500 to 1,000 foot band is directly above your legal ceiling, which is exactly why 14 CFR 107.43 exists.',
+ keys:[['Leg order','Departure, upwind, crosswind, downwind, base, final'],['Turn direction','Left, unless RP is charted'],['Propeller pattern altitude','1,000 feet AGL'],['Turbine pattern altitude','Not less than 1,500 feet AGL'],['Helicopters','May use 500 feet AGL']],
+ reg:'AIM 4-3-2 requires all turns in a traffic pattern to be made to the left except for helicopters, unless right traffic is designated. AIM 4-3-3 sets out the pattern legs in order and gives pattern altitudes of 1,000 feet above ground level for propeller driven aircraft, not less than 1,500 feet or 500 feet above the established pattern altitude for large and turbine powered aircraft, and 500 feet for helicopters. The Aeronautical Chart Users Guide shows right traffic as RP followed by the runway number, with an asterisk indicating special conditions or restrictions.',
+ s:'AIM 4-3-2 and 4-3-3',
+ q:['O019','O020','O021'],c:['F063']},
+
+{id:'L34',m:'OPS-B',t:'Runways, wind and the segmented circle',
+ lead:'A runway number is its magnetic azimuth rounded to the nearest 10 degrees with the last digit dropped. A centreline at 183 degrees magnetic is Runway 18. At 87 degrees it is Runway 9.\n\nOn the ground, the segmented circle system carries five things: the circle itself, a wind direction indicator, a landing direction indicator, landing strip indicators and traffic pattern indicators.\n\nTwo of those are constantly confused. A wind cone points its large end into the wind. A tetrahedron points its small end in the landing direction, and the FAA specifically cautions pilots against using a tetrahedron to work out the wind.\n\nOne more trap. A wind reported by a tower or on the automated broadcast is referenced to magnetic north. A wind written in a METAR or TAF is referenced to true north. Same field, same moment, two different numbers.',
+ keys:[['Runway number','Magnetic azimuth to the nearest 10 degrees, last digit dropped'],['Wind cone','Large end points into the wind'],['Tetrahedron','Small end points the landing direction'],['Tower or ATIS wind','Magnetic'],['METAR or TAF wind','True']],
+ reg:'AIM 4-3-4 states that runways are numbered by the nearest 10 degree increment of the magnetic azimuth of the runway centreline, that wind direction issued by the tower is magnetic and velocity is in knots, and describes the five components of the segmented circle system. It notes that the large end of the wind cone points into the wind, that the tetrahedron small end points the landing direction, and that pilots are cautioned against using a tetrahedron to indicate wind direction. FAA-H-8083-28B Sections 24.4.3.5 and 27.4.2.5 reference written METAR and TAF winds to true north.',
+ s:'AIM 4-3-4',
+ q:['O022','O023','O024','O025'],c:['F064','F065']},
+
+{id:'L35',m:'OPS-B',t:'LAANC, notices to airmen and maintenance',
+ lead:'The Low Altitude Authorization and Notification Capability is how you actually get the authorization that 14 CFR 107.41 demands. It grants access to controlled airspace at or below 400 feet, checked in near real time against facility maps, special use airspace, airspace classes and temporary flight restrictions. Requests go through an approved service supplier.\n\nIf you need to fly above the charted grid ceiling, up to 400 feet, you file a further coordination request instead, available up to 90 days in advance and only to Part 107 operators.\n\nUAS facility maps show grid ceilings of 0, 50, 100, 200, 300 and 400 feet. Learn the caveat: the maps authorize nothing. The FAA states they are for informational purposes only. A grid marked 0 means no automatic approval is available and the request must go to FAADroneZone for manual review, which is also where you go if you need both a waiver and an airspace authorization.\n\nA temporary flight restriction is a type of notice to airmen, so checking notices is not optional. And maintenance and preflight inspection procedures are not in the study guide at all: they live in Chapter 7 of AC 107-2A and in your manufacturer manual.',
+ keys:[['LAANC gives','Near real time authorization at or below 400 feet'],['Grid ceilings','0, 50, 100, 200, 300 and 400 feet'],['Do facility maps authorize','No, informational only'],['A 0 grid','Manual review through FAADroneZone'],['Waiver plus authorization','Both through FAADroneZone']],
+ reg:'The FAA Low Altitude Authorization and Notification Capability provides access to controlled airspace at or below 400 feet, checked against UAS facility maps, special use airspace data, airspace classes and temporary flight restrictions, with further coordination requests available up to 90 days in advance for Part 107 operators. The FAA UAS Facility Maps page states that the maps do not authorize operations and are for informational purposes only, and publishes grid ceilings of 0, 50, 100, 200, 300 and 400 feet above ground level. The Aeronautical Chart Users Guide defines a temporary flight restriction as a type of notice to airmen. FAA-G-8082-22 Chapter 12 refers maintenance and preflight inspection procedures to Chapter 7 of AC 107-2.',
+ s:'FAA LAANC and UAS Facility Maps, and AC 107-2A Chapter 7',
+ q:['O026','O027','O028','O029','O030','O033'],c:['F066','F067']},
+/* ---------- AIR-A, the classes of airspace ---------- */
+{id:'L36',m:'AIR-A',t:'Class B and Class C',
+ lead:'Class B surrounds the busiest airports. It normally runs from the surface to 10,000 feet mean sea level and is individually tailored, which is why it is described as an upside down wedding cake: a small surface core with wider shelves stacked above it.\n\nClass C surrounds moderately busy airports. It normally runs from the surface to 4,000 feet above the airport elevation, with an inner core of 5 nautical miles radius and a shelf out to 10 nautical miles whose floor sits no lower than 1,200 feet.\n\nThe shelf is where the exam earns its money. Under a Class C shelf whose floor is 1,300 feet mean sea level, flying at 200 feet above terrain that sits at 400 feet, you are at 600 feet MSL. You are beneath the shelf, so you are not inside Class C, and 14 CFR 107.41 is not triggered by that shelf. Inside the surface core, it certainly is.\n\nOne more Class C detail: a ceiling printed as the letter T means the ceiling extends to, but does not include, the floor of the Class B above it.',
+ keys:[['Class B','Surface to 10,000 feet MSL, individually tailored'],['Class C','Surface to 4,000 feet above the airport elevation'],['Class C core','5 nautical mile radius'],['Class C shelf','Out to 10 nautical miles, floor no lower than 1,200 feet'],['Ceiling shown as T','Up to, but not including, the Class B floor above']],
+ reg:'AIM 3-2-3 describes Class B as extending from the surface to 10,000 feet mean sea level, individually tailored and designed to contain published instrument procedures, with an ATC clearance required. AIM 3-2-4 describes Class C as extending from the surface to 4,000 feet above the airport elevation, with a 5 nautical mile inner core, a shelf to 10 nautical miles with a floor no lower than 1,200 feet, and an outer area normally 20 nautical miles from the primary airport, requiring two way radio communication to be established before entry. The Aeronautical Chart Users Guide states that a Class C ceiling value of T indicates the ceiling is to, but not including, the floor of the overlying Class B airspace.',
+ s:'AIM 3-2-3 and 3-2-4',
+ q:['A013','A015','A007','A008'],c:['F047']},
+
+{id:'L37',m:'AIR-A',t:'Class D, Class E and Class G',
+ lead:'Class D wraps a single airport with an operating control tower. It runs from the surface to 2,500 feet above the airport elevation. The chart prints that ceiling as a mean sea level figure, so a field at 120 feet gets a charted ceiling of 26, meaning 2,600 feet MSL.\n\nClass E is everything else that is controlled. Unless designated otherwise it begins at 1,200 feet above the ground. Around airports with instrument approaches it is lowered to 700 feet, and at some airports it comes all the way to the surface as a Class E surface area.\n\nThis produces the single most useful insight for a drone pilot. Below 700 or 1,200 feet, in the places where Class E has been lowered but does not reach the surface, the airspace at your operating altitude is Class G. You are underneath the controlled airspace, not inside it.\n\nClass G is uncontrolled airspace and it extends up to 14,500 feet mean sea level. Above that it becomes Class E, except for airspace less than 1,500 feet above the terrain and certain special use areas.\n\nClass A, from 18,000 feet to flight level 600, is instrument flight only and never appears on a visual chart.',
+ keys:[['Class D','Surface to 2,500 feet above the airport elevation'],['Class E default floor','1,200 feet AGL, lowered to 700 feet near instrument airports'],['Below a lowered Class E floor','Class G'],['Top of Class G','14,500 feet MSL'],['Class A','18,000 feet to flight level 600, not charted on visual charts']],
+ reg:'AIM 3-2-5 describes Class D as extending upward from the surface to 2,500 feet above the airport elevation, with two way radio communication required before entry. AIM 3-2-6 describes Class E, including transition area floors at 700 feet above ground level shown by a magenta vignette and 1,200 feet shown by a blue vignette. The Aeronautical Chart Users Guide states that Class E exists at 1,200 feet above ground level unless designated otherwise, that Class G within the United States extends up to 14,500 feet mean sea level with Class E at and above that altitude excluding airspace less than 1,500 feet above the terrain and certain special use airspace, and that Class A extends from 18,000 feet to flight level 600 and is not depicted on visual charts.',
+ s:'AIM 3-2-5 and 3-2-6, and the Aeronautical Chart Users Guide',
+ q:['A014','A010','A011','A012'],c:['F045','F046']},
+
+/* ---------- AIR-B, reading a sectional ---------- */
+{id:'L38',m:'AIR-B',t:'The four line styles',
+ lead:'Everything about airspace on a sectional is encoded in two variables: the colour of a line and whether it is solid or dashed. Four combinations, and once they are automatic the chart stops being intimidating.\n\nSolid blue is Class B.\nSolid magenta is Class C.\nDashed blue is Class D.\nDashed magenta is a Class E surface area.\n\nA memory hook that works: solid means busy, blue means the biggest. Class B is the busiest and gets the boldest treatment. Dashed means it is a single airport rather than a layered system.\n\nThe fourth one matters more than its size suggests. A dashed magenta ring is a Class E surface area, which means the controlled airspace comes down to the ground, which means 14 CFR 107.41 applies and you need prior authorization. Students routinely mistake it for an advisory boundary and fly into controlled airspace without asking.',
+ keys:[['Solid blue','Class B'],['Solid magenta','Class C'],['Dashed blue','Class D'],['Dashed magenta','Class E surface area, authorization required']],
+ reg:'The Aeronautical Chart Users Guide, Controlled Airspace, states that Class B is depicted with solid blue lines, Class C with solid magenta lines, Class D with a blue dashed line, and a Class E surface area with a magenta dashed line.',
+ s:'Aeronautical Chart Users Guide, Controlled Airspace',
+ q:['A001','A002','A003','A004'],c:['F035','F036','F037','F038']},
+
+{id:'L39',m:'AIR-B',t:'Floors, ceilings and vignettes',
+ lead:'Altitude figures on a chart are printed in hundreds of feet above mean sea level with the last two zeros dropped, and stacked with the ceiling above the floor.\n\nSo 100 over 30 is a ceiling of 10,000 feet MSL over a floor of 3,000 feet MSL. And 41 over SFC is a ceiling of 4,100 feet MSL with the floor at the surface. SFC in the floor position always means the airspace comes down to the ground, which is your trigger for needing authorization.\n\nA vignette is a soft fuzzy band of colour rather than a hard line, and it tells you where Class E begins overhead rather than enclosing anything. Magenta vignette means the Class E floor is 700 feet above the ground. Blue vignette means a floor other than 700, normally 1,200 feet, where it abuts Class G.\n\nStanding under a magenta vignette at 300 feet, you are in Class G. The vignette is telling you about a ceiling of uncontrolled airspace above your head, not about the airspace you are flying in.',
+ keys:[['Format','Hundreds of feet MSL, ceiling over floor, last two zeros dropped'],['100 over 30','10,000 MSL over 3,000 MSL'],['SFC','The floor is the surface'],['Magenta vignette','Class E begins at 700 feet AGL'],['Blue vignette','Class E begins at 1,200 feet AGL']],
+ reg:'The Aeronautical Chart Users Guide states that the mean sea level ceiling and floor altitudes of each Class B sector are shown in solid blue figures with the last two zeros omitted, and the same for Class C in magenta. It states that controlled airspace floors of 700 feet above the ground are defined by a magenta vignette, and that floors other than 700 feet which laterally abut uncontrolled airspace are defined by a blue vignette.',
+ s:'Aeronautical Chart Users Guide, Controlled Airspace',
+ q:['A005','A006','A009'],c:['F039','F040']},
+
+{id:'L40',m:'AIR-B',t:'Airport symbols',
+ lead:'The colour of an airport symbol answers exactly one question: does it have an operating control tower. Blue means yes. Magenta means no. It tells you nothing directly about airspace class, so you still trace the boundary line through your point.\n\nThe shape carries runway information. A runway pattern is drawn only where there is at least one hard surfaced runway 1,500 feet or longer. A large circle with a runway outline means hard surfaced runways longer than 8,069 feet. A plain circle means other than hard surfaced.\n\nTick marks around the symbol mean fuel is available. A boxed letter R marks a non public use field with landmark value. An anchor is a seaplane base.\n\nOne pair of symbols is constantly mixed up. A star next to the airport symbol is a rotating or flashing beacon operating dusk to dawn. A star next to the control tower frequency in the data block means the tower operates part of the time. Different star, different meaning.\n\nAnd the elevation printed for an airport is the highest point on the usable portion of the landing areas, not an average.',
+ keys:[['Blue symbol','Operating control tower'],['Magenta symbol','No control tower'],['Runway pattern drawn','At least one hard surfaced runway 1,500 feet or longer'],['Tick marks','Fuel available'],['Boxed R','Non public use field'],['Star by the symbol','Rotating beacon, dusk to dawn']],
+ reg:'The Aeronautical Chart Users Guide, Airports, states that airports with control towers and their related data are shown in blue and all other airports and their data in magenta. Runway patterns are depicted at airports with at least one hard surfaced runway 1,500 feet or greater in length, with a large circle and runway outline for hard surfaced runways greater than 8,069 feet and a plain circle for other than hard surfaced runways. Fuel availability is indicated by tick marks around the basic airport symbol. A boxed R marks a non public use field having landmark value. A star adjacent to the airport symbol indicates a rotating or flashing beacon operating dusk to dawn, while a star next to the control tower frequency indicates part time operation. Airport elevation is the highest point on the usable portion of the landing areas.',
+ s:'Aeronautical Chart Users Guide, Airports',
+ q:['A016','A017','A033','A036','A038','A039','A040'],c:['F041']},
+
+{id:'L41',m:'AIR-B',t:'The airport data block',
+ lead:'Beside each airport sits a small block of text in the airport colour. Read it left to right, top to bottom.\n\nThe left side carries identifiers and frequencies: the location identifier, the control tower primary frequency if there is one, the common traffic advisory frequency marked with a C in a magenta circle, and automated weather sources such as ATIS or AWOS, which are shown when full time ATIS is not available.\n\nThe right side carries physical facts: elevation in feet, then a lighting code, then the length of the longest runway in hundreds of feet.\n\nThe letter L means runway edge lighting operating sunset to sunrise. A star before the L means limitations exist and you should check the Chart Supplement. A dash means no runway edge lights at all. Where information is simply missing, the character is replaced with a dash.\n\nRP followed by a runway number means that runway uses a right hand traffic pattern, so aircraft will be circling on the opposite side from where you expect. An asterisk before RP means restrictions apply.\n\nRunway length is rounded to the nearest 100 feet using 70 as the rounding point, so 8,070 feet charts as 81 and 8,069 feet charts as 80.',
+ keys:[['Elevation','In feet, on the right side'],['L','Runway lighting, sunset to sunrise'],['Dash','No runway edge lights, or information missing'],['Last number','Longest runway in hundreds of feet'],['RP 18','Runway 18 uses right traffic']],
+ reg:'The Aeronautical Chart Users Guide, Airports, describes the airport data grouping, including the location identifier, control tower frequency, the common traffic advisory frequency marked by a C in a magenta circle, ATIS and automated surface weather observing systems shown when full time ATIS is not available, elevation in feet, the lighting code L for lighting in operation sunset to sunrise with a star indicating limitations, the length of the longest runway in hundreds of feet, and RP followed by the runway number for right traffic patterns with an asterisk for special conditions. Runway length is shown to the nearest 100 feet using 70 as the rounding point.',
+ s:'Aeronautical Chart Users Guide, Airports',
+ q:['A034','A035','A037'],c:[]},
+
+{id:'L42',m:'AIR-B',t:'Obstructions',
+ lead:'An obstruction is charted with two numbers, and the order never changes. The upper figure is the elevation of the top above mean sea level. The figure in parentheses below it is the height of the structure above the ground beneath it. A tower charted as 1,249 with 430 in parentheses stands 430 feet tall on ground that sits at 819 feet.\n\nNothing needs adding to the upper figure. It is already an MSL altitude, ready to compare against your own field elevation plus 400.\n\nCharts generally show man made obstacles extending more than 200 feet above the ground, or more than 299 feet inside yellow city tint. Symbols come in two weights, one for obstacles under 1,000 feet above the ground and a heavier one for 1,000 feet and above. In very congested areas the FAA may show only the highest obstacle using a group symbol, and may omit the parenthetical height entirely to keep the chart readable.\n\nWind turbine farms are drawn as a hatched area with a boxed elevation for the highest turbine. Remember that the blade tips are not lit: the obstruction lights sit on the nacelle at the hub, which can be 200 to 300 feet below the top of the blade arc.',
+ keys:[['Upper figure','Top of the obstacle in feet MSL'],['Figure in parentheses','Height above the ground'],['Charting threshold','More than 200 feet AGL, or 299 feet in city tint'],['Heavier symbol','Obstacles 1,000 feet AGL and above'],['Wind turbines','Blade tips are not lighted']],
+ reg:'The Aeronautical Chart Users Guide, Obstructions, states that sectional charts typically show man made obstacles extending more than 200 feet above ground level, or more than 299 feet above ground level in yellow city tint, and that the elevation of the top of the obstacle above mean sea level and the height of the structure above ground level are both indicated, with the height above ground shown in parentheses below the mean sea level elevation. It distinguishes symbols for obstacles less than 1,000 feet above ground level from those 1,000 feet or greater, notes that only the highest obstacle may be shown using the group obstacle symbol in high density areas, and describes wind turbine farms with a boxed elevation for the highest turbine, warning that blade tips are not lighted and that obstruction lights on the nacelle can be 200 to 300 feet below the blade tips.',
+ s:'Aeronautical Chart Users Guide, Obstructions',
+ q:['A018','A019','A042'],c:['F042']},
+
+{id:'L43',m:'AIR-B',t:'The maximum elevation figure',
+ lead:'Each quadrangle on a sectional carries one large figure that answers a single question: what is the highest thing in this box. That is the maximum elevation figure.\n\nIt covers terrain and vertical obstacles together, including towers and trees. It is expressed in thousands and hundreds of feet above mean sea level with the last two digits dropped, so 28 means 2,800 feet MSL and 135 means 13,500 feet MSL.\n\nA quadrangle is the area bounded by ticked lines dividing each 30 minutes of latitude and each 30 minutes of longitude.\n\nThe derivation differs depending on what is highest, and the exam does ask. If a man made obstacle is the tallest thing, you take its top above mean sea level, add 100 feet of possible source error, and raise to the next 100 foot level. If natural terrain is the tallest thing, you take its elevation, add the 100 feet of error, then add a further 200 feet as an allowance for uncharted obstacles, and raise to the next 100 foot level. Only the natural case gets the extra 200 feet.\n\nOne caution the FAA prints itself: the figures are not verified by field survey.',
+ keys:[['What it covers','Terrain and vertical obstacles, the highest in the quadrangle'],['Units','Thousands and hundreds of feet MSL, last two digits dropped'],['Quadrangle size','30 minutes of latitude by 30 minutes of longitude'],['Man made obstacle','Add 100 feet of error, round up'],['Natural terrain','Add 100 feet of error plus a 200 foot allowance, round up']],
+ reg:'The Aeronautical Chart Users Guide, Land Features and Obstructions, states that the maximum elevation figure represents the highest elevation within a quadrant, including terrain and other vertical obstacles such as towers and trees, that a quadrant on a sectional is bounded by ticked lines dividing each 30 minutes of latitude and each 30 minutes of longitude, and that figures are rounded up to the nearest 100 foot value with the last two digits not shown. For a man made obstacle the calculation adds the possible vertical error of the source material, normally 100 feet, and raises to the following 100 foot level. For a natural terrain feature or natural vertical obstacle it also adds a 200 foot allowance for uncharted natural or man made obstacles. The guide notes that the figures are not verified by field surveys.',
+ s:'Aeronautical Chart Users Guide, Land Features',
+ q:['A020','A021','A022','A023'],c:['F043','F044']},
+
+{id:'L44',m:'AIR-B',t:'Special use airspace and other markings',
+ lead:'Special use airspace comes in five charted types: Prohibited, Restricted, Warning, Military Operations Areas and Alert Areas. Prohibited, restricted and warning areas are presented in blue and tabulated numerically along the chart border. Alert areas and military operations areas are tabulated in magenta, with alert areas listed numerically and military operations areas alphabetically.\n\nOne type is never charted at all: a controlled firing area, because activity there stops immediately when an aircraft may be approaching.\n\nMilitary training routes carry a digit rule worth memorising. Four digits, such as VR1007, means no segment of the route sits above 1,500 feet above the ground, which is exactly the band you fly in. Three or fewer digits, such as IR21, means at least one segment goes above 1,500 feet.\n\nOnly temporary flight restrictions relating to national security are charted, using a broken blue line. Every other temporary flight restriction exists only as a notice to airmen, which is why checking before each flight is not optional. A national security area uses a broken magenta line.\n\nA solid magenta line drawn 30 nautical miles around a Class B primary airport is the Mode C veil, requiring transponder equipped operation from the surface to 10,000 feet MSL.',
+ keys:[['Blue tabulation','Prohibited, restricted and warning areas, numerically'],['Magenta tabulation','Alert areas and military operations areas'],['Never charted','Controlled firing areas'],['Four digit route','No segment above 1,500 feet AGL'],['Charted TFRs','National security only, broken blue line'],['30 nautical mile magenta ring','Mode C veil']],
+ reg:'The Aeronautical Chart Users Guide states that prohibited, restricted and warning areas are presented in blue and listed numerically, while alert areas and military operations areas are tabulated in magenta. Except for controlled firing areas, special use airspace areas are depicted on visual charts; controlled firing areas are not charted. Military training routes with no segment above 1,500 feet above ground level carry four digit numbers, and those with one or more segments above 1,500 feet carry three or fewer digits. Only temporary flight restrictions relating to national security are charted, using a broken blue line, and a national security area is shown with a broken magenta line. Mode C required airspace within a 30 nautical mile radius of the primary Class B airport, from the surface to 10,000 feet mean sea level, is depicted by a solid magenta line.',
+ s:'Aeronautical Chart Users Guide, Special Use Airspace and Other Airspace Areas',
+ q:['A027','A028','A029','A030','A031','A032'],c:['F048','F049']},
+
+{id:'L45',m:'AIR-B',t:'Terrain, tints and chart housekeeping',
+ lead:'Terrain is shown five ways at once: contour lines, shaded relief, colour tints, obstruction symbols and maximum elevation figures.\n\nColour tints run from light green at the lower elevations to dark brown at the higher ones. Yellow is not an elevation band at all. Yellow marks a populated place, which is why the obstruction charting threshold rises to 299 feet inside it. Confusing the two is a classic error and a good distractor.\n\nContour lines join points of equal elevation, spaced at 500 foot intervals on a sectional. Closely spaced contours mean steep ground, widely spaced contours mean gentle ground.\n\nA sectional is drawn at a scale of 1 to 500,000 and is updated every 56 days. The old habit of calling it a six month chart is out of date. Since your legal ceiling is 400 feet, an out of date chart is mostly a hazard through missing obstructions and changed airspace, both of which change more often than you would guess.',
+ keys:[['Elevation tints','Light green low, dark brown high'],['Yellow tint','A populated place, not an elevation'],['Contour interval','500 feet on a sectional'],['Close contours','Steep ground'],['Scale','1 to 500,000'],['Update cycle','Every 56 days']],
+ reg:'The Aeronautical Chart Users Guide, Land Features, lists contour lines, shaded relief, colour tints, obstruction symbols and maximum elevation figures as the five depiction techniques, states that colour tints range from light green for the lower elevations to dark brown for the higher elevations, and that yellow tinted areas indicate populated places. Basic contours on a sectional are spaced at 500 foot intervals, with widely spaced contours representing gentle slopes and closely spaced contours steep slopes. The guide gives the sectional scale as 1 to 500,000 and states that sectionals and terminal area charts are updated every 56 days.',
+ s:'Aeronautical Chart Users Guide, Land Features',
+ q:['A024','A025','A026','A041'],c:['F050','F051']},
+/* ---------- WX-A, weather ---------- */
+{id:'L46',m:'WX-A',t:'Reading a METAR',
+ lead:'A METAR is a routine surface observation, written in a fixed order so you can decode it by position.\n\nType, station, day and time in Coordinated Universal Time, then AUTO if the report is fully automated with no human oversight, then wind, visibility, runway visual range, present weather, sky condition, temperature and dew point, altimeter, and finally remarks after RMK.\n\nWind is three digits of direction referenced to true north, then speed in whole knots, always suffixed KT. So 27020G35KT is 270 degrees true at 20 knots gusting 35. A gust means a variation of 10 knots or more between peaks and lulls, and the coded figure is the maximum instantaneous speed. Calm is coded 00000KT. When the speed is 6 knots or less and the direction wanders, the direction is replaced by VRB.\n\nTemperature and dew point are whole degrees Celsius, with M in front of anything below zero. So 04/M02 is 4 degrees with a dew point of minus 2.\n\nThe altimeter group starts with A and gives four digits with the decimal point removed, so A2992 is 29.92 inches of mercury.',
+ keys:[['AUTO','Fully automated, no human oversight'],['Wind reference','True north'],['Gust definition','A variation of 10 knots or more'],['Calm','00000KT'],['VRB','Speed 6 knots or less with a varying direction'],['M prefix','Below zero Celsius'],['A2992','29.92 inches of mercury']],
+ reg:'FAA-H-8083-28B Section 24.4.3 sets out the METAR body as a maximum of eleven groups followed by remarks. Section 24.4.3.4 defines AUTO as fully automated with no human intervention or oversight. Section 24.4.3.5 gives wind direction in tens of degrees relative to true north averaged over two minutes, defines gusts as rapid fluctuations with a variation of 10 knots or more between peaks and lulls, and codes calm wind as 00000KT, with VRB substituted when the speed is 6 knots or less and the direction varies. Section 24.4.3.10 codes temperature and dew point as two digits rounded to the nearest whole degree Celsius with an M prefix for sub zero values. Section 24.4.3.11 gives the altimeter as an A followed by four digits in inches of mercury with the decimal point not coded.',
+ s:'FAA-H-8083-28B, Chapter 24',
+ q:['W001','W002','W003','W007','W008','W009'],c:['F071']},
+
+{id:'L47',m:'WX-A',t:'Cloud, ceiling and sky cover',
+ lead:'Sky cover is reported in eighths, and the amounts are cumulative rather than per layer. FEW is one to two eighths, SCT is three to four, BKN is five to seven, and OVC is eight eighths. CLR at an automated station means no layers at or below 12,000 feet. SKC is the manual station equivalent.\n\nHeights are coded in hundreds of feet above the surface using three digits, so BKN050 is broken at 5,000 feet above the ground.\n\nThe ceiling is the lowest layer reported as broken or overcast. Nothing scattered or few ever sets a ceiling. If the sky is totally obscured by ground based cloud, the vertical visibility becomes the ceiling instead, coded as VV.\n\nSo in FEW012 SCT030 BKN050 the ceiling is 5,000 feet, because BKN050 is the first broken or overcast layer in the string.\n\nFor a Part 107 flight the practical question is not the ceiling but whether you can hold 500 feet below cloud with 3 statute miles of visibility from where you are standing. A low ceiling is what takes that away.',
+ keys:[['FEW','One to two eighths'],['SCT','Three to four eighths'],['BKN','Five to seven eighths'],['OVC','Eight eighths'],['Ceiling','The lowest broken or overcast layer'],['Totally obscured','Vertical visibility becomes the ceiling']],
+ reg:'FAA-H-8083-28B Table 24-4 gives the summation amounts for each sky cover contraction: VV eight eighths, SKC or CLR zero, FEW one to two eighths, SCT three to four eighths, BKN five to seven eighths and OVC eight eighths. CLR is used at automated stations when no layers at or below 12,000 feet are reported and SKC at manual stations when no layers are reported. Section 24.4.3.9 states that the ceiling is the lowest layer aloft reported as broken or overcast, and that if the sky is totally obscured with ground based clouds the vertical visibility is the ceiling. Heights are coded in hundreds of feet above the surface using three digits.',
+ s:'FAA-H-8083-28B, Chapter 24',
+ q:['W004','W005','W006'],c:['F069','F070']},
+
+{id:'L48',m:'WX-A',t:'The forecast, or TAF',
+ lead:'A terminal aerodrome forecast covers a small area around an airport. Scheduled forecasts are issued four times a day at 0000, 0600, 1200 and 1800 Coordinated Universal Time and run for 24 or 30 hours.\n\nThe valid period is written as day and hour, twice. So 1512 slash 1612 runs from the 15th at 1200 UTC to the 16th at 1200 UTC.\n\nThree change indicators matter. FM marks a significant change happening over less than one hour, and it is self contained: everything before it is superseded and the new conditions are stated in full. TEMPO marks temporary fluctuations that last one hour or less each time and, in aggregate, cover less than half the period, listing only the elements that change. PROB30 marks a 30 percent chance of a thunderstorm or precipitation event.\n\nWorth knowing: BECMG is no longer a National Weather Service change indicator in United States civil forecasts. It survives only in joint use military format and in international forecasts. Most study material has not caught up.',
+ keys:[['Issued','0000, 0600, 1200 and 1800 UTC'],['Length','24 or 30 hours'],['FM','Change in under an hour, supersedes everything before it'],['TEMPO','One hour or less each time, under half the period'],['PROB30','30 percent chance of thunderstorm or precipitation'],['BECMG','Military and international only']],
+ reg:'FAA-H-8083-28B Section 27.4.2.4 states that scheduled 24 and 30 hour forecasts are issued four times per day at 0000, 0600, 1200 and 1800 Coordinated Universal Time, with the valid period given as day and hour pairs. Section 27.4.2.10 lists FM, TEMPO and PROB as the change indicators. Section 27.4.2.10.1 describes FM as used when prevailing conditions are expected to change significantly over a period of less than one hour, followed by a complete description with all earlier conditions superseded. Section 27.4.2.10.2 describes TEMPO as temporary fluctuations lasting one hour or less in each instance and covering less than half of the period in aggregate. Section 27.4.2.10.3 restricts PROB30 to a 30 percent chance of a thunderstorm or precipitation event. All four occurrences of BECMG in the handbook appear in Section 27.4.2.10.4 covering joint use military airports.',
+ s:'FAA-H-8083-28B, Chapter 27',
+ q:['W010','W011','W012'],c:[]},
+
+{id:'L49',m:'WX-A',t:'Density altitude',
+ lead:'Density altitude is pressure altitude corrected for temperature deviations from the standard atmosphere. In plain terms it is the altitude the air feels like it is at, and it is the single weather concept that most directly costs you performance.\n\nThe standard atmosphere at sea level is 29.92 inches of mercury and 15 degrees Celsius. Density altitude equals field elevation only under those exact conditions, which almost never happen.\n\nHigh density altitude hurts three ways, and the FAA lists them in this order. It reduces power, because the engine or motor takes in less air. It reduces thrust, because there is less air for the propeller to work against. And it reduces lift, because thinner air exerts less force on the airfoils.\n\nTemperature has by far the greatest effect. Humidity raises density altitude too, because water vapour is lighter than air, but the effect is small enough that the handbook calls it generally negligible.\n\nFor a drone this shows up as longer spin up, sluggish climb, shorter flight time and less margin when you need to arrest a descent. A hot afternoon at elevation is a real planning constraint, not a theoretical one.',
+ keys:[['Definition','Pressure altitude corrected for temperature'],['Standard sea level','29.92 inches of mercury and 15 degrees Celsius'],['Three effects','Reduces power, reduces thrust, reduces lift'],['Biggest factor','Temperature'],['Humidity','Raises density altitude, but the effect is small']],
+ reg:'FAA-H-8083-28B Chapter 8 defines density altitude as pressure altitude corrected for temperature deviations from the standard atmosphere, states that it equals field elevation during standard atmospheric conditions, and lists the three ways high density altitude reduces performance: it reduces power because the engine takes in less air to support combustion, reduces thrust because there is less air for the propeller to work with, and reduces lift because the light air exerts less force on the airfoils. It identifies temperature as the most important factor and describes the effect of dew point as generally negligible. Chapter 4 gives standard sea level pressure of 1013.25 hectopascals or 29.92 inches of mercury and standard sea level temperature of 15 degrees Celsius.',
+ s:'FAA-H-8083-28B, Chapters 4 and 8',
+ q:['W013','W014','W015','W016'],c:['F072','F073','F078']},
+
+{id:'L50',m:'WX-A',t:'Stable air, unstable air and fog',
+ lead:'Stability decides what the sky looks like and how the air feels. Stable air suppresses vertical motion, unstable air encourages it.\n\nStable air gives you stratiform cloud in flat layers, smooth flight, poor visibility because haze and smoke are trapped, and steady precipitation or drizzle. Unstable air gives you cumuliform cloud, turbulence, good visibility and showers.\n\nBillowy cumulus over land on a sunny afternoon is a signpost of convective turbulence. The cloud top marks roughly the top of the rising current, so expect a rough ride beneath and inside the cloud and smoother air above it.\n\nFog forms when air is cooled to its dew point, so a narrowing temperature and dew point spread is your warning.\n\nFor San Diego, the type that matters is advection fog: moist air moving over colder water, then carried inland by the wind. The West Coast is described by the FAA as quite vulnerable to it. It can sit offshore for weeks, push over the land at night and retreat over the water the next morning, which is the marine layer you already live with. It is more extensive and more persistent than radiation fog and can arrive rapidly at any hour.\n\nRadiation fog is the other common one: clear skies, light wind, high humidity, forming overnight in valleys and densest around sunrise.',
+ keys:[['Stable air','Stratiform cloud, smooth, poor visibility, steady rain'],['Unstable air','Cumuliform cloud, turbulent, good visibility, showers'],['Advection fog','Moist air over a colder surface, the coastal one'],['Radiation fog','Overnight cooling, densest around sunrise'],['Fog warning sign','A narrowing temperature and dew point spread']],
+ reg:'FAA-H-8083-28B Chapter 13 states that stable air suppresses vertical motion while unstable air enhances it. Chapter 19 Section 19.2.1 notes that billowy cumuliform clouds are signposts indicating convective turbulence, that the cloud top usually marks the approximate upper limit of the convective current, and that air above the clouds is generally smooth. Section 18.1.1.1.2 describes advection fog as forming when moist air moves over a colder surface, most common along coastal areas, and states that the West Coast of the United States is quite vulnerable to it, that it forms offshore over cold water and is carried inland, that it can remain over the water for weeks advancing over land at night, and that it is more extensive and persistent than radiation fog. Section 18.1.1.1.1 describes radiation fog as forming from nighttime radiational cooling and being densest around sunrise.',
+ s:'FAA-H-8083-28B, Chapters 13, 18 and 19',
+ q:['W017','W018','W019','W020'],c:['F076','F077']},
+
+{id:'L51',m:'WX-A',t:'Coastal wind, thunderstorms and turbulence',
+ lead:'A sea breeze blows from sea to land when the water is colder than the land, on calm sunny days, because land heats faster than water. At night the pattern reverses into a land breeze. A narrow peninsula sees sea breezes converge from both shores, which makes it an area of strong convective development in the late morning and early afternoon.\n\nThunderstorms need three ingredients: sufficient water vapour, unstable air and a lifting mechanism. A sea breeze front is one of the lifting mechanisms the handbook names.\n\nThe life cycle has three stages: towering cumulus, mature, and dissipating. The cell becomes mature when precipitation reaches the surface, and the hazards peak toward the end of that stage. The whole thing typically lasts about 30 minutes.\n\nA microburst is a small scale intense downdraft that spreads outward at the surface, and it is the most severe form of wind shear. Under 2.5 miles across, about 1,000 feet deep, lasting 5 to 15 minutes, with downdrafts to 6,000 feet per minute and headwind losses of 30 to 90 knots.\n\nAvoid a severe storm by at least 20 miles.\n\nA cold front acts like a snowplough, forcing warm air up abruptly and producing a narrow band of showers and thunderstorms along or just ahead of it. A high dew point and falling pressure signal one is imminent.\n\nMechanical turbulence is the everyday one for a drone: wind broken into a snarl of eddies by trees, buildings and terrain, worse the faster the wind and the rougher the surface.',
+ keys:[['Sea breeze','From sea to land, calm sunny days'],['Thunderstorm ingredients','Water vapour, unstable air, a lifting mechanism'],['Stages','Towering cumulus, mature, dissipating'],['Microburst','Under 2.5 miles wide, 5 to 15 minutes, the worst wind shear'],['Storm avoidance','At least 20 miles'],['Mechanical turbulence','Wind broken up by buildings, trees and terrain']],
+ reg:'FAA-H-8083-28B Section 10.6.1 describes the sea breeze as a coastal wind blowing from sea to land caused by temperature differences when the sea surface is colder than the adjacent land, and Section 10.6.1.2 notes that a narrow peninsula or island is an area of strong convective development during the late morning or early afternoon. Section 22.2 names the three ingredients as sufficient water vapour, unstable air and a lifting mechanism. Section 22.3 names the three stages as towering cumulus, mature and dissipating, notes that the mature stage begins when precipitation reaches the surface and that hazards peak toward its end, with a typical life cycle of about 30 minutes. Chapter 22 describes the microburst as a small scale intense downdraft, the most severe type of wind shear, less than 2.5 miles across, about 1,000 feet deep, lasting 5 to 15 minutes with downdrafts to 6,000 feet per minute and headwind losses of 30 to 90 knots, and Section 22.8.2 requires avoiding severe storms by at least 20 miles. Section 11.3.2 describes the cold front. Section 19.2.2 defines mechanical turbulence as caused by obstructions to the wind flow.',
+ s:'FAA-H-8083-28B, Chapters 10, 11, 19 and 22',
+ q:['W021','W022','W023','W024','W025','W026','W027','W028'],c:['F074','F075']},
+
+{id:'L52',m:'WX-A',t:'Getting a weather briefing',
+ lead:'Flight Service is the official channel. By telephone that is 1-800-WX-BRIEF, covering the contiguous United States, Hawaii and Puerto Rico. Online it is 1800wxbrief.com, and pilots may now obtain a regulation compliant briefing without speaking to anybody.\n\nThe other primary site is aviationweather.gov, operated by the National Weather Service Aviation Weather Center in Kansas City. It was significantly redesigned recently, and the old name ADDS no longer exists. Any answer key referring to ADDS is out of date.\n\nOne more piece of currency: the FAA reverted the phrase Notice to Air Mission back to Notice to Airmen in the 2026 handbook.\n\nOn the field itself, automated stations report continuously. On a sectional they appear in the airport data block, and the guide notes they are shown when full time ATIS is not available.\n\nRemember why any of this matters legally. 14 CFR 107.49 requires you to assess local weather conditions before every flight, so a briefing is not a nicety, it is the evidence that you did the preflight assessment the rule demands.',
+ keys:[['Telephone','1-800-WX-BRIEF'],['Online briefing','1800wxbrief.com'],['Aviation Weather Center','aviationweather.gov'],['ADDS','No longer exists'],['Current FAA term','Notice to Airmen'],['Why it is required','14 CFR 107.49 preflight assessment']],
+ reg:'FAA-H-8083-28B Section 3.3.2.1 gives 1-800-WX-BRIEF for flights within the contiguous United States, Hawaii and Puerto Rico, and Section 3.3.3.1 gives 1800wxbrief.com. The handbook states that pilots may receive a regulatory compliant briefing without contacting Flight Service, and that aviationweather.gov is operated by the National Weather Service Aviation Weather Center in Kansas City. The 2026 preface notes numerous and significant changes to that website, and the Major Revisions list records the change of Notice to Air Mission back to Notice to Airmen. Section 24.4.3.10 defines dew point as the temperature to which a parcel must be cooled at constant pressure and water vapour content to become fully saturated.',
+ s:'FAA-H-8083-28B, Chapters 3 and 24',
+ q:['W029','W030'],c:[]},
+
+/* ---------- LP-A, loading and performance ---------- */
+{id:'L53',m:'LP-A',t:'Weight and balance',
+ lead:'The centre of gravity is the point at which all the weight of the aircraft is considered to be concentrated. Support the aircraft exactly there and it would balance in any attitude. On something as small as a drone, its position has an outsized effect on stability.\n\nLift acts at a different point, the centre of pressure. The relationship between the two decides which way the aircraft wants to pitch. Centre of gravity forward of the centre of pressure gives a natural nose down tendency. Centre of pressure forward of the centre of gravity gives a nose up pitching moment. Designers therefore fix the aft limit of the centre of gravity forward of the centre of pressure so the aircraft stays in equilibrium.\n\nWeight and balance are two separate limits. Being under the maximum weight does not excuse an out of limits centre of gravity, and the result of getting it wrong is control difficulty rather than a simple performance penalty.\n\nWhen lift equals weight the aircraft is in equilibrium. Less lift than weight and the vertical speed decreases. More lift than weight and it increases.',
+ keys:[['Centre of gravity','Where all the weight is considered concentrated'],['Centre of pressure','Where lift acts'],['CG forward of CP','Nose down tendency'],['CG outside limits','Control difficulty'],['Lift less than weight','Vertical speed decreases']],
+ reg:'FAA-G-8082-22 Chapter 4 states that the centre of gravity may be considered the point at which all the weight of the aircraft is concentrated, that an aircraft supported at its exact centre of gravity would balance in any attitude, and that the centre of gravity is of major importance in a small unmanned aircraft because its position has a great bearing upon stability. It states that weight is concentrated at the centre of gravity while lift occurs at the centre of pressure, that a centre of gravity forward of the centre of pressure gives a nose down tendency and the reverse gives a nose up pitching moment, and that designers fix the aft limit of the centre of gravity forward of the centre of pressure. It states that operation with the centre of gravity outside the approved limits results in control difficulty.',
+ s:'FAA-G-8082-22, Chapter 4',
+ q:['L001','L002','L003'],c:['F079']},
+
+{id:'L54',m:'LP-A',t:'What overloading actually does',
+ lead:'The FAA publishes a list of ten performance deficiencies of an overloaded aircraft, and questions are drawn straight from it. Higher takeoff speed. Longer takeoff run. Reduced rate and angle of climb. Lower maximum altitude. Shorter range. Reduced cruising speed. Reduced manoeuvrability. Higher stalling speed. Higher approach and landing speed. Longer landing roll.\n\nRead it once for the pattern rather than as ten separate facts. Everything that should be small gets bigger, everything that should be big gets smaller, and every speed goes up.\n\nShorter range is the item that covers reduced flight time with a payload. The handbook gives no numeric relationship between payload and endurance, so do not expect a calculation and do not trust a source that invents one.\n\nOperating above the maximum weight limitation compromises structural integrity as well as performance. An overloaded aircraft may not leave the ground at all, and if it does it may fly unusually badly. The initial indication of poor performance usually appears during takeoff, which is why that is the moment to notice something is wrong rather than the moment to push through it.',
+ keys:[['Takeoff run','Longer'],['Rate and angle of climb','Reduced'],['Range','Shorter'],['Manoeuvrability','Reduced'],['Stalling speed','Higher'],['First indication','During takeoff']],
+ reg:'FAA-G-8082-22 Chapter 4 lists the most important performance deficiencies of an overloaded aircraft as higher takeoff speed, longer takeoff run, reduced rate and angle of climb, lower maximum altitude, shorter range, reduced cruising speed, reduced manoeuvrability, higher stalling speed, higher approach and landing speed, and longer landing roll. It states that operating above the maximum weight limitation compromises the structural integrity of an aircraft and adversely affects its performance, that an overloaded aircraft may not be able to leave the ground or may exhibit unexpected and unusually poor flight characteristics, and that the initial indication of poor performance usually takes place during takeoff.',
+ s:'FAA-G-8082-22, Chapter 4',
+ q:['L004','L005','L010'],c:['F081']},
+
+{id:'L55',m:'LP-A',t:'Load factor, stability and air density',
+ lead:'Load factor is measured in G. A load factor of 3 means the total load on the structure is three times the weight of the aircraft. It matters for two reasons the handbook states directly: a pilot can impose a dangerous overload, and an increased load factor raises the stalling speed, making a stall possible at a speed that felt safe.\n\nThree words get confused and the exam separates them.\n\nStability is the inherent quality of an aircraft to correct for conditions that disturb its equilibrium and return to its original flight path. It is primarily a design characteristic.\n\nManoeuvrability is the quality that lets it be manoeuvred easily and withstand the stresses of manoeuvres, governed by weight, inertia, the size and location of flight controls, structural strength and powerplant. Also a design characteristic.\n\nControllability is the capability to respond to the pilot input, regardless of how stable the aircraft is.\n\nFinally, air density ties this module back to weather. Moist air is lighter than dry air, so rising humidity raises density altitude and reduces performance. It is a contributing factor rather than a major one, but it is the reason a humid hot day feels worse than the temperature alone suggests.',
+ keys:[['Load factor of 3','Three times the aircraft weight on the structure'],['Higher load factor','Raises the stalling speed'],['Stability','Returns to the original flight path, a design characteristic'],['Manoeuvrability','Handles easily and takes the stress, a design characteristic'],['Controllability','Responds to the pilot, whatever its stability'],['Moist air','Lighter than dry air, so density altitude rises']],
+ reg:'FAA-G-8082-22 Chapter 4 states that load factor is measured in G, that a load factor of 3 means the total load on the structure is three times the weight of the aircraft, and that load factors matter because a pilot can impose a dangerous overload and because an increased load factor increases the stalling speed and makes stalls possible at seemingly safe flight speeds. It defines stability as the inherent quality of an aircraft to correct for conditions that may disturb its equilibrium and to return to or continue on the original flight path, primarily a design characteristic; manoeuvrability as the quality permitting it to be manoeuvred easily and to withstand the stresses imposed by manoeuvres, governed by weight, inertia, size and location of flight controls, structural strength and powerplant; and controllability as the capability to respond to the pilot control regardless of stability characteristics. Chapter 8 states that water vapour is lighter than air, so moist air is less dense, increasing density altitude and decreasing performance, while noting humidity is usually not considered an important factor.',
+ s:'FAA-G-8082-22, Chapters 4 and 8',
+ q:['L006','L007','L008','L009'],c:['F080','F082']}
+];
+/* ===== COURSE END ===== */
 /* ===== APP ===== */
 (function(){
 'use strict';
@@ -1883,9 +2366,9 @@ function daysBetween(a, b){ var pa = a.split('-'), pb = b.split('-');
 /* ---------------- state ---------------- */
 var S;
 function blank(){
-  return { v:1, streak:0, best:0, last:'', days:{}, boxes:{},
+  return { v:2, streak:0, best:0, last:'', days:{}, boxes:{},
            stats:{ seen:0, right:0 }, areas:{}, chart:{ seen:0, right:0 },
-           mocks:[], testDate:'', checks:{} };
+           mocks:[], testDate:'', checks:{}, learn:{}, wholePool:false };
 }
 function load(){
   try{
@@ -1909,6 +2392,38 @@ var i0;
 for(i0 = 0; i0 < QUESTIONS.length; i0++) ITEMS[QUESTIONS[i0].id] = { kind:'q', d:QUESTIONS[i0], a:QUESTIONS[i0].a };
 for(i0 = 0; i0 < CARDS.length; i0++)     ITEMS[CARDS[i0].id]     = { kind:'c', d:CARDS[i0],     a:CARDS[i0].a };
 
+var LESSON_BY_ID = {}, LESSON_OF_ITEM = {};
+(function(){
+  for(var i = 0; i < LESSONS.length; i++){
+    var L = LESSONS[i];
+    LESSON_BY_ID[L.id] = L;
+    for(var j = 0; j < L.q.length; j++) LESSON_OF_ITEM[L.q[j]] = L.id;
+    for(var k = 0; k < L.c.length; k++) LESSON_OF_ITEM[L.c[k]] = L.id;
+  }
+})();
+function lessonState(id){ return S.learn[id] || { read:0, done:0, best:0, n:0 }; }
+function lessonsRead(){ var n = 0; for(var i = 0; i < LESSONS.length; i++) if(lessonState(LESSONS[i].id).read) n++; return n; }
+function lessonsDone(){ var n = 0; for(var i = 0; i < LESSONS.length; i++) if(lessonState(LESSONS[i].id).done) n++; return n; }
+function unlockedIds(){
+  var out = {}, any = false;
+  for(var i = 0; i < LESSONS.length; i++){
+    var L = LESSONS[i];
+    if(!lessonState(L.id).read) continue;
+    any = true;
+    for(var j = 0; j < L.q.length; j++) out[L.q[j]] = 1;
+    for(var k = 0; k < L.c.length; k++) out[L.c[k]] = 1;
+  }
+  return any ? out : null;
+}
+/* The daily drill only tests material you have read, until you have read enough
+   of the course that the distinction stops mattering. */
+function activePool(){
+  if(S.wholePool) return null;
+  var u = unlockedIds();
+  if(!u) return null;
+  var n = 0; for(var k in u) n++;
+  return n >= 30 ? u : null;
+}
 function boxOf(id){ return (S.boxes[id] && S.boxes[id].box) || 0; }
 function dueOn(id){ return S.boxes[id] && S.boxes[id].due; }
 function isDue(id){ var b = S.boxes[id]; if(!b) return false; return b.due <= todayStr(); }
@@ -1936,10 +2451,12 @@ function shuffle(arr, rndf){
 /* Blueprint weighted draw. Returns ids. */
 function drawItems(n, kindFilter, weakOnly){
   var byArea = {}, a, i;
+  var pool = activePool();
   for(i = 0; i < AREA_ORDER.length; i++) byArea[AREA_ORDER[i]] = { due:[], fresh:[], old:[] };
   for(var id in ITEMS){
     var it = ITEMS[id];
     if(kindFilter && it.kind !== kindFilter) continue;
+    if(pool && !pool[id]) continue;
     if(isDue(id)) byArea[it.a].due.push(id);
     else if(!S.boxes[id]) byArea[it.a].fresh.push(id);
     else byArea[it.a].old.push(id);
@@ -2056,11 +2573,174 @@ function progHTML(n, marks, cur){
   return h;
 }
 
+
+/* ---------------- the course ---------------- */
+var lesRun = null;
+
+function paintLearnHome(){
+  var read = lessonsRead(), done = lessonsDone(), tot = LESSONS.length;
+  var pct = Math.round(100 * done / tot);
+  $('coursePct').textContent = pct + '%';
+  $('courseBar').style.width = pct + '%';
+  $('courseCount').textContent = done + ' of ' + tot + ' checked, ' + read + ' read';
+  var next = nextLesson();
+  $('btnContinue').textContent = next ? (read ? 'Continue the course' : 'Start the course') : 'Every lesson is complete';
+  $('btnContinue').disabled = !next;
+  $('learnLede').textContent = next
+    ? (read ? 'Next up, lesson ' + (LESSONS.indexOf(next) + 1) + ': ' + next.t + '.'
+            : '55 lessons across 11 modules. Every rule the exam can ask about is taught by one of them, and each lesson ends by checking what you just read.')
+    : 'You have been through all 55 lessons. Keep the daily drill going and start running mock exams.';
+
+  var h = '';
+  for(var m = 0; m < MODULES.length; m++){
+    var M = MODULES[m], list = lessonsIn(M.id), md = 0, mr = 0, inner = '';
+    for(var i = 0; i < list.length; i++){
+      var L = list[i], st = lessonState(L.id);
+      if(st.done) md++; if(st.read) mr++;
+      inner += '<button class="les' + (st.done ? ' done' : st.read ? ' read' : '') + '" data-les="' + L.id + '">' +
+               '<span class="dot">' + (st.done ? '\u2713' : (i + 1)) + '</span>' +
+               '<span class="t">' + esc(L.t) + '</span></button>';
+    }
+    var open = (md < list.length && mr > 0) || (m === 0 && mr === 0);
+    h += '<div class="mod' + (open ? ' open' : '') + '" data-mod="' + M.id + '">' +
+         '<button class="head"><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>' +
+         '<span style="flex:1"><b>' + esc(M.t) + '</b><p>' + esc(M.d) + '</p></span>' +
+         '<span class="cnt">' + md + '/' + list.length + '</span></button>' +
+         '<div class="body">' + inner + '</div></div>';
+  }
+  $('moduleList').innerHTML = h;
+  var heads = $('moduleList').querySelectorAll('.mod > .head');
+  for(var k = 0; k < heads.length; k++){
+    (function(el){ el.onclick = function(){ el.parentNode.classList.toggle('open'); }; })(heads[k]);
+  }
+  var ls = $('moduleList').querySelectorAll('.les');
+  for(var j = 0; j < ls.length; j++){
+    (function(el){ el.onclick = function(){ openLesson(el.getAttribute('data-les')); }; })(ls[j]);
+  }
+}
+function lessonsIn(mod){
+  var out = [];
+  for(var i = 0; i < LESSONS.length; i++) if(LESSONS[i].m === mod) out.push(LESSONS[i]);
+  return out;
+}
+function nextLesson(){
+  var i;
+  for(i = 0; i < LESSONS.length; i++) if(!lessonState(LESSONS[i].id).read) return LESSONS[i];
+  for(i = 0; i < LESSONS.length; i++) if(!lessonState(LESSONS[i].id).done) return LESSONS[i];
+  return null;
+}
+function moduleOf(id){
+  for(var i = 0; i < MODULES.length; i++) if(MODULES[i].id === id) return MODULES[i];
+  return { t:'', a:'REG' };
+}
+
+function openLesson(id){
+  var L = LESSON_BY_ID[id];
+  if(!L) return;
+  var M = moduleOf(L.m);
+  var st = S.learn[id] || { read:0, done:0, best:0, n:0 };
+  st.read = 1;
+  S.learn[id] = st;
+  save();
+
+  var idx = LESSONS.indexOf(L);
+  var paras = L.lead.split('\n\n'), body = '';
+  for(var p = 0; p < paras.length; p++) body += '<p>' + esc(paras[p]) + '</p>';
+  var keys = '';
+  for(var k = 0; k < L.keys.length; k++){
+    keys += '<tr><td class="k">' + esc(L.keys[k][0]) + '</td><td class="v">' + esc(L.keys[k][1]) + '</td></tr>';
+  }
+  $('learnHome').style.display = 'none';
+  $('lessonView').style.display = '';
+  $('lessonView').innerHTML =
+    '<button class="back" id="lesBack">\u2039 The course</button>' +
+    '<div class="card lesson">' +
+      '<p class="crumb">' + esc(M.t) + ' \u00b7 lesson ' + (idx + 1) + ' of ' + LESSONS.length + '</p>' +
+      '<h2>' + esc(L.t) + '</h2>' +
+      '<span class="pill ' + M.a + '">' + esc(AREAS[M.a].short) + '</span>' +
+      '<div class="body" style="margin-top:13px">' + body + '</div>' +
+      (keys ? '<table class="keytab"><tbody>' + keys + '</tbody></table>' : '') +
+      '<details class="reg"><summary>Show the regulation</summary><div class="txt">' + esc(L.reg) +
+        '<span class="cite">' + esc(L.s) + '</span></div></details>' +
+      '<div class="btnrow" style="margin-top:15px"><button class="btn mag" id="lesCheck">Check what you just read</button></div>' +
+    '</div>' +
+    '<div id="lesRunBox"></div>';
+  $('lesBack').onclick = backToCourse;
+  $('lesCheck').onclick = function(){ startLessonCheck(L); };
+  window.scrollTo(0, 0);
+}
+function backToCourse(){
+  lesRun = null;
+  $('lessonView').style.display = 'none';
+  $('learnHome').style.display = '';
+  paintLearnHome();
+  window.scrollTo(0, 0);
+}
+function startLessonCheck(L){
+  var ids = L.q.slice();
+  shuffle(ids);
+  lesRun = { L:L, ids:ids, i:0, right:0, marks:[] };
+  $('lesCheck').disabled = true;
+  paintLessonCheck();
+}
+function paintLessonCheck(){
+  var r = lesRun;
+  if(r.i >= r.ids.length) return finishLessonCheck();
+  var it = ITEMS[r.ids[r.i]];
+  var v = viewOf(it.d);
+  r.view = v;
+  $('lesRunBox').innerHTML =
+    '<div class="card tight"><div class="prog">' + progHTML(r.ids.length, r.marks, r.i) + '</div>' +
+    '<div class="qmeta"><span>Check</span><span class="n">' + (r.i + 1) + ' / ' + r.ids.length + '</span></div>' +
+    '<div id="lesQ"><div class="qtext">' + esc(v.q) + '</div>' + optHTML(v, -1, false) + '</div><div id="lesFoot"></div></div>';
+  bindOpts($('lesQ'), function(i){
+    var ok = (i === v.c);
+    $('lesQ').innerHTML = '<div class="qtext">' + esc(v.q) + '</div>' + optHTML(v, i, true) + verdictHTML(ok, v);
+    $('lesFoot').innerHTML = '<div class="btnrow" style="margin-top:13px"><button class="btn" id="lesNext">' +
+      (r.i + 1 >= r.ids.length ? 'See how you did' : 'Next') + '</button></div>';
+    $('lesNext').onclick = function(){
+      grade(r.ids[r.i], ok);
+      r.marks[r.i] = ok;
+      if(ok) r.right++;
+      r.i++;
+      save(); paintStrip(); paintLessonCheck();
+    };
+  });
+  $('lesRunBox').scrollIntoView({ block:'start' });
+}
+function finishLessonCheck(){
+  var r = lesRun, L = r.L, n = r.ids.length;
+  var need = Math.ceil(n * 0.75);
+  var passed = r.right >= need;
+  var st = S.learn[L.id] || { read:1, done:0, best:0, n:0 };
+  st.n = n;
+  if(r.right > st.best) st.best = r.right;
+  if(passed) st.done = 1;
+  S.learn[L.id] = st;
+  save(); paintStrip();
+
+  var idx = LESSONS.indexOf(L), nxt = LESSONS[idx + 1];
+  $('lesRunBox').innerHTML =
+    '<div class="card"><p class="eyebrow">' + (passed ? 'Lesson complete' : 'Worth another read') + '</p>' +
+    '<div class="result ' + (passed ? 'pass' : 'fail') + '"><div class="big">' + r.right + '<span style="font-size:.34em"> / ' + n + '</span></div>' +
+    '<div class="verdictword">' + (passed ? 'Passed' : 'Not yet') + '</div>' +
+    '<p class="lede" style="margin-top:8px">' + (passed
+      ? 'This material has joined your review queue and will come back in the daily drill.'
+      : 'You need ' + need + ' of ' + n + '. Read it again, then check once more. Anything you missed is already in box 1.') + '</p></div>' +
+    '<div class="btnrow" style="margin-top:14px">' +
+      (nxt ? '<button class="btn mag" id="lesNextLesson">Next lesson</button>' : '') +
+      '<button class="btn ghost" id="lesDone">Back to the course</button></div></div>';
+  if(nxt) $('lesNextLesson').onclick = function(){ openLesson(nxt.id); };
+  $('lesDone').onclick = backToCourse;
+  lesRun = null;
+  $('lesRunBox').scrollIntoView({ block:'start' });
+}
+
 /* ---------------- sortie ---------------- */
 var run = null;
 
 function startRun(ids, title){
-  run = { ids:ids, i:0, marks:[], right:0, view:null, revealed:false, title:title || 'Sortie' };
+  run = { ids:ids, i:0, marks:[], right:0, view:null, revealed:false, title:title || 'Session' };
   $('sortieHome').style.display = 'none';
   $('sortieDone').style.display = 'none';
   $('sortieRun').style.display = '';
@@ -2138,7 +2818,7 @@ function finishRun(){
     '<div class="verdictword">' + run.right + ' of ' + run.ids.length + '</div></div>' +
     '<hr class="rule"><div class="kv"><b>Streak</b><span>' + S.streak + ' days, best ' + S.best + '</span></div>' +
     '<div class="kv"><b>Readiness</b><span>' + readiness() + ' percent</span></div>' +
-    '<div class="btnrow" style="margin-top:14px"><button class="btn ghost" id="doneBack">Back to sortie</button></div></div>';
+    '<div class="btnrow" style="margin-top:14px"><button class="btn ghost" id="doneBack">Back to the drill</button></div></div>';
   $('doneBack').onclick = function(){ $('sortieDone').style.display = 'none'; $('sortieHome').style.display = ''; paintSortieHome(); };
   window.scrollTo(0, 0);
 }
@@ -2149,11 +2829,20 @@ function paintSortieHome(){
   var dueCount = 0;
   for(var id in ITEMS){ if(isDue(id)) dueCount++; }
   $('sortieLede').textContent = doneToday
-    ? 'Today is logged. ' + S.days[t].n + ' items, ' + Math.round(100 * S.days[t].right / Math.max(1, S.days[t].n)) + ' percent. Fly another sortie if you have the time.'
-    : SORTIE_SIZE + ' items. About 18 minutes. ' + (dueCount ? dueCount + ' items are due for review and will come first.' : 'Nothing is due yet, so this sortie is all new ground.');
-  $('btnStartSortie').textContent = doneToday ? 'Fly another sortie' : 'Start sortie';
+    ? 'Today is logged. ' + S.days[t].n + ' items, ' + Math.round(100 * S.days[t].right / Math.max(1, S.days[t].n)) + ' percent. Run another session if you have the time.'
+    : SORTIE_SIZE + ' items. About 18 minutes. ' + (dueCount ? dueCount + ' items are due for review and will come first.' : 'Nothing is due yet, so this session is all new ground.');
+  $('btnStartSortie').textContent = doneToday ? 'Run another session' : 'Start today\u2019s session';
   var marks = [];
   $('sortiePreview').innerHTML = progHTML(SORTIE_SIZE, marks, -1);
+
+  var pool = activePool(), pooled = 0;
+  if(pool){ for(var pk in pool) pooled++; }
+  $('poolNote').textContent = pool
+    ? 'Drawing only from the ' + lessonsRead() + ' lessons you have read, which is ' + pooled + ' items.'
+    : (S.wholePool ? 'Drawing from the whole bank, including material you have not read yet.'
+                   : 'Read a few lessons on the Learn tab and this session will narrow to what you have covered.');
+  $('btnPoolToggle').textContent = S.wholePool ? 'Only test what I have read' : 'Include material I have not read';
+  $('btnPoolToggle').style.display = (unlockedIds() ? '' : 'none');
 
   var rows = '';
   for(var b = 1; b <= 5; b++){
@@ -2178,7 +2867,7 @@ function paintSortieHome(){
   $('heat').innerHTML = heat;
   var active = 0;
   for(var d2 = 0; d2 < 14; d2++){ if(S.days[addDays(t, -d2)]) active++; }
-  $('heatNote').textContent = active + ' of the last 14 days flown. Best streak ' + S.best + ' days.';
+  $('heatNote').textContent = active + ' of the last 14 days trained. Best streak ' + S.best + ' days.';
 }
 
 /* ---------------- chart lab ---------------- */
@@ -2329,7 +3018,7 @@ function endMock(){
     h += '<tr><td>' + esc(AREAS[a].name) + '</td><td class="n">' + b.r + ' / ' + b.n + '</td><td class="n">' +
          (b.n ? Math.round(100 * b.r / b.n) : 0) + '%</td></tr>';
   }
-  h += '</tbody></table><p class="note">Every missed question has been dropped to box 1 and will come back in tomorrow sortie.</p></div>';
+  h += '</tbody></table><p class="note">Every missed question has been dropped to box 1 and will come back in tomorrow session.</p></div>';
 
   if(missed.length){
     h += '<div class="card"><p class="eyebrow">Missed, ' + missed.length + ' items</p><h3>Work through these</h3>';
@@ -2380,6 +3069,18 @@ function paintProgress(){
     : r < 85 ? 'Close. Start running full mock exams and drilling whatever the results expose.'
     : 'Strong. Book the test.';
 
+  var ch = '';
+  for(var mm = 0; mm < MODULES.length; mm++){
+    var MD = MODULES[mm], list = lessonsIn(MD.id), dn = 0;
+    for(var li = 0; li < list.length; li++) if(lessonState(list[li].id).done) dn++;
+    var mp = Math.round(100 * dn / list.length);
+    ch += '<div class="meter"><div class="top"><b>' + esc(MD.t) + '</b><span class="w">' + esc(AREAS[MD.a].short) +
+          '</span><span class="v">' + dn + '/' + list.length + '</span></div>' +
+          '<div class="bar' + (mm % 2 ? ' b' : '') + '"><i style="width:' + mp + '%"></i></div></div>';
+  }
+  ch += '<p class="note">' + lessonsDone() + ' of ' + LESSONS.length + ' lessons checked, ' + lessonsRead() + ' read.</p>';
+  $('courseMeters').innerHTML = ch;
+
   var h = '';
   for(var i = 0; i < AREA_ORDER.length; i++){
     var a = AREA_ORDER[i], m = Math.round(mastery(a) * 100);
@@ -2413,15 +3114,15 @@ function paintProgress(){
 
 /* ---------------- plan ---------------- */
 var WEEKS = [
-  ['Regulations, the operating limits','14 CFR 107.51 in full, plus visual line of sight, night, the visual observer and operation from a moving vehicle. This is the densest 48 percent of the exam, so it gets four weeks.'],
-  ['Regulations, certificate and registration','Eligibility, recency, retesting, the certificate rules of Subpart C, Part 48 registration and marking, and the falsification rule now at 14 CFR 3.403.'],
-  ['Regulations, remote identification','All of Part 89. Standard remote identification against a broadcast module, what each one broadcasts, and the FAA recognized identification area.'],
-  ['Regulations, people, waivers, reporting','Subpart D categories 1 to 4, operations over moving vehicles, the ten waivable sections at 14 CFR 107.205, and safety event reporting. Run your first mock exam at the end of this week.'],
-  ['Operations, the human side','Aeronautical decision making, the five hazardous attitudes and their exact antidotes, crew resource management, IMSAFE, DECIDE and the physiological factors.'],
-  ['Operations, airport and radio','Common traffic advisory frequency procedures, the traffic pattern, runway numbering, the segmented circle, LAANC, UAS facility maps and notices to airmen.'],
-  ['Airspace, the classes','Class B, C, D, E and G dimensions and entry rules, and exactly when 14 CFR 107.41 bites. Start the chart lab this week and do a set every day.'],
-  ['Airspace, reading the chart','Chart lab intensive. Line styles, floor and ceiling figures, obstruction pairs, the maximum elevation figure and airport symbol colour, until the procedure is automatic.'],
-  ['Weather and loading','Only 7 percent between them, so one week. METAR and TAF decoding, ceiling, density altitude, stability, fog, thunderstorms, centre of gravity and the effects of overloading.'],
+  ['Regulations, the operating limits','Course module Ground rules, lessons 1 to 6. 14 CFR 107.51 in full, plus visual line of sight, night and operation from a moving vehicle. Regulations carry 48 percent of the exam, so they get four weeks.'],
+  ['Regulations, certificate and registration','Course module Your certificate, lessons 7 to 11. Eligibility, recency, retesting, what you carry, and the falsification rule now at 14 CFR 3.403.'],
+  ['Regulations, remote identification','Course module Registration and remote ID, lessons 12 to 16. Part 48 registration and all of Part 89, including what a standard aircraft broadcasts that a module does not.'],
+  ['Regulations, people, waivers, reporting','Course modules People and permission, and Every flight start to finish, lessons 17 to 25. Categories 1 to 4, airspace authorization, waivers, preflight and reporting. Run your first mock exam at the end of this week.'],
+  ['Operations, the human side','Course module The pilot, lessons 26 to 31. Decision making, the five hazardous attitudes and their exact antidotes, IMSAFE, workload and the physiological factors.'],
+  ['Operations, airport and radio','Course module Airports and access, lessons 32 to 35. Radio procedure, the traffic pattern, the segmented circle, LAANC and UAS facility maps.'],
+  ['Airspace, the classes','Course module The classes of airspace, lessons 36 and 37, plus the first chart lessons. Start the Chart Lab this week and run a set every day.'],
+  ['Airspace, reading the chart','Course module Reading a sectional, lessons 38 to 45. Line styles, floor and ceiling figures, obstruction pairs and the maximum elevation figure, drilled in the Chart Lab until the procedure is automatic.'],
+  ['Weather and loading','Course modules Weather, and Loading and performance, lessons 46 to 55. Only 7 percent of the exam between them, so one week covers it.'],
   ['Mock exams and logistics','Full 60 question mocks under time. Drill whatever each result exposes. Confirm your booking, your identification and the route to the test centre.']
 ];
 var CHECKS = [
@@ -2507,6 +3208,7 @@ function showView(name){
   if(name === 'mock') paintMockHome();
   if(name === 'chart') paintChartHome();
   if(name === 'sortie') paintSortieHome();
+  if(name === 'learn') paintLearnHome();
   window.scrollTo(0, 0);
 }
 
@@ -2516,6 +3218,7 @@ function boot(){
   rollStreak();
   save();
   paintStrip();
+  paintLearnHome();
   paintSortieHome();
   paintChartHome();
   paintMockHome();
@@ -2524,10 +3227,12 @@ function boot(){
   for(var i = 0; i < ts.length; i++){
     (function(el){ el.onclick = function(){ showView(el.getAttribute('data-view')); }; })(ts[i]);
   }
+  $('btnContinue').onclick = function(){ var n = nextLesson(); if(n) openLesson(n.id); };
+  $('btnPoolToggle').onclick = function(){ S.wholePool = !S.wholePool; save(); paintSortieHome(); };
   $('btnStartSortie').onclick = function(){
     var cards = drawItems(SORTIE_CARDS, 'c', false);
     var qs = drawItems(SORTIE_SIZE - cards.length, 'q', false);
-    startRun(shuffle(cards.concat(qs)), 'Daily sortie');
+    startRun(shuffle(cards.concat(qs)), 'Daily session');
   };
   $('btnFreeDrill').onclick = function(){ startRun(drawItems(10, 'q', false), 'Extra drill'); };
   $('btnWeakDrill').onclick  = function(){ startRun(drawItems(12, null, true), 'Weak area drill'); };
@@ -2541,7 +3246,7 @@ function boot(){
   $('btnEndMock').onclick = function(){ endMock(); };
   $('testDate').onchange = function(){ S.testDate = this.value; save(); paintStrip(); paintPlan(); };
   $('btnReset').onclick = function(){
-    wipe(); S = blank(); save(); paintStrip(); paintSortieHome(); paintChartHome(); paintMockHome(); paintProgress(); paintPlan();
+    wipe(); S = blank(); save(); paintStrip(); paintLearnHome(); paintSortieHome(); paintChartHome(); paintMockHome(); paintProgress(); paintPlan();
   };
   document.addEventListener('keydown', function(e){
     if(e.key === 'a' || e.key === 'A') clickOpt(0);
@@ -2552,7 +3257,8 @@ function boot(){
     var live = document.querySelector('.view.on .opt[data-i="' + i + '"]:not([disabled])');
     if(live) live.click();
   }
-  window.P107 = { S:S, ITEMS:ITEMS, buildMock:buildMock, drawItems:drawItems, readiness:readiness, showView:showView };
+  window.P107 = { S:S, ITEMS:ITEMS, LESSONS:LESSONS, MODULES:MODULES, buildMock:buildMock,
+                  drawItems:drawItems, readiness:readiness, showView:showView, openLesson:openLesson };
 }
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
