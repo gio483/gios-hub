@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#12100E">
+<title>Gio — Trip Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+  :root{
+    --bg:#12100E; --panel:#1B1815; --panel2:#241F1B; --line:#3A322C;
+    --txt:#F3EDE6; --mut:#A2968A;
+    --t0:#F5B841; --t1:#57B894; --t2:#E8743B; --t3:#7C8CE0; --t4:#C9527F; --chg:#5FB0C4;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+  #map{position:absolute;inset:0;background:var(--bg)}
+  .leaflet-container{background:#0E0C0B}
+  .leaflet-control-attribution{background:rgba(18,16,14,.8)!important;color:#7A6E63!important;font-size:9px!important}
+  .leaflet-control-attribution a{color:#9C8E80!important}
+
+  /* ---------- header ---------- */
+  header{position:absolute;top:0;left:0;right:0;z-index:1000;pointer-events:none;
+    padding:calc(env(safe-area-inset-top) + 10px) 10px 0;}
+  .bar{pointer-events:auto;background:rgba(27,24,21,.93);backdrop-filter:blur(14px);
+    border:1px solid var(--line);border-radius:16px;padding:10px 12px;
+    box-shadow:0 10px 34px rgba(0,0,0,.55)}
+  .ttl{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .ttl h1{margin:0;font-size:15px;font-weight:700;letter-spacing:-.2px}
+  .ttl .sub{font-size:11px;color:var(--mut)}
+  .prog{margin:8px 0 2px;height:4px;border-radius:3px;background:var(--panel2);overflow:hidden}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--t1),var(--t0));transition:width .4s}
+  .progtxt{font-size:10.5px;color:var(--mut);margin-top:5px}
+  .chips{display:flex;gap:6px;overflow-x:auto;margin-top:9px;padding-bottom:2px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;font-size:11px;font-weight:600;padding:6px 10px;border-radius:999px;
+    border:1px solid var(--line);background:var(--panel2);color:var(--mut);cursor:pointer;white-space:nowrap;
+    display:flex;align-items:center;gap:5px;transition:.15s}
+  .chip .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .chip.on{color:#12100E;border-color:transparent}
+  .chip[data-t="0"].on{background:var(--t0)} .chip[data-t="1"].on{background:var(--t1)}
+  .chip[data-t="2"].on{background:var(--t2)} .chip[data-t="3"].on{background:var(--t3)}
+  .chip[data-t="4"].on{background:var(--t4)} .chip[data-t="c"].on{background:var(--chg)}
+  .chip[data-t="r"].on{background:#8C8175}
+
+  /* ---------- pins ---------- */
+  .pin{position:relative;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+    border:2.5px solid #12100E;box-shadow:0 3px 10px rgba(0,0,0,.6);font-size:14px;line-height:1}
+  .pin.visited::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #fff;opacity:.85}
+  .pin.small{width:19px;height:19px;font-size:9px;border-width:2px}
+
+  /* ---------- sheet ---------- */
+  #sheet{position:absolute;z-index:1200;background:var(--panel);border:1px solid var(--line);
+    display:flex;flex-direction:column;overflow:hidden;
+    transition:transform .32s cubic-bezier(.22,.9,.3,1);box-shadow:0 -14px 44px rgba(0,0,0,.6)}
+  @media (max-width:719px){
+    #sheet{left:0;right:0;bottom:0;max-height:82vh;border-radius:22px 22px 0 0;border-bottom:none;
+      transform:translateY(102%)}
+    #sheet.open{transform:translateY(0)}
+  }
+  @media (min-width:720px){
+    #sheet{top:0;bottom:0;right:0;width:404px;border-radius:0;border-right:none;transform:translateX(102%)}
+    #sheet.open{transform:translateX(0)}
+    header{right:auto;width:400px}
+  }
+  .grab{height:20px;display:grid;place-items:center;flex:0 0 auto}
+  .grab i{width:38px;height:4px;border-radius:3px;background:#4A4038;display:block}
+  @media(min-width:720px){.grab{display:none}}
+  .hero{position:relative;flex:0 0 auto;height:190px;background:#241F1B}
+  .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .hero .fade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,16,14,.15) 0%,rgba(18,16,14,.1) 45%,rgba(27,24,21,.97) 100%)}
+  .hero .cap{position:absolute;left:16px;right:16px;bottom:11px}
+  .hero h2{margin:0;font-size:21px;font-weight:750;letter-spacing:-.4px;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+  .hero .loc{font-size:11.5px;color:#D6C9BB;margin-top:2px;text-shadow:0 1px 8px rgba(0,0,0,.8)}
+  #close{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:none;
+    background:rgba(10,9,8,.62);color:#fff;font-size:17px;cursor:pointer;backdrop-filter:blur(6px);z-index:2}
+  .body{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px calc(env(safe-area-inset-bottom) + 20px)}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:11px}
+  .bdg{font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:999px;background:var(--panel2);
+    border:1px solid var(--line);color:var(--mut);letter-spacing:.2px}
+  .bdg.tier{color:#12100E;border-color:transparent}
+  .facts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:13px}
+  .fact{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:8px 10px}
+  .fact .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--mut);font-weight:700}
+  .fact .v{font-size:13px;font-weight:650;margin-top:2px}
+  .body p.lede{font-size:13.5px;line-height:1.62;color:#DCD2C7;margin:0 0 13px}
+  .sec{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--mut);font-weight:800;
+    margin:15px 0 7px;padding-top:12px;border-top:1px solid var(--line)}
+  .body ul{margin:0;padding-left:17px}
+  .body li{font-size:12.5px;line-height:1.62;color:#CFC4B8;margin-bottom:5px}
+  .body li b{color:var(--txt)}
+  .acts{display:flex;gap:8px;margin-top:16px}
+  .btn{flex:1;text-align:center;text-decoration:none;font-size:12.5px;font-weight:700;padding:12px 8px;
+    border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer;
+    display:block;font-family:inherit}
+  .btn.go{background:#F3EDE6;color:#12100E;border-color:transparent}
+  .btn.done{background:var(--t1);color:#12100E;border-color:transparent}
+
+  /* ---------- legend / fab ---------- */
+  #fab{position:absolute;z-index:1000;right:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);
+    display:flex;flex-direction:column;gap:8px}
+  .fbtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:rgba(27,24,21,.94);
+    color:var(--txt);font-size:17px;cursor:pointer;backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.5);
+    display:grid;place-items:center;font-family:inherit}
+  .fbtn.on{background:var(--t2);color:#12100E;border-color:transparent}
+  #tip{position:absolute;z-index:999;left:12px;bottom:calc(env(safe-area-inset-bottom) + 14px);
+    max-width:min(58vw,300px);font-size:10.5px;line-height:1.5;color:var(--mut);
+    background:rgba(27,24,21,.9);border:1px solid var(--line);border-radius:12px;padding:8px 11px;backdrop-filter:blur(10px)}
+  @media(min-width:720px){#tip{max-width:300px}}
+</style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<header>
+  <div class="bar">
+    <div class="ttl">
+      <h1>Trip Map</h1>
+      <span class="sub">San Diego &middot; 2026 Model Y</span>
+    </div>
+    <div class="prog"><i id="pbar"></i></div>
+    <div class="progtxt" id="ptxt">0 of 17 visited</div>
+    <div class="chips" id="chips"></div>
+  </div>
+</header>
+
+<div id="fab">
+  <button class="fbtn" id="routeBtn" title="Toggle routes">&#8599;</button>
+  <button class="fbtn" id="homeBtn" title="Reset view">&#9678;</button>
+</div>
+<div id="tip">Drag to pan &middot; pinch to zoom &middot; tap any pin for the full breakdown.</div>
+
+<div id="sheet">
+  <div class="grab"><i></i></div>
+  <div class="hero">
+    <img id="heroImg" alt="">
+    <div class="fade"></div>
+    <button id="close">&times;</button>
+    <div class="cap"><h2 id="hName"></h2><div class="loc" id="hLoc"></div></div>
+  </div>
+  <div class="body" id="body"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const W = "https://upload.wikimedia.org/wikipedia/commons/";
+const TIERS = {
+  0:{name:"Tier 0 — The Test",  c:"#F5B841", gate:"Do it this month. Nothing has to change."},
+  1:{name:"Tier 1 — Overnight", c:"#57B894", gate:"No income change required."},
+  2:{name:"Tier 2 — Long weekend", c:"#E8743B", gate:"No income change required."},
+  3:{name:"Tier 3 — The week",  c:"#7C8CE0", gate:"Gate: SVM paying you ~$5K/mo."},
+  4:{name:"Tier 4 — Two weeks+",c:"#C9527F", gate:"Gate: SDLR ~$15K/mo profit + Temecula running."}
+};
+
+const PLACES = [
+ {id:"home",tier:-1,name:"Home",loc:"San Diego, CA",lat:32.7157,lng:-117.1611,icon:"&#9679;"},
+
+ {id:"idy",tier:0,name:"Idyllwild",loc:"San Jacinto Mtns, CA",lat:33.7397,lng:-116.7189,
+  img:W+"thumb/7/76/Tahquitz.jpg/500px-Tahquitz.jpg",
+  drive:"2 hrs",mi:"105 mi",cost:"~$25",season:"Year-round",
+  lede:"A mile-high pine village wedged under Tahquitz and Suicide Rock, and the single best place to run the test. It is close enough that bailing is easy, high enough that August is pleasant instead of punishing, and small enough that two days there gives you nothing to do but walk, shoot, and be quiet. You have a friend with a house here — which means a locking door, a real bed, and zero dollars of lodging. This is the trip that answers the only question that matters right now: can you be alone for 48 hours with no assignment?",
+  shoot:["Tahquitz Peak from Humber Park — best light is the first hour after sunrise","Suicide Rock trail, ~3.5 mi round trip, granite and long views","The village itself: woodsmoke, log architecture, dogs everywhere — good street-photography practice on a small, forgiving stage"],
+  logi:["Superchargers in Banning and Palm Springs, ~30–40 min down the hill. Arrive with 40%+ and you never think about it.","Mountain road (CA-243) is winding — budget more time than the map says.","Cell service is patchy in the village. That's a feature."],
+  note:"August pick. Go this month."},
+
+ {id:"laq",tier:0,name:"La Quinta",loc:"Coachella Valley, CA",lat:33.6634,lng:-116.3100,
+  img:W+"thumb/9/9f/Coachella_Valley_on_a_Fall_Morning.jpg/1280px-Coachella_Valley_on_a_Fall_Morning.jpg",
+  drive:"2.5 hrs",mi:"135 mi",cost:"~$30",season:"Oct–April",
+  lede:"The other free bed, and the other version of the test — desert instead of pines. The Santa Rosa Mountains come straight up out of the valley floor here with almost no foothills, which makes for absurd light at both ends of the day. It is also one of the easiest places in California to be outside and alone before 8am. The catch is heat: summer runs well over 110°F and that is not a discomfort, it is a hazard.",
+  shoot:["The Cove and Bear Creek trail at sunrise — mountain wall goes orange for about twenty minutes","Palm oases in the Santa Rosas — unexpected green in dead desert","Long lens compression on the valley haze at dusk"],
+  logi:["Superchargers throughout the valley — this is the easiest charging of any trip on this map.","Do not go June–September. Wait for October.","Flat, easy driving the whole way."],
+  note:"Save for fall. Same test, different landscape."},
+
+ {id:"cuy",tier:1,name:"Lake Cuyamaca",loc:"Julian area, CA",lat:32.9917,lng:-116.5786,
+  img:W+"thumb/3/34/Lake_Cuyamaca_in_2022.jpg/1280px-Lake_Cuyamaca_in_2022.jpg",
+  drive:"1 hr",mi:"50 mi",cost:"~$40",season:"Kayak fishing: Memorial–Labor Day",
+  lede:"An hour from your door and the closest thing you have to a starter kayak-and-fish trip. Cuyamaca sits at 4,600 ft in oak and pine, gets stocked with trout, and holds bass and catfish. Kayak fishing is allowed here in the summer window — you check in at the Tackle Shop, show a California fishing license, and buy the lake permit on the spot. Rent the boat. Do not buy one until you have done this five times.",
+  shoot:["Dawn fog on the water — the lake holds mist longer than anywhere else in the county","Stonewall Peak reflected on a still morning","Burned-and-regrown oak stands from the 2003 Cedar Fire — stark, graphic, underrated"],
+  logi:["<b>Required:</b> CA state fishing license + Lake Cuyamaca permit, both at the Tackle Shop.","Kayak fishing window is Memorial Day to Labor Day — verify before you drive.","Charge before you leave; East County charging is thinner than the coast."],
+  note:"Cheapest real kayak + fish day you have."},
+
+ {id:"jul",tier:1,name:"Julian",loc:"San Diego County, CA",lat:33.0786,lng:-116.6019,
+  img:W+"thumb/b/b3/Julian_Californien.JPG/1280px-Julian_Californien.JPG",
+  drive:"1 hr",mi:"60 mi",cost:"~$100",season:"Fall best",
+  lede:"An 1870s gold-rush town that turned into an apple town, sitting right next to Cuyamaca so the two pair into one easy overnight. Julian is the lowest-friction trip on this entire map — close enough to leave after lunch, far enough that it feels like elsewhere. In fall it smells like woodsmoke and pie and gets genuinely crowded; midweek in any other season you'll have the main street to yourself.",
+  shoot:["Main Street storefronts — warm wood and painted signage, great in flat overcast light","Volcan Mountain trail at golden hour, big open views back toward the desert","Orchards in October"],
+  logi:["Pairs naturally with Lake Cuyamaca — do both in one overnight.","Weekend traffic in apple season is real. Go Tuesday.","Level 2 charging in town; Supercharger back down the hill."],
+  note:"Your default 'I need to leave for one night' trip."},
+
+ {id:"lag",tier:1,name:"Mount Laguna",loc:"Cleveland NF, CA",lat:32.8683,lng:-116.4183,
+  img:W+"thumb/4/41/Banner02.jpg/1280px-Banner02.jpg",
+  drive:"1 hr",mi:"55 mi",cost:"~$60",season:"Year-round",
+  lede:"Six thousand feet of Jeffrey pine sitting directly above the Anza-Borrego desert, which gives you the strangest edge in San Diego County: alpine forest on one side, badlands dropping away on the other. It is also the best dark sky within an hour of the city — the observatory is up here for a reason. If you want to learn astrophotography without committing a whole weekend, this is where you do it.",
+  shoot:["Desert View overlook — pine trunks framing the Salton basin 5,000 ft below","Milky Way core, roughly May–September, from any pullout on Sunrise Highway","Snow on pines in January, half an hour from palm trees"],
+  logi:["Adventure Pass or day-use fee required at some Forest Service lots.","Cold at night year-round — it's 20–25°F colder than the coast.","No charging on the mountain. Arrive with margin."],
+  note:"Closest true dark sky. Perfect Camp Mode test run."},
+
+ {id:"bbl",tier:1,name:"Big Bear Lake",loc:"San Bernardino Mtns, CA",lat:34.2439,lng:-116.9114,
+  img:W+"thumb/3/33/BBV_Summer_2019_-33.jpg/1280px-BBV_Summer_2019_-33.jpg",
+  drive:"2.5 hrs",mi:"140 mi",cost:"~$150",season:"Spring–Fall",
+  lede:"A real seven-mile alpine lake at 6,750 ft, with rentals on the water and trout in it. This is the step up from Cuyamaca: bigger water, better paddling, and enough town that you can get a cheap room instead of sleeping in the car if you want. Bald eagles winter here. The drive up the mountain is half the experience and the descent at dusk is better than the ascent.",
+  shoot:["Boulder Bay at sunrise — the postcard, and worth the early alarm","Castle Rock trail for the elevated lake view","Winter eagles, December–February"],
+  logi:["Superchargers in the Big Bear area plus plenty of Level 2 — easiest mountain charging on this list.","Winter requires chains or verified snow tires; the Model Y is capable but the passes get enforced.","Kayak and paddleboard rentals right on the lake — rent, don't buy."],
+  note:"Best paddling within 3 hours."},
+
+ {id:"anza",tier:1,name:"Anza-Borrego",loc:"Borrego Springs, CA",lat:33.2558,lng:-116.3750,
+  img:W+"thumb/2/26/Fontspoint02262006.JPG/1280px-Fontspoint02262006.JPG",
+  drive:"2 hrs",mi:"90 mi",cost:"~$50",season:"Oct–April",
+  lede:"The largest state park in California and the most photographically loaded place within two hours of San Diego. Font's Point is a badlands overlook that looks like someone dropped a piece of Utah into the county. Borrego Springs is a certified Dark Sky Community, so the night sky is genuinely dark, and free dispersed camping is allowed in most of the park — which makes this the cheapest multi-night trip available to you. In late February and March a wet winter turns the desert floor into wildflowers.",
+  shoot:["Font's Point at sunrise or sunset — the badlands go on fire (high-clearance road; check conditions, and don't push the Model Y down it)","Galleta Meadows: 130+ giant rusted metal sculptures scattered across open desert. Serpent, mammoths, raptors. Nothing else looks like this.","Milky Way over the sculptures — the shot that made this place famous","Wildflowers late Feb–March in a wet year"],
+  logi:["<b>Free dispersed camping</b> is permitted in most of the park — one of the few places in CA where that's true.","Charging in Borrego Springs is limited. Arrive with 60%+ and plan the return leg before you commit.","<b>Do not go May–September.</b> Summer here regularly exceeds 110°F.","Cell coverage drops fast outside town."],
+  note:"Best value on the map. Free camping + dark sky + surreal subjects."},
+
+ {id:"bom",tier:1,name:"Bombay Beach",loc:"Salton Sea, CA",lat:33.3506,lng:-115.7292,
+  img:W+"thumb/d/de/Bombay_beach_sign.jpg/1280px-Bombay_beach_sign.jpg",
+  drive:"2.5 hrs",mi:"130 mi",cost:"~$60",season:"Nov–March",
+  lede:"A half-abandoned resort town on the shore of a shrinking inland sea, 223 feet below sea level, where the beach is made of pulverized fish bone and artists have been installing large-scale work in the ruins for a decade. It is bleak, strange, and one of the most photographable places in the American West. Go with your eyes open: the receding shoreline is a genuine environmental and public-health story, and this is a place people actually live, not a set. Shoot it with some respect and it will give you your best frames of the year.",
+  shoot:["The Bombay Beach Biennale installations — swing set in the water, drive-in theater in the dust","Salt-crusted shoreline at low sun","Abandoned structures — golden hour turns the decay warm instead of grim"],
+  logi:["Air quality can be poor when the playa dust kicks up; skip it on windy days.","Very limited services. Bring water, fuel your charge in Brawley or Indio.","Winter only — summer is brutal and the smell is worse."],
+  note:"Strangest place within 3 hours. Go in January."},
+
+ {id:"jt",tier:2,name:"Joshua Tree",loc:"Joshua Tree NP, CA",lat:33.8734,lng:-115.9010,
+  img:W+"thumb/f/f9/Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg/1280px-Joshua_Tree_-_Cyclops_%2B_Potato_Head_-_Sunrise.jpg",
+  drive:"3 hrs",mi:"170 mi",cost:"~$250",season:"Oct–April",
+  lede:"Where the Mojave and the Colorado deserts collide, producing monzogranite boulder piles and the Joshua trees that only grow in one of the two. It is a Dark Sky Park with some of the best accessible night skies in Southern California, and the boulder formations give you foreground — which is the thing most desert astrophotography is missing. Three hours from your door, endlessly re-shootable, and it changes completely between seasons.",
+  shoot:["Cyclops and Potato Head rocks at sunrise","Cholla Cactus Garden in backlight — the whole field glows","Arch Rock for Milky Way foreground","Keys View at sunset, looking down at the whole Coachella Valley"],
+  logi:["Park entrance fee applies; the America the Beautiful annual pass pays for itself if you'll also do Zion and Bryce.","<b>No charging inside the park.</b> Superchargers in Yucca Valley and Palm Springs. Enter with 70%+.","Campgrounds book out far ahead in peak season — reserve or plan to stay in town.","Summer is dangerous. October through April only."],
+  note:"The classic. Do it once the local overnights feel routine."},
+
+ {id:"ah",tier:2,name:"Alabama Hills",loc:"Lone Pine, CA",lat:36.6058,lng:-118.1200,
+  img:W+"thumb/4/48/Alabamahills.jpg/1280px-Alabamahills.jpg",
+  drive:"5 hr 15",mi:"296 mi",cost:"~$300",season:"Apr–Jun, Sep–Oct",
+  lede:"This is the one. Rounded orange granite boulders piled across the valley floor with the sheerest face of the Sierra Nevada standing 10,000 feet up directly behind them — Mount Whitney included. Hundreds of films were shot here, and it is now a National Scenic Area with free dispersed camping and Bortle class 2 skies, meaning it is as dark as Joshua Tree or darker. Dozens of natural arches are reachable on short walks from the road. If you only do one Tier 2 trip in the next year, do this one; it is the highest-return photography ground in California for the effort.",
+  shoot:["<b>Mobius Arch</b> framing Mount Whitney — half a mile round trip, and the most photographed composition in the Eastern Sierra for good reason","Movie Flat Road at first light, boulders and Sierra wall together","Milky Way through any of the arches — Bortle 2 means you can see structure with your naked eye","Whitney Portal Road switchbacks from above"],
+  logi:["<b>Free camping permit required</b> — get it online, at the Eastern Sierra Visitor Center in Lone Pine, or from a BLM ranger on site.","Camp <b>only</b> where you see the tent symbol. Tent-with-a-red-line signs mean no.","Max stay 7 days per 28; 14 days per calendar year.","<b>Free CA campfire permit</b> required for any fire or camp stove — readyforwildfire.org/permits","<b>Supercharger at the Lone Pine Film History Museum</b> (6 stalls). Small station — don't arrive on fumes.","296 miles exceeds your realistic one-charge range. Plan one stop each way, roughly $25–40."],
+  note:"The trip. Free to sleep, world-class to shoot."},
+
+ {id:"mam",tier:2,name:"Mammoth Lakes",loc:"Eastern Sierra, CA",lat:37.6485,lng:-118.9721,
+  img:W+"e/e3/Mammoth_Lakes_Village.jpg",
+  drive:"7 hrs",mi:"400 mi",cost:"~$450",season:"Jun–Oct",
+  lede:"The northern anchor of a 395 road trip and the reason to keep driving past Lone Pine. Alpine lakes you can paddle, trout in most of them, hot springs in the valley below, and the Minarets on the skyline. Charging is solid here — eight pull-through Supercharger stalls, which is unusually good for the Eastern Sierra. Best run as leg two of an Alabama Hills trip rather than a destination on its own.",
+  shoot:["Minaret Vista at sunset — the Ritter Range going pink","Convict Lake reflections at dawn, roadside and effortless","June Lake Loop in October when the aspens turn","Wild hot springs on the Long Valley plateau at night"],
+  logi:["<b>8 pull-through Supercharger stalls</b> in town.","Lone Pine → Mammoth is the leg to plan; Bishop charging is thinner.","Snow closes CA-120 and higher roads roughly November–May.","Altitude is 8,000 ft — take the first day easy."],
+  note:"Leg two of the 395 run."},
+
+ {id:"mono",tier:2,name:"Mono Lake",loc:"Lee Vining, CA",lat:38.0175,lng:-119.0136,
+  img:W+"thumb/a/a0/Mono_Lake_aerial.jpg/1280px-Mono_Lake_aerial.jpg",
+  drive:"7.5 hrs",mi:"425 mi",cost:"add-on",season:"Jun–Oct",
+  lede:"A million-year-old alkaline lake with limestone tufa towers rising straight out of water three times saltier than the ocean. Half an hour past Mammoth, and it looks like nowhere else on earth. The South Tufa reserve at sunrise is one of the most reliably spectacular twenty minutes of photography in California — mirror-flat water, spires, and the Sierra behind.",
+  shoot:["South Tufa at sunrise, calm water, mirrored towers","Navy Beach for reflections and shorebirds","Milky Way over the tufa in summer"],
+  logi:["Small entrance fee at South Tufa.","Nearest reliable charging is Mammoth. Round trip from there is easy.","Bug season is real in early summer — bring repellent."],
+  note:"Add half a day to any Mammoth trip."},
+
+ {id:"hav",tier:2,name:"Lake Havasu",loc:"Havasu, AZ",lat:34.4839,lng:-114.3225,
+  img:W+"thumb/d/d2/Lake_Havasu_1.jpg/1280px-Lake_Havasu_1.jpg",
+  drive:"5 hrs",mi:"290 mi",cost:"~$300",season:"Oct–May",
+  lede:"Forty-five miles of Colorado River reservoir with striped bass, largemouth, and the Topock Gorge upstream — a slot canyon you can paddle through, with bighorn sheep on the walls and petroglyphs at the water line. This is the trip where kayaking and fishing are the point rather than a bonus. Also, improbably, the original London Bridge is here, having been bought and shipped stone by stone in 1968.",
+  shoot:["Topock Gorge from water level — canyon walls, best in morning light","London Bridge at blue hour, lit and reflected","Desert bighorn along the gorge rim"],
+  logi:["Rent the kayak in town — several outfitters run Topock Gorge shuttles.","Superchargers in Lake Havasu City and along I-40.","Arizona fishing license required; if you fish from the California bank, rules differ. Check before you cast.","Summer exceeds 110°F. October through May."],
+  note:"Best dedicated kayak-and-fish trip in range."},
+
+ {id:"bs",tier:2,name:"Big Sur",loc:"Central Coast, CA",lat:36.2704,lng:-121.8081,
+  img:W+"thumb/0/09/Central_Californian_Coastline%2C_Big_Sur_-_May_2013.jpg/1280px-Central_Californian_Coastline%2C_Big_Sur_-_May_2013.jpg",
+  drive:"7 hrs",mi:"400 mi",cost:"~$500",season:"Sep–Nov clearest",
+  lede:"Ninety miles of the Santa Lucia Mountains falling straight into the Pacific, with Highway 1 cut into the side of it. The drive is the destination here — you will stop constantly and you should. Redwoods in the canyons, condors overhead, and light that gets good in the afternoon and stays good. Fog is the wild card: June and July are often socked in, September through November is usually clearest.",
+  shoot:["Bixby Creek Bridge from the north pullout, late afternoon","McWay Falls dropping onto the beach at Julia Pfeiffer Burns","Pfeiffer Beach keyhole rock — the sun lines up through the arch in December and January","Redwood interiors in Big Sur valley on a foggy morning"],
+  logi:["<b>Check Highway 1 status before you commit</b> — slides close sections regularly and detours are hours long.","Charging is thin between Cambria and Carmel. Fill up at both ends.","Lodging is expensive; state campgrounds book out months ahead.","Cell service is largely absent through the corridor."],
+  note:"Long drive, but the drive is the trip."},
+
+ {id:"zion",tier:3,name:"Zion",loc:"Springdale, UT",lat:37.2982,lng:-113.0263,
+  img:W+"thumb/1/10/Zion_angels_landing_view.jpg/500px-Zion_angels_landing_view.jpg",
+  drive:"7.5 hrs",mi:"440 mi",cost:"~$1,000 (week)",season:"Apr–May, Sep–Oct",
+  lede:"Two thousand feet of Navajo sandstone on both sides of a river you can walk up. Zion is the anchor of the Utah week, and the trip you described wanting when you said Utah. The Narrows is a canyon so tight you hike it in the water; Angels Landing is a fin of rock with chains bolted to it. Spring and fall are the windows — summer is crowded and over 100°F, winter is quiet and beautiful but icy on the high routes.",
+  shoot:["The Watchman from Canyon Junction Bridge at sunset — the signature frame","The Narrows mid-morning when reflected light bounces down the walls","Canyon Overlook Trail at sunrise, one mile, enormous payoff","Zion–Mt Carmel switchbacks from above"],
+  logi:["<b>Charging:</b> Superchargers at Toquerville (Anderson Junction), St. George, Cedar City, Beaver, Scipio. <b>Level 2 inside the park</b> at Zion Canyon Visitor Center and Zion Lodge; several Springdale hotels have destination chargers.","Angels Landing requires a <b>permit by lottery</b> — apply well ahead.","Shuttle is mandatory in the main canyon most of the year; you park in Springdale and ride in.","Flash-flood risk in the Narrows. Check the forecast every single morning, no exceptions."],
+  note:"Anchor of the Utah week."},
+
+ {id:"bryce",tier:3,name:"Bryce Canyon",loc:"Bryce, UT",lat:37.5930,lng:-112.1871,
+  img:W+"thumb/c/c3/Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg/1280px-Inspiration_Point_Bryce_Canyon_November_2018_panorama.jpg",
+  drive:"+2 hrs from Zion",mi:"85 mi",cost:"add-on",season:"May–Oct",
+  lede:"Not a canyon but an eroding amphitheater edge, filled with thousands of orange limestone hoodoos. At 8,000–9,000 feet it stays cool when Zion is baking, and it holds some of the darkest skies in the United States — the park runs astronomy programs for a reason. Sunrise here is not a cliché; the hoodoos light from the inside out and it takes about fifteen minutes.",
+  shoot:["Sunrise or Inspiration Point at actual sunrise — go in the dark and wait","Navajo Loop through Wall Street, down among the hoodoos","Thor's Hammer, the iconic single spire","Milky Way over the amphitheater — among the darkest skies in the country"],
+  logi:["Two hours from Zion — pair them, never choose.","Charging is thinner here than the I-15 corridor. Top up in Cedar City on the way.","8,000+ ft: nights are cold even in July, and snow lingers into May.","Same park pass as Zion."],
+  note:"Two hours from Zion. Do both."},
+
+ {id:"moab",tier:4,name:"Moab & Arches",loc:"Moab, UT",lat:38.7331,lng:-109.5925,
+  img:W+"thumb/f/f0/Delicate_arch_sunset.jpg/1280px-Delicate_arch_sunset.jpg",
+  drive:"11 hrs",mi:"700 mi",cost:"~$1,500+",season:"Apr–May, Sep–Oct",
+  lede:"The far end of the Utah loop: 2,000+ natural stone arches in one park, Canyonlands next door, and the Colorado River running between them. This is where a week stops being enough and the two-week version starts making sense. It is also the point where charging gets thin and needs real planning rather than optimism — worth doing once the shorter Utah trip has taught you how you actually travel.",
+  shoot:["Delicate Arch at sunset — 3 mi round trip, and everyone is there for a reason","Mesa Arch at sunrise in Canyonlands, the underglow shot","Double Arch and the Windows in early light","Milky Way over the arches — dark sky certified"],
+  logi:["<b>Timed-entry reservations</b> are required for Arches during peak season. Book ahead.","Charging is the thinnest of any stop on this map — verify current stations in the app before you commit to the leg.","Summer exceeds 100°F with almost no shade.","This is the trip that justifies two weeks instead of one."],
+  note:"Where the week becomes two weeks."}
+];
+
+const CHARGERS = [
+ {name:"Lone Pine",note:"6 stalls, at the Film History Museum. Small — arrive with margin.",lat:36.5936,lng:-118.0619},
+ {name:"Mammoth Lakes",note:"8 pull-through stalls. Best charging in the Eastern Sierra.",lat:37.6485,lng:-118.9721},
+ {name:"Barstow",note:"Major I-15 hub. Your pivot point for both the 395 and Utah runs.",lat:34.8958,lng:-117.0173},
+ {name:"Baker",note:"I-15, between Barstow and Vegas.",lat:35.2686,lng:-116.0764},
+ {name:"St. George",note:"10–15 min off I-15, but the key Utah hub.",lat:37.0965,lng:-113.5684},
+ {name:"Toquerville",note:"Anderson Junction travel center — closest Supercharger to Zion.",lat:37.2545,lng:-113.2843},
+ {name:"Cedar City",note:"I-15. Top up here before turning off for Bryce.",lat:37.6775,lng:-113.0619},
+ {name:"Beaver",note:"I-15, northern Utah corridor.",lat:38.2766,lng:-112.6408},
+ {name:"Yucca Valley",note:"Closest charging to Joshua Tree. No charging inside the park.",lat:34.1142,lng:-116.4322},
+ {name:"Palm Springs",note:"Dense charging. Covers Idyllwild and La Quinta.",lat:33.8303,lng:-116.5453}
+];
+
+const ROUTES = [
+ {name:"395 Run — San Diego to Alabama Hills",color:"#E8743B",
+  pts:[[32.7157,-117.1611],[33.4936,-117.1489],[34.1083,-117.2898],[34.5362,-117.2928],[35.0058,-117.6503],[35.7683,-117.6539],[36.2872,-117.9520],[36.6058,-118.1200]]},
+ {name:"Utah Loop — San Diego to Zion",color:"#7C8CE0",
+  pts:[[32.7157,-117.1611],[33.9425,-117.2297],[34.8958,-117.0173],[35.2686,-116.0764],[36.1699,-115.1398],[37.0965,-113.5684],[37.2545,-113.2843],[37.2982,-113.0263]]},
+ {name:"Desert Runs",color:"#57B894",
+  pts:[[32.7157,-117.1611],[32.9917,-116.5786],[33.0786,-116.6019],[33.2558,-116.3750],[33.3506,-115.7292]]}
+];
+
+/* ---------------- map ---------------- */
+const map = L.map('map',{zoomControl:false,attributionControl:true,maxZoom:16,minZoom:4})
+  .setView([35.4,-116.4],6);
+L.control.zoom({position:'topright'}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+  attribution:'&copy; OpenStreetMap &copy; CARTO | Photos: Wikimedia Commons',maxZoom:19,subdomains:'abcd'
+}).addTo(map);
+
+const visited = JSON.parse(localStorage.getItem('gio_trips_visited')||'{}');
+const markers = {}, tierLayers = {}, chargeLayer = L.layerGroup(), routeLayer = L.layerGroup();
+[0,1,2,3,4].forEach(t=>tierLayers[t]=L.layerGroup().addTo(map));
+
+function pinIcon(color,label,vis,small){
+  return L.divIcon({html:`<div class="pin${vis?' visited':''}${small?' small':''}" style="background:${color}">${label||''}</div>`,
+    className:'',iconSize:small?[19,19]:[30,30],iconAnchor:small?[9.5,9.5]:[15,15]});
+}
+
+/* home */
+L.marker([32.7157,-117.1611],{icon:pinIcon('#F3EDE6','&#8962;',false,false),zIndexOffset:500})
+ .addTo(map).bindTooltip('Home — San Diego',{direction:'top',offset:[0,-14]});
+
+/* places */
+PLACES.filter(p=>p.tier>=0).forEach(p=>{
+  const t=TIERS[p.tier];
+  const m=L.marker([p.lat,p.lng],{icon:pinIcon(t.c,'',!!visited[p.id],false)})
+    .bindTooltip(p.name,{direction:'top',offset:[0,-15]})
+    .on('click',()=>openSheet(p));
+  markers[p.id]=m; m.addTo(tierLayers[p.tier]);
+});
+
+/* chargers */
+CHARGERS.forEach(c=>{
+  L.marker([c.lat,c.lng],{icon:pinIcon('#5FB0C4','&#9889;',false,true)})
+   .bindTooltip(`<b>${c.name}</b><br>${c.note}`,{direction:'top',offset:[0,-10]})
+   .addTo(chargeLayer);
+});
+
+/* routes */
+ROUTES.forEach(r=>{
+  L.polyline(r.pts,{color:r.color,weight:3,opacity:.8,dashArray:'8 7',lineCap:'round'})
+   .bindTooltip(r.name,{sticky:true}).addTo(routeLayer);
+});
+
+/* ---------------- chips ---------------- */
+const CHIPDEF=[{k:"0",l:"The Test"},{k:"1",l:"Overnights"},{k:"2",l:"Weekends"},
+  {k:"3",l:"The Week"},{k:"4",l:"Two Weeks+"},{k:"c",l:"Chargers"},{k:"r",l:"Routes"}];
+const chipsEl=document.getElementById('chips');
+CHIPDEF.forEach(d=>{
+  const b=document.createElement('button');
+  b.className='chip on'; b.dataset.t=d.k;
+  b.innerHTML=`<span class="dot"></span>${d.l}`;
+  if(d.k==='c'||d.k==='r') b.classList.remove('on');
+  b.onclick=()=>{
+    b.classList.toggle('on');
+    const on=b.classList.contains('on');
+    if(d.k==='c') on?chargeLayer.addTo(map):map.removeLayer(chargeLayer);
+    else if(d.k==='r') on?routeLayer.addTo(map):map.removeLayer(routeLayer);
+    else on?tierLayers[d.k].addTo(map):map.removeLayer(tierLayers[d.k]);
+  };
+  chipsEl.appendChild(b);
+});
+
+document.getElementById('routeBtn').onclick=function(){
+  const on=!this.classList.contains('on');
+  this.classList.toggle('on',on);
+  const chip=document.querySelector('.chip[data-t="r"]');
+  chip.classList.toggle('on',on);
+  on?routeLayer.addTo(map):map.removeLayer(routeLayer);
+};
+document.getElementById('homeBtn').onclick=()=>{map.setView([35.4,-116.4],6);closeSheet();};
+
+/* ---------------- sheet ---------------- */
+const sheet=document.getElementById('sheet'), bodyEl=document.getElementById('body');
+let current=null;
+
+function openSheet(p){
+  current=p;
+  const t=TIERS[p.tier];
+  const img=document.getElementById('heroImg');
+  img.src=p.img; img.alt=p.name;
+  img.onerror=()=>{img.style.display='none';img.parentElement.style.background=`linear-gradient(135deg,${t.c}44,#241F1B)`;};
+  img.style.display='block';
+  document.getElementById('hName').textContent=p.name;
+  document.getElementById('hLoc').textContent=p.loc;
+
+  const isV=!!visited[p.id];
+  bodyEl.innerHTML=`
+    <div class="badges">
+      <span class="bdg tier" style="background:${t.c}">${t.name}</span>
+      <span class="bdg">${p.season}</span>
+    </div>
+    <div class="facts">
+      <div class="fact"><div class="k">Drive</div><div class="v">${p.drive}</div></div>
+      <div class="fact"><div class="k">Distance</div><div class="v">${p.mi}</div></div>
+      <div class="fact"><div class="k">Rough cost</div><div class="v">${p.cost}</div></div>
+      <div class="fact"><div class="k">Unlock</div><div class="v" style="font-size:11px;line-height:1.35">${t.gate}</div></div>
+    </div>
+    <p class="lede">${p.lede}</p>
+    <div class="sec">What to shoot</div>
+    <ul>${p.shoot.map(s=>`<li>${s}</li>`).join('')}</ul>
+    <div class="sec">Logistics &amp; charging</div>
+    <ul>${p.logi.map(s=>`<li>${s}</li>`).join('')}</ul>
+    <div class="sec">Bottom line</div>
+    <p class="lede" style="margin:0;color:${t.c};font-weight:650">${p.note}</p>
+    <div class="acts">
+      <a class="btn go" href="https://maps.apple.com/?daddr=${p.lat},${p.lng}&dirflg=d" target="_blank" rel="noopener">Directions</a>
+      <button class="btn ${isV?'done':''}" id="visBtn">${isV?'&#10003; Been there':'Mark visited'}</button>
+    </div>`;
+
+  document.getElementById('visBtn').onclick=()=>{
+    visited[p.id]=!visited[p.id];
+    if(!visited[p.id]) delete visited[p.id];
+    localStorage.setItem('gio_trips_visited',JSON.stringify(visited));
+    markers[p.id].setIcon(pinIcon(t.c,'',!!visited[p.id],false));
+    updateProgress(); openSheet(p);
+  };
+
+  sheet.classList.add('open');
+  map.panTo([p.lat,p.lng],{animate:true});
+}
+function closeSheet(){sheet.classList.remove('open');current=null;}
+document.getElementById('close').onclick=closeSheet;
+map.on('click',closeSheet);
+
+/* swipe down to close on mobile */
+let sy=null;
+sheet.addEventListener('touchstart',e=>{if(sheet.querySelector('.body').scrollTop<=0)sy=e.touches[0].clientY;},{passive:true});
+sheet.addEventListener('touchmove',e=>{
+  if(sy===null)return;
+  const d=e.touches[0].clientY-sy;
+  if(d>0)sheet.style.transform=`translateY(${d}px)`;
+},{passive:true});
+sheet.addEventListener('touchend',e=>{
+  if(sy===null)return;
+  const d=e.changedTouches[0].clientY-sy;
+  sheet.style.transform='';
+  if(d>90)closeSheet();
+  sy=null;
+});
+
+/* ---------------- progress ---------------- */
+function updateProgress(){
+  const total=PLACES.filter(p=>p.tier>=0).length;
+  const n=Object.keys(visited).length;
+  document.getElementById('pbar').style.width=(n/total*100)+'%';
+  document.getElementById('ptxt').textContent=
+    n===0?`0 of ${total} visited — start with Idyllwild`:`${n} of ${total} visited`;
+}
+updateProgress();
+
+setTimeout(()=>{const t=document.getElementById('tip');t.style.transition='opacity .6s';t.style.opacity='0';
+  setTimeout(()=>t.remove(),700);},7000);
+</script>
+</body>
+</html>
