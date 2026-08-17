@@ -61,9 +61,15 @@ header{position:absolute;top:0;left:0;right:0;z-index:1000;pointer-events:none;
   background:linear-gradient(90deg,var(--t1),var(--t0),var(--t2));transition:width .55s cubic-bezier(.3,1,.4,1)}
 .progtxt{font-size:10.5px;color:var(--mut);margin-top:6px;font-weight:550;letter-spacing:.1px}
 .progtxt b{color:var(--t0);font-weight:700}
-.chips{display:flex;gap:6px;overflow-x:auto;margin-top:10px;padding-bottom:1px;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.chips::-webkit-scrollbar{display:none}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:9px}
+.rowlbl{font-size:8.5px;text-transform:uppercase;letter-spacing:1.1px;color:var(--mut2);
+  font-weight:850;margin:11px 0 5px}
+.seg{display:flex;gap:0;margin-top:9px;background:rgba(0,0,0,.3);border:1px solid var(--line);
+  border-radius:11px;padding:3px}
+.seg button{flex:1;font-family:inherit;font-size:10.5px;font-weight:700;padding:6px 4px;
+  border:none;background:none;color:var(--mut);border-radius:8px;cursor:pointer;transition:.18s}
+.seg button.on{background:linear-gradient(150deg,#4A403A,#332B26);color:var(--txt);
+  box-shadow:0 2px 8px rgba(0,0,0,.4)}
 .chip{flex:0 0 auto;font-size:11px;font-weight:650;padding:6px 11px;border-radius:999px;
   border:1px solid var(--line2);background:rgba(0,0,0,.25);color:var(--mut);cursor:pointer;
   white-space:nowrap;display:flex;align-items:center;gap:6px;transition:.18s;font-family:inherit}
@@ -93,6 +99,12 @@ header{position:absolute;top:0;left:0;right:0;z-index:1000;pointer-events:none;
 .pulse{position:absolute;left:50%;top:14px;width:28px;height:28px;margin:-14px 0 0 -14px;
   border-radius:50%;background:var(--c);opacity:.55;animation:pl 2.2s ease-out infinite;pointer-events:none}
 @keyframes pl{0%{transform:scale(.55);opacity:.55}70%{transform:scale(2.3);opacity:0}100%{opacity:0}}
+.pinwrap.sm{width:26px;height:32px}
+.pinwrap.sm .pin{width:21px;height:21px;margin-left:-10.5px;border-width:1.5px}
+.pinwrap.sm .pin i{width:7px;height:7px}
+body.lightbase .leaflet-tooltip{background:rgba(14,12,11,.94)!important}
+body.lightbase .leaflet-control-attribution{background:rgba(255,255,255,.82)!important;color:#333!important}
+body.lightbase .leaflet-control-attribution a{color:#0645ad!important}
 .cpin{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:9px;
   background:linear-gradient(150deg,#6EC4D8,#3E93A9);border:1.5px solid rgba(0,0,0,.35);
   box-shadow:0 3px 9px rgba(0,0,0,.55);color:#0C1C21;font-weight:800}
@@ -120,6 +132,8 @@ header{position:absolute;top:0;left:0;right:0;z-index:1000;pointer-events:none;
 @media(min-width:760px){.grab{display:none}}
 
 .hero{position:relative;flex:0 0 auto;height:224px;background:#221C18;overflow:hidden}
+.hero.compact{height:132px}
+.glyph{position:absolute;inset:0;display:grid;place-items:center;font-size:52px;opacity:.28}
 .hero .slide{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
 .hero .slide.on{opacity:1}
 .hero .slide img{width:100%;height:100%;object-fit:cover;display:block}
@@ -208,7 +222,11 @@ ul.lst li .sm{display:block;font-size:11.5px;color:var(--mut);margin-top:1px;lin
   </div>
   <div class="prog"><i id="pbar"></i></div>
   <div class="progtxt" id="ptxt"></div>
+  <div class="rowlbl">Trips by tier</div>
   <div class="chips" id="chips"></div>
+  <div class="rowlbl">Map layers</div>
+  <div class="chips" id="chips2"></div>
+  <div class="seg" id="seg"></div>
 </div></header>
 
 <div id="fab">
@@ -622,6 +640,197 @@ const P=[
  note:"Where the week becomes two weeks."}
 ];
 
+const KINDS={
+ water:{n:"Lake / River",c:"#3FA9D6",c2:"#26769B",gate:"Go whenever \u2014 these are day trips.",g:"\u{1F6F6}"},
+ nature:{n:"Forest / Park",c:"#52A86B",c2:"#2F7245",gate:"Go whenever \u2014 no gate on trees.",g:"\u{1F332}"}
+};
+
+const POI=[
+/* ============ WATER ============ */
+{id:"w1",kind:"water",name:"Lake Jennings",loc:"Lakeside, CA",lat:32.8747,lng:-116.8836,drive:"35 min",mi:"28 mi",cost:"~$25",season:"Trout Nov\u2013Apr, catfish summer",
+ lede:"The closest real fishing lake to your door. Stocked with trout in the cool months, catfish in summer, and it runs night fishing on summer weekends \u2014 which is a genuinely different experience.",
+ do:["<b>Shore fishing</b><span class='sm'>Easy access all around the lake. Permit at the entrance.</span>","<b>Rent a boat or bring the kayak</b><span class='sm'>Small motorboats and kayaks available on site.</span>","<b>Night fishing, summer Fri\u2013Sat</b><span class='sm'>Lit shoreline, catfish, almost nobody there.</span>","<b>Campground</b><span class='sm'>Real sites with hookups if you want to stay over 30 minutes from home.</span>"],
+ see:["<b>Dawn mist off the water</b><span class='sm'>East County mornings hold fog longer than you'd think.</span>","<b>Night-fishing lantern light</b><span class='sm'>Long exposures on the shoreline.</span>"],
+ logi:["Day-use + fishing permit at the gate. CA fishing license required.","Open Fri\u2013Mon plus holidays \u2014 check hours before driving.","Closest Superchargers are in Santee and El Cajon."],
+ note:"Your 'I want to fish after work' lake."},
+
+{id:"w2",kind:"water",name:"Lake Murray",loc:"San Diego, CA",lat:32.7856,lng:-117.0281,drive:"20 min",mi:"12 mi",cost:"free",season:"Year-round",
+ lede:"City-limits water inside Mission Trails. Not wild, but it's a 3-mile paved loop you can walk at sunrise and be back before anyone needs you.",
+ do:["<b>Walk or run the 3.2-mile loop</b><span class='sm'>Flat, paved, out-and-back along the shoreline.</span>","<b>Kayak or paddleboard</b><span class='sm'>Launch on the water most days \u2014 check the reservoir schedule.</span>","<b>Bass and bluegill fishing</b><span class='sm'>Shore access the whole way around.</span>"],
+ see:["<b>Sunrise over Cowles Mountain</b><span class='sm'>Reflected in flat morning water.</span>","<b>Bird life on the north end</b><span class='sm'>Herons, egrets, coots. Long lens.</span>"],
+ logi:["Free parking, gets full by 8am on weekends.","City of San Diego reservoir \u2014 boating days and hours vary seasonally.","No charging needed. It's 20 minutes."],
+ note:"The 'I have two hours' option."},
+
+{id:"w3",kind:"water",name:"Lake Miramar",loc:"Scripps Ranch, CA",lat:32.9147,lng:-117.0956,drive:"25 min",mi:"18 mi",cost:"free",season:"Year-round",
+ lede:"A quiet 5-mile loop reservoir with genuinely good bass fishing and almost no drama. Good place to test paddling gear before you drive anywhere far.",
+ do:["<b>Paddle the reservoir</b><span class='sm'>Rentals on site; your own kayak is allowed with an inspection.</span>","<b>Largemouth bass</b><span class='sm'>This lake has produced some very large fish.</span>","<b>Bike or walk the 5-mile loop</b><span class='sm'>Paved, rolling, quiet on weekdays.</span>"],
+ see:["<b>Eucalyptus reflections at dawn</b><span class='sm'>Still water, tall trees, no wind before 8am.</span>","<b>The dam overlook</b><span class='sm'>Clean geometry against the water.</span>"],
+ logi:["Free entry; fishing permit required on top of a CA license.","Closed some weekdays \u2014 verify the reservoir schedule.","Quagga mussel inspection for private boats."],
+ note:"Best close-to-home paddle."},
+
+{id:"w4",kind:"water",name:"Lake Poway",loc:"Poway, CA",lat:32.9861,lng:-117.0044,drive:"35 min",mi:"27 mi",cost:"~$30",season:"Trout Nov\u2013May",
+ lede:"Small mountain-feeling reservoir with rentals, a stocked trout program, and the Mount Woodson trail to Potato Chip Rock leaving from the same parking lot.",
+ do:["<b>Trout fishing, Nov\u2013May</b><span class='sm'>Regularly stocked. Rowboats, pedal boats and kayaks for rent.</span>","<b>Mount Woodson \u2192 Potato Chip Rock</b><span class='sm'>7 mi round trip, steep, the famous rock slab at the top.</span>","<b>Lake loop trail</b><span class='sm'>2.75 mi around the water, moderate.</span>"],
+ see:["<b>Potato Chip Rock</b><span class='sm'>Yes it's a clich\u00e9. Go at sunrise and it isn't.</span>","<b>Boulder fields on Mount Woodson</b><span class='sm'>Great graphic shapes in raking light.</span>"],
+ logi:["Non-resident parking fee on weekends.","No private boats \u2014 rentals only.","Start Woodson before 7am in warm months. No shade."],
+ note:"Fishing plus a real hike in one stop."},
+
+{id:"w5",kind:"water",name:"Lake Hodges",loc:"Escondido, CA",lat:33.0603,lng:-117.1114,drive:"40 min",mi:"32 mi",cost:"~$20",season:"Varies \u2014 verify",
+ lede:"Historically one of the best largemouth bass fisheries in the county, ringed by the Del Dios Highlands and crossed by a long pedestrian bridge. Access has been restricted on and off for dam-safety work, so this one always needs a phone call first.",
+ do:["<b>Bass fishing</b><span class='sm'>When it's open and the water is up, it's excellent.</span>","<b>Hodges pedestrian bridge</b><span class='sm'>Longest stress-ribbon bridge of its kind \u2014 walk it at sunset.</span>","<b>Bernardo Mountain summit</b><span class='sm'>7 mi round trip, big views back over the water.</span>"],
+ see:["<b>The bridge from below</b><span class='sm'>Clean lines, good at blue hour.</span>","<b>Water levels and dry shoreline</b><span class='sm'>Honest landscape \u2014 the drought story in one frame.</span>"],
+ logi:["<b>Check current access before driving.</b> Dam work has closed boating for long stretches.","Fishing permit plus CA license.","Bridge and trails stay open even when the water doesn't."],
+ note:"Call first. Rewarding when it's open."},
+
+{id:"w6",kind:"water",name:"El Capitan Reservoir",loc:"Lakeside, CA",lat:32.8836,lng:-116.8078,drive:"45 min",mi:"36 mi",cost:"~$25",season:"Spring best",
+ lede:"The biggest of the city reservoirs and the one that feels most like backcountry \u2014 steep chaparral walls, very few people, and big bass water.",
+ do:["<b>Bass and catfish</b><span class='sm'>Deep water, serious fish, bring a boat if you can.</span>","<b>Paddle the arms</b><span class='sm'>Long fingers of water with nobody in them on weekdays.</span>","<b>Water-ski / wakeboard days</b><span class='sm'>Scheduled seasonally \u2014 avoid those days if you want quiet.</span>"],
+ see:["<b>Steep chaparral shoreline at golden hour</b><span class='sm'>Warm rock, blue water, very little sign of people.</span>","<b>Storm light over the reservoir</b><span class='sm'>Winter fronts are dramatic here.</span>"],
+ logi:["Limited open days \u2014 verify the schedule before driving.","Long dirt approach road; take it slow in the Model Y.","No services. Bring everything."],
+ note:"The most remote-feeling water within an hour."},
+
+{id:"w7",kind:"water",name:"San Vicente Reservoir",loc:"Lakeside, CA",lat:32.9231,lng:-116.9231,drive:"40 min",mi:"33 mi",cost:"~$25",season:"Year-round",
+ lede:"Recently raised and reopened, with clear deep water and good structure. Splits its calendar between fishing days and water-sports days, so pick your weekend deliberately.",
+ do:["<b>Bass, crappie and catfish</b><span class='sm'>Newer water, healthy fishery.</span>","<b>Kayak the coves</b><span class='sm'>Steep sides, deep water, quiet arms.</span>","<b>Boat rentals</b><span class='sm'>Available on fishing days.</span>"],
+ see:["<b>Drowned shoreline geometry</b><span class='sm'>The raised dam left interesting edges.</span>","<b>Early light on the east arm</b><span class='sm'>Get on the water before the wind.</span>"],
+ logi:["Check whether it's a fishing day or a ski day before you go.","Fishing permit + CA license.","Quagga inspection for private boats."],
+ note:"Cleanest water of the East County reservoirs."},
+
+{id:"w8",kind:"water",name:"Lake Morena",loc:"Campo, CA",lat:32.6828,lng:-116.5142,drive:"1 hr 15",mi:"62 mi",cost:"~$60",season:"Spring &amp; Fall",
+ lede:"High, dry, and quiet at 3,000 ft near the Mexican border, with a county campground on the shore and the Pacific Crest Trail passing within a mile. Feels much further from the city than it is.",
+ do:["<b>Camp on the water</b><span class='sm'>County campground with real sites \u2014 cheap and rarely full midweek.</span>","<b>Bass fishing</b><span class='sm'>Historically a trophy bass lake when levels are up.</span>","<b>Walk a PCT section</b><span class='sm'>The trail runs right past. Northbound hikers come through in spring.</span>","<b>Stargaze</b><span class='sm'>Dark enough to matter, and only an hour out.</span>"],
+ see:["<b>Oak and granite shoreline</b><span class='sm'>High-desert-meets-chaparral edge.</span>","<b>Milky Way over the lake</b><span class='sm'>Genuinely dark sky for something this close.</span>"],
+ logi:["County park day-use and camping fees.","Water levels swing hard year to year \u2014 check before planning to fish.","Cold at night year-round. Charging is thin out here \u2014 arrive with margin."],
+ note:"Cheapest real overnight on the water."},
+
+{id:"w9",kind:"water",name:"Lake Skinner",loc:"Temecula, CA",lat:33.5836,lng:-117.0644,drive:"1 hr 20",mi:"72 mi",cost:"~$50",season:"Year-round",
+ lede:"Rolling grassland reservoir north of Temecula with a big campground, wildflowers in spring, and consistent striper and bass fishing. Also right in your Temecula expansion territory, which makes it an easy excuse.",
+ do:["<b>Striped bass and largemouth</b><span class='sm'>Boat rentals on site.</span>","<b>Camp or day-use</b><span class='sm'>Large county park with showers and easy access.</span>","<b>Spring wildflower walks</b><span class='sm'>The surrounding hills go green and gold March\u2013April.</span>"],
+ see:["<b>Rolling green hills in March</b><span class='sm'>Looks like nowhere else in Southern California for about four weeks.</span>","<b>Hot air balloons at dawn</b><span class='sm'>They launch out of Temecula and drift right over.</span>"],
+ logi:["Riverside County park fees.","No swimming or body contact \u2014 it's a drinking supply.","Superchargers in Temecula, 20 minutes away."],
+ note:"Pair with a Temecula business day."},
+
+{id:"w10",kind:"water",name:"Diamond Valley Lake",loc:"Hemet, CA",lat:33.6864,lng:-116.9822,drive:"1 hr 25",mi:"80 mi",cost:"~$40",season:"Oct\u2013May",
+ lede:"A huge man-made reservoir with startlingly blue water and a 22-mile perimeter trail. Big-water feeling without leaving Riverside County.",
+ do:["<b>Kayak or rent a boat</b><span class='sm'>Big open water \u2014 watch the afternoon wind.</span>","<b>Striper and bass fishing</b><span class='sm'>Deep, clear, productive.</span>","<b>Lakeview Trail</b><span class='sm'>Ride or hike part of the 22-mile loop above the water.</span>"],
+ see:["<b>The blue</b><span class='sm'>Water color here is unusual \u2014 shoot it from the trail above.</span>","<b>Dam faces</b><span class='sm'>Enormous scale, good with a person for reference.</span>"],
+ logi:["Day-use and launch fees.","Very exposed \u2014 hot and windy in summer. Go Oct\u2013May.","Superchargers in Hemet and Temecula."],
+ note:"Biggest open water in easy range."},
+
+{id:"w11",kind:"water",name:"Silverwood Lake",loc:"Hesperia, CA",lat:34.2867,lng:-117.3339,drive:"2 hrs",mi:"115 mi",cost:"~$60",season:"Spring\u2013Fall",
+ lede:"State recreation area at 3,350 ft in the San Bernardinos, right on the drive up toward the 395. Pines, swimming beaches, and the PCT crossing the north shore.",
+ do:["<b>Swim and paddle</b><span class='sm'>Designated swim beaches \u2014 rare for a reservoir.</span>","<b>Trout and bass fishing</b><span class='sm'>Stocked in the cool months.</span>","<b>PCT along the north shore</b><span class='sm'>Easy access to a genuinely pretty section.</span>","<b>Camp</b><span class='sm'>State park campground on the water.</span>"],
+ see:["<b>Pines meeting water</b><span class='sm'>Feels like the Sierra without the drive.</span>","<b>Bald eagles in winter</b><span class='sm'>They winter here too.</span>"],
+ logi:["State park day-use fee.","Gets busy on summer weekends \u2014 midweek is a different lake.","Superchargers in Hesperia and Victorville."],
+ note:"Good stop on the way to the 395."},
+
+{id:"w12",kind:"water",name:"Kern River",loc:"Kernville, CA",lat:35.7522,lng:-118.4400,drive:"4 hrs",mi:"240 mi",cost:"~$250",season:"May\u2013Aug for flow",
+ lede:"The best whitewater within a day's drive, running out of the southern Sierra through a granite canyon. Class II through Class V depending on the section and the snowpack.",
+ do:["<b>Guided whitewater raft trip</b><span class='sm'>Half-day Class III is the right first move. Outfitters all over Kernville.</span>","<b>Fly fish the upper Kern</b><span class='sm'>Wild trout water above Johnsondale.</span>","<b>Swim the calm sections</b><span class='sm'>Only where it's marked \u2014 this river kills people every year.</span>","<b>Camp along the canyon</b><span class='sm'>Forest Service sites right on the water.</span>"],
+ see:["<b>Whitewater from the canyon road</b><span class='sm'>Fast shutter for spray, slow for silk.</span>","<b>Granite canyon walls at golden hour</b><span class='sm'>Sierra rock without the Sierra crowds.</span>"],
+ logi:["<b>The Kern is genuinely dangerous.</b> Respect closures and never swim above rapids.","Flow depends entirely on snowpack \u2014 check before committing.","Charging in Lake Isabella and Bakersfield. Thin above Kernville."],
+ note:"Where kayaking stops being casual."},
+
+{id:"w13",kind:"water",name:"Owens River",loc:"Bishop, CA",lat:37.3300,lng:-118.4000,drive:"5 hrs 30",mi:"320 mi",cost:"add-on",season:"Apr\u2013Oct",
+ lede:"Slow, clear, spring-fed water winding through the Owens Valley under the Sierra crest. Legendary wild trout, and easy flatwater paddling with a 14,000-foot mountain wall as the backdrop.",
+ do:["<b>Fly fish the Upper Owens</b><span class='sm'>Wild browns and rainbows. One of California's classic stretches.</span>","<b>Paddle the meanders</b><span class='sm'>Flat, slow, no skill required. Just spectacular.</span>","<b>Soak in the Long Valley hot springs</b><span class='sm'>Free, primitive, best after dark.</span>"],
+ see:["<b>River bends with the Sierra behind</b><span class='sm'>Drone-less aerial feeling from any small rise.</span>","<b>Dawn mist on the water</b><span class='sm'>Cold nights, warm springs \u2014 fog most mornings.</span>"],
+ logi:["CA fishing license; some sections are catch-and-release with gear restrictions.","Pairs naturally with an Alabama Hills or Mammoth trip.","Superchargers at Lone Pine and Mammoth."],
+ note:"Add to any 395 trip."},
+
+{id:"w14",kind:"water",name:"Topock Gorge",loc:"Colorado River, AZ",lat:34.7239,lng:-114.4869,drive:"5 hrs",mi:"300 mi",cost:"~$150",season:"Oct\u2013May",
+ lede:"Sixteen miles of the Colorado River cutting through a desert canyon, reachable only by water, with bighorn sheep on the walls and petroglyphs down at the waterline. The single best paddle on this entire map.",
+ do:["<b>Kayak the full gorge</b><span class='sm'>Outfitters in Needles and Lake Havasu run one-way shuttles. Plan a full day.</span>","<b>Spot desert bighorn</b><span class='sm'>They come down to drink. Scan the rimrock constantly.</span>","<b>Find the petroglyphs</b><span class='sm'>Marked panels near the water. Look, photograph, never touch.</span>"],
+ see:["<b>Canyon walls from water level</b><span class='sm'>Morning light bouncing off red rock into green water.</span>","<b>Bighorn silhouettes on the rim</b><span class='sm'>Long lens, patient morning.</span>"],
+ logi:["It's a National Wildlife Refuge \u2014 no camping inside the gorge.","Wind picks up hard in the afternoon. Start at dawn.","Book the shuttle ahead in season. Superchargers in Lake Havasu City and Needles."],
+ note:"The best paddling day available to you."},
+
+/* ============ NATURE ============ */
+{id:"n1",kind:"nature",name:"Torrey Pines Reserve",loc:"La Jolla, CA",lat:32.9227,lng:-117.2514,drive:"20 min",mi:"18 mi",cost:"~$20",season:"Year-round",
+ lede:"Sandstone bluffs, the rarest pine in North America, and the Pacific 300 feet below. Twenty minutes from your door and it does not feel like San Diego.",
+ do:["<b>Razor Point &amp; Yucca Point trails</b><span class='sm'>Short loops out to the cliff edge.</span>","<b>Beach Trail down to the sand</b><span class='sm'>Descend to the beach and walk back along the water at low tide.</span>","<b>Guided nature walk</b><span class='sm'>Rangers run them on weekends and they're genuinely good.</span>"],
+ see:["<b>Eroded sandstone at Razor Point</b><span class='sm'>Best in low side light \u2014 early morning or late afternoon.</span>","<b>Flat Rock and the tide pools</b><span class='sm'>Check the tide chart before you go.</span>","<b>Torrey pines silhouetted at sunset</b><span class='sm'>Twisted trunks against orange water.</span>"],
+ logi:["Parking fee; the lot fills early on weekends \u2014 park up on the road and walk in.","No food, no drinks except water on the trails. They enforce it.","Stay on the trails; the bluffs are actively collapsing."],
+ note:"The 20-minute reset."},
+
+{id:"n2",kind:"nature",name:"Mission Trails",loc:"San Diego, CA",lat:32.8262,lng:-117.0428,drive:"15 min",mi:"11 mi",cost:"free",season:"Year-round",
+ lede:"Nearly 8,000 acres of chaparral, a river gorge and five summits inside the city limits. This is the one you can do before work.",
+ do:["<b>Cowles Mountain at sunrise</b><span class='sm'>Highest point in the city. 3 mi round trip, steep, worth it.</span>","<b>Oak Canyon &amp; the Old Mission Dam</b><span class='sm'>Shaded creek walk to a 1800s Spanish dam.</span>","<b>Climb at Mission Gorge</b><span class='sm'>Real rock, ten minutes from downtown.</span>","<b>Kumeyaay Lake &amp; campground</b><span class='sm'>You can legally camp inside San Diego here.</span>"],
+ see:["<b>Sunrise from Cowles</b><span class='sm'>Whole county, ocean to mountains, in one frame.</span>","<b>Oak Canyon after rain</b><span class='sm'>The creek actually runs. Rare and green.</span>","<b>Spring wildflowers on the north slopes</b><span class='sm'>March\u2013April.</span>"],
+ logi:["Free. Visitor center has maps and is worth ten minutes.","Cowles has zero shade \u2014 dawn or dusk only in summer.","Rattlesnakes are real here. Watch where you put your hands."],
+ note:"No excuse trip. It's fifteen minutes."},
+
+{id:"n3",kind:"nature",name:"Cuyamaca Rancho SP",loc:"Descanso, CA",lat:32.9425,lng:-116.5842,drive:"1 hr",mi:"48 mi",cost:"~$20",season:"Year-round",
+ lede:"Twenty-six thousand acres of oak, pine and meadow at 4,000\u20136,500 ft, still visibly regrowing from the 2003 Cedar Fire. Melancholy and beautiful in a way the coast never is.",
+ do:["<b>Stonewall Peak</b><span class='sm'>4 mi round trip up a stone staircase to a 360\u00b0 summit.</span>","<b>Cuyamaca Peak</b><span class='sm'>6,512 ft \u2014 the hard one, and the best view in the county.</span>","<b>Green Valley Falls</b><span class='sm'>Short walk to real running water after winter rain.</span>","<b>Camp at Paso Picacho</b><span class='sm'>Pines, cold nights, an hour from home.</span>"],
+ see:["<b>Burned snags against green regrowth</b><span class='sm'>The Cedar Fire story, twenty years on. Graphic and honest.</span>","<b>West Mesa meadows at golden hour</b><span class='sm'>Grass, black oaks, long light.</span>","<b>Snow on the peak in January</b><span class='sm'>It happens a few times a winter.</span>"],
+ logi:["State park day-use fee.","Snow closes the summit road occasionally in winter.","Pairs with Lake Cuyamaca and Julian in one loop."],
+ note:"The county's best forest, an hour out."},
+
+{id:"n4",kind:"nature",name:"Palomar Mountain SP",loc:"Palomar Mountain, CA",lat:33.3400,lng:-116.8900,drive:"1 hr 20",mi:"65 mi",cost:"~$20",season:"Spring\u2013Fall",
+ lede:"Cedar, fir and pine at 5,500 ft with a Sierra-like feel, plus the 200-inch Hale Telescope on the ridge above it. One of the quietest forests within easy reach.",
+ do:["<b>Doane Valley &amp; Weir trails</b><span class='sm'>Meadow, creek and big conifers in a short loop.</span>","<b>Palomar Observatory</b><span class='sm'>Free self-guided visit to a genuinely historic telescope.</span>","<b>Boucher Hill fire lookout</b><span class='sm'>Drive or walk up for a view clear to the ocean.</span>","<b>Camp at Doane Pond</b><span class='sm'>Trout pond, cold air, deep quiet.</span>"],
+ see:["<b>Doane Valley meadow at dawn</b><span class='sm'>Fog, deer, and long light through conifers.</span>","<b>The observatory dome</b><span class='sm'>White dome against blue \u2014 shoot it wide and tight.</span>","<b>Ocean view from Boucher Hill on a clear day</b><span class='sm'>You can see Catalina.</span>"],
+ logi:["State park day-use fee. Observatory is separate and free.","S6 up the mountain is a serious set of switchbacks \u2014 fun, but slow.","Snow closes roads occasionally in winter. No charging on the mountain."],
+ note:"Most underrated forest in the county."},
+
+{id:"n5",kind:"nature",name:"Mt San Jacinto SP",loc:"Idyllwild / Palm Springs, CA",lat:33.8145,lng:-116.6790,drive:"2 hrs",mi:"110 mi",cost:"~$40",season:"May\u2013Oct",
+ lede:"A true alpine wilderness at 10,834 ft that you can reach in ten minutes from the desert floor by tramway. John Muir called the view from the summit one of the most sublime in the world.",
+ do:["<b>Palm Springs Aerial Tramway</b><span class='sm'>Valley floor to 8,516 ft in ten minutes. Rotating cars.</span>","<b>Round Valley &amp; Wellman Divide</b><span class='sm'>Easy alpine walking straight off the tram.</span>","<b>San Jacinto Peak</b><span class='sm'>11 mi round trip from the tram \u2014 a real day, permit required.</span>","<b>Winter snowshoe</b><span class='sm'>Rent at the top station. Desert to snow in ten minutes.</span>"],
+ see:["<b>Coachella Valley from 8,500 ft</b><span class='sm'>Vertical relief you can't get anywhere else in California.</span>","<b>Granite and lodgepole at Round Valley</b><span class='sm'>Pure Sierra look, two hours from home.</span>","<b>Sunset from the tram deck</b><span class='sm'>Ride up late, shoot, ride down in the dark.</span>"],
+ logi:["Tram tickets \u2014 book ahead on weekends and holidays.","<b>Free wilderness permit</b> required for day hikes past the valley.","Altitude is real: 8,500 ft off an elevator. Take it slow the first hour."],
+ note:"The most dramatic elevation change in reach."},
+
+{id:"n6",kind:"nature",name:"San Bernardino NF",loc:"Big Bear / Idyllwild, CA",lat:34.2000,lng:-117.0000,drive:"2 hrs",mi:"120 mi",cost:"~$10",season:"Spring\u2013Fall",
+ lede:"Eight hundred thousand acres wrapping Big Bear and Lake Arrowhead, with the PCT running through it and some of the last big conifer forest before the desert.",
+ do:["<b>PCT sections near Big Bear</b><span class='sm'>Easy road access, drop in for a few hours.</span>","<b>Castle Rock &amp; Cougar Crest</b><span class='sm'>Short summits above Big Bear Lake.</span>","<b>Rim of the World Highway</b><span class='sm'>The drive itself \u2014 pullouts every few miles.</span>","<b>Heaps Peak Arboretum</b><span class='sm'>Short interpretive loop, good for a slow morning.</span>"],
+ see:["<b>Big Bear Lake from Castle Rock</b><span class='sm'>Elevated, mid-afternoon.</span>","<b>Rim of the World overlooks</b><span class='sm'>Inland Empire under haze, best at sunset.</span>","<b>Snow-loaded pines in winter</b><span class='sm'>Chains required, worth it.</span>"],
+ logi:["Adventure Pass required at most trailhead parking.","Chains enforced in winter storms.","Superchargers in Big Bear and Running Springs."],
+ note:"Closest big conifer forest."},
+
+{id:"n7",kind:"nature",name:"Angeles NF",loc:"La Ca\u00f1ada / Wrightwood, CA",lat:34.3000,lng:-118.0000,drive:"2 hrs 30",mi:"140 mi",cost:"~$10",season:"Spring\u2013Fall",
+ lede:"The San Gabriels rising straight out of Los Angeles \u2014 steep, dry, and surprisingly wild, with Mount Wilson Observatory on the crest and the Angeles Crest Highway running the spine.",
+ do:["<b>Drive the Angeles Crest Highway</b><span class='sm'>One of the great mountain roads in California. Two hours of pullouts.</span>","<b>Mount Wilson Observatory</b><span class='sm'>Historic 100-inch telescope, free grounds, weekend tours.</span>","<b>Mount Baldy</b><span class='sm'>10,064 ft \u2014 the big one. Serious day hike.</span>","<b>Switzer Falls</b><span class='sm'>Shaded canyon walk to a real waterfall.</span>"],
+ see:["<b>Inversion layer from the crest</b><span class='sm'>LA under a sea of cloud. Winter mornings.</span>","<b>Mount Wilson domes</b><span class='sm'>White against pine and sky.</span>","<b>Bighorn on the Baldy ridge</b><span class='sm'>They're up there.</span>"],
+ logi:["Adventure Pass for trailhead parking.","Angeles Crest closes for snow and fire regularly \u2014 check status.","Charging is thin on the crest. Fill up in La Ca\u00f1ada or Wrightwood."],
+ note:"Best mountain drive in Southern California."},
+
+{id:"n8",kind:"nature",name:"Trail of 100 Giants",loc:"Giant Sequoia NM, CA",lat:35.9200,lng:-118.5900,drive:"5 hrs 30",mi:"290 mi",cost:"~$300",season:"May\u2013Oct",
+ lede:"A grove of giant sequoias you can walk in half an hour, with none of the Sequoia National Park logistics. Trees up to 1,500 years old and 20 feet across, on a paved accessible loop.",
+ do:["<b>Walk the 1.3-mile grove loop</b><span class='sm'>Paved, flat, and completely disorienting in scale.</span>","<b>Camp at Redwood Meadow</b><span class='sm'>Right across the road from the grove.</span>","<b>Drive the Western Divide Highway</b><span class='sm'>Ridge road through the whole monument.</span>","<b>Detour to the Kern River</b><span class='sm'>An hour away \u2014 pair them.</span>"],
+ see:["<b>Looking straight up a sequoia trunk</b><span class='sm'>Widest lens you own, from the base.</span>","<b>Bark texture in side light</b><span class='sm'>Red, fibrous, unlike anything else.</span>","<b>The fallen giant</b><span class='sm'>Two trees came down in 2011 \u2014 the root plate is a photograph on its own.</span>"],
+ logi:["National Forest \u2014 no timed entry, no reservation, small fee.","Roads close with snow roughly Nov\u2013May.","Charging is thin. Come in from Bakersfield or Porterville with margin."],
+ note:"Easiest giant sequoias to actually reach."},
+
+{id:"n9",kind:"nature",name:"Sequoia & Kings Canyon",loc:"Three Rivers, CA",lat:36.4864,lng:-118.5658,drive:"6 hrs 30",mi:"350 mi",cost:"~$600",season:"May\u2013Oct",
+ lede:"The General Sherman Tree \u2014 the largest living thing on earth by volume \u2014 plus a canyon deeper than the Grand Canyon next door. The most humbling forest in California.",
+ do:["<b>General Sherman &amp; Congress Trail</b><span class='sm'>2 mi loop through the densest part of the Giant Forest.</span>","<b>Moro Rock</b><span class='sm'>350 stairs up a granite dome for a Great Western Divide view.</span>","<b>Crescent Meadow</b><span class='sm'>Muir called it the gem of the Sierra. Easy loop, bears often seen at dusk.</span>","<b>Kings Canyon Scenic Byway</b><span class='sm'>Drops 4,000 ft into the canyon. One of the best drives in America.</span>"],
+ see:["<b>Congress Trail in morning fog</b><span class='sm'>Light shafts between trunks. Arrive at opening.</span>","<b>Moro Rock at sunset</b><span class='sm'>Whole Sierra crest going pink.</span>","<b>Kings Canyon from Junction View</b><span class='sm'>The depth is impossible to convey \u2014 try anyway.</span>"],
+ logi:["Park entrance fee; America the Beautiful pass covers it.","Generals Highway is steep and winding \u2014 range drops fast climbing.","<b>Charging is genuinely thin.</b> Charge in Visalia/Three Rivers and plan the return.","Bear canisters required for backcountry. Never leave food in the car."],
+ note:"The biggest trees on earth."},
+
+{id:"n10",kind:"nature",name:"Inyo NF",loc:"Eastern Sierra, CA",lat:37.3500,lng:-118.5000,drive:"5 hrs 30",mi:"320 mi",cost:"~$300",season:"Jun\u2013Oct",
+ lede:"Two million acres running the length of the Eastern Sierra, from Mount Whitney to Mono Lake \u2014 and holding the Ancient Bristlecone Pine Forest, where trees have been alive for nearly 5,000 years.",
+ do:["<b>Ancient Bristlecone Pine Forest</b><span class='sm'>Schulman Grove at 10,000 ft. The oldest non-clonal living things on earth.</span>","<b>Whitney Portal</b><span class='sm'>Drive to 8,300 ft below the highest peak in the lower 48.</span>","<b>Little Lakes Valley, Rock Creek</b><span class='sm'>Alpine lakes with barely any elevation gain. Best easy Sierra hike there is.</span>","<b>Convict Lake loop</b><span class='sm'>3 flat miles, absurd scenery.</span>"],
+ see:["<b>Bristlecones at sunset</b><span class='sm'>Twisted 4,000-year-old wood against the White Mountains. Nothing else looks like this.</span>","<b>Milky Way from Schulman Grove</b><span class='sm'>10,000 ft, no light, ancient trees as foreground.</span>","<b>Little Lakes Valley in October</b><span class='sm'>Golden willow, blue lakes, white peaks.</span>"],
+ logi:["Bristlecone road is high and closes with snow \u2014 typically open late May to October.","10,000 ft with no acclimatization. Go slow and drink water.","Superchargers at Lone Pine, Bishop area and Mammoth. Nothing in the White Mountains."],
+ note:"5,000-year-old trees. Go once."},
+
+{id:"n11",kind:"nature",name:"Los Padres NF",loc:"Big Sur backcountry, CA",lat:36.1000,lng:-121.5000,drive:"6 hrs 30",mi:"370 mi",cost:"~$400",season:"Sep\u2013Nov",
+ lede:"The wild half of Big Sur \u2014 redwood canyons, chaparral ridges and hot springs behind the coast, where the Ventana Wilderness climbs straight out of the Pacific.",
+ do:["<b>Pfeiffer Falls &amp; Valley View</b><span class='sm'>Redwood canyon up to an ocean overlook.</span>","<b>Ewoldsen Trail</b><span class='sm'>Redwoods to ridge, one of the best short hikes on the coast.</span>","<b>Sykes Hot Springs area</b><span class='sm'>Long backcountry walk; check current access and fire closures.</span>","<b>Cone Peak road</b><span class='sm'>Steepest coastal rise in the lower 48 \u2014 5,000 ft in three miles from the ocean.</span>"],
+ see:["<b>Redwoods in coastal fog</b><span class='sm'>Morning, always. Fog is the subject here, not the problem.</span>","<b>Cone Peak looking down at the Pacific</b><span class='sm'>Vertical scale that doesn't photograph easily \u2014 include a road for reference.</span>","<b>Condors on the ridges</b><span class='sm'>Reintroduced here. Wingspan you can't mistake.</span>"],
+ logi:["<b>Fire closures are frequent.</b> Check Forest Service status before every trip.","Highway 1 slides can cut access entirely \u2014 verify the route.","Almost no charging and no cell service inside the corridor."],
+ note:"The Big Sur nobody photographs."},
+
+{id:"n12",kind:"nature",name:"Yosemite NP",loc:"Yosemite Valley, CA",lat:37.8651,lng:-119.5383,drive:"8 hrs",mi:"440 mi",cost:"~$800",season:"May\u2013Oct",
+ lede:"You know what it is. Worth listing because from Mammoth it's only two hours over Tioga Pass \u2014 which makes it an extension of the 395 trip rather than a separate expedition.",
+ do:["<b>Tuolumne Meadows</b><span class='sm'>The high country. Emptier, higher and arguably better than the valley.</span>","<b>Mist Trail to Vernal Fall</b><span class='sm'>Wet, crowded, unforgettable. Go at dawn.</span>","<b>Glacier Point</b><span class='sm'>Drive-up view of Half Dome and the whole valley.</span>","<b>Sentinel Dome &amp; Taft Point</b><span class='sm'>Short walks, enormous payoff, far fewer people.</span>"],
+ see:["<b>Tunnel View at sunrise</b><span class='sm'>The classic. Still worth it if you're there before the buses.</span>","<b>Taft Point fissures</b><span class='sm'>Cracks dropping 3,000 ft. Vertigo in a photograph.</span>","<b>Tuolumne Meadows at golden hour</b><span class='sm'>Granite domes, river bends, no crowds.</span>","<b>Horsetail Fall in late February</b><span class='sm'>Firefall. Reservation required, and it needs everything to line up.</span>"],
+ logi:["<b>Peak-season entry reservations</b> are required \u2014 check the current system months ahead.","Tioga Pass from Mammoth is closed by snow roughly Nov\u2013May.","Level 2 charging in the valley; Superchargers in Oakhurst, Mariposa and Groveland."],
+ note:"Two hours past Mammoth. Extend the 395 trip."}
+];
+
 const CH=[
  ["Lone Pine","6 stalls at the Film History Museum. Small — arrive with margin.",36.5936,-118.0619],
  ["Mammoth Lakes","8 pull-through stalls. Best charging in the Eastern Sierra.",37.6485,-118.9721],
@@ -645,9 +854,22 @@ const RT=[
 const map=L.map('map',{zoomControl:false,maxZoom:17,minZoom:4,zoomAnimation:true})
   .setView([35.3,-116.6],6);
 L.control.zoom({position:'topright'}).addTo(map);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-  attribution:'&copy; OpenStreetMap &copy; CARTO &middot; Photos: Wikimedia Commons',
-  maxZoom:19,subdomains:'abcd'}).addTo(map);
+const BASE={
+ dark:L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+   {attribution:'&copy; OpenStreetMap &copy; CARTO &middot; Photos: Wikimedia Commons',maxZoom:19,subdomains:'abcd'}),
+ terrain:L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+   {attribution:'&copy; OpenTopoMap &copy; OpenStreetMap contributors',maxZoom:17,subdomains:'abc'}),
+ satellite:L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+   {attribution:'Imagery &copy; Esri',maxZoom:18})
+};
+let curBase='dark'; BASE.dark.addTo(map);
+function setBase(k){
+  if(k===curBase) return;
+  map.removeLayer(BASE[curBase]); BASE[k].addTo(map); curBase=k;
+  document.body.classList.toggle('lightbase',k!=='dark');
+  [...document.querySelectorAll('#seg button')].forEach(b=>b.classList.toggle('on',b.dataset.b===k));
+  Object.values(BASE).forEach(l=>l.bringToBack&&l.bringToBack());
+}
 
 const vis=JSON.parse(localStorage.getItem('gio_trips_visited')||'{}');
 const mk={},layers={},chL=L.layerGroup(),rtL=L.layerGroup();
@@ -669,6 +891,15 @@ P.forEach(p=>{
     .on('click',()=>openP(p));
   mk[p.id]=m; m.addTo(layers[p.tier]);
 });
+const poiL={water:L.layerGroup(),nature:L.layerGroup()};
+POI.forEach(p=>{
+  const K=KINDS[p.kind];
+  L.marker([p.lat,p.lng],{riseOnHover:true,icon:L.divIcon({className:'',iconSize:[26,32],iconAnchor:[13,30],
+    html:`<div class="pinwrap sm" style="--c:${K.c};--c2:${K.c2}"><div class="pin"><i></i></div></div>`})})
+   .bindTooltip(p.name,{direction:'top',offset:[0,-28]})
+   .on('click',()=>openP(p)).addTo(poiL[p.kind]);
+});
+
 CH.forEach(c=>L.marker([c[2],c[3]],{icon:L.divIcon({className:'',iconSize:[18,18],
   iconAnchor:[9,9],html:'<div class="cpin">&#9889;</div>'})})
   .bindTooltip(`<b>${c[0]}</b><br>${c[1]}`,{direction:'top',offset:[0,-11]}).addTo(chL));
@@ -679,26 +910,38 @@ RT.forEach(r=>{
 });
 
 /* ---------- chips ---------- */
-const cd=[["0","The Test"],["1","Overnights"],["2","Weekends"],["3","The Week"],["4","Two Weeks+"],["c","Chargers"],["r","Routes"]];
-const ce=document.getElementById('chips');
-cd.forEach(([k,l])=>{
+function mkChip(host,k,label,count,on,fn){
   const b=document.createElement('button');
-  b.className='chip'+((k==='c'||k==='r')?'':' on'); b.dataset.t=k;
-  const n=k.match(/\d/)?P.filter(p=>p.tier==+k).length:'';
-  b.innerHTML=`<span class="dot"></span>${l}${n?' '+n:''}`;
-  b.onclick=()=>{
-    b.classList.toggle('on'); const on=b.classList.contains('on');
-    if(k==='c') on?chL.addTo(map):map.removeLayer(chL);
-    else if(k==='r'){on?rtL.addTo(map):map.removeLayer(rtL);
-      document.getElementById('routeBtn').classList.toggle('on',on);}
-    else on?layers[k].addTo(map):map.removeLayer(layers[k]);
-  };
-  ce.appendChild(b);
+  b.className='chip'+(on?' on':''); b.dataset.t=k;
+  b.innerHTML=`<span class="dot"></span>${label}${count?' '+count:''}`;
+  b.onclick=()=>{b.classList.toggle('on');fn(b.classList.contains('on'));};
+  host.appendChild(b); return b;
+}
+const ce=document.getElementById('chips'), ce2=document.getElementById('chips2');
+[["0","The Test"],["1","Overnights"],["2","Weekends"],["3","The Week"],["4","Two Weeks+"]]
+ .forEach(([k,l])=>mkChip(ce,k,l,P.filter(p=>p.tier==+k).length,true,
+   on=>on?layers[k].addTo(map):map.removeLayer(layers[k])));
+
+mkChip(ce2,'w','Lakes & Rivers',POI.filter(p=>p.kind==='water').length,false,
+  on=>on?poiL.water.addTo(map):map.removeLayer(poiL.water));
+mkChip(ce2,'n','Forests & Parks',POI.filter(p=>p.kind==='nature').length,false,
+  on=>on?poiL.nature.addTo(map):map.removeLayer(poiL.nature));
+mkChip(ce2,'c','Chargers',CH.length,false,
+  on=>on?chL.addTo(map):map.removeLayer(chL));
+mkChip(ce2,'r','Routes','',false,on=>{
+  on?rtL.addTo(map):map.removeLayer(rtL);
+  document.getElementById('routeBtn').classList.toggle('on',on);});
+
+const seg=document.getElementById('seg');
+[["dark","Dark"],["terrain","Terrain"],["satellite","Satellite"]].forEach(([k,l])=>{
+  const b=document.createElement('button'); b.dataset.b=k; b.textContent=l;
+  if(k==='dark') b.classList.add('on');
+  b.onclick=()=>setBase(k); seg.appendChild(b);
 });
 document.getElementById('routeBtn').onclick=function(){
   const on=!this.classList.contains('on');
   this.classList.toggle('on',on);
-  document.querySelector('.chip[data-t="r"]').classList.toggle('on',on);
+  const rc=document.querySelector('.chip[data-t="r"]'); if(rc) rc.classList.toggle('on',on);
   on?rtL.addTo(map):map.removeLayer(rtL);
 };
 document.getElementById('homeBtn').onclick=()=>{map.setView([35.3,-116.6],6);close_();};
@@ -710,12 +953,22 @@ const sheet=document.getElementById('sheet'),hero=document.getElementById('hero'
 let cur=null;
 
 function openP(p){
-  cur=p; const T=TIERS[p.tier];
+  cur=p;
+  const isPOI = p.tier===undefined;
+  const T = isPOI ? KINDS[p.kind] : TIERS[p.tier];
   sheet.style.setProperty('--ac',T.c);
+  hero.classList.toggle('compact',isPOI);
 
-  hero.querySelectorAll('.slide').forEach(n=>n.remove());
+  hero.querySelectorAll('.slide,.glyph').forEach(n=>n.remove());
   rail.innerHTML='';
-  p.imgs.forEach((im,i)=>{
+  const imgs = p.imgs || [];
+  if(!imgs.length){
+    const g=document.createElement('div');
+    g.className='glyph'; g.textContent=T.g||'';
+    g.style.background=`linear-gradient(150deg,${T.c}44,${T.c2}22,#221C18)`;
+    hero.insertBefore(g,hero.firstChild);
+  }
+  imgs.forEach((im,i)=>{
     const d=document.createElement('div');
     d.className='slide'+(i===0?' on':'');
     d.innerHTML=`<img src="${im[0]}" alt="${im[1]}">`;
@@ -732,12 +985,14 @@ function openP(p){
       rail.appendChild(t);
     }
   });
-  rail.style.display=p.imgs.length>1?'flex':'none';
-  shot.textContent=p.imgs[0][1];
+  rail.style.display=imgs.length>1?'flex':'none';
+  shot.style.display=imgs.length?'block':'none';
+  if(imgs.length) shot.textContent=imgs[0][1];
   document.getElementById('hName').textContent=p.name;
   document.getElementById('hLoc').textContent=p.loc;
 
   const seen=!!vis[p.id];
+  const costRow = p.cost?`<div class="fact"><div class="k">Rough cost</div><div class="v">${p.cost}</div></div>`:'';
   body.innerHTML=`
    <div class="badges">
      <span class="bdg tier" style="background:${T.c}">${T.n}</span>
@@ -746,7 +1001,7 @@ function openP(p){
    <div class="facts">
      <div class="fact"><div class="k">Drive</div><div class="v">${p.drive}</div></div>
      <div class="fact"><div class="k">Distance</div><div class="v">${p.mi}</div></div>
-     <div class="fact"><div class="k">Rough cost</div><div class="v">${p.cost}</div></div>
+     ${costRow}
      <div class="fact"><div class="k">Spots</div><div class="v">${p.do.length + p.see.length}</div></div>
      <div class="fact wide"><div class="k">What unlocks it</div><div class="v">${T.gate}</div></div>
    </div>
@@ -770,7 +1025,8 @@ function openP(p){
   document.getElementById('vb').onclick=()=>{
     vis[p.id]?delete vis[p.id]:vis[p.id]=1;
     localStorage.setItem('gio_trips_visited',JSON.stringify(vis));
-    mk[p.id].setIcon(pin(p.tier,!!vis[p.id])); prog(); openP(p);
+    if(mk[p.id]) mk[p.id].setIcon(pin(p.tier,!!vis[p.id]));
+    prog(); openP(p);
   };
   body.scrollTop=0;
   sheet.classList.add('open');
@@ -790,7 +1046,8 @@ sheet.addEventListener('touchend',e=>{if(sy===null)return;
 
 /* ---------- progress ---------- */
 function prog(){
-  const n=Object.keys(vis).length,t=P.length;
+  const ids=P.map(x=>x.id);
+  const n=Object.keys(vis).filter(k=>ids.includes(k)).length, t=P.length;
   document.getElementById('pbar').style.width=(n/t*100)+'%';
   document.getElementById('ptxt').innerHTML = n===0
     ? `<b>0</b> of ${t} visited &mdash; start with Idyllwild`
