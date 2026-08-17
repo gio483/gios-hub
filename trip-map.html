@@ -981,11 +981,15 @@ async function drawRoute(p){
   return r;
 }
 function stopsAlong(r,p){
+  const total=r.coords.length;
   const chargers=CH.map(c=>({name:c[0],note:c[1],ll:[c[2],c[3]]}))
     .map(c=>({...c,...nearRoute(c.ll,r.coords)}))
-    .filter(c=>c.km<26).sort((a,b)=>a.at-b.at);
+    .filter(c=>c.km<40).sort((a,b)=>a.at-b.at);
   const spots=POI.map(x=>({p:x,...nearRoute([x.lat,x.lng],r.coords)}))
-    .filter(x=>x.km<45 && x.p.id!==p.id).sort((a,b)=>a.at-b.at);
+    .filter(x=>x.km<45 && x.p.id!==p.id
+              && R2D([x.p.lat,x.p.lng],HOME)>65
+              && x.at>total*0.06)
+    .sort((a,b)=>a.at-b.at);
   return {chargers,spots};
 }
 
