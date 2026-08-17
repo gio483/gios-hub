@@ -229,6 +229,14 @@ details.reg[open] summary::after{content:"\2013"}
 details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(--ink2)}
 .crumb{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 7px}
 
+ol.steps{margin:11px 0 0;padding:0;list-style:none;counter-reset:st}
+ol.steps li{counter-increment:st;display:grid;grid-template-columns:26px 1fr;gap:11px;padding:10px 0;border-bottom:1px solid var(--line2)}
+ol.steps li:last-child{border-bottom:0}
+ol.steps li::before{content:counter(st);font-family:var(--f-mono);font-size:.74rem;font-weight:600;color:#fff;background:var(--ink);
+  width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;grid-row:span 2}
+ol.steps li b{font-family:var(--f-head);font-size:1rem}
+ol.steps li span{font-size:.9rem;color:var(--muted);line-height:1.45;grid-column:2}
+
 /* ---------- tab bar ---------- */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--paper2);border-top:2px solid var(--ink);
   padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 14px rgba(29,27,23,.08)}
@@ -283,6 +291,16 @@ details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(
       <div class="btnrow" style="margin-top:14px"><button class="btn mag" id="btnContinue">Start lesson 1</button></div>
       <p class="note">Read a lesson and its material joins your review queue, so the daily drill only tests what you have actually covered.</p>
     </div>
+    <div class="card" id="howCard">
+      <p class="eyebrow">How this works</p>
+      <h3>Three steps, in this order</h3>
+      <ol class="steps">
+        <li><b>Learn</b><span>Read a lesson here. Plain English first, then the exact rule and the numbers, then the regulation itself if you want it. Two or three minutes each.</span></li>
+        <li><b>Get checked</b><span>Each lesson ends with a few questions on what you just read. Pass and the material joins your review queue.</span></li>
+        <li><b>Drill and test</b><span>The Drill tab brings that material back on a spaced schedule so it sticks. The Mock tab is the full 60 question exam, for when you are most of the way through the course.</span></li>
+      </ol>
+      <p class="note">The Drill and Mock tabs will not throw material at you that the course has not taught you yet.</p>
+    </div>
     <div id="moduleList"></div>
   </div>
   <div id="lessonView" style="display:none"></div>
@@ -291,7 +309,16 @@ details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(
 <!-- ============ DAILY DRILL ============ -->
 <section class="view" id="v-sortie" aria-labelledby="h-sortie">
   <div id="sortieHome">
-    <div class="card">
+    <div class="card" id="drillGate" style="display:none">
+      <p class="eyebrow">Not yet</p>
+      <h2>The drill tests what you have learned</h2>
+      <p class="lede">You have not read a lesson yet, so there is nothing here to review. Drilling questions you were never taught is just guessing, and it is the fastest way to feel like this test is impossible.</p>
+      <p class="lede" style="margin-top:9px">Read one lesson. It takes about three minutes. Then this tab will have something worth asking you.</p>
+      <div class="btnrow" style="margin-top:14px"><button class="btn mag" id="btnGateToCourse">Go to the course</button></div>
+      <div class="btnrow" style="margin-top:9px"><button class="btn ghost sm" id="btnGateAnyway" style="flex:1">Let me drill the whole bank anyway</button></div>
+    </div>
+
+    <div class="card" id="drillMain">
       <p class="eyebrow">Today</p>
       <h2 id="h-sortie">Daily session</h2>
       <p class="lede" id="sortieLede">22 items. About 18 minutes. Rapid recall cards mixed with exam style questions, drawn from what you are due to review.</p>
@@ -309,14 +336,14 @@ details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="boxCard">
       <p class="eyebrow">Review queue</p>
       <h3>Leitner boxes</h3>
       <p class="lede">A miss drops an item to box 1. Boxes come back after 1, 2, 4, 9 and 18 days.</p>
       <div id="boxRows" style="margin-top:11px"></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="heatCard">
       <p class="eyebrow">Last 14 days</p>
       <h3>Consistency</h3>
       <div id="heat" style="display:flex;gap:4px;margin-top:11px"></div>
@@ -392,6 +419,7 @@ details.reg .txt{padding:0 13px 13px;font-size:.9rem;line-height:1.55;color:var(
       <p class="eyebrow">Mock exam</p>
       <h2 id="h-mock">60 questions, 120 minutes</h2>
       <p class="lede">Blueprint weighted, three options each, 42 correct to pass. Everything you miss goes back into box 1 of the review queue.</p>
+      <div class="warnbox" id="mockWarn" style="display:none"></div>
       <div id="mockMix" style="margin-top:12px"></div>
       <div class="btnrow" style="margin-top:14px"><button class="btn mag" id="btnStartMock">Begin mock exam</button></div>
       <p class="note">The real test also contains 5 unscored validation questions that do not count either way, so you will see 65 on screen at a PSI centre.</p>
@@ -2419,11 +2447,17 @@ function unlockedIds(){
    of the course that the distinction stops mattering. */
 function activePool(){
   if(S.wholePool) return null;
-  var u = unlockedIds();
-  if(!u) return null;
-  var n = 0; for(var k in u) n++;
-  return n >= 30 ? u : null;
+  return unlockedIds();          /* null only when the user has opted into the whole bank */
 }
+function poolCount(){
+  var u = activePool();
+  if(!u) return Object.keys(ITEMS).length;
+  var n = 0; for(var k in u) n++;
+  return n;
+}
+/* A drill you cannot pass teaches nothing. Until the first lesson is read there is
+   nothing to review, so the drill sends you to the course instead. */
+function drillLocked(){ return lessonsRead() === 0 && !S.wholePool; }
 function boxOf(id){ return (S.boxes[id] && S.boxes[id].box) || 0; }
 function dueOn(id){ return S.boxes[id] && S.boxes[id].due; }
 function isDue(id){ var b = S.boxes[id]; if(!b) return false; return b.due <= todayStr(); }
@@ -2579,6 +2613,7 @@ var lesRun = null;
 
 function paintLearnHome(){
   var read = lessonsRead(), done = lessonsDone(), tot = LESSONS.length;
+  $('howCard').style.display = read ? 'none' : '';
   var pct = Math.round(100 * done / tot);
   $('coursePct').textContent = pct + '%';
   $('courseBar').style.width = pct + '%';
@@ -2830,19 +2865,24 @@ function paintSortieHome(){
   for(var id in ITEMS){ if(isDue(id)) dueCount++; }
   $('sortieLede').textContent = doneToday
     ? 'Today is logged. ' + S.days[t].n + ' items, ' + Math.round(100 * S.days[t].right / Math.max(1, S.days[t].n)) + ' percent. Run another session if you have the time.'
-    : SORTIE_SIZE + ' items. About 18 minutes. ' + (dueCount ? dueCount + ' items are due for review and will come first.' : 'Nothing is due yet, so this session is all new ground.');
+    : Math.min(SORTIE_SIZE, poolCount()) + ' items. ' + (dueCount ? dueCount + ' due for review, which come first.' : 'Nothing is due yet, so this is a first pass over what you have read.');
   $('btnStartSortie').textContent = doneToday ? 'Run another session' : 'Start today\u2019s session';
   var marks = [];
   $('sortiePreview').innerHTML = progHTML(SORTIE_SIZE, marks, -1);
 
-  var pool = activePool(), pooled = 0;
-  if(pool){ for(var pk in pool) pooled++; }
-  $('poolNote').textContent = pool
-    ? 'Drawing only from the ' + lessonsRead() + ' lessons you have read, which is ' + pooled + ' items.'
-    : (S.wholePool ? 'Drawing from the whole bank, including material you have not read yet.'
-                   : 'Read a few lessons on the Learn tab and this session will narrow to what you have covered.');
+  var locked = drillLocked();
+  $('drillGate').style.display = locked ? '' : 'none';
+  $('drillMain').style.display = locked ? 'none' : '';
+  $('boxCard').style.display = locked ? 'none' : '';
+  $('heatCard').style.display = locked ? 'none' : '';
+  if(locked) return;
+
+  var pooled = poolCount();
+  $('poolNote').textContent = S.wholePool
+    ? 'Drawing from the whole bank, including material the course has not taught you yet.'
+    : 'Drawing only from the ' + lessonsRead() + ' lesson' + (lessonsRead() === 1 ? '' : 's') +
+      ' you have read, which is ' + pooled + ' item' + (pooled === 1 ? '' : 's') + '.';
   $('btnPoolToggle').textContent = S.wholePool ? 'Only test what I have read' : 'Include material I have not read';
-  $('btnPoolToggle').style.display = (unlockedIds() ? '' : 'none');
 
   var rows = '';
   for(var b = 1; b <= 5; b++){
@@ -3047,6 +3087,16 @@ function paintMockHome(){
          (AREAS[a].mock === 1 ? ' question, ' : ' questions, ') + AREAS[a].pct + '%</span></div>';
   }
   $('mockMix').innerHTML = h;
+  var done = lessonsDone(), tot = LESSONS.length;
+  if(done < 25){
+    $('mockWarn').style.display = '';
+    $('mockWarn').innerHTML = '<b>You are ' + done + ' lessons into ' + tot + '</b><p>' +
+      (done === 0
+        ? 'A mock exam right now will test 60 questions the course has not taught you yet, so a low score tells you nothing except that you have not started. Work through the Learn tab first.'
+        : 'Most of these 60 questions cover material the course has not reached with you yet. Useful as a baseline, but do not read the score as a verdict.') + '</p>';
+  } else {
+    $('mockWarn').style.display = 'none';
+  }
   if(S.mocks.length){
     $('mockHistoryCard').style.display = '';
     var hh = '';
@@ -3230,12 +3280,23 @@ function boot(){
   $('btnContinue').onclick = function(){ var n = nextLesson(); if(n) openLesson(n.id); };
   $('btnPoolToggle').onclick = function(){ S.wholePool = !S.wholePool; save(); paintSortieHome(); };
   $('btnStartSortie').onclick = function(){
-    var cards = drawItems(SORTIE_CARDS, 'c', false);
-    var qs = drawItems(SORTIE_SIZE - cards.length, 'q', false);
-    startRun(shuffle(cards.concat(qs)), 'Daily session');
+    var size = Math.min(SORTIE_SIZE, poolCount());
+    var cards = drawItems(Math.min(SORTIE_CARDS, Math.floor(size / 3)), 'c', false);
+    var qs = drawItems(size - cards.length, 'q', false);
+    var set = shuffle(cards.concat(qs));
+    if(!set.length) return;
+    startRun(set, 'Daily session');
   };
-  $('btnFreeDrill').onclick = function(){ startRun(drawItems(10, 'q', false), 'Extra drill'); };
-  $('btnWeakDrill').onclick  = function(){ startRun(drawItems(12, null, true), 'Weak area drill'); };
+  $('btnFreeDrill').onclick = function(){
+    var set = drawItems(Math.min(10, poolCount()), 'q', false);
+    if(set.length) startRun(set, 'Extra drill');
+  };
+  $('btnWeakDrill').onclick  = function(){
+    var set = drawItems(Math.min(12, poolCount()), null, true);
+    if(set.length) startRun(set, 'Weak area drill');
+  };
+  $('btnGateToCourse').onclick = function(){ showView('learn'); };
+  $('btnGateAnyway').onclick = function(){ S.wholePool = true; save(); paintSortieHome(); };
   $('btnQuitRun').onclick = function(){ $('sortieRun').style.display = 'none'; $('sortieHome').style.display = ''; paintSortieHome(); };
   $('btnChartSet').onclick = function(){ startChart(6); };
   $('btnChartOne').onclick = function(){ startChart(1); };
