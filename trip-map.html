@@ -85,7 +85,7 @@ header{position:absolute;top:0;left:0;right:0;z-index:1000;pointer-events:none;
 .chip[data-t="w"]{color:#3FA9D6} .chip[data-t="w"].on{background:#3FA9D6;color:#151210}
 .chip[data-t="n"]{color:#52A86B} .chip[data-t="n"].on{background:#52A86B;color:#151210}
 .chip[data-t="c"]{color:var(--chg)} .chip[data-t="c"].on{background:var(--chg);color:#151210}
-.chip[data-t="r"]{color:#B0A296} .chip[data-t="r"].on{background:#B0A296;color:#151210}
+.chip[data-t="water"]{color:#4FA8D8} .chip[data-t="water"].on{background:#4FA8D8;color:#151210}
 
 /* ============ pins ============ */
 .pinwrap{position:relative;width:34px;height:42px}
@@ -189,6 +189,15 @@ ul.lst li .sm{display:block;font-size:11.5px;color:var(--mut);margin-top:1px;lin
 .note{margin-top:18px;padding:12px 14px;border-radius:14px;font-size:12.5px;font-weight:650;
   line-height:1.55;border:1px solid var(--line2);position:relative;overflow:hidden}
 .note::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac)}
+.stop{display:flex;gap:9px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--line);
+  cursor:pointer;transition:.15s}
+.stop:last-child{border-bottom:none}
+.stop:hover{opacity:.75}
+.stop .pip{width:9px;height:9px;border-radius:50%;flex:0 0 auto;margin-top:4px}
+.stop .sn{font-size:12.5px;font-weight:700;color:var(--txt);line-height:1.35}
+.stop .sd{font-size:11px;color:var(--mut);margin-top:1px;line-height:1.4}
+.stop .mi{margin-left:auto;font-size:10.5px;font-weight:750;color:var(--mut2);white-space:nowrap;padding-top:2px}
+.loading{font-size:11.5px;color:var(--mut2);padding:6px 0;font-weight:600}
 .acts{display:flex;gap:9px;margin-top:16px}
 .btn{flex:1;text-align:center;text-decoration:none;font-size:12.5px;font-weight:750;padding:13px 8px;
   border-radius:14px;border:1px solid var(--line2);background:var(--panel2);color:var(--txt);
@@ -226,16 +235,16 @@ ul.lst li .sm{display:block;font-size:11.5px;color:var(--mut);margin-top:1px;lin
   <div class="progtxt" id="ptxt"></div>
   <div class="rowlbl">Trips by tier</div>
   <div class="chips" id="chips"></div>
-  <div class="rowlbl">Map layers</div>
+  <div class="rowlbl">Overlay</div>
   <div class="chips" id="chips2"></div>
   <div class="seg" id="seg"></div>
 </div></header>
 
 <div id="fab">
-  <button class="fbtn" id="routeBtn" title="Routes">&#8599;</button>
+  <button class="fbtn" id="routeBtn" title="Clear route">&#10005;</button>
   <button class="fbtn" id="homeBtn" title="Reset view">&#9678;</button>
 </div>
-<div id="tip">Drag to pan &middot; pinch to zoom &middot; tap a pin for activities, photo spots and charging.</div>
+<div id="tip">Tap a pin &mdash; it draws the real driving route from your house and lists the chargers and stops along it.</div>
 
 <div id="sheet">
   <div class="grab"><i></i></div>
@@ -846,11 +855,10 @@ const CH=[
  ["Palm Springs","Dense charging. Covers Idyllwild and La Quinta.",33.8303,-116.5453]
 ];
 
-const RT=[
- ["395 Run — San Diego to Alabama Hills","#EE7A45",[[32.7157,-117.1611],[33.4936,-117.1489],[34.1083,-117.2898],[34.5362,-117.2928],[35.0058,-117.6503],[35.7683,-117.6539],[36.2872,-117.9520],[36.6058,-118.1200]]],
- ["Utah Loop — San Diego to Zion","#7D8CE8",[[32.7157,-117.1611],[33.9425,-117.2297],[34.8958,-117.0173],[35.2686,-116.0764],[36.1699,-115.1398],[37.0965,-113.5684],[37.2545,-113.2843],[37.2982,-113.0263]]],
- ["Desert Runs","#4FB98A",[[32.7157,-117.1611],[32.9917,-116.5786],[33.0786,-116.6019],[33.2558,-116.3750],[33.3506,-115.7292]]]
-];
+const HOME=[32.7157,-117.1611];
+const routeCache={};
+let routeLine=null, routePins=L.layerGroup();
+
 
 /* ---------- map ---------- */
 const map=L.map('map',{zoomControl:false,maxZoom:17,minZoom:4,zoomAnimation:true})
@@ -874,7 +882,7 @@ function setBase(k){
 }
 
 const vis=JSON.parse(localStorage.getItem('gio_trips_visited')||'{}');
-const mk={},layers={},chL=L.layerGroup(),rtL=L.layerGroup();
+const mk={},layers={},chL=L.layerGroup(),waterL=L.layerGroup();
 [0,1,2,3,4].forEach(t=>layers[t]=L.layerGroup().addTo(map));
 
 function pin(t,visited){
@@ -893,23 +901,24 @@ P.forEach(p=>{
     .on('click',()=>openP(p));
   mk[p.id]=m; m.addTo(layers[p.tier]);
 });
-const poiL={water:L.layerGroup(),nature:L.layerGroup()};
-POI.forEach(p=>{
-  const K=KINDS[p.kind];
-  L.marker([p.lat,p.lng],{riseOnHover:true,icon:L.divIcon({className:'',iconSize:[26,32],iconAnchor:[13,30],
-    html:`<div class="pinwrap sm" style="--c:${K.c};--c2:${K.c2}"><div class="pin"><i></i></div></div>`})})
-   .bindTooltip(p.name,{direction:'top',offset:[0,-28]})
-   .on('click',()=>openP(p)).addTo(poiL[p.kind]);
-});
+/* POI + chargers are no longer pinned to the map — they surface as stops on the drawn route */
+routePins.addTo(map);
 
-CH.forEach(c=>L.marker([c[2],c[3]],{icon:L.divIcon({className:'',iconSize:[18,18],
-  iconAnchor:[9,9],html:'<div class="cpin">&#9889;</div>'})})
-  .bindTooltip(`<b>${c[0]}</b><br>${c[1]}`,{direction:'top',offset:[0,-11]}).addTo(chL));
-RT.forEach(r=>{
-  L.polyline(r[2],{color:r[1],weight:6,opacity:.13,lineCap:'round'}).addTo(rtL);
-  L.polyline(r[2],{color:r[1],weight:2.5,opacity:.85,dashArray:'7 8',lineCap:'round'})
-   .bindTooltip(r[0],{sticky:true}).addTo(rtL);
-});
+/* ---------- water overlay (real river/lake geometry) ---------- */
+let waterLoaded=false;
+async function loadWater(){
+  if(waterLoaded) return; waterLoaded=true;
+  try{
+    const w=await (await fetch('water.json')).json();
+    w.l.forEach(lk=>lk.r.forEach(ring=>
+      L.polygon(ring.map(c=>[c[1],c[0]]),{color:'#5FB6E0',weight:1,opacity:.75,
+        fillColor:'#2E7FA8',fillOpacity:.5,interactive:!!lk.n})
+       .bindTooltip(lk.n||'',{sticky:true}).addTo(waterL)));
+    w.r.forEach(rv=>rv.s.forEach(seg=>
+      L.polyline(seg.map(c=>[c[1],c[0]]),{color:'#4FA8D8',weight:2,opacity:.8,lineCap:'round'})
+       .bindTooltip(rv.n?rv.n+' River':'',{sticky:true}).addTo(waterL)));
+  }catch(e){ waterLoaded=false; }
+}
 
 /* ---------- chips ---------- */
 function mkChip(host,k,label,count,on,fn){
@@ -924,15 +933,10 @@ const ce=document.getElementById('chips'), ce2=document.getElementById('chips2')
  .forEach(([k,l])=>mkChip(ce,k,l,P.filter(p=>p.tier==+k).length,true,
    on=>on?layers[k].addTo(map):map.removeLayer(layers[k])));
 
-mkChip(ce2,'w','Lakes & Rivers',POI.filter(p=>p.kind==='water').length,false,
-  on=>on?poiL.water.addTo(map):map.removeLayer(poiL.water));
-mkChip(ce2,'n','Forests & Parks',POI.filter(p=>p.kind==='nature').length,false,
-  on=>on?poiL.nature.addTo(map):map.removeLayer(poiL.nature));
-mkChip(ce2,'c','Chargers',CH.length,false,
-  on=>on?chL.addTo(map):map.removeLayer(chL));
-mkChip(ce2,'r','Routes','',false,on=>{
-  on?rtL.addTo(map):map.removeLayer(rtL);
-  document.getElementById('routeBtn').classList.toggle('on',on);});
+mkChip(ce2,'water','Rivers & Lakes','',false,async on=>{
+  if(on){ await loadWater(); waterL.addTo(map); waterL.eachLayer(l=>l.bringToBack&&l.bringToBack()); }
+  else map.removeLayer(waterL);
+});
 
 const seg=document.getElementById('seg');
 [["dark","Dark"],["terrain","Terrain"],["satellite","Satellite"]].forEach(([k,l])=>{
@@ -940,13 +944,50 @@ const seg=document.getElementById('seg');
   if(k==='dark') b.classList.add('on');
   b.onclick=()=>setBase(k); seg.appendChild(b);
 });
-document.getElementById('routeBtn').onclick=function(){
-  const on=!this.classList.contains('on');
-  this.classList.toggle('on',on);
-  const rc=document.querySelector('.chip[data-t="r"]'); if(rc) rc.classList.toggle('on',on);
-  on?rtL.addTo(map):map.removeLayer(rtL);
-};
-document.getElementById('homeBtn').onclick=()=>{map.setView([35.3,-116.6],6);close_();};
+document.getElementById('routeBtn').onclick=()=>{clearRoute();close_();};
+document.getElementById('homeBtn').onclick=()=>{clearRoute();map.setView([35.3,-116.6],6);close_();};
+
+/* ---------- routing ---------- */
+function clearRoute(){
+  if(routeLine){routeLine.forEach(l=>map.removeLayer(l));routeLine=null;}
+  routePins.clearLayers();
+}
+const R2D=(a,b)=>{const k=Math.cos(a[0]*Math.PI/180);
+  return Math.hypot((a[0]-b[0])*111,(a[1]-b[1])*111*k);}; // km
+function nearRoute(pt,coords){
+  let best=1e9,at=0;
+  for(let i=0;i<coords.length;i++){const d=R2D(pt,coords[i]);if(d<best){best=d;at=i;}}
+  return {km:best,at};
+}
+async function drawRoute(p){
+  clearRoute();
+  const key=p.id;
+  let r=routeCache[key];
+  if(!r){
+    const u=`https://router.project-osrm.org/route/v1/driving/${HOME[1]},${HOME[0]};${p.lng},${p.lat}?overview=full&geometries=geojson`;
+    const j=await (await fetch(u)).json();
+    if(j.code!=='Ok') throw new Error('route');
+    r={coords:j.routes[0].geometry.coordinates.map(c=>[c[1],c[0]]),
+       mi:Math.round(j.routes[0].distance/1609),
+       min:Math.round(j.routes[0].duration/60)};
+    routeCache[key]=r;
+  }
+  const T=p.tier!==undefined?TIERS[p.tier]:KINDS[p.kind];
+  routeLine=[
+    L.polyline(r.coords,{color:'#000',weight:9,opacity:.35,lineCap:'round'}).addTo(map),
+    L.polyline(r.coords,{color:T.c,weight:3.5,opacity:.95,lineCap:'round'}).addTo(map)
+  ];
+  routeLine.forEach(l=>l.bringToFront());
+  return r;
+}
+function stopsAlong(r,p){
+  const chargers=CH.map(c=>({name:c[0],note:c[1],ll:[c[2],c[3]]}))
+    .map(c=>({...c,...nearRoute(c.ll,r.coords)}))
+    .filter(c=>c.km<26).sort((a,b)=>a.at-b.at);
+  const spots=POI.map(x=>({p:x,...nearRoute([x.lat,x.lng],r.coords)}))
+    .filter(x=>x.km<45 && x.p.id!==p.id).sort((a,b)=>a.at-b.at);
+  return {chargers,spots};
+}
 
 /* ---------- sheet ---------- */
 const sheet=document.getElementById('sheet'),hero=document.getElementById('hero'),
@@ -1001,8 +1042,8 @@ function openP(p){
      <span class="bdg">${p.season}</span>
    </div>
    <div class="facts">
-     <div class="fact"><div class="k">Drive</div><div class="v">${p.drive}</div></div>
-     <div class="fact"><div class="k">Distance</div><div class="v">${p.mi}</div></div>
+     <div class="fact"><div class="k">Drive</div><div class="v" id="fDrive">${p.drive}</div></div>
+     <div class="fact"><div class="k">Distance</div><div class="v" id="fMi">${p.mi}</div></div>
      ${costRow}
      <div class="fact"><div class="k">Spots</div><div class="v">${p.do.length + p.see.length}</div></div>
      <div class="fact wide"><div class="k">What unlocks it</div><div class="v">${T.gate}</div></div>
@@ -1018,6 +1059,9 @@ function openP(p){
    <div class="sec"><div class="ic" style="background:${T.c}22;color:${T.c}">&#9889;</div><h3>Logistics &amp; charging</h3></div>
    <ul class="lst">${p.logi.map(x=>`<li>${x}</li>`).join('')}</ul>
 
+   <div class="sec"><div class="ic" style="background:${T.c}22;color:${T.c}">&#128663;</div><h3>On the way</h3></div>
+   <div id="routeBox"><div class="loading">Finding the driving route&hellip;</div></div>
+
    <div class="note" style="background:${T.c}14;color:${T.c}">${p.note}</div>
    <div class="acts">
      <a class="btn go" href="https://maps.apple.com/?daddr=${p.lat},${p.lng}&dirflg=d" target="_blank" rel="noopener">Directions</a>
@@ -1032,9 +1076,44 @@ function openP(p){
   };
   body.scrollTop=0;
   sheet.classList.add('open');
-  map.panTo([p.lat,p.lng],{animate:true,duration:.5});
+
+  (async()=>{
+    const box=document.getElementById('routeBox');
+    try{
+      const r=await drawRoute(p);
+      if(cur!==p) return;
+      const fd=document.getElementById('fDrive'), fm=document.getElementById('fMi');
+      const h=Math.floor(r.min/60), m=r.min%60;
+      if(fd) fd.textContent = h? h+' hr'+(m?' '+m:'') : r.min+' min';
+      if(fm) fm.textContent = r.mi+' mi';
+      const {chargers,spots}=stopsAlong(r,p);
+      let html='';
+      if(chargers.length){
+        html+='<div class="rowlbl" style="margin:2px 0 4px">Superchargers on this drive</div>';
+        chargers.forEach(c=>{ html+=`<div class="stop" data-nav="${c.ll[0]},${c.ll[1]}">
+          <span class="pip" style="background:#5FB0C4"></span>
+          <span><span class="sn">&#9889; ${c.name}</span><span class="sd">${c.note}</span></span>
+          <span class="mi">${Math.round(c.km*0.621)} mi off</span></div>`; });
+      }
+      if(spots.length){
+        html+='<div class="rowlbl" style="margin:14px 0 4px">Worth a stop</div>';
+        spots.slice(0,8).forEach(x=>{ const K=KINDS[x.p.kind];
+          html+=`<div class="stop" data-poi="${x.p.id}">
+            <span class="pip" style="background:${K.c}"></span>
+            <span><span class="sn">${x.p.name}</span><span class="sd">${x.p.loc} &middot; ${K.n}</span></span>
+            <span class="mi">${Math.round(x.km*0.621)} mi off</span></div>`; });
+      }
+      box.innerHTML = html || '<div class="loading">Nothing else worth stopping for on this leg.</div>';
+      box.querySelectorAll('.stop[data-poi]').forEach(el=>el.onclick=()=>{
+        const t=POI.find(z=>z.id===el.dataset.poi); if(t) openP(t);});
+      box.querySelectorAll('.stop[data-nav]').forEach(el=>el.onclick=()=>
+        window.open('https://maps.apple.com/?daddr='+el.dataset.nav+'&dirflg=d','_blank'));
+    }catch(e){
+      box.innerHTML='<div class="loading">Couldn\'t load the driving route just now &mdash; tap Directions for turn-by-turn.</div>';
+    }
+  })();
 }
-function close_(){sheet.classList.remove('open');cur=null;}
+function close_(){sheet.classList.remove('open');cur=null;clearRoute();}
 document.getElementById('close').onclick=close_;
 map.on('click',close_);
 
