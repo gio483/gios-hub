@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SDLR &mdash; One-to-One Deck</title>
+<meta name="theme-color" content="#14201A">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#14201A; --panel:#1B2A22; --panel2:#213329;
+  --cream:#F3EFE7; --brass:#C9A468; --brass-d:#A8874B;
+  --muted:#9FB3A8; --line:rgba(201,164,104,.28);
+}
+html,body{height:100%}
+body{background:var(--ink);color:var(--cream);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  overflow:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--ink)}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;
+  display:flex;flex-direction:column;justify-content:center;padding:6vh 7vw;background:var(--ink)}
+.slide.on{opacity:1;pointer-events:auto}
+@media(prefers-reduced-motion:reduce){.slide{transition:none}}
+
+.eyebrow{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:clamp(9px,1.05vw,12px);
+  letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:2.4vh}
+h1{font-family:"Newsreader",Georgia,serif;font-weight:300;line-height:1.02;letter-spacing:-.02em;
+  font-size:clamp(30px,5.6vw,74px);color:var(--cream);text-wrap:balance}
+h2{font-family:"Newsreader",Georgia,serif;font-weight:300;line-height:1.08;letter-spacing:-.015em;
+  font-size:clamp(24px,4.1vw,54px);color:var(--cream);text-wrap:balance;margin-bottom:2.6vh}
+.lede{font-size:clamp(14px,1.65vw,22px);line-height:1.62;color:#DCE4DC;max-width:62ch}
+.lede + .lede{margin-top:1.6vh}
+.small{font-size:clamp(11px,1.15vw,15px);line-height:1.6;color:var(--muted);max-width:70ch}
+.brass{color:var(--brass)}
+strong{font-weight:600;color:var(--cream)}
+
+/* cover */
+.cover{align-items:flex-start;justify-content:center;text-align:left}
+.cover img{width:min(30vw,300px);margin-bottom:4.5vh}
+.cover .tag{font-family:"Newsreader",Georgia,serif;font-weight:300;
+  font-size:clamp(26px,4.6vw,60px);line-height:1.06;letter-spacing:-.02em;max-width:16ch}
+.cover .foot{margin-top:5vh;padding-top:2.4vh;border-top:1px solid var(--line);
+  font-family:"IBM Plex Mono",monospace;font-size:clamp(10px,1.1vw,13px);letter-spacing:.09em;color:var(--muted)}
+
+/* full bleed image */
+.bleed{padding:0}
+.bleed img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bleed .scrim{position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(10,17,13,.92) 0%,rgba(10,17,13,.45) 34%,rgba(10,17,13,0) 62%)}
+.bleed .cap{position:absolute;left:6vw;right:6vw;bottom:5.5vh;z-index:2}
+.bleed .cap .t{font-family:"Newsreader",Georgia,serif;font-weight:300;
+  font-size:clamp(20px,3.1vw,40px);line-height:1.12;margin-bottom:1vh}
+.bleed .cap .m{font-family:"IBM Plex Mono",monospace;font-size:clamp(9px,1.05vw,12px);
+  letter-spacing:.13em;text-transform:uppercase;color:var(--brass)}
+.bleed.dark .scrim{background:linear-gradient(to right,rgba(10,17,13,.97) 0%,rgba(10,17,13,.93) 26%,rgba(10,17,13,.74) 46%,rgba(10,17,13,.30) 74%,rgba(10,17,13,.10) 100%)}
+.bleed.dark .cap{top:50%;transform:translateY(-50%);bottom:auto;right:auto;max-width:46vw}
+
+/* grid of images */
+.grid4{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1.6vh 1.4vw;
+  position:absolute;inset:6vh 7vw}
+.tile{position:relative;overflow:hidden;border-radius:2px;background:var(--panel)}
+.tile img{width:100%;height:100%;object-fit:cover;display:block}
+.tile .lab{position:absolute;left:0;right:0;bottom:0;padding:2.2vh 1.4vw 1.6vh;
+  background:linear-gradient(to top,rgba(10,17,13,.93),rgba(10,17,13,0));
+  font-family:"IBM Plex Mono",monospace;font-size:clamp(8px,.92vw,11px);letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cream);line-height:1.5}
+.tile .lab b{color:var(--brass);font-weight:500}
+
+/* lists */
+.rows{display:flex;flex-direction:column;gap:2.2vh;margin-top:1vh;max-width:74ch}
+.row{display:flex;gap:1.6vw;align-items:flex-start}
+.row .n{font-family:"IBM Plex Mono",monospace;font-size:clamp(9px,1vw,12px);color:var(--brass);
+  padding-top:.5em;min-width:2.4em;letter-spacing:.1em}
+.row .b{flex:1}
+.row .h{font-size:clamp(14px,1.7vw,21px);font-weight:600;color:var(--cream);margin-bottom:.5vh;line-height:1.3}
+.row .p{font-size:clamp(12px,1.35vw,17px);line-height:1.58;color:#C6D0C6}
+
+/* services chips */
+.chips{display:flex;flex-wrap:wrap;gap:.9vh .7vw;margin-top:3vh;max-width:78ch}
+.chip{border:1px solid var(--line);border-radius:2px;padding:.85vh .9vw;
+  font-size:clamp(10px,1.12vw,14px);color:#D6DED6;white-space:nowrap}
+.boundary{margin-top:3.4vh;padding-left:1.1vw;border-left:2px solid var(--brass);
+  font-size:clamp(13px,1.5vw,19px);line-height:1.55;color:var(--brass);max-width:52ch}
+
+/* pull quote */
+.pull{font-family:"Newsreader",Georgia,serif;font-weight:300;font-style:italic;
+  font-size:clamp(19px,2.9vw,38px);line-height:1.3;color:var(--cream);max-width:24ch;
+  border-left:2px solid var(--brass);padding-left:1.4vw;margin-top:4vh}
+.note{margin-top:3.6vh;padding-top:2vh;border-top:1px solid rgba(201,164,104,.2);
+  font-size:clamp(10.5px,1.15vw,14px);line-height:1.6;color:var(--muted);max-width:74ch}
+
+/* big number */
+.hero-num{font-family:"Newsreader",Georgia,serif;font-weight:300;color:var(--brass);
+  font-size:clamp(52px,11vw,150px);line-height:.92;letter-spacing:-.03em;margin-bottom:2vh}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:1.8vw;margin-top:4vh;max-width:96ch}
+.col{border-top:1px solid var(--line);padding-top:1.8vh}
+.col .k{font-family:"IBM Plex Mono",monospace;font-size:clamp(8.5px,.95vw,11px);letter-spacing:.14em;
+  text-transform:uppercase;color:var(--brass);margin-bottom:1vh}
+.col .v{font-size:clamp(11.5px,1.32vw,16px);line-height:1.55;color:#C6D0C6}
+
+/* contact */
+.contact .line{font-family:"IBM Plex Mono",monospace;font-size:clamp(11px,1.35vw,17px);
+  letter-spacing:.06em;color:var(--cream);line-height:2.1}
+.contact img{width:min(24vw,230px);margin-bottom:4vh}
+
+/* chrome */
+.hud{position:fixed;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.07);z-index:50}
+.hud .bar{height:100%;background:var(--brass);transition:width .35s ease}
+.count{text-shadow:0 1px 6px rgba(0,0,0,.8);position:fixed;right:2.2vw;bottom:2.4vh;z-index:50;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;letter-spacing:.14em;color:rgba(243,239,231,.45)}
+.hint{text-shadow:0 1px 6px rgba(0,0,0,.8);position:fixed;left:2.2vw;bottom:2.4vh;z-index:50;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;letter-spacing:.12em;color:rgba(243,239,231,.3);transition:opacity .5s}
+.hint.gone{opacity:0}
+.zone{position:fixed;top:0;bottom:0;width:22vw;z-index:40;cursor:pointer}
+.zone.l{left:0}.zone.r{right:0}
+.back{text-shadow:0 1px 6px rgba(0,0,0,.8);position:fixed;left:2.2vw;top:2.4vh;z-index:60;font-family:"IBM Plex Mono",monospace;
+  font-size:11px;letter-spacing:.08em;color:rgba(243,239,231,.42);text-decoration:none}
+.back:hover{color:var(--brass)}
+@media(max-width:760px){
+  .slide{padding:7vh 7vw}
+  .cols3{grid-template-columns:1fr;gap:2.4vh}
+  .bleed.dark .cap{max-width:80vw}
+  .grid4{grid-template-columns:1fr;grid-template-rows:repeat(4,1fr);inset:5vh 6vw}
+  .zone{width:26vw}
+}
+</style>
+</head><body>
+<a class="back" href="/">&larr; Gio's Hub</a>
+<div class="stage">
+<!-- 1 COVER -->
+<section class="slide cover on">
+  <img src="sdlr-deck-logo.png" alt="San Diego Landscape Remodeling">
+  <div class="tag">The general contractor of the outdoor&nbsp;space.</div>
+  <div class="foot">SAN DIEGO COUNTY &nbsp;·&nbsp; LICENSED &amp; INSURED &nbsp;·&nbsp; CSLB #1139785</div>
+</section>
+
+<!-- 2 WHAT WE ARE -->
+<section class="slide">
+  <div class="eyebrow">What we are</div>
+  <h2>Not a landscaping company.</h2>
+  <p class="lede">SDLR is an outdoor living company that builds complete, intentional spaces &mdash; designed around how you actually live. We design it, we run it, and we bring the trades.</p>
+  <div class="chips">
+    <span class="chip">Full backyard remodels</span><span class="chip">Outdoor kitchens &amp; BBQ islands</span>
+    <span class="chip">Patios &amp; hardscape</span><span class="chip">Fire pits &amp; fireplaces</span>
+    <span class="chip">Pergolas &amp; shade structures</span><span class="chip">Retaining &amp; seating walls</span>
+    <span class="chip">Pool decks &amp; poolside hardscape</span><span class="chip">Artificial turf</span>
+    <span class="chip">Landscape lighting</span><span class="chip">Drainage &amp; grading</span>
+  </div>
+  <div class="boundary">We don't do maintenance, and we never touch the inside of the house.</div>
+</section>
+
+<!-- 3 HOW THIS STARTED -->
+<section class="slide">
+  <div class="eyebrow">How this started</div>
+  <h2>Most outdoor companies start with a truck.</h2>
+  <p class="lede">We started with the brand &mdash; then went and found the right builder to put behind it.</p>
+  <p class="lede">I built SDLR first, then reached out to the people I actually wanted to work with. Mike was the one. He'd already delivered these projects in Los Angeles, he holds the Class B license, and he came out of general contracting and specialty materials. The only piece missing was San Diego crews. We went and found them.</p>
+  <div class="pull">He knows construction. I know how to get high-end leads in the door.</div>
+</section>
+
+<!-- 4 THE TEAM -->
+<section class="slide">
+  <div class="eyebrow">Who's behind it</div>
+  <h2>Assembled, not stumbled into.</h2>
+  <div class="rows">
+    <div class="row"><div class="n">01</div><div class="b">
+      <div class="h">A licensed Class B general contractor</div>
+      <div class="p">CSLB #1139785. Every project is contracted, permitted and warrantied under a real license &mdash; not a handshake.</div></div></div>
+    <div class="row"><div class="n">02</div><div class="b">
+      <div class="h">50+ years of field expertise across two leads</div>
+      <div class="p">Two crew leads with 25+ years each in high-end outdoor build. Roughly $35M of completed work behind them before we brought them together.</div></div></div>
+    <div class="row"><div class="n">03</div><div class="b">
+      <div class="h">Our trusted crew plus vetted specialty subs</div>
+      <div class="p">Pool, electrical, plumbing, masonry &mdash; all coordinated under one license. One timeline, one point of contact, one honest number.</div></div></div>
+  </div>
+  <div class="note">The $35M and the Los Angeles portfolio are our people's track record from before SDLR. That's exactly the point &mdash; nobody is learning on your project.</div>
+</section>
+
+<!-- 5 HERO IMAGE -->
+<section class="slide bleed">
+  <img src="sdlr-deck-kitchen.jpg" alt="Outdoor kitchen under a louvered pergola at golden hour">
+  <div class="scrim"></div>
+  <div class="cap">
+    <div class="t">A kitchen you'd actually cook in.</div>
+    <div class="m">Rancho Santa Fe &nbsp;·&nbsp; louvered pergola &nbsp;·&nbsp; integrated lighting &nbsp;·&nbsp; stone oven</div>
+  </div>
+</section>
+
+<!-- 6 GRID -->
+<section class="slide">
+  <div class="grid4">
+    <div class="tile"><img src="sdlr-deck-pool.jpg" alt="Contemporary pool deck"><div class="lab"><b>Del Mar</b> &nbsp;·&nbsp; porcelain pavers, glass-tile spa, contemporary pool deck</div></div>
+    <div class="tile"><img src="sdlr-deck-fire.jpg" alt="Sunken lounge with linear fire feature"><div class="lab"><b>Mt. Helix</b> &nbsp;·&nbsp; sunken lounge, linear fire feature, seat walls</div></div>
+    <div class="tile"><img src="sdlr-deck-court.jpg" alt="Aerial of sport court and paver surround"><div class="lab"><b>4S Ranch</b> &nbsp;·&nbsp; sport court, paver surround, full-yard build</div></div>
+    <div class="tile"><img src="sdlr-deck-curb.jpg" alt="Paver driveway and stone veneer curb appeal"><div class="lab"><b>Point Loma</b> &nbsp;·&nbsp; paver driveway, stone veneer, drought-tolerant curb appeal</div></div>
+  </div>
+</section>
+
+<!-- 7 MID CONSTRUCTION -->
+<section class="slide bleed dark">
+  <img src="sdlr-deck-build.jpg" alt="Backyard mid-construction with base prep and rebar">
+  <div class="scrim"></div>
+  <div class="cap">
+    <div class="eyebrow">How it actually gets built</div>
+    <div class="t" style="margin-bottom:2vh">Anyone can post a finished photo.</div>
+    <p class="small" style="color:#CBD5CB">Compacted base. Rebar in the fire feature. Formed seat walls. Drainage solved before a single paver is set. The part that decides whether it still looks right in ten years is the part nobody photographs.</p>
+  </div>
+</section>
+
+<!-- 8 DIFFERENT -->
+<section class="slide">
+  <div class="eyebrow">What makes us different</div>
+  <h2>Four things most of our competitors can't say.</h2>
+  <div class="rows">
+    <div class="row"><div class="n">01</div><div class="b">
+      <div class="h">We render it before we build it</div>
+      <div class="p">Photorealistic 2D/3D of your actual property, before a shovel moves. You see it, then you decide.</div></div></div>
+    <div class="row"><div class="n">02</div><div class="b">
+      <div class="h">The 10-Month Walk-Through</div>
+      <div class="p">We come back ten months after handover and inspect the work with a fine-toothed comb. No charge. Every project. Most builders are gone the day the check clears.</div></div></div>
+    <div class="row"><div class="n">03</div><div class="b">
+      <div class="h">You talk to the owners</div>
+      <div class="p">Gio and Mike, personally, start to finish. No account managers, no hand-offs.</div></div></div>
+    <div class="row"><div class="n">04</div><div class="b">
+      <div class="h">By design, not by dispatch</div>
+      <div class="p">Projects are planned months ahead and scheduled deliberately. If someone needs a patio this weekend, we're honest that it isn't us.</div></div></div>
+  </div>
+</section>
+
+<!-- 9 US BANK -->
+<section class="slide">
+  <div class="eyebrow">An opportunity most people don't know exists</div>
+  <div class="hero-num">$200K</div>
+  <h2 style="margin-bottom:2vh">of backyard, financed into the mortgage.</h2>
+  <p class="lede">We're a preferred vendor on US Bank's list for new-home builds &mdash; which means a buyer can roll their outdoor build into the mortgage on the home, up to $200,000 of work, instead of paying out of pocket a year later.</p>
+  <div class="cols3">
+    <div class="col"><div class="k">If you're a realtor</div><div class="v">Your buyer moves into a finished home instead of a dirt lot. It shows better, and it closes better.</div></div>
+    <div class="col"><div class="k">If you're a lender</div><div class="v">It's a larger loan on the same file, with the work already scoped and priced.</div></div>
+    <div class="col"><div class="k">If you're a builder</div><div class="v">The outdoor scope is handled, financed, and off your plate entirely.</div></div>
+  </div>
+  <div class="note">That's the part worth remembering about us.</div>
+</section>
+
+<!-- 10 THE GIVE -->
+<section class="slide">
+  <div class="eyebrow">What I can do for you</div>
+  <h2>Let's start with what I can send your way.</h2>
+  <div class="rows">
+    <div class="row"><div class="n">01</div><div class="b">
+      <div class="h">A rendering, free</div>
+      <div class="p">Send me a photo of any property you're standing in &mdash; a client's, a listing, your own &mdash; and I'll have a photorealistic version of that backyard back to you this week. Yours to use however you like.</div></div></div>
+    <div class="row"><div class="n">02</div><div class="b">
+      <div class="h">Actual subcontract work</div>
+      <div class="p">I'm the GC on every build, which means I'm hiring masonry, concrete, electrical, plumbing, pool and planting on every project. If the numbers work, I'd rather that money go to someone in this room.</div></div></div>
+    <div class="row"><div class="n">03</div><div class="b">
+      <div class="h">Referrals out of my own book</div>
+      <div class="p">I generated $15M in project leads for a construction company last year. Finding them is the thing I'm actually good at &mdash; and I pass them.</div></div></div>
+  </div>
+</section>
+
+<!-- 11 REFERRAL -->
+<section class="slide">
+  <div class="eyebrow">What a referral looks like</div>
+  <h2 style="font-style:italic;font-size:clamp(21px,3.4vw,44px);max-width:24ch;border-left:2px solid var(--brass);padding-left:1.4vw">&ldquo;The person to send me is standing in a backyard that's bare dirt, dead grass, or cracked 1980s concrete &mdash; and they just spent real money on the house.&rdquo;</h2>
+  <div class="cols3">
+    <div class="col"><div class="k">Easiest one</div><div class="v">Someone who just closed on a home and the backyard has never been touched.</div></div>
+    <div class="col"><div class="k">Second easiest</div><div class="v">A listing that won't photograph because the yard is dead.</div></div>
+    <div class="col"><div class="k">Third</div><div class="v">A homeowner already remodeling inside who hasn't thought about outside yet.</div></div>
+  </div>
+  <div class="boundary" style="margin-top:3.4vh">You don't have to sell anything. Just text me the address.</div>
+</section>
+
+<!-- 12 CONTACT -->
+<section class="slide contact">
+  <img src="sdlr-deck-logo.png" alt="San Diego Landscape Remodeling">
+  <div class="line">Gio Azzarello</div>
+  <div class="line brass">(619) 613-2511</div>
+  <div class="line">office@sandiegolandscaperemodeling.com</div>
+  <div class="foot" style="margin-top:4vh;padding-top:2.4vh;border-top:1px solid var(--line);font-family:'IBM Plex Mono',monospace;font-size:clamp(10px,1.1vw,13px);letter-spacing:.09em;color:var(--muted)">
+    SAN DIEGO COUNTY &nbsp;·&nbsp; LICENSED &amp; INSURED &nbsp;·&nbsp; CSLB #1139785 &nbsp;·&nbsp; BY DESIGN, NOT BY DISPATCH
+  </div>
+</section>
+
+</div>
+<div class="zone l" id="zl"></div>
+<div class="zone r" id="zr"></div>
+<div class="hud"><div class="bar" id="bar"></div></div>
+<div class="count" id="cnt">01 / 12</div>
+<div class="hint" id="hint">SWIPE OR PRESS &rarr;</div>
+<script>
+const S=[...document.querySelectorAll('.slide')];let i=0;
+const bar=document.getElementById('bar'),cnt=document.getElementById('cnt'),hint=document.getElementById('hint');
+function go(n){i=Math.max(0,Math.min(S.length-1,n));
+  S.forEach((s,k)=>s.classList.toggle('on',k===i));
+  bar.style.width=((i+1)/S.length*100)+'%';
+  cnt.textContent=String(i+1).padStart(2,'0')+' / '+String(S.length).padStart(2,'0');
+  if(i>0)hint.classList.add('gone');
+  try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
+function next(){go(i+1)}function prev(){go(i-1)}
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','ArrowDown',' ','PageDown','Enter'].includes(e.key)){e.preventDefault();next()}
+  else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].includes(e.key)){e.preventDefault();prev()}
+  else if(e.key==='Home')go(0); else if(e.key==='End')go(S.length-1);});
+document.getElementById('zr').addEventListener('click',next);
+document.getElementById('zl').addEventListener('click',prev);
+let x0=null,y0=null;
+addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY},{passive:true});
+addEventListener('touchend',e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0,dy=e.changedTouches[0].clientY-y0;
+  if(Math.abs(dx)>44&&Math.abs(dx)>Math.abs(dy)){dx<0?next():prev()}x0=null},{passive:true});
+const h=parseInt((location.hash||'').replace('#',''),10);
+go(Number.isFinite(h)&&h>0?h-1:0);
+</script>
+</body></html>
