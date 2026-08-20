@@ -146,6 +146,17 @@ td.td-links{white-space:nowrap;width:74px}
 .mwarn.REFER{background:#eaf7ee;border:1px solid #aedcbe;color:#155e2c}
 .mwarn.ASK{background:#fdf5e4;border:1px solid #e8d09a;color:#6f5427}
 .mwarn b{display:block;margin-bottom:3px}
+/* --- TYFCB amount --- */
+td.td-amt{width:104px}
+.amt-input{width:100%;padding:5px 8px;border:1px solid #e6e9e5;border-radius:6px;font-size:12px;color:#1F3A34;
+ outline:none;font-family:inherit;font-variant-numeric:tabular-nums;text-align:right;background:#fcfdfc}
+.amt-input:focus{border-color:#C9A468;box-shadow:0 0 0 2px rgba(201,164,104,.2)}
+.amt-input::-webkit-outer-spin-button,.amt-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.amt-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;
+ padding-top:10px;border-top:1px solid #eef0ed}
+.amt-row span{font-size:11.5px;color:#6b7268;letter-spacing:.02em}
+.amt-row .amt-input{width:120px}
+.s-total .sval{font-size:21px}
 </style>
 </head><body>
 
@@ -163,7 +174,7 @@ td.td-links{white-space:nowrap;width:74px}
 </div>
 
 <div class="stats">
-  <div class="stat s-total"><div class="sval" id="vTotal">0</div><div class="slbl">Total</div></div>
+  <div class="stat s-total"><div class="sval" id="vTotal">$0</div><div class="slbl">Given to members</div></div>
   <div class="stat s-worked"><div class="sval" id="vWorked">0</div><div class="slbl">Worked</div></div>
   <div class="stat s-conn"><div class="sval" id="vConn">0</div><div class="slbl">Connected</div></div>
   <div class="stat s-1on1"><div class="sval" id="vDone">0</div><div class="slbl">1-to-1 done</div></div>
@@ -192,7 +203,7 @@ td.td-links{white-space:nowrap;width:74px}
   <table>
     <thead><tr>
       <th>#</th><th>Name</th><th>Links</th><th>They are</th><th>Group</th><th>Chapter</th><th>Phone</th>
-      <th>Status</th><th>Met</th><th>Last contact</th><th>Notes</th><th>Actions</th>
+      <th>Status</th><th>Met</th><th>Last contact</th><th>Paid them</th><th>Notes</th><th>Actions</th>
     </tr></thead>
     <tbody id="tb"></tbody>
   </table>
@@ -249,7 +260,7 @@ function loadLocal(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(
 function saveLocal(d){try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){}}
 let STATE=loadLocal(), dirty={}, timer=null, polling=null;
 
-function rec(id){return STATE[id]||(STATE[id]={st:'Not started',met:false,dt:'',nt:'',u:0})}
+function rec(id){return STATE[id]||(STATE[id]={st:'Not started',met:false,dt:'',nt:'',amt:0,u:0})}
 function set(id,k,v){const r=rec(id);r[k]=v;r.u=Date.now();saveLocal(STATE);dirty[id]=r;renderStats();paintRow(id);queuePush()}
 
 function setSync(cls,txt){const d=document.getElementById('syncDot'),t=document.getElementById('syncTxt');
@@ -290,6 +301,7 @@ async function pull(quiet){
   }catch(e){ setSync('bad','Offline — saved on this device') }
 }
 
+const money=n=>{n=Number(n)||0;return n?'$'+n.toLocaleString('en-US'):''};
 const fone=t=>t.length===10?'('+t.slice(0,3)+') '+t.slice(3,6)+'-'+t.slice(6):t;
 const first=n=>n.split(' ')[0];
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -367,6 +379,8 @@ function render(){
      ' onchange="set('+p.id+',\'met\',this.checked)"></label></td>'+
    '<td class="td-date"><input class="date-input" type="date" value="'+(r.dt||'')+
      '" onchange="set('+p.id+',\'dt\',this.value)"></td>'+
+   '<td class="td-amt"><input class="amt-input" type="number" min="0" step="100" placeholder="0" value="'+(r.amt||'')+
+     '" onchange="set('+p.id+',\'amt\',Number(this.value)||0)"></td>'+
    '<td class="td-notes"><input class="notes-input" placeholder="Add notes..." value="'+esc(r.nt||'')+
      '" onchange="set('+p.id+',\'nt\',this.value)"></td>'+
    '<td class="td-act">'+actHTML(p)+'</td></tr>');}).join('');
@@ -378,6 +392,8 @@ function render(){
    '<div class="crow" style="margin-top:8px">'+flagHTML(p)+links(p)+'</div>'+
    selHTML(p)+
    '<div class="crow">'+actHTML(p)+'</div>'+
+   '<div class="amt-row"><span>Paid them</span><input class="amt-input" type="number" min="0" step="100" placeholder="0" value="'+(r.amt||'')+
+     '" onchange="set('+p.id+',\'amt\',Number(this.value)||0)"></div>'+
    '<input class="notes-input" style="margin-top:8px" placeholder="Add notes..." value="'+esc(r.nt||'')+
      '" onchange="set('+p.id+',\'nt\',this.value)"></div>');}).join('');
   renderStats();
@@ -385,14 +401,15 @@ function render(){
 function paintRow(id){const p=PEOPLE.find(x=>x.id===id);if(!p)return;const tr=document.getElementById('r'+id);
   if(tr){tr.className=rowCls(p,rec(id));const s=tr.querySelector('.status-select');if(s)s.className='status-select '+CLS[rec(id).st];}}
 function renderStats(){
-  let worked=0,conn=0,done=0,ref=0,t1=0;
+  let worked=0,conn=0,done=0,ref=0,t1=0,given=0;
   PEOPLE.forEach(p=>{const r=rec(p.id);
     if(r.st!=='Not started')worked++;
     if(['Connected - warm','1-to-1 scheduled','1-to-1 done','Referral sent','Referral received'].includes(r.st))conn++;
     if(r.st==='1-to-1 done')done++;
     if(r.st==='Referral received')ref++;
-    if(p.o==='HIRE'&&r.st==='Not started')t1++;});
-  document.getElementById('vTotal').textContent=PEOPLE.length;
+    if(p.o==='HIRE'&&r.st==='Not started')t1++;
+    given+=Number(r.amt)||0;});
+  document.getElementById('vTotal').textContent=given?'$'+(given>=1000?Math.round(given/1000)+'k':given):'$0';
   document.getElementById('vWorked').textContent=worked;
   document.getElementById('vConn').textContent=conn;
   document.getElementById('vDone').textContent=done;
@@ -422,10 +439,10 @@ function openPlay(id){
 }
 function closePlay(){document.getElementById('modal').classList.remove('on')}
 function exportCSV(){
-  const h=['Tier','Segment','Name','Company','Profession','Phone','Chapter','Overlap','Website','Instagram','Status','Met','Date','Notes'];
+  const h=['Tier','Segment','Name','Company','Profession','Phone','Chapter','Overlap','Website','Instagram','Status','Met','Date','Paid them','Notes'];
   const q=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
   const lines=[h.join(',')].concat(filtered().map(p=>{const r=rec(p.id);
-    return [p.tr,p.s,p.n,p.c,p.p,fone(p.t),p.ch,FLAGTXT[p.o]||'',p.w,p.ig,r.st,r.met?'Yes':'No',r.dt||'',r.nt||''].map(q).join(',')}));
+    return [p.tr,p.s,p.n,p.c,p.p,fone(p.t),p.ch,FLAGTXT[p.o]||'',p.w,p.ig,r.st,r.met?'Yes':'No',r.dt||'',r.amt||0,r.nt||''].map(q).join(',')}));
   const b=new Blob([lines.join('\n')],{type:'text/csv'});
   const a=document.createElement('a');a.href=URL.createObjectURL(b);
   a.download='sdlr-bni-outreach.csv';document.body.appendChild(a);a.click();a.remove();
@@ -433,7 +450,7 @@ function exportCSV(){
 async function resetAll(){
   if(!confirm('Clear every status, date and note on ALL your devices? This cannot be undone.'))return;
   const now=Date.now(); const wipe={};
-  PEOPLE.forEach(p=>{wipe[p.id]={st:'Not started',met:false,dt:'',nt:'',u:now}});
+  PEOPLE.forEach(p=>{wipe[p.id]={st:'Not started',met:false,dt:'',nt:'',amt:0,u:now}});
   STATE=wipe;saveLocal(STATE);Object.assign(dirty,wipe);render();await push();
 }
 function initFilters(){
