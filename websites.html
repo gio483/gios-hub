@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b1220">
-<title>Our Websites &#8212; Gio's Hub</title>
+<title>Our Websites — Gio's Hub</title>
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="icon" href="icon-192.png">
 <style>
@@ -26,10 +26,11 @@
   .head .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;background:color-mix(in srgb, var(--svm) 16%, transparent)}
   h1{font-size:1.4rem;margin:0;letter-spacing:-.02em}
   .sub{color:var(--muted);font-size:.92rem;margin:4px 4px 22px}
+  .count{font-size:.72rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 4px 12px}
   .list{display:flex;flex-direction:column;gap:14px}
   .site{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
   .site-top{display:flex;align-items:flex-start;gap:14px}
-  .dot{width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:800;color:#0b1220}
+  .dot{width:42px;height:42px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#0b1220}
   .site h2{margin:0;font-size:1.12rem;line-height:1.2}
   .site .url{color:var(--muted);font-size:.82rem;margin:3px 0 0;word-break:break-all}
   .site p{margin:9px 0 0;font-size:.9rem;color:#cbd5e1;line-height:1.45}
@@ -53,11 +54,12 @@
     Shift Vision Media
   </a>
   <div class="head">
-    <div class="ico">&#127760;</div>
+    <div class="ico">🌐</div>
     <h1>Our Websites</h1>
   </div>
   <p class="sub">Every website we've built together. Hit <b>Edit text</b> to change the words yourself.</p>
 
+  <p class="count" id="count"></p>
   <div class="list" id="list"></div>
 
   <footer>To change words, open the <b>Website Editor</b> first (on your Mac), then click Edit text.</footer>
@@ -67,30 +69,45 @@
 const EDITOR = 'website-editor.html';
 const SITES = [
   {
-    name:'Shift Vision Media', initials:'SV', color:'#fb7a3c',
+    name:'Shift Vision Media', initials:'SVM', color:'#fb7a3c',
     url:'shiftvisionmedia.com', visit:'https://shiftvisionmedia.com',
-    desc:'Your agency site \u2014 marketing for contractors and trades. Hero, services, packages, work, and contact pages.',
-    status:'built', editable:true
+    desc:'Our agency site — marketing for San Diego contractors and trades. Websites, video, and ad systems that turn local searches into booked jobs.',
+    status:'live', editable:true
   },
   {
-    name:'KSH Construction', initials:'KSH', color:'#fbbf24',
-    url:'kshconstruction.com', visit:'https://kshconstruction.com',
-    desc:'The KSH Construction company website \u2014 services, projects, and contact.',
-    status:'built', editable:true
-  },
-  {
-    name:'San Diego Landscape Remodeling', initials:'SD', color:'#34d399',
+    name:'San Diego Landscape Remodeling', initials:'SDLR', color:'#8aa05c',
     url:'sandiegolandscaperemodeling.com', visit:'https://sandiegolandscaperemodeling.com',
-    desc:'Live at sandiegolandscaperemodeling.com. Hosted on a website platform \u2014 not the local editor setup, so edits go through Claude for now.',
+    desc:'Design-build backyard remodels across San Diego County — one firm from first sketch to final stone. Edits go through Claude for now.',
     status:'live', editable:false
   },
   {
     name:'Starts With One', initials:'S1', color:'#38bdf8',
     url:'startswith1.com', visit:'https://startswith1.com',
-    desc:'The Starts With One website \u2014 live at startswith1.com. Connected to GitHub, so it can publish updates.',
+    desc:'Starts With One Properties — a real estate investment firm that acquires, operates and grows cash-flowing real estate for a select group of investors.',
     status:'live', editable:true
+  },
+  {
+    name:'KSH Construction', initials:'KSH', color:'#4a97d6',
+    url:'kshconstruction.com', visit:'https://kshconstruction.com',
+    desc:'Luxury residential general contractor in coastal San Diego — "Timeless Luxury, Masterfully Crafted."',
+    status:'live', editable:true
+  },
+  {
+    name:'Signing Superheroes', initials:'SS', color:'#e2483d',
+    url:'signingsuperheroes.com', visit:'https://signingsuperheroes.com',
+    desc:'Kristin Rhodes — mobile notary & certified loan signing agent in La Mesa, serving all of San Diego County.',
+    status:'live', editable:true
+  },
+  {
+    name:'Pacific West Sales & Consulting', initials:'PW', color:'#14b8a6',
+    url:'pacificwestsc.com', visit:'https://pacificwestsc.com',
+    desc:'Premium custom interiors & outdoor living — cabinets, saunas, wine cellars, frameless showers, glass staircases and landscape design. Edits go through Claude for now.',
+    status:'live', editable:false
   }
 ];
+
+document.getElementById('count').textContent =
+  SITES.length + ' site' + (SITES.length>1?'s':'') + ' — all live';
 
 document.getElementById('list').innerHTML = SITES.map(s => `
   <div class="site">
@@ -103,14 +120,14 @@ document.getElementById('list').innerHTML = SITES.map(s => `
     </div>
     <p>${s.desc}</p>
     <div>
-      <span class="status ${s.status==='live'?'st-live':'st-built'}">${s.status==='live'?'Live':'Built \u2014 ready to edit'}</span>
+      <span class="status ${s.status==='live'?'st-live':'st-built'}">${s.status==='live'?'Live':'Built — ready to edit'}</span>
     </div>
     <div class="actions">
       ${s.editable
-        ? `<a class="btn btn-edit" href="${EDITOR}">\u270f\ufe0f Edit text</a>`
-        : `<span class="btn btn-visit btn-dim">\u270f\ufe0f Edits via Claude</span>`}
+        ? `<a class="btn btn-edit" href="${EDITOR}">✏️ Edit text</a>`
+        : `<span class="btn btn-visit btn-dim">✏️ Edits via Claude</span>`}
       ${s.visit
-        ? `<a class="btn btn-visit" href="${s.visit}" target="_blank" rel="noopener">Visit site \u2197</a>`
+        ? `<a class="btn btn-visit" href="${s.visit}" target="_blank" rel="noopener">Visit site ↗</a>`
         : `<span class="btn btn-visit btn-dim">No public link yet</span>`}
     </div>
   </div>`).join('');
