@@ -152,6 +152,7 @@ const GROUPS = [
             text:'#f4f1e6', muted:'#a8a98e', line:'rgba(200,168,105,.22)',
             accent:'#9fb56a', accent2:'#c8a869', glow:'rgba(160,176,92,.18)', particle:'#c8a869' },
     apps:[
+    { name:'Command Center', desc:'CRM, inbox, follow-ups & marketing — the GoHighLevel replacement', href:'https://sdlr-hq.vercel.app', icon:'\u{1f3db}️', tag:'HQ' },
     { name:"This Week's Posts", desc:'Download image, copy caption, schedule', href:'sdlr-this-week.html', icon:'\u{1f4f2}', tag:'Post now' },
     { name:'1-to-1 Deck', desc:'The story, the work & the $200K mortgage play \u2014 for networking meetings', href:'sdlr-deck.html', icon:'\u{1f5bc}\ufe0f', tag:'Present' },
     { name:'BNI Outreach', desc:'358 referral partners \u2014 call, text & track every 1-to-1', href:'sdlr-bni-outreach.html', icon:'\u{1f91d}', tag:'Outreach' },
@@ -272,7 +273,7 @@ function showGroup(id){
   subtitle.textContent = g.desc;
   setLogo(g.logo || { type:'mono', text:(g.name[0]||'G') });
   appGrid.innerHTML = g.apps.map(a => `
-    <a class="tile" href="${a.href}">
+    <a class="tile" href="${a.href}"${/^https?:\/\//.test(a.href) ? ' target="_blank" rel="noopener"' : ''}>
       <span class="edge" style="background:${g.color}"></span>
       <div class="ico" style="background:color-mix(in srgb, ${g.color} 18%, transparent)">${a.icon}</div>
       <h3>${a.name}</h3>
