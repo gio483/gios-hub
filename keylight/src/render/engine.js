@@ -551,7 +551,10 @@ export class Engine {
   renderPreview(state, aspect) {
     this.ensureGear(state);
     this.applyCamera(state, aspect);
-    this.applyState(state, { withFlash: false });
+    // Modeling mode simulates the flash continuously, like the modeling
+    // lamp on a studio head. The capture math is identical, so what you
+    // watch is what the frame will be - minus the accumulation quality.
+    this.applyState(state, { withFlash: !!state.modeling });
     this.uniforms.uFrame.value = 0;
     const r = this.renderer;
     this.material.blending = THREE.NoBlending;

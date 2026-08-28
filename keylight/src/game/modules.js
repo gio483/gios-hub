@@ -48,16 +48,29 @@ export const MODULES = [
     lock: { camera: true, plan: ['camera', 'L1'], controls: ['aperture', 'iso', 'lens', 'focal', 'mode', 'modifier', 'gel', 'head', 'height', 'tilt', 'wb'] },
     hint: 'Only shutter and flash power are live. Everything else is pinned.',
     goals: [
-      goal('window', 'Hold the window between half a stop and two stops over, using shutter only',
+      goal('window', 'Hold the window - detail kept, nothing blown - using shutter only',
         ({ result }) => {
           const c = result?.criteria.find((x) => x.id === 'window');
-          return !!c && !c.notApplicable && c.stats.mean >= 0.2 && c.stats.mean <= 2.2 && c.stats.blown < 0.16;
+          return !!c && !c.notApplicable && c.stats.mean >= -0.35 && c.stats.mean <= 2.2 && c.stats.blown < 0.16;
         }),
       goal('room', 'Then bring the room to middle grey using flash power only',
         ({ result }) => Math.abs(result?.surfaceMedianStops ?? -9) < 0.85)
     ],
+    demo: [
+      { say: 'Watch the window in the live view. At an eighth of a second the room looks bright, but the view outside is a white hole.',
+        set: (s) => { s.modeling = true; s.shutter = 1 / 8; s.lights[0].power = 8; } },
+      { say: 'Shutter is the ambient dial. I am shortening it to 1/180 - watch the trees outside come back while the room falls dark.',
+        set: (s) => { s.shutter = 1 / 181; } },
+      { say: 'Now the flash. Modeling view is on, so you can watch it: I am raising power from 1/8 to 1/2. The room lifts. The window does not move at all.',
+        set: (s) => { s.lights[0].power = 2; } },
+      { say: 'Fire the shutter and the capture proves it: window held, room lit, two dials that never fight.',
+        shoot: true,
+        after: 'That frame is the whole craft. Now the same drill is yours - I have reset the controls.' }
+    ],
     coach: ({ state, lastResult }) => {
-      if (!lastResult) return 'Fire a frame. You will not see the flash in the live view, because you cannot see flash through a viewfinder in real life either.';
+      if (!lastResult) return state.modeling
+        ? 'Modeling view is on, so the flash shows live. Set the window with shutter, the room with power, then fire.'
+        : 'Fire a frame. You will not see the flash in the live view, because you cannot see flash through a viewfinder in real life either.';
       const w = lastResult.criteria.find((c) => c.id === 'window');
       const room = lastResult.surfaceMedianStops ?? 0;
       if (w && w.stats.blown > 0.16) {
@@ -93,6 +106,15 @@ export const MODULES = [
       }];
       s.selected = 'L1';
     },
+    demo: [
+      { say: 'The shutter is at 1/1000, four times past sync speed. The live view gives no warning at all.',
+        set: (s) => { s.modeling = false; s.shutter = 1 / 1024; s.hss = false; } },
+      { say: 'Fire.', shoot: true,
+        after: 'There is the curtain: a black band across most of the frame. The flash fired once, and only the slice of sensor that happened to be uncovered saw it.' },
+      { say: 'High speed sync turns that one pulse into a burst that runs the whole curtain travel. I am switching it on and firing again.',
+        set: (s) => { s.hss = true; s.lights[0].power = 1; }, shoot: true,
+        after: 'Band gone - but look at the exposure. The head is at full power and the room is still thin. HSS charged us about two stops. Your turn.' }
+    ],
     lock: { plan: ['camera'], controls: ['aperture', 'iso', 'lens', 'focal', 'gel', 'head', 'tilt', 'wb'] },
     hint: 'Push the shutter past 1/250 and watch what the curtain does.',
     goals: [
@@ -135,6 +157,14 @@ export const MODULES = [
     },
     // The bare bulb, deliberately: a fresnel's cone can only ever light a
     // slice, so a whole-room drill about distance needs the omni head.
+    demo: [
+      { say: 'Power is pinned. The only dial is where the head stands. Right now it is a metre from the near wall - watch the hotspot and the cliff of darkness behind it.',
+        set: (s) => { s.modeling = true; Object.assign(s.lights[0], { x: 2.0, z: -2.6, yaw: 20 }); }, shoot: true,
+        after: 'A metre away, doubling distance costs two full stops - that is the falloff you just saw.' },
+      { say: 'Same head, same power, moved to the middle of the room. Watch the whole frame even out.',
+        set: (s) => { Object.assign(s.lights[0], { x: 0.3, z: -0.9, yaw: 12 }); }, shoot: true,
+        after: 'Distance sets the level AND the evenness. Far away, one metre of difference barely matters. Your turn - land it yourself.' }
+    ],
     lock: { controls: ['power', 'aperture', 'iso', 'shutter', 'lens', 'focal', 'mode', 'modifier', 'gel', 'head', 'wb'] },
     hint: 'Power is pinned at 1/4 on the bare bulb. Move the head on the plan instead.',
     goals: [
@@ -178,6 +208,14 @@ export const MODULES = [
     },
     // Bare bulb rather than fresnel: the comparison is hard-versus-soft, and
     // an omni source is the only bare head that can carry a whole room.
+    demo: [
+      { say: 'Bare bulb, aimed straight into the room. Watch the shadows in the live view - hard cut edges under everything.',
+        set: (s) => { s.modeling = true; s.lights[0].mode = 'direct'; Object.assign(s.lights[0], { x: 1.2, z: -1.8, yaw: 15, power: 8 }); },
+        shoot: true, after: 'Correctly exposed and completely unforgiving. Every texture raked, every shadow a knife.' },
+      { say: 'Same head pointed at the ceiling. Watch the room change character as the ceiling becomes the light.',
+        set: (s) => { s.lights[0].mode = 'ceiling'; s.lights[0].power = 2; },
+        shoot: true, after: 'Two stops of power bought a two-metre soft source. The shadows melted. That trade is the whole module - now make it yourself.' }
+    ],
     lock: { controls: ['aperture', 'iso', 'shutter', 'lens', 'focal', 'gel', 'head', 'wb'] },
     hint: 'Shoot it bare first. Then bounce it and pay the difference in power.',
     goals: [

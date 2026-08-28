@@ -80,6 +80,7 @@ class App {
     this.engine.loadScene(this.compiled);
     if (!keepState || !this.state) this.state = defaultState(this.scene);
     this.state.sceneId = this.scene.id;
+    this.state.modeling = this.modelingDefault();
     this.plan.setScene(this.scene);
     this.plan.setState(this.state);
         this.history = [];
@@ -134,7 +135,7 @@ class App {
 
   loop() {
     const step = () => {
-      if (this.dirty && !this.busy && this.mode !== 'learnList') {
+      if (this.dirty && !this.busy && !this.holdCapture && this.mode !== 'learnList') {
         this.dirty = false;
         try {
           this.engine.setSize(
@@ -152,10 +153,34 @@ class App {
     requestAnimationFrame(step);
   }
 
+  /**
+   * Whether the flash shows live. New players get it on, like the modeling
+   * lamp on a studio head, so every adjustment is visible as it happens.
+   * Once the fundamentals modules are done it defaults off - the real
+   * discipline of not seeing flash until the frame exists - but the toggle
+   * stays either way.
+   */
+  modelingDefault() {
+    if (this.progress.modelingPref === 'on') return true;
+    if (this.progress.modelingPref === 'off') return false;
+    return this.progress.completedModules.length < 4;
+  }
+
+  toggleModeling() {
+    this.state.modeling = !this.state.modeling;
+    this.progress.modelingPref = this.state.modeling ? 'on' : 'off';
+    saveProgress(this.progress);
+    document.getElementById('btn-modeling')?.classList.toggle('on', this.state.modeling);
+    this.markDirty();
+  }
+
   stale() {
     const b = document.getElementById('stale-badge');
-    b.textContent = 'LIVE · AMBIENT ONLY';
+    b.textContent = this.state.modeling
+      ? 'LIVE · MODELING - FLASH SIMULATED'
+      : 'LIVE · AMBIENT ONLY';
     b.classList.add('live');
+    document.getElementById('btn-modeling')?.classList.toggle('on', !!this.state.modeling);
     const warn = document.getElementById('warn-badge');
     const band = syncBandCoverage(this.state.shutter, this.state.hss);
     if (band > 0.01 && this.state.lights.some((l) => l.enabled)) {
@@ -219,17 +244,27 @@ class App {
         result.total = Math.round(result.total * 0.6 + sim * 100 * 0.4);
       }
       this.lastResult = result;
-      this.recordHistory(result, resolved);
+      this.lastPasses = passes;
+      // A copy of the shot for the diagnosis panel, so the criticism and
+      // the photograph are always on screen together.
+      try { this.lastShotURL = this.engine.grabImage().toDataURL('image/jpeg', 0.82); }
+      catch { this.lastShotURL = null; }
       document.getElementById('stale-badge').textContent =
         `CAPTURED · ${passes} PASSES`;
       document.getElementById('stale-badge').classList.remove('live');
       this.refreshReadouts();
       // The photograph stays on screen until something is actually changed.
-      // Without this a queued preview redraw can wipe the frame you just took.
       this.dirty = false;
+      this.holdCapture = true;
 
-      if (this.activeModule) this.evaluateModule();
-      else this.showResult(result);
+      if (this.demoActive) {
+        // Demo shots are the teacher's, not the player's: they must not
+        // latch goals or enter the history the goals read.
+      } else {
+        this.recordHistory(result, resolved);
+        if (this.activeModule) this.evaluateModule();
+        else this.showResult(result);
+      }
     } catch (e) {
       console.error(e);
       alert('The capture failed. ' + e.message);
@@ -288,6 +323,12 @@ class App {
 
     const body = document.getElementById('result-body');
     body.innerHTML = '';
+    if (this.lastShotURL) {
+      const shot = el('img', 'result-shot');
+      shot.src = this.lastShotURL;
+      shot.alt = 'The captured frame';
+      body.append(shot);
+    }
     for (const c of result.criteria) {
       const row = el('div', 'crit');
       const head = el('div', 'crit-head');
@@ -313,7 +354,12 @@ class App {
     again.onclick = () => panelEl.classList.remove('on');
     actions.append(again);
     const insp = el('button', 'btn', 'Look at the frame');
-    insp.onclick = () => panelEl.classList.remove('on');
+    insp.onclick = () => {
+      panelEl.classList.remove('on');
+      // Put the capture back on the canvas explicitly - never trust that
+      // nothing repainted the viewfinder while the panel was up.
+      try { this.engine.presentLast(this.lastPasses || 1); this.holdCapture = true; this.dirty = false; } catch { /* fine */ }
+    };
     actions.append(insp);
     if (this.mode === 'daily') {
       const done = el('button', 'btn', 'Log today’s score');
@@ -343,6 +389,7 @@ class App {
     document.querySelector('#coach .coach-close').onclick = () =>
       document.getElementById('coach').classList.remove('on');
     document.getElementById('btn-inspect').onclick = () => this.toggleInspect();
+    document.getElementById('btn-modeling').onclick = () => this.toggleModeling();
     this.tab = 'camera';
   }
 
@@ -431,7 +478,14 @@ class App {
     this.plan.draw();
   }
 
-  markDirty() { this.dirty = true; this.refreshReadouts(); this.panelRoot?.refresh(); this.plan.draw(); this.updateCoach(); }
+  markDirty() {
+    this.dirty = true;
+    this.holdCapture = false;   // touching anything releases the frozen frame
+    this.refreshReadouts();
+    this.panelRoot?.refresh();
+    this.plan.draw();
+    this.updateCoach();
+  }
 
   buildCameraTab(add, locked) {
     const s = this.state;
@@ -993,18 +1047,116 @@ class App {
     }
     body.append(gl);
     const actions = el('div', 'result-actions');
-    const go = el('button', 'btn primary', 'Start');
-    go.onclick = () => { panelEl.classList.remove('on'); this.updateCoach(); };
+    if (m.demo) {
+      const demo = el('button', 'btn primary', 'Show me first');
+      demo.onclick = () => { panelEl.classList.remove('on'); this.startDemo(m); };
+      actions.append(demo);
+      const go = el('button', 'btn', 'I\u2019ll try it myself');
+      go.onclick = () => { panelEl.classList.remove('on'); this.updateCoach(); };
+      actions.append(go);
+    } else {
+      const go = el('button', 'btn primary', 'Start');
+      go.onclick = () => { panelEl.classList.remove('on'); this.updateCoach(); };
+      actions.append(go);
+    }
     const back = el('button', 'btn', 'Back to the list');
     back.onclick = () => { panelEl.classList.remove('on'); this.exitModule(); };
-    actions.append(go, back);
+    actions.append(back);
     body.append(actions);
     panelEl.classList.add('on');
+  }
+
+  /* ---------------- guided demo ---------------- */
+
+  /**
+   * The teacher's hands on the controls: each step narrates, moves the
+   * dials visibly, optionally fires. Demo shots never touch the player's
+   * goals or history, and the module resets to its drill state at the end.
+   */
+  startDemo(m) {
+    this.demoActive = true;
+    this.demoStep = -1;
+    this.demoModule = m;
+    document.getElementById('result').classList.remove('on');
+    this.advanceDemo();
+  }
+
+  async advanceDemo() {
+    const m = this.demoModule;
+    this.demoStep++;
+    const step = m.demo[this.demoStep];
+    if (!step) return this.endDemo();
+
+    if (step.set) {
+      step.set(this.state);
+      this.renderPanels();
+      this.markDirty();
+      this.holdCapture = false;
+    }
+    this.showDemoCoach(`Watch \u00b7 ${this.demoStep + 1} of ${m.demo.length}`, step.say,
+      step.shoot ? 'Fire' : 'Next');
+
+    if (step.shoot) {
+      this.demoPending = async () => {
+        await this.shoot();
+        if (step.after) {
+          this.showDemoCoach(`Watch \u00b7 ${this.demoStep + 1} of ${m.demo.length}`, step.after,
+            this.demoStep + 1 < m.demo.length ? 'Next' : 'Your turn');
+          this.demoPending = null;
+        } else {
+          this.advanceDemo();
+        }
+      };
+    } else {
+      this.demoPending = null;
+    }
+  }
+
+  onDemoNext() {
+    if (this.demoPending) { const p = this.demoPending; this.demoPending = null; p(); }
+    else this.advanceDemo();
+  }
+
+  endDemo() {
+    const m = this.demoModule;
+    this.demoActive = false;
+    this.demoModule = null;
+    // Reset to the drill's opening state - the player gets the same table
+    // the teacher had, not the teacher's finished settings.
+    m.setup(this.state);
+    this.state.modeling = this.modelingDefault();
+    this.state.selected = this.state.lights[0]?.id || 'camera';
+    this.history = [];
+    this.lastResult = null;
+    this.hist.update(null);
+    this.renderPanels();
+    this.markDirty();
+    const box = document.getElementById('coach');
+    document.getElementById('coach-title').textContent = 'Your turn';
+    document.getElementById('coach-body').textContent =
+      'Same room, same drill, reset to the start. ' + (m.hint || '');
+    document.getElementById('coach-next')?.remove();
+    box.classList.add('on');
+  }
+
+  showDemoCoach(title, body, nextLabel) {
+    const box = document.getElementById('coach');
+    document.getElementById('coach-title').textContent = title;
+    document.getElementById('coach-body').textContent = body;
+    document.getElementById('coach-next')?.remove();
+    const btn = el('button', 'btn primary demo-next', nextLabel);
+    btn.id = 'coach-next';
+    btn.onclick = () => this.onDemoNext();
+    box.append(btn);
+    box.classList.add('on');
   }
 
   exitModule() {
     this.activeModule = null;
     this.goalState = {};
+    this.demoActive = false;
+    this.demoModule = null;
+    document.getElementById('coach-next')?.remove();
     document.getElementById('coach').classList.remove('on');
     this.setMode('learn');
   }
@@ -1066,8 +1218,10 @@ class App {
   }
 
   updateCoach(newlyMet) {
+    if (this.demoActive) return;   // the demo owns the coach box
     const box = document.getElementById('coach');
     const m = this.activeModule;
+    document.getElementById('coach-next')?.remove();
     if (!m || m.noCoach) { box.classList.remove('on'); return; }
     let text = null;
     try {

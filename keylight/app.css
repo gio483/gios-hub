@@ -315,6 +315,11 @@ button { cursor: pointer; border: none; background: none; }
 .crit-detail { font-size: 12.5px; line-height: 1.6; color: var(--muted); padding-left: 17px; }
 .pen { color: var(--bad); }
 .result-actions { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.result-shot {
+  display: block; width: 100%; max-width: 560px; border-radius: 8px;
+  border: 1px solid var(--line2); margin: 2px 0 14px;
+}
+#coach-next { margin-top: 10px; min-height: 40px; padding: 0 22px; font-size: 12px; }
 .btn {
   min-height: 44px; padding: 0 18px; border-radius: 8px; border: 1px solid var(--line2);
   background: var(--panel2); color: var(--text); font-size: 13px;

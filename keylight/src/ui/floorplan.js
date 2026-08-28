@@ -8,7 +8,7 @@
  * on a phone without hover.
  */
 
-import { lensById } from '../physics/gear.js';
+import { lensById, headById, modifierById } from '../physics/gear.js';
 import { SENSOR_FULL_FRAME, SENSOR_APSC } from '../physics/constants.js';
 import { raycastWall } from '../physics/lightmodel.js';
 
@@ -202,6 +202,45 @@ export class FloorPlan {
       }
       c.setLineDash([]);
       c.restore();
+
+      // Where the beam axis actually lands, with the cone's footprint there.
+      // This is the answer to "where is this light pointing" without firing.
+      if (l.mode === 'direct' && on) {
+        const tilt = ((l.tilt || 0) * Math.PI) / 180;
+        const dy = Math.sin(tilt);
+        const horiz = Math.max(0.03, Math.cos(tilt));
+        const room = this.scene.room;
+        let t3 = Infinity, hitKind = 'wall';
+        if (dy < -0.015) { t3 = l.height / -dy; hitKind = 'floor'; }
+        else if (dy > 0.015) { t3 = (room.ceiling - l.height) / dy; hitKind = 'ceiling'; }
+        const wallHit = raycastWall(l.x, l.z, yaw, room);
+        const tWall = wallHit.distance / horiz;
+        if (tWall < t3) { t3 = tWall; hitKind = 'wall'; }
+        if (isFinite(t3) && t3 > 0.05) {
+          const lx = l.x + Math.sin(yaw) * horiz * t3;
+          const lz = l.z + Math.cos(yaw) * horiz * t3;
+          const [mx, my] = this.toScreen(lx, lz, L);
+          const head = headById(l.headId);
+          const mod = modifierById(l.modifierId);
+          const cone = ((mod?.beamHalfAngle ?? head?.beamHalfAngle ?? 30) * Math.PI) / 180;
+          const rM = Math.min(2.6, Math.tan(Math.min(cone, 1.2)) * t3);
+          c.save();
+          c.fillStyle = sel ? 'rgba(127,211,255,.14)' : 'rgba(90,169,214,.09)';
+          c.strokeStyle = sel ? 'rgba(127,211,255,.5)' : 'rgba(90,169,214,.3)';
+          c.lineWidth = 1;
+          if (hitKind === 'ceiling') c.setLineDash([3, 3]);
+          c.beginPath(); c.arc(mx, my, Math.max(5, rM * L.s), 0, 7); c.fill(); c.stroke();
+          c.setLineDash([]);
+          // crosshair at the axis
+          c.strokeStyle = sel ? '#7fd3ff' : 'rgba(122,200,240,.6)';
+          c.lineWidth = 1.5;
+          c.beginPath();
+          c.moveTo(mx - 5, my); c.lineTo(mx + 5, my);
+          c.moveTo(mx, my - 5); c.lineTo(mx, my + 5);
+          c.stroke();
+          c.restore();
+        }
+      }
 
       c.fillStyle = col;
       c.strokeStyle = '#0b0d10';

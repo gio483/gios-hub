@@ -35,6 +35,7 @@ export function defaultState(scene) {
     shiftX: 0, shiftY: 0,
     lights: [defaultLight('L1', 1.4, -2.2)],
     selected: 'L1',
+    modeling: false,
     vignette: 0.12
   };
 }
@@ -83,7 +84,8 @@ export function freshProgress() {
     lastDailyDate: null,
     dailyHistory: [],
     inProgress: null,
-    seenIntro: false
+    seenIntro: false,
+    modelingPref: 'auto'
   };
 }
 
