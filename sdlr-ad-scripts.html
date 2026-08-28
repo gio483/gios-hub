@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>SDLR · Founder-Led Ad Scripts</title>
+<style>
+  :root{
+    --bg:#0b1220;--panel:#111a2c;--card:#151f33;--card2:#1a2740;--text:#f1f5f9;
+    --muted:#93a3bc;--line:#26344f;--accent:#34d399;--accent-soft:rgba(52,211,153,.14);--gold:#d8c9a3;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #14243d 0%, var(--bg) 55%) fixed;color:var(--text);
+    min-height:100vh;line-height:1.5;padding:max(20px,env(safe-area-inset-top)) 16px calc(56px + env(safe-area-inset-bottom))}
+  .wrap{max-width:820px;margin:0 auto}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  a.back{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;padding:6px 2px}
+  a.back:hover{color:var(--text)}
+  header.masthead{margin:10px 0 6px}
+  .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .eyebrow .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  h1{font-size:2rem;margin:.28em 0 .1em;letter-spacing:-.01em;line-height:1.1}
+  .dek{color:var(--muted);font-size:1rem;margin:.2em 0 0;max-width:60ch}
+  .metaline{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:.76rem;color:var(--muted);font-weight:600}
+  .pill.on{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+  .usebar{margin:18px 0 4px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+    border-radius:14px;padding:13px 15px;font-size:.9rem;color:#d7f5e9}
+  .usebar b{color:#fff}
+  section{margin:30px 0 0}
+  .sec-h{display:flex;align-items:baseline;gap:11px;margin:0 0 4px;border-bottom:1px solid var(--line);padding-bottom:9px}
+  .sec-h h2{font-size:1.28rem;margin:0;letter-spacing:.005em}
+  .sec-h .count{color:var(--accent);font-size:.82rem;font-weight:700;margin-left:auto}
+  .sec-note{color:var(--muted);font-size:.83rem;margin:8px 0 14px;font-style:italic}
+  .block{position:relative;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 15px 15px;margin:11px 0}
+  .block .lbl{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:flex;gap:9px;align-items:center;padding-right:74px}
+  .block .lbl .n{display:inline-flex;align-items:center;justify-content:center;min-width:23px;height:23px;padding:0 6px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-size:.82rem}
+  .block .lbl .kind{color:var(--gold);font-weight:600;letter-spacing:.02em;text-transform:none;font-size:.76rem}
+  .block .say{font-size:1.02rem;color:#eef3fa;line-height:1.5}
+  .block.primary{background:linear-gradient(180deg,#16273f,#131d30);border-color:color-mix(in srgb,var(--accent) 34%,var(--line))}
+  .block.primary .say{font-size:1.06rem}
+  .block .say p{margin:0 0 .7em}.block .say p:last-child{margin-bottom:0}
+  .copy{position:absolute;top:12px;right:12px;background:var(--card2);border:1px solid var(--line);color:var(--muted);
+    border-radius:8px;font-size:.72rem;font-weight:700;padding:5px 10px;cursor:pointer;transition:.12s}
+  .copy:hover{color:var(--text);border-color:#3a4d72}
+  .copy.done{color:var(--accent);border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+  details.strat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:2px 15px;margin:18px 0 0}
+  details.strat summary{cursor:pointer;font-weight:700;padding:13px 0;list-style:none;display:flex;align-items:center;gap:9px}
+  details.strat summary::-webkit-details-marker{display:none}
+  details.strat summary .chev{transition:.2s;color:var(--muted)}
+  details.strat[open] summary .chev{transform:rotate(90deg)}
+  .strat .kv{font-size:.9rem;color:#dfe7f2;margin:4px 0 14px}
+  .strat .kv div{margin:7px 0;padding-left:14px;border-left:2px solid var(--line)}
+  .strat .kv b{color:#fff}
+  .flags{background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:14px 16px;margin-top:12px;font-size:.88rem;color:#dfe7f2}
+  .flags li{margin:7px 0}
+  footer{margin-top:40px;color:var(--muted);font-size:.78rem;text-align:center;line-height:1.6}
+  .grp{margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="designs.html?c=sdlr">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+    San Diego Landscape · Design Gallery
+  </a>
+
+  <header class="masthead">
+    <div class="eyebrow"><span class="dot"></span> Meta Video Ad Scripts</div>
+    <h1 class="serif">Founder-Led Ad Scripts</h1>
+    <p class="dek">The full script package for cold Meta video — 12 hooks, a modular body you can recombine, five consultation offers, six CTAs, and ready-to-shoot 60 / 30 / 15-second cuts. Written in SDLR's voice, for a founder to camera.</p>
+    <div class="metaline">
+      <span class="pill on">v1 · Aug 28, 2026</span>
+      <span class="pill">Hero: full backyard remodels</span>
+      <span class="pill">Founder-led · Gio or Mike</span>
+      <span class="pill">Offer: design consultation</span>
+    </div>
+    <div class="usebar">
+      <b>How to use it.</b> Every block below is one module. Build an ad by combining <b>one hook + the body + one offer + one CTA</b> — or shoot the assembled 60-second script as-is. Tap <b>Copy</b> on any block to drop it straight into a teleprompter. Spoken words only; production notes are kept separate at the end.
+    </div>
+  </header>
+
+  <details class="strat">
+    <summary><span class="chev">▸</span> Strategy &amp; the offer gate (read once, not spoken)</summary>
+    <div class="kv">
+      <div><b>Audience &amp; geo.</b> San Diego County luxury homeowners; hooks rotate real high-end pockets and build qualification (full-remodel scale) into the hook — never a price floor.</div>
+      <div><b>Offer — Gate 0: PASS.</b> A private in-home design consultation with a founder that produces a photorealistic design of the client's actual backyard before they commit — a real result in advance. Believability (the hard part at launch, with no testimonials yet) is carried by founder identification, a reframed 25+ year track record and GC depth, the design-first / one-contract process, the render of their own yard, and the 10-Month Walk-Through standing in as risk reversal. It escapes a price fight through process and accountability, not a discount.</div>
+      <div><b>Voice.</b> Editorial-luxury with human warmth — the client voice governs, not a generic contractor register.</div>
+      <div><b>Compliance held.</b> No testimonials or specific delivered-job claims (none exist yet); "references on request"; no client-home visits; delivery = "our own crew and vetted specialty subcontractors, under one licensed contract"; no naming of the partner's other companies or the lead craftsman's full name; no price floor in prose; no emergency/same-day language.</div>
+      <div><b>Not the Seven Day Number.</b> Built on the standard design-consultation offer, so that campaign's three open decisions stay open.</div>
+    </div>
+  </details>
+
+  <main id="app"></main>
+
+  <section>
+    <div class="sec-h"><h2 class="serif">Open items</h2></div>
+    <ul class="flags">
+      <li><b>Which founder on camera</b> — written so either Gio or Mike can deliver it; pick who's more natural for cold audiences.</li>
+      <li><b>Proof upgrades fast</b> — once the first project is 30 days post-handover with a signed client quote, upgrade the Social Proof block from reframed track record to a real, attributed result.</li>
+      <li><b>The Seven Day Number's three open decisions</b> (guarantee, price anchor, blocked CTA 3) remain untouched.</li>
+      <li><b>Product-named version available</b> — Belgard, Techo-Bloc, Warming Trends, StruXure, SYNLawn, etc. can be worked into the Service / Social Proof blocks for a warmer audience.</li>
+    </ul>
+  </section>
+
+  <footer>
+    San Diego Landscape Remodeling · produced with the SVM ad-scriptwriter system<br>
+    Spoken copy only — see the production notes block for shot direction.
+  </footer>
+</div>
+
+<script>
+const DATA = [
+  { id:'hooks', title:'Hooks', count:'12 variations',
+    note:'Each names a real audience and a materially different entry. Spoken, first person.',
+    items:[
+      {n:1, kind:'If-then + qualification', say:"If you're finally ready to remodel the backyard of your Rancho Santa Fe home — the whole thing, not a weekend patch — there's something worth understanding before you take a single bid."},
+      {n:2, kind:'The scene / emotional want', say:"La Jolla homeowners: the best room in your house might be the one you haven't built yet — the one out back, where your family actually ends up."},
+      {n:3, kind:'Owner opinion / contrarian', say:"Most people in Del Mar don't regret remodeling their backyard. They regret how long they waited to enjoy it."},
+      {n:4, kind:'Damaging admission', say:"I'll tell you the honest part first: we are not the fastest outdoor remodeler in San Diego, and if you need a crew this weekend, we're the wrong call. Here's who we are right for."},
+      {n:5, kind:'Yes-question, disguised qualifier', say:"Coronado homeowners — is your backyard the one part of a beautiful home that still doesn't feel finished?"},
+      {n:6, kind:'Contractor confession', say:"The reason so many San Diego backyard remodels go sideways isn't the crew. It's that nobody designed the whole thing before demolition started."},
+      {n:7, kind:'Cost of waiting, no fake fear', say:"Point Loma homeowners: another summer is going to pass in that backyard exactly the way the last one did — unless the design gets started now."},
+      {n:8, kind:'Ridiculous-result / lived experience', say:"We build the kind of backyard your family stops leaving the house for. Fairbanks Ranch — this is what an outdoor living space is supposed to feel like."},
+      {n:9, kind:'Myth vs reality', say:"The myth is that a backyard remodel is a landscaping job. At this level, in Santaluz, it's a design-build project — and the difference is the whole outcome."},
+      {n:10, kind:'Neighbor comparison / pride', say:"You know the backyard on your street that everyone quietly wishes was theirs? Mount Helix — that's a design decision, not a budget."},
+      {n:11, kind:'Process transparency / control', say:"Before we pour anything at your Bonita home, you'll see a photorealistic design of your actual backyard. You approve the whole plan before the first day of work."},
+      {n:12, kind:'Founder identification / results in advance', say:"I'm one of the two people who'll actually run your project. Before you commit to anything, San Diego, I'll design your backyard for you so you can see it — then you decide."},
+    ]},
+  { id:'body', title:'The body', count:'core modules',
+    note:'One core section each — the middle of any assembled ad.',
+    items:[
+      {kind:'Service', say:"We design and build the whole outdoor space — the living areas, the kitchen and the fire, the pool and the deck around it, the shade, the walls, the lighting, the planting, and the drainage that keeps all of it right for decades. One firm plans it, one firm builds it, and one licensed contract stands behind it, so you're not refereeing a pool company against a hardscape company over who owns what. It starts with design: we render your actual property, down to the materials, before anyone touches the ground — so the backyard you approve on the screen is the one you walk into at the end."},
+      {kind:'Hesitation', say:"If you've been putting this off, it's usually not the money — it's the risk. You've heard the stories: the budget that drifted, the project that dragged into a second season, the contractor who got hard to reach the moment the deposit cleared. Those are real, and they're exactly why we built the way we did — the design settled and priced before we start, direct access to the two of us who run it, and a program that brings us back ten months later to go over the finished work with a fine-tooth comb. Waiting another year doesn't lower the risk. Working with someone who removes it does."},
+      {kind:'Social proof', say:"Here's what stands behind the work. It's built and led by a licensed general contractor and a lead craftsman with more than twenty-five years in high-end outdoor construction — this isn't a new trade for us, it's decades of it, under our own company now. We're a licensed and insured general contractor, we install the premium material lines you'd want named on your project, and every build carries our 10-Month Walk-Through. We keep a detailed photographic record of completed work and references we're glad to share, privately, when we talk — out of respect for our clients, their homes never become anyone's showroom."},
+      {kind:'Pain point', say:"The hard part of living with an unfinished backyard isn't how it looks. It's that it's the one project that never gets off the list. Every good weekend, the space you should be enjoying is the space you're apologizing for when people come over. You've got the home you worked for, and the part of it your family would use the most is the part that still isn't right. It doesn't get worse dramatically — it just quietly costs you another year of the thing you actually wanted, which was the time out there, not the construction."},
+      {kind:'UVP', say:"What makes us different is what happens around the build. You talk to the two people who own the company, not an account manager — so nothing gets lost between the sale and the crew. The whole project is designed and priced before we start, so you're not making expensive decisions in the middle of demolition. It's our own crew and our vetted specialty trades under one contract, so one firm is accountable for the pool, the deck, and everything between them. And we don't disappear at the end — ten months later we're back, walking the finished space with you."},
+    ]},
+  { id:'offers', title:'Offers', count:'5 variations',
+    note:'The offer is the consultation, never a discount. Spoken variations.',
+    items:[
+      {n:1, say:"Start with a private design consultation. One of us comes to you, we walk the space, and we turn it into a photorealistic design of your actual backyard — so you can see the whole thing before you decide anything."},
+      {n:2, say:"Before you commit a dollar to the build, we'll design it. You'll see your real backyard, rendered with the actual materials, and a plan and an honest number to go with it."},
+      {n:3, say:"Book the consultation and you get the design conversation most firms skip — the one where we tell you honestly what your space wants, and where a smaller scope or a different timeline is the right call for you."},
+      {n:4, say:"Every project we take includes our 10-Month Walk-Through: ten months after we finish, we come back and inspect the work with you, in detail. That's built in — it's how we stand behind what we build."},
+      {n:5, say:"We only take on a limited number of projects at a time, by design. If you want yours planned properly rather than squeezed in, the first step is the design consultation."},
+    ]},
+  { id:'ctas', title:'CTAs', count:'6 variations',
+    note:'Book the design consultation — varied motivation. Spoken.',
+    items:[
+      {n:1, kind:'relief', say:"When you're ready to have this finally handled, book a design consultation and we'll take it from there."},
+      {n:2, kind:'see-it-first', say:"Tap the button, book the consultation, and let us show you your actual backyard designed — before you decide anything."},
+      {n:3, kind:'smart-decision', say:"If you're going to invest in this, invest in getting it right. Start with the design consultation — book it below."},
+      {n:4, kind:'family / lived experience', say:"Book the consultation, and let's build the backyard your family stops wanting to leave."},
+      {n:5, kind:'intention / real scarcity', say:"We plan our projects months ahead and take a limited number at once. If yours matters, start the design now — book below."},
+      {n:6, kind:'founder access', say:"You'll be working directly with me. Book a design consultation and let's talk about your space."},
+    ]},
+  { id:'cuts', title:'Assembled cuts', count:'60 / 30 / 15s',
+    note:'Ready to shoot. Founder-led, teleprompter, spoken only.',
+    items:[
+      {kind:'60-second primary', primary:true, say:[
+        "If you're finally ready to remodel the backyard of your San Diego home — the whole thing, not a weekend patch — there's something worth understanding before you take a single bid.",
+        "I'll be honest with you first: we're not the fastest outdoor remodeler in town, and if you need a crew this weekend, we're the wrong call. But if you want it done right, once, stay with me.",
+        "You've probably heard the stories — the budget that drifts, the project that slides into a second season, the contractor who gets hard to reach the day the deposit clears. The reason those happen usually isn't the crew. It's that nobody designed the whole thing before demolition started.",
+        "So we do it backwards from everyone else. Before we touch your yard, one of us comes out, walks the space with you, and turns it into a photorealistic design of your actual backyard — the real materials, the whole plan, an honest number. You approve all of it before day one.",
+        "It's built and led by a licensed general contractor and a lead craftsman with more than twenty-five years in high-end outdoor work — our own crew and our vetted specialty trades, under one contract. And ten months after we finish, we come back and walk the whole thing with you, in detail. That's built in.",
+        "If you want the backyard your family actually stops leaving the house for, start with the design. Tap the button and book your consultation — you'll be working directly with me."
+      ]},
+      {kind:'30-second cut', say:"San Diego, if you're ready to remodel the whole backyard — not patch it — here's what most firms skip. They start building before it's designed. We do the opposite: before we touch your yard, we render your actual backyard with the real materials, and you approve the entire plan and price before day one. Licensed, led by a craftsman with twenty-five-plus years, and we come back ten months later to walk the finished work with you. Book your design consultation — tap below."},
+      {kind:'15-second cut', say:"San Diego — the best room in your house might be the one out back that you haven't built yet. Before you commit a dollar, we'll design your actual backyard so you can see it. Book your consultation below."},
+    ]},
+  { id:'prod', title:'Production notes', count:'not spoken',
+    note:'Shot direction — do not read aloud.',
+    items:[
+      {kind:'Setup', say:"Founder to camera (Gio or Mike), direct eye contact, at a finished space or an active build — never an office, never a ring-light studio. Work-appropriate wardrobe, real setting."},
+      {kind:'Frame & captions', say:"First frame mid-sentence or mid-action; trim the first half-second. Burned-in captions, 2–5 words per card, high-contrast, above the bottom Reels UI."},
+      {kind:'Energy', say:"Deliberately unpolished energy in the founder's real register; stumbles are fine — they read as trust."},
+    ]},
+];
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function sayHTML(say){return Array.isArray(say) ? say.map(p=>'<p>'+esc(p)+'</p>').join('') : esc(say);}
+function plain(say){return Array.isArray(say) ? say.join('\n\n') : say;}
+
+const app = document.getElementById('app');
+DATA.forEach(sec=>{
+  const s = document.createElement('section');
+  s.innerHTML = `<div class="sec-h"><h2 class="serif">${sec.title}</h2><span class="count">${sec.count}</span></div>
+    ${sec.note?`<p class="sec-note">${sec.note}</p>`:''}<div class="grp"></div>`;
+  const grp = s.querySelector('.grp');
+  sec.items.forEach(it=>{
+    const b = document.createElement('div');
+    b.className = 'block' + (it.primary?' primary':'');
+    const label = (it.n?`<span class="n">${it.n}</span>`:'') + (it.kind?`<span class="kind">${esc(it.kind)}</span>`:'');
+    b.innerHTML = `${label?`<div class="lbl">${label}</div>`:''}
+      <button class="copy" type="button">Copy</button>
+      <div class="say">${sayHTML(it.say)}</div>`;
+    const btn = b.querySelector('.copy');
+    btn.addEventListener('click', ()=>{
+      navigator.clipboard.writeText(plain(it.say)).then(()=>{
+        btn.textContent='Copied'; btn.classList.add('done');
+        setTimeout(()=>{btn.textContent='Copy'; btn.classList.remove('done');},1400);
+      }).catch(()=>{btn.textContent='—';});
+    });
+    grp.appendChild(b);
+  });
+  app.appendChild(s);
+});
+</script>
+</body>
+</html>
