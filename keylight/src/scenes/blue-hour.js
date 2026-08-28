@@ -33,7 +33,7 @@ export const blueHour = {
   },
 
   windows: [
-    { wall: '+x', u: 4.0, v: 1.45, w: 6.4, h: 2.40, ev: 7.4, kelvin: 8600, view: 'city' }
+    { wall: '+x', u: 4.0, v: 1.45, w: 6.4, h: 2.40, ev: 7.4, kelvin: 8600, view: 'city', drapes: 'shade', drapeWidth: 0.5 }
   ],
 
   fixtures: [
@@ -44,30 +44,27 @@ export const blueHour = {
   ],
 
   props: [
-    { type: 'box', x: -0.2, y: 0.008, z: 0.3, w: 4.2, h: 0.016, d: 3.4, mat: 'rug', occluder: false },
-    { type: 'box', x: -1.0, y: 0.21, z: 1.7, w: 2.7, h: 0.42, d: 0.95, mat: 'sofa' },
-    { type: 'box', x: -1.0, y: 0.60, z: 2.09, w: 2.7, h: 0.58, d: 0.18, mat: 'sofa' },
-    { type: 'box', x: 1.0, y: 0.21, z: -1.2, w: 0.95, h: 0.42, d: 0.95, mat: 'sofa', yaw: -0.5 },
-    { type: 'box', x: 1.25, y: 0.60, z: -0.95, w: 0.95, h: 0.56, d: 0.16, mat: 'sofa', yaw: -0.5 },
-    { type: 'box', x: -0.4, y: 0.38, z: 0.35, w: 1.3, h: 0.03, d: 0.72, mat: 'glassTop', occluder: false },
-    { type: 'box', x: -0.4, y: 0.19, z: 0.35, w: 1.1, h: 0.05, d: 0.55, mat: 'oak' },
-    // Console tables with the lamps
-    { type: 'box', x: -2.6, y: 0.40, z: -2.4, w: 0.9, h: 0.05, d: 0.5, mat: 'oak' },
-    { type: 'box', x: -2.6, y: 0.40, z: 2.4, w: 0.9, h: 0.05, d: 0.5, mat: 'oak' },
-    { type: 'cyl', x: -2.6, y: 0.52, z: -2.4, r: 0.02, h: 0.20, mat: 'steel', occluder: false },
-    { type: 'cyl', x: -2.6, y: 0.52, z: 2.4, r: 0.02, h: 0.20, mat: 'steel', occluder: false },
-    { type: 'cyl', x: -2.6, y: 0.78, z: -2.4, rTop: 0.14, rBot: 0.19, h: 0.26, mat: 'shade', caps: false, occluder: false },
-    { type: 'cyl', x: -2.6, y: 0.78, z: 2.4, rTop: 0.14, rBot: 0.19, h: 0.26, mat: 'shade', caps: false, occluder: false },
+    { type: 'rug', x: -0.2, z: 0.3, w: 4.4, d: 3.5, yaw: 0, rug: 'rug', border: 'oak' },
+
+    { type: 'sofa', x: -1.0, z: 1.7, yaw: 3.14159, w: 2.7, d: 0.95, body: 'sofa', legs: 'oak' },
+    { type: 'armchair', x: 1.0, z: -1.2, yaw: -0.5, body: 'sofa', legs: 'oak' },
+    { type: 'table', x: -0.4, z: 0.35, yaw: 0, w: 1.3, d: 0.72, h: 0.38, top: 'glassTop', legs: 'oak' },
+    { type: 'stack', x: -0.6, y: 0.38, z: 0.35, mats: ['art', 'oak'], n: 2 },
+    { type: 'vase', x: -0.1, y: 0.38, z: 0.35, r: 0.08, h: 0.26, mat: 'steel', stems: 'plant' },
+
+    // Console tables with warm lamps
+    { type: 'table', x: -2.6, z: -2.4, yaw: 0, w: 0.9, d: 0.5, h: 0.40, top: 'oak', legs: 'oak' },
+    { type: 'table', x: -2.6, z: 2.4, yaw: 0, w: 0.9, d: 0.5, h: 0.40, top: 'oak', legs: 'oak' },
+    { type: 'lamp', x: -2.6, z: -2.4, kind: 'table', h: 0.42, base: 'steel', stem: 'steel', shade: 'shade' },
+    { type: 'lamp', x: -2.6, z: 2.4, kind: 'table', h: 0.42, base: 'steel', stem: 'steel', shade: 'shade' },
+
     // Pendant over the table
-    { type: 'cyl', x: -0.6, y: 2.62, z: 0.6, r: 0.014, h: 0.56, mat: 'steel', occluder: false },
-    { type: 'cyl', x: -0.6, y: 2.34, z: 0.6, rTop: 0.10, rBot: 0.22, h: 0.24, mat: 'steel', caps: false, occluder: false },
-    // Shelving on the -x wall
-    { type: 'box', x: -3.28, y: 1.1, z: 0.0, w: 0.36, h: 2.2, d: 2.6, mat: 'oak' },
-    { type: 'box', x: -3.22, y: 1.65, z: 0.0, w: 0.32, h: 0.03, d: 2.4, mat: 'shade', occluder: false },
-    { type: 'cyl', x: 2.2, y: 0.28, z: 3.2, rTop: 0.22, rBot: 0.17, h: 0.56, mat: 'oak' },
-    { type: 'cyl', x: 2.2, y: 1.15, z: 3.2, rTop: 0.05, rBot: 0.02, h: 1.2, mat: 'plant', occluder: false },
-    { type: 'box', x: 2.2, y: 1.62, z: 3.2, w: 0.9, h: 0.55, d: 0.85, mat: 'plant', occluder: false },
-    { type: 'box', x: -0.6, y: 1.75, z: -3.95, w: 1.6, h: 1.05, d: 0.05, mat: 'art', occluder: false }
+    { type: 'pendant', x: -0.6, y: 2.86, z: 0.6, drop: 0.52, r: 0.20, metal: 'steel', shade: 'steel' },
+
+    // Bookcase on the -x wall, plant and art
+    { type: 'bookcase', x: -3.28, z: 0.0, yaw: 1.5708, w: 2.4, h: 2.2, d: 0.36, frame: 'oak', books: 'shade', shelves: 4 },
+    { type: 'plant', x: 2.2, z: 3.2, scale: 1.3, pot: 'oak', foliage: 'plant', stem: 'plant', clumps: 8 },
+    { type: 'art', x: -0.6, y: 1.75, z: -3.97, w: 1.6, h: 1.05, yaw: 0, frame: 'oak', canvas: 'art' }
   ],
 
   reflectors: [

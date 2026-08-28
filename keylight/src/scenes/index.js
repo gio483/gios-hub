@@ -5,6 +5,8 @@ import { greatRoom } from './great-room.js';
 import { blueHour } from './blue-hour.js';
 import { hallway } from './hallway.js';
 import { darkOffice } from './dark-office.js';
+import { bedroom } from './bedroom.js';
+import { diningRoom } from './dining-room.js';
 
-export const SCENES = [livingRoom, kitchen, bathroom, greatRoom, blueHour, hallway, darkOffice];
+export const SCENES = [livingRoom, kitchen, bathroom, greatRoom, blueHour, hallway, darkOffice, bedroom, diningRoom];
 export const sceneById = (id) => SCENES.find((s) => s.id === id) || SCENES[0];

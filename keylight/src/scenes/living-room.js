@@ -35,8 +35,8 @@ export const livingRoom = {
   },
 
   windows: [
-    { wall: '+x', u: 4.6, v: 1.45, w: 3.4, h: 1.95, ev: 14.2, kelvin: 6100 },
-    { wall: '+x', u: 1.5, v: 1.35, w: 1.1, h: 1.6,  ev: 14.0, kelvin: 6200 }
+    { wall: '+x', u: 4.6, v: 1.45, w: 3.4, h: 1.95, ev: 14.2, kelvin: 6100, view: 'foliage', drapes: 'shade' },
+    { wall: '+x', u: 1.5, v: 1.35, w: 1.1, h: 1.6,  ev: 14.0, kelvin: 6200, view: 'foliage' }
   ],
 
   fixtures: [
@@ -45,57 +45,30 @@ export const livingRoom = {
   ],
 
   props: [
-    // Rug
-    { type: 'box', x: 0.1, y: 0.006, z: 0.4, w: 3.6, h: 0.012, d: 2.7, mat: 'rug', occluder: false },
+    { type: 'rug', x: 0.1, z: 0.4, w: 3.7, d: 2.8, yaw: 0, rug: 'rug', border: 'walnut' },
 
-    // Sofa, back to the far wall, facing the window
-    { type: 'box', x: -0.6, y: 0.22, z: 1.85, w: 2.4, h: 0.44, d: 0.95, mat: 'sofa', yaw: 0 },
-    { type: 'box', x: -0.6, y: 0.60, z: 2.24, w: 2.4, h: 0.58, d: 0.18, mat: 'sofa' },
-    { type: 'box', x: -1.72, y: 0.50, z: 1.85, w: 0.18, h: 0.30, d: 0.95, mat: 'sofa' },
-    { type: 'box', x: 0.52, y: 0.50, z: 1.85, w: 0.18, h: 0.30, d: 0.95, mat: 'sofa' },
-    { type: 'box', x: -1.30, y: 0.53, z: 2.06, w: 0.44, h: 0.44, d: 0.16, mat: 'pillow', yaw: 0.18 },
-    { type: 'box', x: 0.08, y: 0.53, z: 2.06, w: 0.44, h: 0.44, d: 0.16, mat: 'pillow', yaw: -0.14 },
+    // Sofa facing the window, coffee table, angled armchair
+    { type: 'sofa', x: -0.6, z: 1.9, yaw: 0, w: 2.4, d: 0.95, body: 'sofa', cushion: 'pillow', legs: 'walnut' },
+    { type: 'table', x: -0.1, z: 0.55, yaw: 0, w: 1.2, d: 0.68, h: 0.40, top: 'glass', legs: 'metal' },
+    { type: 'armchair', x: 1.75, z: -0.55, yaw: -0.62, body: 'sofa', legs: 'walnut' },
+    { type: 'stack', x: -0.35, y: 0.42, z: 0.55, mats: ['books', 'walnut', 'art'], n: 3 },
+    { type: 'vase', x: 0.25, y: 0.42, z: 0.5, r: 0.08, h: 0.26, mat: 'metal', stems: 'plant' },
 
-    // Coffee table, glass top on a walnut frame
-    { type: 'box', x: -0.1, y: 0.40, z: 0.55, w: 1.25, h: 0.035, d: 0.68, mat: 'glass', occluder: false },
-    { type: 'box', x: -0.1, y: 0.19, z: 0.55, w: 1.10, h: 0.06, d: 0.55, mat: 'walnut' },
-    { type: 'cyl', x: -0.62, y: 0.19, z: 0.28, r: 0.028, h: 0.38, mat: 'metal', occluder: false },
-    { type: 'cyl', x: 0.42, y: 0.19, z: 0.28, r: 0.028, h: 0.38, mat: 'metal', occluder: false },
-    { type: 'cyl', x: -0.62, y: 0.19, z: 0.82, r: 0.028, h: 0.38, mat: 'metal', occluder: false },
-    { type: 'cyl', x: 0.42, y: 0.19, z: 0.82, r: 0.028, h: 0.38, mat: 'metal', occluder: false },
+    // Console with a lamp under the art
+    { type: 'table', x: -2.5, z: -2.1, yaw: 0, w: 1.5, d: 0.42, h: 0.40, top: 'walnut', legs: 'metal' },
+    { type: 'lamp', x: -2.5, z: -2.1, kind: 'table', h: 0.42, base: 'metal', stem: 'metal', shade: 'shade' },
+    { type: 'art', x: -2.5, y: 1.7, z: -4.06, w: 1.5, h: 1.0, yaw: 0, frame: 'walnut', canvas: 'art' },
 
-    // Armchair angled to the window
-    { type: 'box', x: 1.75, y: 0.23, z: -0.55, w: 0.85, h: 0.46, d: 0.85, mat: 'sofa', yaw: -0.62 },
-    { type: 'box', x: 2.03, y: 0.60, z: -0.30, w: 0.85, h: 0.56, d: 0.16, mat: 'sofa', yaw: -0.62 },
-
-    // Console and lamp against the near wall
-    { type: 'box', x: -2.5, y: 0.36, z: -2.1, w: 1.5, h: 0.05, d: 0.42, mat: 'walnut' },
-    { type: 'cyl', x: -3.15, y: 0.18, z: -2.1, r: 0.03, h: 0.36, mat: 'metal', occluder: false },
-    { type: 'cyl', x: -1.85, y: 0.18, z: -2.1, r: 0.03, h: 0.36, mat: 'metal', occluder: false },
-    { type: 'cyl', x: -2.5, y: 0.48, z: -2.1, r: 0.02, h: 0.20, mat: 'metal', occluder: false },
-    { type: 'cyl', x: -2.5, y: 0.72, z: -2.1, rTop: 0.13, rBot: 0.17, h: 0.24, mat: 'shade', caps: false, occluder: false },
-
-    // Bookshelf on the far wall
-    { type: 'box', x: 2.1, y: 0.95, z: 3.85, w: 1.6, h: 1.9, d: 0.34, mat: 'walnut' },
-    { type: 'box', x: 2.1, y: 0.62, z: 3.72, w: 1.44, h: 0.03, d: 0.28, mat: 'shade', occluder: false },
-    { type: 'box', x: 2.1, y: 1.14, z: 3.72, w: 1.44, h: 0.03, d: 0.28, mat: 'shade', occluder: false },
-    { type: 'box', x: 2.1, y: 1.62, z: 3.72, w: 1.44, h: 0.03, d: 0.28, mat: 'shade', occluder: false },
-    { type: 'box', x: 2.02, y: 0.80, z: 3.74, w: 1.28, h: 0.30, d: 0.22, mat: 'books', occluder: false },
-    { type: 'box', x: 2.18, y: 1.32, z: 3.74, w: 1.05, h: 0.30, d: 0.22, mat: 'books', occluder: false },
-    { type: 'box', x: 2.0,  y: 1.78, z: 3.74, w: 0.85, h: 0.26, d: 0.22, mat: 'books', occluder: false },
+    // Bookcase on the far wall, dressed
+    { type: 'bookcase', x: 2.1, z: 3.82, yaw: 3.14159, w: 1.7, h: 1.95, d: 0.34, frame: 'walnut', books: 'books', shelves: 4 },
 
     // Plant in the corner
-    { type: 'cyl', x: -2.65, y: 0.22, z: 2.9, rTop: 0.20, rBot: 0.15, h: 0.44, mat: 'walnut' },
-    { type: 'cyl', x: -2.65, y: 0.95, z: 2.9, rTop: 0.06, rBot: 0.02, h: 1.0, mat: 'plant', occluder: false },
-    { type: 'box', x: -2.65, y: 1.32, z: 2.9, w: 0.9, h: 0.5, d: 0.8, mat: 'plant', occluder: false },
+    { type: 'plant', x: -2.65, z: 2.9, scale: 1.15, pot: 'walnut', foliage: 'plant', stem: 'plant' },
 
-    // Chandelier: stem, arms hinted as a ring, hanging over the seating area
+    // Chandelier body over the seating
     { type: 'cyl', x: -0.2, y: 2.51, z: 0.7, r: 0.013, h: 0.42, mat: 'metal', occluder: false },
     { type: 'cyl', x: -0.2, y: 2.27, z: 0.7, rTop: 0.30, rBot: 0.30, h: 0.035, mat: 'metal', caps: false, occluder: false },
-    { type: 'cyl', x: -0.2, y: 2.24, z: 0.7, rTop: 0.055, rBot: 0.085, h: 0.10, mat: 'metal', caps: false, occluder: false },
-
-    // Art on the near wall
-    { type: 'box', x: -0.4, y: 1.55, z: -4.05, w: 1.4, h: 0.95, d: 0.05, mat: 'art', occluder: false }
+    { type: 'cyl', x: -0.2, y: 2.24, z: 0.7, rTop: 0.055, rBot: 0.085, h: 0.10, mat: 'metal', caps: false, occluder: false }
   ],
 
   reflectors: [

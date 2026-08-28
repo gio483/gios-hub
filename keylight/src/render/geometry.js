@@ -89,6 +89,22 @@ export class MeshBuilder {
    * emits overlapping quads as soon as two windows share a wall at different
    * heights, which shows up as z-fighting stripes.
    */
+  /** Low-poly UV sphere / ellipsoid, for foliage clumps and soft cushions. */
+  sphere(cx, cy, cz, rx, ry, rz, matId, rings = 6, seg = 9) {
+    const P = (i, j) => {
+      const v = (i / rings) * Math.PI, u = (j / seg) * Math.PI * 2;
+      return [cx + Math.sin(v) * Math.cos(u) * rx, cy + Math.cos(v) * ry, cz + Math.sin(v) * Math.sin(u) * rz];
+    };
+    for (let i = 0; i < rings; i++) {
+      for (let j = 0; j < seg; j++) {
+        const a2 = P(i, j), b2 = P(i, j + 1), c2 = P(i + 1, j + 1), d2 = P(i + 1, j);
+        const n1 = normalize([a2[0] - cx, a2[1] - cy, a2[2] - cz]);
+        this.tri(a2, b2, c2, n1, [[0, 0], [1, 0], [1, 1]], matId);
+        this.tri(a2, c2, d2, n1, [[0, 0], [1, 1], [0, 1]], matId);
+      }
+    }
+  }
+
   wallWithHoles(origin, right, up, width, height, holes, matId) {
     const at = (u, v) => [
       origin[0] + right[0] * u + up[0] * v,

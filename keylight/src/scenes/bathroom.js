@@ -29,7 +29,8 @@ export const bathroom = {
     vanity:   { albedo: '#48403a', roughness: 0.40, spec: 0.10, tex: 8 },
     porcelain:{ albedo: '#eeece7', roughness: 0.24, spec: 0.24 },
     towel:    { albedo: '#c9c3b4', roughness: 0.95, spec: 0.01, tex: 5, texScale: 1.6 },
-    shade:    { albedo: '#e8e3d8', roughness: 0.92, spec: 0.03 }
+    shade:    { albedo: '#e8e3d8', roughness: 0.92, spec: 0.03 },
+    plant:    { albedo: '#4f6d40', roughness: 0.85, spec: 0.05, tex: 11, texScale: 2 }
   },
 
   windows: [
@@ -66,7 +67,10 @@ export const bathroom = {
     { type: 'box', x: -1.0, y: 0.29, z: 1.35, w: 0.86, h: 0.58, d: 1.72, mat: 'porcelain' },
     { type: 'cyl', x: -0.42, y: 0.22, z: -0.2, r: 0.17, h: 0.44, mat: 'vanity' },
     { type: 'box', x: -0.42, y: 0.47, z: -0.2, w: 0.30, h: 0.06, d: 0.24, mat: 'towel', occluder: false },
-    { type: 'box', x: -1.66, y: 1.25, z: -0.5, w: 0.04, h: 0.5, d: 0.38, mat: 'towel', occluder: false }
+    { type: 'box', x: -1.66, y: 1.25, z: -0.5, w: 0.04, h: 0.5, d: 0.38, mat: 'towel', occluder: false },
+    { type: 'plant', x: 1.5, z: -1.7, scale: 0.55, pot: 'porcelain', foliage: 'plant', stem: 'plant', clumps: 6 },
+    { type: 'stack', x: -0.55, y: 0.89, z: -2.0, mats: ['towel', 'marble'], n: 2 },
+    { type: 'vase', x: 0.7, y: 0.89, z: -2.02, r: 0.05, h: 0.22, mat: 'chrome' }
   ],
 
   /** The plane the reflection pass mirrors through. */

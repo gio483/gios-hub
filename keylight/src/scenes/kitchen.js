@@ -30,7 +30,8 @@ export const kitchen = {
     walnut:    { albedo: '#5a4231', roughness: 0.33, spec: 0.15, tex: 8 },
     brass:     { albedo: '#9a7c3f', roughness: 0.18, spec: 0.55, tex: 10 },
     stool:     { albedo: '#7d6a52', roughness: 0.8,  spec: 0.04, tex: 5 },
-    shade:     { albedo: '#e7e2d5', roughness: 0.9,  spec: 0.03, tex: 5 }
+    shade:     { albedo: '#e7e2d5', roughness: 0.9,  spec: 0.03, tex: 5 },
+    plant:     { albedo: '#4a6b3c', roughness: 0.85, spec: 0.05, tex: 11, texScale: 2 }
   },
 
   windows: [
@@ -76,7 +77,10 @@ export const kitchen = {
     { type: 'box', x: -1.6, y: 0.45, z: -3.05, w: 3.0, h: 0.90, d: 0.60, mat: 'lower' },
     { type: 'box', x: -1.6, y: 0.925, z: -3.05, w: 3.1, h: 0.045, d: 0.66, mat: 'quartz' },
     { type: 'box', x: -2.5, y: 0.98, z: -2.9, w: 0.24, h: 0.06, d: 0.24, mat: 'steel', occluder: false },
-    { type: 'cyl', x: -2.5, y: 1.16, z: -2.9, r: 0.018, h: 0.30, mat: 'brass', occluder: false }
+    { type: 'cyl', x: -2.5, y: 1.16, z: -2.9, r: 0.018, h: 0.30, mat: 'brass', occluder: false },
+    { type: 'plant', x: -2.9, z: -2.9, scale: 0.5, pot: 'steel', foliage: 'plant', stem: 'plant', clumps: 6 },
+    { type: 'vase', x: -0.1, y: 0.93, z: 0.9, r: 0.13, h: 0.16, mat: 'quartz' },
+    { type: 'stack', x: -0.1, y: 0.93, z: -0.6, mats: ['walnut', 'brass', 'lower'], n: 3 }
   ],
 
   reflectors: [

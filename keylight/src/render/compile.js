@@ -8,6 +8,7 @@
  */
 
 import { MeshBuilder } from './geometry.js';
+import { isFurniture, expandFurniture } from './furniture.js';
 import { hexToLinear, kelvinToRGB } from '../physics/color.js';
 import { windowLuminance, fixtureIntensity, fixtureSurfaceLuminance } from '../physics/ambient.js';
 
@@ -114,6 +115,31 @@ export function compileScene(scene) {
       mb.quad(o0, o1, c1, c0, rm);
       mb.quad(c3, c2, o2, o3, rm);
     }
+
+    // Drapes. Two folded panels flanking the opening, floor to above the
+    // head casing. As much a lighting element as a decor one: they narrow
+    // the bright zone and give the window a soft edge instead of a hard cut.
+    if (w.drapes) {
+      const dm = idOf(w.drapes);
+      const vTop = Math.min(room.ceiling - 0.06, w.v + w.h / 2 + 0.26);
+      const panelW = w.drapeWidth || 0.34;
+      const alongX = Math.abs(f.right[0]) > 0.5;
+      const segs = 5;
+      for (const side of [-1, 1]) {
+        const uEdge = w.u + side * (w.w / 2 + panelW / 2 + 0.03);
+        for (let k = 0; k < segs; k++) {
+          const uu = uEdge - panelW / 2 + (panelW * (k + 0.5)) / segs;
+          const fold = 0.035 + 0.03 * (k % 2);
+          const base = at(f, uu, vTop / 2);
+          const cx = base[0] + n[0] * (inset + fold + 0.05);
+          const cz = base[2] + n[2] * (inset + fold + 0.05);
+          const segW = panelW / segs + 0.012;
+          const bw = alongX ? segW : fold * 2 + 0.06;
+          const bd = alongX ? fold * 2 + 0.06 : segW;
+          mb.box(cx, vTop / 2, cz, bw, vTop, bd, dm);
+        }
+      }
+    }
   }
 
   // Carpentry. Baseboards and crown around the perimeter, casings and a
@@ -170,6 +196,11 @@ export function compileScene(scene) {
 
   // Props.
   for (const p of scene.props || []) {
+    if (isFurniture(p.type)) {
+      const occ = expandFurniture(mb, p, idOf);
+      for (const o of occ) occluders.push(o);
+      continue;
+    }
     const m = idOf(p.mat);
     if (p.type === 'cyl') {
       mb.cylinder(p.x, p.y, p.z, p.rTop ?? p.r, p.rBot ?? p.r, p.h, m, p.segments || 14, p.caps !== false);

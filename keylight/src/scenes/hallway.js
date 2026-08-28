@@ -51,14 +51,13 @@ export const hallway = {
     { type: 'cyl', x: -1.20, y: 1.80, z: -1.6, rTop: 0.09, rBot: 0.06, h: 0.20, mat: 'brass', caps: false, occluder: false },
     { type: 'cyl', x: -1.20, y: 1.80, z: 1.6, rTop: 0.09, rBot: 0.06, h: 0.20, mat: 'brass', caps: false, occluder: false },
     // Art run
-    { type: 'box', x: -1.22, y: 1.50, z: 0.2, w: 0.04, h: 0.70, d: 0.52, mat: 'art', occluder: false },
-    { type: 'box', x: -1.22, y: 1.50, z: 2.9, w: 0.04, h: 0.70, d: 0.52, mat: 'art', occluder: false },
     // Door at the far end
     { type: 'box', x: 0, y: 1.05, z: 3.26, w: 1.0, h: 2.10, d: 0.06, mat: 'door', occluder: false },
     { type: 'cyl', x: 0.36, y: 1.02, z: 3.20, r: 0.03, h: 0.05, mat: 'brass', occluder: false },
-    { type: 'cyl', x: -0.85, y: 0.24, z: 2.5, rTop: 0.19, rBot: 0.15, h: 0.48, mat: 'oak' },
-    { type: 'cyl', x: -0.85, y: 0.95, z: 2.5, rTop: 0.04, rBot: 0.02, h: 0.95, mat: 'plant', occluder: false },
-    { type: 'box', x: -0.85, y: 1.30, z: 2.5, w: 0.7, h: 0.45, d: 0.6, mat: 'plant', occluder: false }
+    { type: 'plant', x: -0.85, z: 2.5, scale: 1.15, pot: 'oak', foliage: 'plant', stem: 'plant', clumps: 8 },
+    { type: 'vase', x: 1.14, y: 0.44, z: -0.2, r: 0.08, h: 0.26, mat: 'brass', stems: 'plant' },
+    { type: 'art', x: -1.24, y: 1.5, z: 0.2, w: 0.5, h: 0.68, yaw: 1.5708, frame: 'oak', canvas: 'art' },
+    { type: 'art', x: -1.24, y: 1.5, z: 2.9, w: 0.5, h: 0.68, yaw: 1.5708, frame: 'oak', canvas: 'art' }
   ],
 
   mirrorPlane: { point: [1.185, 1.45, -0.6], normal: [-1, 0, 0] },

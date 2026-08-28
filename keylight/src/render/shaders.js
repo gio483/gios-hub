@@ -20,7 +20,7 @@
 export const MAX_WINDOWS = 3;
 export const MAX_FIXTURES = 10;
 export const MAX_FLASH = 4;
-export const MAX_OCCLUDERS = 22;
+export const MAX_OCCLUDERS = 36;
 
 export const commonVertexShader = /* glsl */ `
 out vec3 vWorld;
@@ -384,7 +384,7 @@ float objectOcclusion(vec3 p, vec3 n) {
     if (dist2 < r2 * 1.05) continue;        // we are this object
     occ += (r2 / dist2) * clamp(dot(n, d * inversesqrt(dist2)), 0.0, 1.0);
   }
-  return clamp(1.0 - 0.8 * occ, 0.22, 1.0);
+  return clamp(1.0 - 0.62 * occ, 0.28, 1.0);
 }
 
 /**

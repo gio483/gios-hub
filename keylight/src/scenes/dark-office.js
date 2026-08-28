@@ -34,7 +34,7 @@ export const darkOffice = {
   },
 
   windows: [
-    { wall: '-x', u: 2.7, v: 1.55, w: 1.4, h: 1.60, ev: 12.6, kelvin: 6900, view: 'foliage' }
+    { wall: '-x', u: 2.7, v: 1.55, w: 1.4, h: 1.60, ev: 12.6, kelvin: 6900, view: 'foliage', drapes: 'shade', drapeWidth: 0.3 }
   ],
 
   fixtures: [
@@ -66,9 +66,10 @@ export const darkOffice = {
     // Reading corner
     { type: 'box', x: -1.5, y: 0.24, z: -1.6, w: 0.80, h: 0.46, d: 0.80, mat: 'leather', yaw: 0.55 },
     { type: 'box', x: -1.72, y: 0.66, z: -1.85, w: 0.80, h: 0.56, d: 0.16, mat: 'leather', yaw: 0.55 },
-    { type: 'cyl', x: 1.2, y: 0.26, z: -2.1, rTop: 0.20, rBot: 0.16, h: 0.52, mat: 'walnut' },
-    { type: 'cyl', x: 1.2, y: 1.05, z: -2.1, rTop: 0.04, rBot: 0.02, h: 1.05, mat: 'plant', occluder: false },
-    { type: 'box', x: 1.2, y: 1.42, z: -2.1, w: 0.75, h: 0.48, d: 0.65, mat: 'plant', occluder: false }
+    { type: 'plant', x: 1.2, z: -2.1, scale: 1.25, pot: 'walnut', foliage: 'plant', stem: 'plant', clumps: 8 },
+    { type: 'stack', x: 0.2, y: 0.78, z: 0.75, mats: ['leather', 'books', 'paper'], n: 3 },
+    { type: 'vase', x: 0.35, y: 0.78, z: 0.35, r: 0.07, h: 0.2, mat: 'brass', stems: 'plant' },
+    { type: 'art', x: -0.4, y: 1.55, z: -2.68, w: 0.7, h: 0.9, yaw: 0, frame: 'walnut', canvas: 'leather' }
   ],
 
   reflectors: [],

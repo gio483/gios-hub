@@ -34,7 +34,7 @@ sync-speed wall, mired-shifted gels, and the shutter/flash asymmetry.
 
     src/physics/     headless, unit tested, no DOM and no renderer
     src/render/      three.js engine, shaders, scene compiler, mask pass
-    src/scenes/      seven hand-authored rooms
+    src/scenes/      nine hand-authored rooms
     src/game/        rubric, diagnostics, learning modules, challenges
     src/ui/          floor plan, controls, histogram
     test/            zero-dependency test harness

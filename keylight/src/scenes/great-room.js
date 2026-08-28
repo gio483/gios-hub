@@ -29,11 +29,12 @@ export const greatRoom = {
     steel:    { albedo: '#8f8f8d', roughness: 0.20, spec: 0.5, tex: 10 },
     plant:    { albedo: '#405c37', roughness: 0.86, spec: 0.05, tex: 11, texScale: 2 },
     art:      { albedo: '#332f2c', roughness: 0.6,  spec: 0.05 },
-    shade:    { albedo: '#e4dfd2', roughness: 0.93, spec: 0.02, tex: 5 }
+    shade:    { albedo: '#e4dfd2', roughness: 0.93, spec: 0.02, tex: 5 },
+    linen:    { albedo: '#dcd6c6', roughness: 0.95, spec: 0.02, tex: 5 }
   },
 
   windows: [
-    { wall: '+x', u: 5.0, v: 1.70, w: 3.6, h: 2.30, ev: 13.6, kelvin: 6300, view: 'foliage' },
+    { wall: '+x', u: 5.0, v: 1.70, w: 3.6, h: 2.30, ev: 13.6, kelvin: 6300, view: 'foliage', drapes: 'linen', drapeWidth: 0.42 },
     { wall: '+x', u: 5.0, v: 4.70, w: 5.4, h: 1.30, ev: 15.1, kelvin: 8200, view: 'sky' },
     { wall: '-z', u: 5.2, v: 4.60, w: 3.0, h: 1.40, ev: 14.9, kelvin: 8000, view: 'sky' }
   ],
@@ -45,31 +46,30 @@ export const greatRoom = {
   ],
 
   props: [
-    { type: 'box', x: 0.2, y: 0.008, z: 0.4, w: 5.0, h: 0.016, d: 4.0, mat: 'rug', occluder: false },
+    { type: 'rug', x: 0.4, z: 0.45, w: 5.2, d: 4.2, yaw: 0, rug: 'rug', border: 'oak' },
+
     // Stone fireplace wall
     { type: 'box', x: -3.72, y: 2.6, z: 0.0, w: 0.5, h: 5.2, d: 3.4, mat: 'stone' },
     { type: 'box', x: -3.40, y: 0.55, z: 0.0, w: 0.22, h: 1.10, d: 1.5, mat: 'art', occluder: false },
     { type: 'box', x: -3.36, y: 1.32, z: 0.0, w: 0.34, h: 0.10, d: 2.0, mat: 'oak', occluder: false },
+    { type: 'vase', x: -3.30, y: 1.37, z: -0.6, r: 0.10, h: 0.34, mat: 'steel', stems: 'plant' },
 
-    // Facing sofas
-    { type: 'box', x: 0.4, y: 0.22, z: 2.05, w: 3.0, h: 0.44, d: 1.0, mat: 'sofa' },
-    { type: 'box', x: 0.4, y: 0.62, z: 2.46, w: 3.0, h: 0.60, d: 0.20, mat: 'sofa' },
-    { type: 'box', x: 0.4, y: 0.22, z: -1.25, w: 3.0, h: 0.44, d: 1.0, mat: 'sofa' },
-    { type: 'box', x: 0.4, y: 0.62, z: -1.66, w: 3.0, h: 0.60, d: 0.20, mat: 'sofa' },
-    { type: 'box', x: 0.4, y: 0.36, z: 0.45, w: 1.5, h: 0.08, d: 0.9, mat: 'oak' },
-    { type: 'cyl', x: -0.2, y: 0.16, z: 0.45, r: 0.03, h: 0.32, mat: 'steel', occluder: false },
-    { type: 'cyl', x: 1.0, y: 0.16, z: 0.45, r: 0.03, h: 0.32, mat: 'steel', occluder: false },
+    // Facing sofas with a long table between
+    { type: 'sofa', x: 0.4, z: 2.0, yaw: 3.14159, w: 3.0, d: 1.0, body: 'sofa', legs: 'oak' },
+    { type: 'sofa', x: 0.4, z: -1.2, yaw: 0, w: 3.0, d: 1.0, body: 'sofa', legs: 'oak' },
+    { type: 'table', x: 0.4, z: 0.45, yaw: 0, w: 1.6, d: 0.9, h: 0.36, top: 'oak', legs: 'steel' },
+    { type: 'stack', x: 0.1, y: 0.36, z: 0.45, mats: ['art', 'oak', 'stone'], n: 3 },
+    { type: 'vase', x: 0.8, y: 0.36, z: 0.45, r: 0.09, h: 0.3, mat: 'stone', stems: 'plant' },
 
     // Chandelier body hanging into the volume
     { type: 'cyl', x: -0.4, y: 5.1, z: 0.5, r: 0.02, h: 1.3, mat: 'steel', occluder: false },
     { type: 'cyl', x: -0.4, y: 4.30, z: 0.5, rTop: 0.42, rBot: 0.42, h: 0.06, mat: 'steel', caps: false, occluder: false },
 
-    // Console and greenery
-    { type: 'box', x: 3.1, y: 0.40, z: -3.6, w: 1.6, h: 0.06, d: 0.44, mat: 'oak' },
-    { type: 'cyl', x: -2.7, y: 0.30, z: 3.6, rTop: 0.26, rBot: 0.20, h: 0.60, mat: 'stone' },
-    { type: 'cyl', x: -2.7, y: 1.45, z: 3.6, rTop: 0.06, rBot: 0.03, h: 1.7, mat: 'plant', occluder: false },
-    { type: 'box', x: -2.7, y: 2.20, z: 3.6, w: 1.3, h: 0.7, d: 1.1, mat: 'plant', occluder: false },
-    { type: 'box', x: 1.0, y: 3.3, z: -4.92, w: 2.2, h: 1.5, d: 0.06, mat: 'art', occluder: false }
+    // Console, big plant, and a large canvas
+    { type: 'table', x: 3.1, z: -3.6, yaw: 0, w: 1.6, d: 0.44, h: 0.38, top: 'oak', legs: 'steel' },
+    { type: 'plant', x: -2.7, z: 3.6, scale: 1.8, pot: 'stone', foliage: 'plant', stem: 'plant', clumps: 9 },
+    { type: 'plant', x: 3.1, z: -3.6, scale: 0.7, pot: 'stone', foliage: 'plant', stem: 'plant' },
+    { type: 'art', x: 1.0, y: 3.3, z: -4.94, w: 2.2, h: 1.5, yaw: 0, frame: 'oak', canvas: 'art' }
   ],
 
   reflectors: [],
