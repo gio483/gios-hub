@@ -49,7 +49,17 @@ class App {
 
     this.setScene(this.progress.lastScene || 'living-room');
     this.buildChrome();
-    this.setMode(this.progress.completedModules.length === 0 ? 'learn' : 'practice');
+    const firstVisit = this.progress.completedModules.length === 0 && !this.progress.seenIntro;
+    // Mid-course players land on Learn, graduates land on Shoot.
+    const graduated = this.progress.completedModules.length >= MODULES.length;
+    this.setMode(graduated ? 'practice' : 'learn');
+    if (firstVisit) {
+      // No menu on the very first open: module one explains itself, and its
+      // intro card is a better front door than a list of eleven boxes.
+      this.progress.seenIntro = true;
+      saveProgress(this.progress);
+      this.startModule(MODULES[0].id);
+    }
 
     window.addEventListener('resize', () => { this.layout(); this.dirty = true; });
     window.addEventListener('orientationchange', () => setTimeout(() => { this.layout(); this.dirty = true; }, 200));
@@ -568,6 +578,25 @@ class App {
         format: (v) => `${Math.round(v)}°`,
         get: () => l.yaw, set: (v) => { l.yaw = v; this.markDirty(); },
         sub: () => l.mode === 'ceiling' ? 'not used when bouncing up' : 'or drag the handle on the plan'
+      }),
+      sliderControl({
+        label: 'Tilt', accent: 'cyan', min: -60, max: 75, step: 1,
+        format: (v) => Math.abs(v) < 1 ? 'level' : `${v > 0 ? '+' : ''}${Math.round(v)}°`,
+        get: () => l.tilt || 0,
+        set: (v) => { if (!locked('tilt')) { l.tilt = v; this.markDirty(); } },
+        sub: (v) => {
+          if (l.mode !== 'direct') return 'not used when bouncing';
+          const t = (Math.abs(v) * Math.PI) / 180;
+          if (v < -1) {
+            const d = l.height / Math.tan(t);
+            return d > 15 ? 'nearly level, aimed slightly down' : `beam centre lands ${d.toFixed(1)}m out`;
+          }
+          if (v > 1) {
+            const d = (this.scene.room.ceiling - l.height) / Math.tan(t);
+            return d > 15 ? 'nearly level, aimed slightly up' : `meets the ceiling ${d.toFixed(1)}m out - feathering up`;
+          }
+          return 'level, straight across the room';
+        }
       })
     ]));
 
@@ -846,6 +875,38 @@ class App {
     }
   }
 
+  /* ---------------- scene thumbnails ---------------- */
+
+  /**
+   * A small ambient render of each room, generated once and cached. The
+   * exposure is chosen per scene so the thumbnail reads as an invitation
+   * rather than as a correctly metered (and therefore often dark) frame.
+   */
+  sceneThumb(sceneId, onReady) {
+    this.thumbCache = this.thumbCache || new Map();
+    if (this.thumbCache.has(sceneId)) return this.thumbCache.get(sceneId);
+    try {
+      if (!this.thumbEngine) {
+        this.thumbEngine = new Engine(document.createElement('canvas'));
+      }
+      const scene = sceneById(sceneId);
+      const compiled = this.compiledFor(scene);
+      this.thumbEngine.loadScene(compiled);
+      this.thumbEngine.setSize(252, 168);
+      const st = defaultState(scene);
+      st.lights = [];
+      const brightest = Math.max(0, ...(scene.windows || []).map((w) => w.ev));
+      if (brightest >= 13.5) { st.shutter = 1 / 45; st.iso = 200; }
+      else if (brightest >= 10) { st.shutter = 1 / 10; st.iso = 400; }
+      else { st.shutter = 1 / 3; st.iso = 800; }
+      this.thumbEngine.renderPreview(st, 1.5);
+      const url = this.thumbEngine.canvas.toDataURL('image/jpeg', 0.78);
+      this.thumbCache.set(sceneId, url);
+      onReady?.(url);
+      return url;
+    } catch { return null; }
+  }
+
   /* ---------------- modules ---------------- */
 
   renderModuleList() {
@@ -859,15 +920,24 @@ class App {
     lede.textContent = 'Eleven modules in order. Each one locks off everything except the thing it is teaching, then checks the frame you actually made.';
     h.append(lede);
 
+    let nextFound = false;
     for (const m of MODULES) {
       const unlocked = isUnlocked(m, this.progress);
       const done = this.progress.completedModules.includes(m.id);
-      const card = el('button', `module-card ${unlocked ? '' : 'locked'} ${done ? 'done' : ''}`);
-      card.append(el('div', 'module-num', done ? '✓' : String(m.n).padStart(2, '0')));
-      const t = el('div');
+      const isNext = unlocked && !done && !nextFound;
+      if (isNext) nextFound = true;
+      const card = el('button',
+        `module-card ${unlocked ? '' : 'locked'} ${done ? 'done' : ''} ${isNext ? 'next' : ''}`);
+      card.append(el('div', 'module-num', done ? '✓' : (unlocked ? String(m.n).padStart(2, '0') : '·')));
+      const thumb = el('div', 'module-thumb');
+      const url = this.sceneThumb(m.sceneId, (u) => { thumb.style.backgroundImage = `url(${u})`; });
+      if (url) thumb.style.backgroundImage = `url(${url})`;
+      card.append(thumb);
+      const t = el('div', 'module-text');
       t.append(el('div', 'module-title', m.title));
       t.append(el('div', 'module-desc', m.blurb));
       card.append(t);
+      if (isNext) card.append(el('span', 'start-pill', done ? 'REPLAY' : (m.n === 1 ? 'START' : 'NEXT')));
       card.disabled = !unlocked;
       card.onclick = () => this.startModule(m.id);
       h.append(card);
@@ -1032,7 +1102,11 @@ class App {
       const best = this.progress.bestScores[s.id];
       const card = el('button', 'module-card');
       card.append(el('div', 'module-num', best ? String(best) : '–'));
-      const t = el('div');
+      const thumb = el('div', 'module-thumb');
+      const url = this.sceneThumb(s.id, (u) => { thumb.style.backgroundImage = `url(${u})`; });
+      if (url) thumb.style.backgroundImage = `url(${url})`;
+      card.append(thumb);
+      const t = el('div', 'module-text');
       t.append(el('div', 'module-title', `${s.name} · ${s.subtitle}`));
       t.append(el('div', 'module-desc', s.brief));
       card.append(t);

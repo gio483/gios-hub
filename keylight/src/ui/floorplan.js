@@ -192,7 +192,9 @@ export class FloorPlan {
       } else if (l.mode === 'ceiling') {
         c.beginPath(); c.arc(sx, sy, 17, 0, 7); c.stroke();
       } else {
-        const len = 46;
+        // Foreshortened by tilt: a head aimed up or down shows a shorter
+        // throw on the plan, which is exactly what a plan view would show.
+        const len = 46 * Math.max(0.25, Math.cos(((l.tilt || 0) * Math.PI) / 180));
         c.beginPath();
         c.moveTo(sx, sy);
         c.lineTo(sx + Math.sin(yaw) * len, sy - Math.cos(yaw) * len);
