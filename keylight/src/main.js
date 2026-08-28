@@ -1191,6 +1191,14 @@ class App {
     document.getElementById('score-verdict').textContent = `Module ${m.n} complete · ${m.title}`;
     const body = document.getElementById('result-body');
     body.innerHTML = '';
+    // Show the frame they just made - the point of the whole exercise - before
+    // any of the congratulations text.
+    if (this.lastShotURL) {
+      const shot = el('img', 'result-shot');
+      shot.src = this.lastShotURL;
+      shot.alt = 'The frame you just captured';
+      body.append(shot);
+    }
     const p = el('p', null, `Every goal met. ${m.reward} credits added, which you can spend on the Gear tab.`);
     p.style.cssText = 'font-size:13.5px;line-height:1.7;color:var(--muted)';
     body.append(p);
