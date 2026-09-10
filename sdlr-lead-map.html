@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDLR Lead Map</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#f3f1ea;--panel:#ffffff;--ink:#1e211e;--muted:#5f665c;--faint:#8b9187;
+  --line:#e2ded3;--green:#425443;--green-soft:#6b7d68;--gold:#b08d57;
+  --shadow:0 1px 2px rgba(30,33,30,.06),0 8px 22px rgba(30,33,30,.07);
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#14170f;--panel:#1d211a;--ink:#eef0e8;--muted:#a7ada0;--faint:#7f857a;
+  --line:#2c3128;--green:#8fae86;--green-soft:#6f8a68;--gold:#d4ab72;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 26px rgba(0,0,0,.45);
+}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;line-height:1.5}
+.wrap{max-width:1200px;margin:0 auto;padding:26px 18px 40px}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:600;margin:0;text-wrap:balance}
+.eyebrow{font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:600}
+h1{font-size:30px;line-height:1.1;margin-top:6px}
+.sub{color:var(--muted);font-size:14px;margin-top:4px;max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0 20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;box-shadow:var(--shadow)}
+.stat .n{font-family:Fraunces,serif;font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+.stat .green{color:var(--green)}
+.grid{display:grid;grid-template-columns:1.7fr 1fr;gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);overflow:hidden}
+.card .hd{padding:14px 16px 0}
+.card .hd h2{font-size:17px}
+.card .hd p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;padding:12px 16px 12px;align-items:center}
+.chip{border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:#fff}
+.spacer{flex:1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12.5px;font-weight:500;padding:5px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#22160a}
+#map{height:560px;width:100%}
+.leaflet-popup-content{font-family:Inter,sans-serif;font-size:12.5px;margin:10px 12px}
+.leaflet-popup-content b{font-family:Fraunces,serif}
+.pop .r{display:flex;justify-content:space-between;gap:14px;color:#555;margin-top:2px}
+.legend{display:flex;flex-wrap:wrap;gap:9px 15px;padding:12px 16px 16px;font-size:12px;color:var(--muted);border-top:1px solid var(--line)}
+.dot{width:11px;height:11px;border-radius:50%;display:inline-block;vertical-align:-1px;margin-right:5px}
+.szc{border-radius:50%;background:var(--green-soft);display:inline-block;vertical-align:middle;margin-right:3px}
+.side{display:flex;flex-direction:column;gap:18px}
+.panel{padding:14px 16px 16px}
+.panel h3{font-size:14px;margin-bottom:10px}
+.bar{display:grid;grid-template-columns:92px 1fr auto;gap:8px;align-items:center;margin-bottom:7px;font-size:12.5px}
+.bar .lab{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar .track{background:var(--line);border-radius:5px;height:15px;position:relative;overflow:hidden}
+.bar .fill{position:absolute;inset:0 auto 0 0;border-radius:5px}
+.bar .val{font-variant-numeric:tabular-nums;font-weight:600;font-size:11.5px}
+.plist{list-style:none;margin:0;padding:0}
+.plist li{display:grid;grid-template-columns:18px 1fr auto;gap:9px;align-items:center;padding:7px 0;border-top:1px solid var(--line);cursor:pointer}
+.plist li:first-child{border-top:0}
+.plist .rk{font-family:Fraunces,serif;font-weight:600;color:var(--faint);text-align:center}
+.plist .nm{font-weight:600;font-size:13px}
+.plist .mt{font-size:11.5px;color:var(--muted)}
+.plist .amt{font-variant-numeric:tabular-nums;font-weight:600;font-size:12.5px}
+.plan ol{margin:0;padding:0;list-style:none;counter-reset:m}
+.plan li{position:relative;padding:9px 0 9px 32px;border-top:1px solid var(--line);font-size:13px}
+.plan li:first-child{border-top:0}
+.plan li::before{counter-increment:m;content:counter(m);position:absolute;left:0;top:8px;width:21px;height:21px;background:var(--green);color:#fff;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700}
+.plan b{color:var(--green)}
+.foot{color:var(--faint);font-size:11.5px;margin-top:18px;text-align:center}
+a.back{color:var(--gold);text-decoration:none;font-size:12.5px;font-weight:600}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}#map{height:440px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">&larr; Hub</a>
+  <div class="eyebrow" style="margin-top:10px">San Diego Landscape Remodeling</div>
+  <h1>Lead Map</h1>
+  <div class="sub">Every estimate and lead on record, on a real map. Circle size is project value, color is where the lead came from. Click any pin for details.</div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid">
+    <section class="card">
+      <div class="hd"><h2>Where the work is</h2><p>Switch to satellite, zoom in, and click pins. Use the filters to show only what is live.</p></div>
+      <div class="controls">
+        <button class="chip" data-f="all" aria-pressed="true">All</button>
+        <button class="chip" data-f="Open" aria-pressed="false">Open</button>
+        <button class="chip" data-f="Lost" aria-pressed="false">Lost</button>
+        <button class="chip" data-f="No action" aria-pressed="false">No action</button>
+        <span class="spacer"></span>
+        <span class="seg"><button data-v="all" aria-pressed="true">All of SD</button><button data-v="core" aria-pressed="false">Core corridor</button></span>
+      </div>
+      <div id="map"></div>
+      <div class="legend" id="legend"></div>
+    </section>
+    <div class="side">
+      <section class="card"><div class="panel"><h3>Where leads come from</h3><div id="srcbars"></div></div></section>
+      <section class="card"><div class="panel"><h3>By area (open value)</h3><div id="regbars"></div></div></section>
+      <section class="card"><div class="panel"><h3>Priority open leads</h3><ul class="plist" id="plist"></ul></div></section>
+      <section class="card"><div class="panel plan"><h3>The game plan</h3><ol>
+        <li><b>Mail the core corridor first.</b> La Mesa, Mt Helix, Del Cerro and San Carlos hold most of the pipeline and sit minutes from the office.</li>
+        <li><b>Feed the website, it is the engine.</b> Most leads and the 300k job came through it. Point ads and mailers at driving traffic to the site.</li>
+        <li><b>Fix follow up.</b> A 200k Vista job went cold from silence. Put every new lead on automatic follow up so big ones stop slipping.</li>
+        <li><b>Coastal is a referral play.</b> A 600k La Jolla and a 125k Solana Beach job both slipped. The coast has money but nothing closes cold. Work it through partners and designers.</li>
+        <li><b>Close what you have.</b> Thirteen open leads worth about 895k. Converting these beats chasing more.</li>
+      </ol></div></section>
+    </div>
+  </div>
+  <div class="foot">Data as of 10 September 2026. Positions approximate to street. Private working tool for the SDLR team.</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJ5x9+K1x2sZ13tXTf/Cv5kMS6O30=" crossorigin=""></script>
+<script>
+const SRC={"Website":"#425443","BNI referral":"#b08d57","Facebook group":"#3b6ea5","Yelp / Nextdoor":"#b0563f","Social (FB/IG)":"#3f8f8a","Designer referral":"#7a5c9e","KSH bid":"#6b7280","(unknown)":"#a3a79c"};
+const LEADS=[
+ {n:"Donald",v:300000,s:"Website",st:"Open",reg:"Central inland",city:"Del Cerro",lat:32.794,lon:-117.028,sc:"Pavers, louvered pergola and more"},
+ {n:"Sarmad Hayawi",v:127000,s:"Facebook group",st:"Open",reg:"East County",city:"Lakeside",lat:32.867,lon:-116.922,sc:"Full backyard build"},
+ {n:"John Love",v:95000,s:"BNI referral",st:"Open",reg:"East County",city:"La Mesa",lat:32.787,lon:-117.020,sc:"Full yard build"},
+ {n:"Christine Rieger",v:58000,s:"Yelp / Nextdoor",st:"Open",reg:"East County",city:"La Mesa",lat:32.783,lon:-117.014,sc:"Fence, wall and water"},
+ {n:"Thuy Doan",v:55750,s:"Website",st:"Open",reg:"Central inland",city:"Del Cerro",lat:32.800,lon:-117.045,sc:"Front yard remodel, design paid"},
+ {n:"Blake",v:55000,s:"Website",st:"Open",reg:"East County",city:"La Mesa (Mt Helix)",lat:32.760,lon:-116.986,sc:"Slope terracing and planting"},
+ {n:"Chelsie Pepin",v:50000,s:"Website",st:"Open",reg:"Central inland",city:"Del Cerro",lat:32.796,lon:-117.040,sc:"Backyard refresh, patio cover"},
+ {n:"Barbara",v:30000,s:"Website",st:"Open",reg:"Coastal",city:"Coronado",lat:32.686,lon:-117.183,sc:"Scope to confirm"},
+ {n:"Bill Major",v:23000,s:"(unknown)",st:"Open",reg:"Central inland",city:"Del Cerro",lat:32.792,lon:-117.050,sc:"Front yard remodel"},
+ {n:"Tim",v:15000,s:"Website",st:"Open",reg:"East County",city:"La Mesa (Mt Helix)",lat:32.762,lon:-117.001,sc:"Drain and light pavers"},
+ {n:"Alejandra Leal",v:15000,s:"Website",st:"Open",reg:"East County",city:"San Carlos",lat:32.808,lon:-117.016,sc:"Patio cover"},
+ {n:"Don Browning",v:6500,s:"BNI referral",st:"Open",reg:"East County",city:"Lakeside",lat:32.856,lon:-116.906,sc:"Deck and ramp"},
+ {n:"David Dekozan",v:65000,s:"Website",st:"Open",reg:"East County",city:"La Mesa (Mt Helix)",lat:32.770,lon:-117.010,sc:"Drainage work"},
+ {n:"Jeffrey Munden",v:200000,s:"Website",st:"Lost",reg:"North County",city:"Vista",lat:33.196,lon:-117.235,sc:"Sport court, turf, pool. Went unresponsive"},
+ {n:"Craig Harrietha",v:44500,s:"(unknown)",st:"Lost",reg:"East County",city:"Jamul",lat:32.730,lon:-116.860,sc:"Turf and DG, commercial"},
+ {n:"David (Cerro Verde)",v:125000,s:"Designer referral",st:"Lost",reg:"Coastal",city:"Solana Beach",lat:32.995,lon:-117.263,sc:"Whole property rebuild"},
+ {n:"Crommett",v:600000,s:"KSH bid",st:"Lost",reg:"Coastal",city:"La Jolla",lat:32.843,lon:-117.270,sc:"GC bid via KSH"},
+ {n:"Lauren Jones",v:0,s:"Website",st:"No action",reg:"Coastal",city:"Del Mar",lat:32.959,lon:-117.265,sc:"Unverified inbound"},
+ {n:"Zak Goulet",v:0,s:"Social (FB/IG)",st:"No action",reg:"Coastal",city:"Imperial Beach",lat:32.584,lon:-117.113,sc:"Unverified inbound"}
+];
+const $=s=>document.querySelector(s);
+const fmt=n=>n>=1000?"$"+Math.round(n/1000)+"k":(n>0?"$"+n:"n/a");
+const rOf=v=>7+Math.sqrt(v)/26;
+const open=LEADS.filter(l=>l.st==="Open"), openVal=open.reduce((a,l)=>a+l.v,0);
+
+// stats
+$("#stats").innerHTML=[["Open pipeline",fmt(openVal),"green"],["Open leads",open.length,""],["Top source","Website",""],["Biggest open lead","Donald "+fmt(300000),""]]
+ .map(s=>`<div class="stat"><div class="n ${s[2]}">${s[1]}</div><div class="l">${s[0]}</div></div>`).join("");
+
+// map
+const map=L.map("map",{scrollWheelZoom:false}).setView([32.80,-117.02],11);
+const street=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+ {attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+ {attribution:'Imagery &copy; Esri',maxZoom:19});
+L.control.layers({"Street":street,"Satellite":sat},null,{position:"topright"}).addTo(map);
+
+const markers={};
+function draw(){
+  Object.values(markers).forEach(m=>map.removeLayer(m));
+  const f=curF;
+  LEADS.forEach((l,i)=>{
+    if(f!=="all"&&l.st!==f)return;
+    const m=L.circleMarker([l.lat,l.lon],{
+      radius:rOf(l.v),
+      color:l.st==="Lost"?"#a5442f":(l.st==="No action"?"#8b9187":"#ffffff"),
+      weight:l.st==="Open"?1.6:1.3,
+      dashArray:l.st==="Lost"?"3 2":null,
+      fillColor:SRC[l.s],
+      fillOpacity:l.st==="Open"?0.9:0.4
+    });
+    m.bindPopup(`<div class="pop"><b>${l.n}</b> &middot; ${fmt(l.v)}<div class="r"><span>${l.city}</span><span>${l.st}</span></div><div class="r"><span>${l.s}</span></div><div style="margin-top:3px">${l.sc}</div></div>`);
+    m.addTo(map); markers[i]=m;
+  });
+}
+let curF="all"; draw();
+map.fitBounds(LEADS.map(l=>[l.lat,l.lon]),{padding:[30,30]});
+
+document.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true"); curF=b.dataset.f; draw();
+}));
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed","false"));
+  b.setAttribute("aria-pressed","true");
+  if(b.dataset.v==="core") map.setView([32.786,-116.995],13);
+  else map.fitBounds(LEADS.map(l=>[l.lat,l.lon]),{padding:[30,30]});
+}));
+
+// legend
+$("#legend").innerHTML=
+ Object.keys(SRC).map(s=>`<span><span class="dot" style="background:${SRC[s]}"></span>${s}</span>`).join("")+
+ `<span><span class="szc" style="width:9px;height:9px"></span><span class="szc" style="width:15px;height:15px"></span><span class="szc" style="width:22px;height:22px"></span> larger = higher value</span>`+
+ `<span><span class="dot" style="background:transparent;border:1.5px solid #a5442f"></span>lost</span>`;
+
+// source bars
+const bySrc={}; LEADS.forEach(l=>{(bySrc[l.s]=bySrc[l.s]||{c:0,v:0});bySrc[l.s].c++;bySrc[l.s].v+=l.v;});
+const ss=Object.entries(bySrc).sort((a,b)=>b[1].v-a[1].v), mS=Math.max(...ss.map(x=>x[1].v));
+$("#srcbars").innerHTML=ss.map(([s,d])=>`<div class="bar"><span class="lab">${s}</span><span class="track"><span class="fill" style="width:${Math.max(4,d.v/mS*100)}%;background:${SRC[s]}"></span></span><span class="val">${d.c} &middot; ${fmt(d.v)}</span></div>`).join("");
+
+// region bars (open value)
+const reg={}; open.forEach(l=>reg[l.reg]=(reg[l.reg]||0)+l.v);
+const rs=Object.entries(reg).sort((a,b)=>b[1]-a[1]), mR=Math.max(...rs.map(x=>x[1]));
+$("#regbars").innerHTML=rs.map(([r,v])=>`<div class="bar"><span class="lab">${r}</span><span class="track"><span class="fill" style="width:${Math.max(4,v/mR*100)}%;background:var(--green)"></span></span><span class="val">${fmt(v)}</span></div>`).join("");
+
+// priority
+const pri=open.slice().sort((a,b)=>b.v-a.v);
+$("#plist").innerHTML=pri.map((l,i)=>`<li data-lat="${l.lat}" data-lon="${l.lon}"><span class="rk">${i+1}</span><span><span class="nm">${l.n}</span><br><span class="mt"><span class="dot" style="width:8px;height:8px;background:${SRC[l.s]}"></span>${l.city} &middot; ${l.s}</span></span><span class="amt">${fmt(l.v)}</span></li>`).join("");
+document.querySelectorAll("#plist li").forEach(li=>li.addEventListener("click",()=>{
+  map.setView([+li.dataset.lat,+li.dataset.lon],15);
+  const hit=LEADS.findIndex(l=>l.lat==+li.dataset.lat&&l.lon==+li.dataset.lon);
+  if(markers[hit])markers[hit].openPopup();
+}));
+</script>
+</body>
+</html>
