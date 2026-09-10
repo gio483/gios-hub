@@ -149,8 +149,8 @@ $("#stats").innerHTML=[["Open pipeline",fmt(openVal),"green"],["Open leads",open
 
 // map
 const map=L.map("map",{scrollWheelZoom:false}).setView([32.80,-117.02],11);
-const street=L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
- {attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+const street=L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+ {attribution:'&copy; OpenStreetMap contributors',maxZoom:19}).addTo(map);
 const sat=L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
  {attribution:'Imagery &copy; Esri',maxZoom:19});
 L.control.layers({"Street":street,"Satellite":sat},null,{position:"topright"}).addTo(map);
