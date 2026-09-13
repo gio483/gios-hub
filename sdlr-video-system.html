@@ -1,0 +1,838 @@
+<title>SDLR Video System</title>
+<meta name="description" content="A consultative process VSL and seven supporting scripts, with the funnel strategy behind them, for San Diego Landscape Remodeling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --paper:#F4EFE4;
+    --panel:#FBF8F0;
+    --ink:#23281F;
+    --ink-soft:#4A4E42;
+    --muted:#7C7C6C;
+    --green:#425443;
+    --green-deep:#2E3B2C;
+    --gold:#B08D57;
+    --gold-deep:#8C6C3E;
+    --line:#DED6C4;
+    --line-soft:#E9E2D2;
+    --cue:#8C6C3E;
+    --shadow:0 1px 2px rgba(35,40,31,.04),0 10px 30px rgba(35,40,31,.06);
+    --maxw:960px;
+    --font-display:"Fraunces",Georgia,"Times New Roman",serif;
+    --font-body:"Inter",system-ui,-apple-system,sans-serif;
+    --font-mono:"IBM Plex Mono",ui-monospace,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#161B15;
+      --panel:#1D241C;
+      --ink:#EDE7D7;
+      --ink-soft:#C3BEAE;
+      --muted:#8E9080;
+      --green:#8AA184;
+      --green-deep:#A9BFA2;
+      --gold:#CBA36A;
+      --gold-deep:#D8B77E;
+      --line:#313A2E;
+      --line-soft:#28301F;
+      --cue:#CBA36A;
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#161B15;
+    --panel:#1D241C;
+    --ink:#EDE7D7;
+    --ink-soft:#C3BEAE;
+    --muted:#8E9080;
+    --green:#8AA184;
+    --green-deep:#A9BFA2;
+    --gold:#CBA36A;
+    --gold-deep:#D8B77E;
+    --line:#313A2E;
+    --line-soft:#28301F;
+    --cue:#CBA36A;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 12px 34px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:22px;padding-block:0}
+
+  header.top{
+    position:sticky;top:0;z-index:20;
+    background:color-mix(in srgb,var(--paper) 88%,transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:var(--maxw);margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .mark{display:flex;align-items:baseline;gap:9px;font-family:var(--font-display);font-weight:600;letter-spacing:.01em;color:var(--green-deep)}
+  .mark .m-mono{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);align-self:center}
+  nav.jump{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+  nav.jump a{
+    font-size:.72rem;text-decoration:none;color:var(--ink-soft);
+    padding:5px 10px;border:1px solid var(--line);border-radius:999px;
+    white-space:nowrap;transition:.15s;
+  }
+  nav.jump a:hover{border-color:var(--gold);color:var(--gold-deep)}
+
+  .hero{padding-block:58px 30px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:20px}
+  h1{
+    font-family:var(--font-display);font-weight:600;
+    font-size:clamp(2.3rem,6vw,3.7rem);line-height:1.02;letter-spacing:-.015em;
+    text-wrap:balance;margin:0 0 20px;color:var(--green-deep);
+  }
+  .lede{font-size:1.16rem;max-width:38em;color:var(--ink-soft);margin:0}
+  .lede b{color:var(--ink);font-weight:600}
+  .tagline{margin-top:26px;font-family:var(--font-display);font-style:italic;font-size:1.12rem;color:var(--gold-deep)}
+
+  section{padding-block:46px;border-bottom:1px solid var(--line-soft)}
+  h2{
+    font-family:var(--font-display);font-weight:600;font-size:clamp(1.5rem,3.4vw,2.1rem);
+    line-height:1.1;letter-spacing:-.01em;color:var(--green-deep);margin:0 0 8px;text-wrap:balance;
+  }
+  .sec-kicker{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold-deep);margin-bottom:14px}
+  h3{font-family:var(--font-display);font-weight:600;font-size:1.28rem;color:var(--green-deep);margin:26px 0 8px}
+  p{margin:0 0 16px;max-width:66ch}
+  strong{color:var(--ink);font-weight:600}
+
+  .funnel{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:26px 0 8px}
+  .stage{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 15px;box-shadow:var(--shadow)}
+  .stage .st-n{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-deep)}
+  .stage h4{font-family:var(--font-display);font-size:1.12rem;color:var(--green-deep);margin:4px 0 8px;font-weight:600}
+  .stage p{font-size:.86rem;color:var(--ink-soft);margin:0 0 10px}
+  .stage ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+  .stage li{font-size:.8rem;color:var(--ink-soft);display:flex;gap:7px;align-items:flex-start}
+  .stage li::before{content:"";flex:0 0 auto;width:6px;height:6px;margin-top:7px;border-radius:2px;background:var(--gold);transform:rotate(45deg)}
+  @media(max-width:720px){.funnel{grid-template-columns:1fr 1fr}}
+  @media(max-width:440px){.funnel{grid-template-columns:1fr}}
+
+  .levers{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+  .lever{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:10px;padding:15px 17px}
+  .lever h4{margin:0 0 6px;font-family:var(--font-display);font-size:1.05rem;color:var(--green-deep);font-weight:600}
+  .lever p{font-size:.88rem;color:var(--ink-soft);margin:0}
+  .lever .eq{font-family:var(--font-mono);font-size:.8rem;color:var(--gold-deep);display:block;margin-top:8px}
+  @media(max-width:620px){.levers{grid-template-columns:1fr}}
+
+  .video{scroll-margin-top:78px;padding-block:40px;border-bottom:1px solid var(--line-soft)}
+  .v-head{display:flex;gap:16px;align-items:flex-start}
+  .v-num{font-family:var(--font-display);font-weight:500;font-size:2.3rem;line-height:1;color:var(--gold);flex:0 0 auto;width:1.6em;text-align:right;font-variant-numeric:tabular-nums}
+  .v-title h2{margin:0 0 3px}
+  .v-title .v-sub{font-size:.95rem;color:var(--muted);margin:0}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 6px}
+  .chip{font-size:.72rem;font-family:var(--font-mono);letter-spacing:.03em;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--ink-soft);background:var(--panel)}
+  .chip b{color:var(--gold-deep);font-weight:600}
+  .why{background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:15px 18px;margin:16px 0 22px}
+  .why .why-k{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);display:block;margin-bottom:5px}
+  .why p{font-size:.92rem;color:var(--ink-soft);margin:0}
+  .why p + p{margin-top:10px}
+
+  .onscreen{font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--gold-deep);margin:0 0 20px;padding-left:14px;border-left:2px solid var(--gold)}
+  .vlabel{display:flex;align-items:baseline;gap:11px;margin:32px 0 6px;padding-top:24px;border-top:1px solid var(--line)}
+  .vlabel .vl-tag{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--paper);background:var(--gold);padding:4px 10px;border-radius:6px;font-weight:600}
+  :root[data-theme="dark"] .vlabel .vl-tag,:root:not([data-theme="light"]) .vlabel .vl-tag{color:#161B15}
+  .vlabel h3{margin:0;padding:0;font-size:1.18rem}
+
+  .script{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:26px 26px 22px;box-shadow:var(--shadow);position:relative;overflow:hidden;
+  }
+  .script::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--gold),var(--green))}
+  .script .s-label{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;padding-right:108px}
+  .copy-btn{position:absolute;top:16px;right:16px;z-index:3;font-family:var(--font-mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-deep);background:var(--paper);border:1px solid var(--gold);border-radius:8px;padding:7px 13px;cursor:pointer;transition:.15s;font-weight:600}
+  .copy-btn:hover{background:var(--gold);color:#fff}
+  .copy-btn.copied{background:var(--green);border-color:var(--green);color:#fff}
+  :root[data-theme="dark"] .copy-btn.copied,:root:not([data-theme="light"]) .copy-btn.copied{color:#161B15}
+  .copy-btn:focus-visible{outline:2px solid var(--gold-deep);outline-offset:2px}
+  .beat{font-family:var(--font-mono);font-size:.64rem;letter-spacing:.24em;text-transform:uppercase;color:var(--muted);margin:28px 0 12px;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .phase{display:inline-block;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--paper);background:var(--green);padding:7px 13px;border-radius:7px;margin:26px 0 14px;font-weight:600}
+  :root[data-theme="dark"] .phase,:root:not([data-theme="light"]) .phase{color:#161B15}
+  .cue{
+    font-family:var(--font-mono);font-size:.72rem;letter-spacing:.05em;color:var(--cue);
+    text-transform:uppercase;margin:20px 0 7px;display:block;font-weight:500;
+  }
+  .cue:first-of-type{margin-top:0}
+  .cue.proof{color:var(--green-deep)}
+  .line{font-size:1.12rem;line-height:1.62;color:var(--ink);max-width:60ch;margin:0 0 4px}
+  .script .line + .line{margin-top:12px}
+  .keyline{font-family:var(--font-display);font-size:1.32rem;line-height:1.4;color:var(--green-deep);border-left:3px solid var(--gold);padding:8px 0 8px 16px;margin:16px 0;max-width:56ch}
+  .endcard{
+    margin-top:22px;padding-top:16px;border-top:1px dashed var(--line);
+    font-family:var(--font-mono);font-size:.76rem;color:var(--muted);letter-spacing:.03em;line-height:1.7;
+  }
+  .endcard b{color:var(--gold-deep)}
+  .cta-note{margin-top:14px;font-size:.9rem;color:var(--ink-soft)}
+  .cta-note b{color:var(--green-deep)}
+
+  .table-scroll{overflow-x:auto;margin:22px 0 6px;border:1px solid var(--line);border-radius:12px}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:.88rem}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+  th{font-family:var(--font-mono);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-deep);background:var(--panel)}
+  tr:last-child td{border-bottom:none}
+  td b{color:var(--green-deep)}
+
+  .steps{list-style:none;margin:20px 0 0;padding:0;counter-reset:s;display:flex;flex-direction:column;gap:12px}
+  .steps li{position:relative;padding-left:44px;font-size:.95rem;color:var(--ink-soft)}
+  .steps li::before{counter-increment:s;content:counter(s);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;background:var(--green);color:var(--panel);font-family:var(--font-display);font-weight:600;display:flex;align-items:center;justify-content:center;font-size:.95rem}
+  :root[data-theme="dark"] .steps li::before,:root:not([data-theme="light"]) .steps li::before{color:var(--paper)}
+  .steps li b{color:var(--green-deep)}
+
+  .procrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 4px}
+  .procrow .pc{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--green);border-radius:10px;padding:13px 14px}
+  .procrow .pc .pn{font-family:var(--font-mono);font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-deep)}
+  .procrow .pc h4{font-family:var(--font-display);font-size:1.05rem;color:var(--green-deep);margin:4px 0 6px;font-weight:600}
+  .procrow .pc p{font-size:.8rem;color:var(--ink-soft);margin:0}
+  @media(max-width:720px){.procrow{grid-template-columns:1fr 1fr}}
+  @media(max-width:440px){.procrow{grid-template-columns:1fr}}
+
+  footer{padding-block:40px 60px;color:var(--muted);font-size:.85rem}
+  footer .fmark{font-family:var(--font-display);font-style:italic;color:var(--gold-deep);font-size:1.05rem;margin-bottom:6px}
+  a.inline{color:var(--gold-deep);text-decoration:underline;text-underline-offset:2px}
+  ::selection{background:var(--gold);color:#fff}
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <span class="mark">San Diego Landscape Remodeling <span class="m-mono">Video System</span></span>
+    <nav class="jump" aria-label="Jump to section">
+      <a href="#strategy">Strategy</a>
+      <a href="#v1">Process VSL</a>
+      <a href="#v2">Post visit</a>
+      <a href="#more">Scripts</a>
+      <a href="#place">Placement</a>
+      <a href="#shoot">Shoot plan</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Founder led video &nbsp;/&nbsp; Trust before the call</div>
+    <h1>Help the homeowner avoid the expensive mistake</h1>
+    <p class="lede">A homeowner spending fifty to three hundred thousand dollars on their backyard is not buying landscaping. They are buying <b>certainty</b>, and a person they believe will not disappear. The most powerful thing you can do on camera is not sell. It is teach them how to avoid the mistake most people make, then show them a calmer way. Below is the full system: the Whole Yard Planning Process VSL and seven supporting scripts, each built to move one feeling at one moment in the funnel, grounded in Alex Hormozi's value and lead frameworks and the real psychology of a high end remodel buyer.</p>
+    <div class="tagline">By design, not by dispatch.</div>
+  </div>
+
+  <section id="strategy">
+    <div class="sec-kicker">The strategy first</div>
+    <h2>Where each video lives, and the job it does</h2>
+    <p>Hormozi's frame from <em>$100M Leads</em> is simple: you earn <strong>attention</strong>, you build <strong>trust</strong>, then people <strong>buy</strong>. A remodel buyer moves through those same three doors, and a happy client at the end feeds the next stranger at the start. Every video is placed at one door and given one job. Nothing tries to do everything.</p>
+    <p><strong>Two offers, one per depth.</strong> Up top, the give is a free concept image of their own backyard, low effort and zero risk, made to earn attention. Deeper in, once trust is built, the ask is a backyard consultation. Give first, ask second. That is the whole shape of the funnel.</p>
+
+    <div class="funnel">
+      <div class="stage">
+        <div class="st-n">Door 01</div>
+        <h4>Attention</h4>
+        <p>Cold. Scrolling. Does not know you yet.</p>
+        <ul><li>Free concept give</li><li>Transformation reel</li></ul>
+      </div>
+      <div class="stage">
+        <div class="st-n">Door 02</div>
+        <h4>Trust</h4>
+        <p>Curious. On your site. Deciding if you are safe.</p>
+        <ul><li>The Process VSL</li><li>Three fears</li><li>Founders on every project</li></ul>
+      </div>
+      <div class="stage">
+        <div class="st-n">Door 03</div>
+        <h4>Buy</h4>
+        <p>Close to deciding. Comparing. Wants a reason to say yes.</p>
+        <ul><li>One honest number</li><li>Post visit process</li><li>Who this is not for</li></ul>
+      </div>
+      <div class="stage">
+        <div class="st-n">Door 04</div>
+        <h4>Advocacy</h4>
+        <p>Built and happy. The proof that fuels door one.</p>
+        <ul><li>Transformation reel</li><li>Client voice clips</li></ul>
+      </div>
+    </div>
+
+    <h3>The Hormozi levers every script is pulling</h3>
+    <div class="levers">
+      <div class="lever">
+        <h4>The Value Equation</h4>
+        <p>Every video either raises the top of the equation or lowers the bottom. Raise the dream and the belief it will actually happen. Lower the time, the effort, and the risk.</p>
+        <span class="eq">Value = (Dream x Belief) / (Time x Effort and Risk)</span>
+      </div>
+      <div class="lever">
+        <h4>The give, then the consult</h4>
+        <p>Give away the most valuable thing you can, free. The concept image of their own backyard is the give. Once trust is earned, the only ask is a consultation, not a contract.</p>
+      </div>
+      <div class="lever">
+        <h4>Risk reversal</h4>
+        <p>The buyer's fear is a big irreversible mistake. One honest number, founders present, a concept before they commit, and an honest recommendation even if it means design comes first, all remove that fear.</p>
+      </div>
+      <div class="lever">
+        <h4>Attract and filter</h4>
+        <p>Hormozi's lead work is about attracting and filtering profitable leads, not chasing the highest volume. So the videos qualify for the homeowner planning a full transformation and quietly wave off the small repair shopper.</p>
+      </div>
+    </div>
+
+    <h3>The Whole Yard Planning Process, your canonical language</h3>
+    <p>The VSL is built around a named, four phase process. Use these exact four names everywhere a buyer looks, the website, this VSL, the post visit video, and the estimate, so your process reads the same at every touchpoint. Consistency across touchpoints is its own trust signal.</p>
+    <div class="procrow">
+      <div class="pc"><div class="pn">Phase One</div><h4>Discover</h4><p>Project form, a call, and an in person walkthrough of the whole property.</p></div>
+      <div class="pc"><div class="pn">Phase Two</div><h4>Plan</h4><p>Decide how much design the project needs, and recommend the right designer when it does.</p></div>
+      <div class="pc"><div class="pn">Phase Three</div><h4>Price and Prepare</h4><p>One detailed proposal tied to a defined scope, then coordinate everything before the site is disturbed.</p></div>
+      <div class="pc"><div class="pn">Phase Four</div><h4>Build and Stand Behind It</h4><p>Owners involved, clear communication, a final walkthrough, and a return at ten months.</p></div>
+    </div>
+
+    <h3>What is actually going on in the buyer's head</h3>
+    <p><strong>They do not want to be sold. They want to be helped.</strong> At this price point, a homeowner is quietly afraid of making a costly mistake they cannot undo. The company that teaches them how to avoid it, calmly and without a pitch, becomes the one they trust to run it. Education is the sale.</p>
+    <p><strong>Contractor fear is the dominant emotion.</strong> Almost everyone has a story: a crew that vanished, a number that doubled, strangers in the yard they never met. Their real question is not "are you talented," it is "will you finish, will you tell me the truth about money, and who will actually be here." Answer those three and you have most of the sale.</p>
+    <p><strong>The yard is identity and status.</strong> It is where they host, relax, and show who they are. So sell the vacation, not the flight. Show the family using the space, not the paver spec.</p>
+    <p><strong>Certainty reads as expensive and safe.</strong> Calm, specific, and honest beats loud and clever every time at this price point. The tone of these scripts is the message.</p>
+  </section>
+
+  <!-- VIDEO 1 -->
+  <div class="video" id="v1">
+    <div class="v-head">
+      <div class="v-num">01</div>
+      <div class="v-title">
+        <h2>The Process VSL</h2>
+        <p class="v-sub">The flagship. Not a commercial. A founder helping a homeowner avoid an expensive mistake.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Trust</span>
+      <span class="chip"><b>Length</b> &nbsp;About 6 min</span>
+      <span class="chip"><b>Lives</b> &nbsp;Homepage, landing page, YouTube, sent before a consultation</span>
+      <span class="chip"><b>Talent</b> &nbsp;Gio or Mike, educational tone, project footage throughout</span>
+      <span class="chip"><b>CTA</b> &nbsp;Request Your Backyard Consultation</span>
+    </div>
+    <p class="onscreen">On screen title: Before You Remodel Your Backyard, How the SDLR Process Works</p>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>This is the full value equation in one sitting, delivered as help rather than a pitch. It qualifies the right homeowner in the first ten seconds, raises the dream, then names the real problem, fragmented planning, without attacking anyone. The four phase walkthrough lowers the fear of the unknown, and proof is woven throughout instead of stacked at the end, so belief builds the whole way down.</p>
+      <p>The close asks only for a consultation and openly promises clarity, even if that means design before pricing. Promising the honest path instead of a contract is the strongest trust signal in the whole film. Give the "is everyone pricing the same clearly defined finished project" line a real beat on the day, it is the money moment.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script &nbsp;/&nbsp; about 6 min</div>
+
+      <div class="beat">Opening</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">If you are planning to remodel most or all of your backyard, one of the biggest mistakes you can make is asking for a construction price before the entire space has been properly planned.</p>
+      <p class="line">A beautiful backyard is not just a collection of nice features. The pool, hardscape, patio cover, outdoor kitchen, landscaping, lighting, drainage, and utilities all need to work together as one cohesive space.</p>
+      <p class="line">That is why we created the San Diego Landscape Remodeling Whole Yard Planning Process.</p>
+      <p class="line">Over the next few minutes, I will show you how it works and how it can help you avoid expensive mistakes before construction begins.</p>
+      <p class="line">Even if you never hire us, this will help you ask better questions and compare your options more confidently.</p>
+
+      <div class="beat">The dream</div>
+      <span class="cue">[B roll: a dramatic before and after of the same property. The finished space in use for outdoor cooking, poolside living, family gatherings, relaxing, and entertaining]</span>
+      <p class="line">Our goal is not simply to install pavers, build a patio cover, or add a few attractive features.</p>
+      <p class="line">It is to create an outdoor space that feels like a natural extension of your home. A place designed around how your family actually wants to live.</p>
+      <p class="line">Not just a yard you look at through the window, but a space where you can cook, entertain, relax, and enjoy living in San Diego.</p>
+
+      <div class="beat">Where projects go wrong</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">Here is where many backyard projects go wrong.</p>
+      <p class="line">They begin as disconnected ideas.</p>
+      <p class="line">A pool company handles the pool. Someone else installs the pavers. A third contractor builds the patio cover.</p>
+      <p class="line">Then the details connecting everything, including drainage, elevations, utilities, lighting, access, and material transitions, are considered too late.</p>
+      <span class="cue">[B roll: drainage conditions, elevation changes, utilities, narrow access, unfinished transitions, and disconnected construction elements]</span>
+      <p class="line">The problem is not necessarily the people performing the work. The problem is the fragmented plan.</p>
+      <p class="line">When every company focuses only on its own piece, responsibility becomes fragmented and important details fall between scopes.</p>
+      <p class="line">That is when homeowners encounter mismatched materials, unexpected change orders, drainage problems, construction delays, or finished work that must be removed and completed again.</p>
+      <span class="cue proof">[On screen: a short excerpt from a real client review about planning, problem solving, or communication]</span>
+      <span class="cue">[On camera]</span>
+      <p class="line">Before accepting a price from anyone, ask one important question:</p>
+      <p class="keyline">Is everyone pricing the same clearly defined finished project?</p>
+      <p class="line">If the answer is no, the lowest estimate may only be the lowest starting point.</p>
+
+      <div class="beat">The Whole Yard Planning Process</div>
+      <span class="cue">[B roll: SDLR owners walking a property, taking measurements, reviewing inspiration photos, and discussing the project with homeowners]</span>
+      <p class="line">That is why we begin by looking at your entire property.</p>
+      <p class="line">We learn how you want to use the space, establish your priorities, evaluate the existing conditions, and discuss the investment involved.</p>
+      <p class="line">Then we use our Whole Yard Planning Process to determine the right path from your first idea through the completed project.</p>
+
+      <div class="phase">Phase One &nbsp;|&nbsp; Discover</div>
+      <span class="cue">[On screen title: Phase One, Discover]</span>
+      <span class="cue">[B roll: project form being completed, initial phone call, property walkthrough, measurements, grade, drainage, access, and sunlight]</span>
+      <p class="line">First, you complete our project form and tell us about your property and what you want to create.</p>
+      <p class="line">Once we receive it, we call you to learn more about your goals, scope, timing, and investment expectations. We answer your initial questions and make sure San Diego Landscape Remodeling is the right fit for your project.</p>
+      <p class="line">If we agree that it makes sense to continue, we schedule an in person property walkthrough.</p>
+      <p class="line">During that walkthrough, we evaluate the entire space, including the grade, drainage, access, utilities, sunlight, surrounding structures, and how your family wants to use the yard.</p>
+      <p class="line">If the vision, property conditions, and budget need to be adjusted, it is better to discover that now than after you have spent money in the wrong direction.</p>
+
+      <div class="phase">Phase Two &nbsp;|&nbsp; Plan</div>
+      <span class="cue">[On screen title: Phase Two, Plan]</span>
+      <span class="cue">[B roll: designer walking the property, plans, measurements, renderings, material selections, and completed projects]</span>
+      <p class="line">Next, we determine how much planning and design the project requires.</p>
+      <p class="line">A clearly defined project can move toward preliminary pricing. A complex project involving several connected features, structural work, elevation changes, or major layout decisions should begin with professional design.</p>
+      <p class="line">When design is the right path, we recommend the designer we believe is best suited to your project and explain why. When appropriate, we can introduce more than one option based on the project's style, complexity, and design needs.</p>
+      <p class="line">Design is not simply about creating a beautiful picture.</p>
+      <p class="line">It allows the important decisions to be made before construction begins and gives the homeowner, designer, contractor, and trades one coordinated plan to follow.</p>
+      <p class="line">You are not guessing, and neither are we.</p>
+      <span class="cue proof">[Insert a short real client clip about the planning experience or feeling confident before construction]</span>
+
+      <div class="phase">Phase Three &nbsp;|&nbsp; Price and Prepare</div>
+      <span class="cue">[On screen title: Phase Three, Price and Prepare]</span>
+      <span class="cue">[B roll: detailed proposal, material selections, plans, permit documents, scheduling, and team coordination]</span>
+      <p class="line">Once the project is clearly defined, we prepare a detailed construction proposal tied to the agreed scope.</p>
+      <p class="line">You should understand what is included, what is excluded, which decisions have been made, and what could affect the final investment.</p>
+      <p class="line">The goal is not simply to hand you a number. It is to help you understand exactly what that number represents.</p>
+      <p class="line">Before construction begins, we coordinate the selections, materials, permits, scheduling, and major phases of the build.</p>
+      <p class="line">Decisions made on paper are easier and less expensive to change than decisions made after construction has already started.</p>
+
+      <div class="phase">Phase Four &nbsp;|&nbsp; Build and Stand Behind It</div>
+      <span class="cue">[On screen title: Phase Four, Build and Stand Behind It]</span>
+      <span class="cue">[B roll: property protection, demolition, underground work, drainage, construction details, progress updates, owners on site, cleanup, and completed spaces]</span>
+      <p class="line">During construction, you have a clear point of contact and regular communication about what is happening, what is coming next, and which decisions need your attention.</p>
+      <p class="line">The two owners of San Diego Landscape Remodeling remain directly involved in the projects we take on.</p>
+      <p class="line">You are not handed from a salesperson to people you have never met after signing an agreement. The people who help establish the expectations remain involved in delivering on them.</p>
+      <p class="line">We also pay attention to the details you may never see once the project is finished. The preparation, drainage, underground utilities, elevations, and structural connections are just as important as the visible finishes.</p>
+      <p class="line">When construction is complete, we conduct a final walkthrough with you.</p>
+      <p class="line">At approximately ten months, we return to walk the property again. This gives the space time to experience regular use, irrigation, weather, and seasonal changes while giving us another opportunity to confirm that everything is performing as intended.</p>
+      <p class="line">We do not want to disappear when construction ends. We want you to know who stands behind the work.</p>
+      <span class="cue proof">[On screen: another real review about communication, craftsmanship, or how SDLR handled the entire project]</span>
+
+      <div class="beat">Final call to action</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">If you are ready to explore what your entire outdoor space could become, click the button below and request your backyard consultation.</p>
+      <p class="line">Tell us about your project, and our team will call you to learn more, answer your initial questions, and determine whether we should schedule an in person property walkthrough.</p>
+      <p class="line">There is no pressure to sign a construction contract. The first step is simply gaining clarity and discovering the right path forward.</p>
+      <p class="line">Your family's future favorite place might be waiting just outside your back door.</p>
+
+      <div class="endcard">
+        End card<br>
+        <b>SAN DIEGO LANDSCAPE REMODELING</b><br>
+        <b>By design, not by dispatch</b><br>
+        Your whole outdoor space, planned and built as one cohesive project.<br>
+        Button: Request Your Backyard Consultation<br>
+        Below the button: Tell us about your project. Our team will call you to learn more and discuss the next step.
+      </div>
+    </div>
+    <p class="cta-note"><b>Editing note:</b> do not save the proof for the end. The three review and testimonial cues above are placed on purpose, after the problem, after Phase Two, and after Phase Four, so trust is compounding the whole way down.</p>
+  </div>
+
+  <!-- VIDEO 2 -->
+  <div class="video" id="v2">
+    <div class="v-head">
+      <div class="v-num">02</div>
+      <div class="v-title">
+        <h2>After we walk your property</h2>
+        <p class="v-sub">The evergreen video that removes the silence after the first visit.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Buy</span>
+      <span class="chip"><b>Length</b> &nbsp;90 sec to 2 min</span>
+      <span class="chip"><b>Lives</b> &nbsp;Follow up after a site visit, a "what to expect" page</span>
+      <span class="chip"><b>Talent</b> &nbsp;Gio, filmed like you just got in the truck</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>The gap after a visit is where trust leaks out. This closes the loop and reduces the time and uncertainty in the value equation. It also reframes a designer recommendation as the honest move, not a stall, which turns a potential red flag into proof of your integrity. It is Phase Two and Phase Three of the process, spoken in the moment, and the seven business day promise is what removes the wondering.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script &nbsp;/&nbsp; 90 sec to 2 min</div>
+      <span class="cue">[On camera, natural and direct, in the truck or at the office]</span>
+      <p class="line">Thank you again for inviting us to your home and sharing what you want to create.</p>
+      <p class="line">Now that we have walked your property together, I want to explain exactly what happens next so you are not left wondering.</p>
+      <p class="line">Right now, we are reviewing everything we learned. That includes the existing conditions, your priorities, how your family wants to use the space, and the different features you want to bring together.</p>
+      <p class="line">From here, your project will follow one of two paths.</p>
+      <div class="phase">Path One &nbsp;|&nbsp; Pricing</div>
+      <span class="cue">[On screen title: Path One, Pricing]</span>
+      <p class="line">If the project is clearly defined enough for us to price accurately, we will organize the complete scope and prepare written pricing.</p>
+      <p class="line">You will understand what is included, what is excluded, and exactly what the price represents.</p>
+      <p class="line">We are not interested in giving you an attractive starting number that changes once construction begins.</p>
+      <div class="phase">Path Two &nbsp;|&nbsp; Design</div>
+      <span class="cue">[On screen title: Path Two, Design]</span>
+      <p class="line">If important decisions still need to be made, the honest answer is not to guess. It is to develop the plan before pricing the construction.</p>
+      <p class="line">We will explain why design is needed and recommend the designer we believe is best suited to your project.</p>
+      <p class="line">Depending on the style and complexity involved, we may introduce you to more than one trusted option. These are professionals whose abilities we understand and whose work we trust.</p>
+      <span class="cue">[On camera, warmer]</span>
+      <p class="line">Either way, you will receive a clear recommendation from us within seven business days.</p>
+      <p class="line">You will not have to wonder what is happening or chase us for an answer.</p>
+      <p class="line">A backyard transformation at this level deserves more than a rushed quote. It deserves a clear plan and a path forward you can feel confident about.</p>
+      <p class="line">We will be in touch soon.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; Gold logo &nbsp;·&nbsp; <b>SAN DIEGO LANDSCAPE REMODELING</b> &nbsp;·&nbsp; <b>By design, not by dispatch</b></div>
+    </div>
+    <p class="cta-note"><b>Placement tip:</b> attach this to the automated follow up that goes out the evening of every first visit. One video, sent to everyone, doing the reassurance you would otherwise have to repeat by phone.</p>
+  </div>
+
+  <section id="more">
+    <div class="sec-kicker">The supporting six</div>
+    <h2>The rest of the system</h2>
+    <p>These six do the quiet work around the flagship. The attention pieces point to the free concept. The trust and buy pieces point to a backyard consultation. Shoot all of the on camera ones in one session with the VSL so your look, your light, and your energy stay consistent across the whole set.</p>
+  </section>
+
+  <!-- VIDEO 3 -->
+  <div class="video" id="v3">
+    <div class="v-head">
+      <div class="v-num">03</div>
+      <div class="v-title">
+        <h2>The three fears</h2>
+        <p class="v-sub">One trust core, two placements. Same three fears, a different frame and CTA depending on whether they have met you yet.</p>
+      </div>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>Naming a fear the buyer never said out loud makes you the trusted authority. The honesty on price, that no contractor can promise a project will never change, is more believable than a frozen number, and the close, that a good contractor shows you the process rather than promising nothing goes wrong, is the differentiator.</p>
+      <p>Run 03A cold to earn the consultation. Run 03B two to three days after the walkthrough to fill the silence before the estimate lands, which is exactly where deals go cold. Same body, different frame and CTA.</p>
+    </div>
+
+    <div class="vlabel"><span class="vl-tag">03A</span><h3>Cold audience, has not met you yet</h3></div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Trust</span>
+      <span class="chip"><b>Length</b> &nbsp;~2 min</span>
+      <span class="chip"><b>Lives</b> &nbsp;Why us page, lead nurture, retargeting</span>
+      <span class="chip"><b>CTA</b> &nbsp;Request Your Backyard Consultation</span>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script</div>
+      <span class="cue">[On camera, direct to lens]</span>
+      <p class="line">If you are considering a major backyard remodel, you probably have a few concerns about choosing the right contractor, even if you have not said them out loud.</p>
+      <p class="line">Most homeowners are worried about the same three things.</p>
+      <p class="line">Let's talk honestly about each one and show you how our process is designed to address them.</p>
+      <div class="phase">Fear One &nbsp;|&nbsp; Will they disappear?</div>
+      <span class="cue">[B roll: the owners meeting homeowners, active construction, client communication, and a final walkthrough]</span>
+      <p class="line">The first fear is, "They will start, take my money, and disappear."</p>
+      <p class="line">San Diego Landscape Remodeling is a licensed contractor, and you can verify our license before trusting us with your property.</p>
+      <p class="line">But a license alone does not guarantee communication or accountability.</p>
+      <p class="line">That is why both owners remain directly involved from the first property visit through the final walkthrough. You have a clear point of contact, regular communication, and people you know standing behind the work.</p>
+      <p class="line">We even return at approximately ten months to walk the completed project with you again.</p>
+      <div class="phase">Fear Two &nbsp;|&nbsp; Will the price keep climbing?</div>
+      <span class="cue">[B roll: detailed proposal, written scope, allowances, material selections, and change documentation]</span>
+      <p class="line">The second fear is, "The price will keep climbing once construction begins."</p>
+      <p class="line">No honest contractor can promise that a project will never change. A homeowner may add to the scope, and hidden property conditions can sometimes be discovered during construction.</p>
+      <p class="line">What we can do is define the scope clearly, identify allowances, explain what is included, and document changes before additional work moves forward.</p>
+      <p class="line">You should always understand why a price changed and approve that decision before paying for it.</p>
+      <div class="phase">Fear Three &nbsp;|&nbsp; Will it match the vision?</div>
+      <span class="cue">[B roll: inspiration photos, design plans, renderings, material selections, and transitions from plans to completed projects]</span>
+      <p class="line">The third fear is, "What if the finished yard looks nothing like I pictured?"</p>
+      <p class="line">That is why complex projects begin with a clear plan.</p>
+      <p class="line">When professional design is needed, we connect you with a designer we trust so the layout, materials, dimensions, and major details can be worked out before construction begins.</p>
+      <p class="line">You can see and approve the direction before we start building it.</p>
+      <span class="cue">[On camera, direct and reassuring]</span>
+      <p class="line">A good contractor should not tell you that nothing can ever go wrong.</p>
+      <p class="line">A good contractor should show you the process they use to prevent problems, communicate changes, and remain accountable when decisions need to be made.</p>
+      <p class="line">If these concerns have been keeping you from starting, click Request Your Backyard Consultation below.</p>
+      <p class="line">Tell us about your project, and our team will call you to answer your initial questions and discuss the right path forward for your space.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; <b>SAN DIEGO LANDSCAPE REMODELING</b> &nbsp;·&nbsp; <b>By design, not by dispatch</b> &nbsp;·&nbsp; Button: Request Your Backyard Consultation</div>
+    </div>
+
+    <div class="vlabel"><span class="vl-tag">03B</span><h3>After the property walkthrough</h3></div>
+    <div class="meta">
+      <span class="chip"><b>Audience</b> &nbsp;Homeowners you have already met</span>
+      <span class="chip"><b>Send</b> &nbsp;2 to 3 days after the walkthrough</span>
+      <span class="chip"><b>Length</b> &nbsp;~2 min</span>
+      <span class="chip"><b>CTA</b> &nbsp;Reply with any questions or concerns</span>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script</div>
+      <span class="cue">[On camera, direct to lens]</span>
+      <p class="line">Now that we have walked your property and learned more about what you want to create, you may still have a few concerns in the back of your mind.</p>
+      <p class="line">That is completely understandable. A backyard transformation is a major investment, and choosing the right company requires trust.</p>
+      <p class="line">Most homeowners are concerned about the same three things, so let's talk honestly about each one.</p>
+      <div class="phase">Fear One &nbsp;|&nbsp; Will they disappear?</div>
+      <span class="cue">[B roll: the owners meeting homeowners, active construction, client communication, and a final walkthrough]</span>
+      <p class="line">The first fear is, "Will they start, take my money, and disappear?"</p>
+      <p class="line">San Diego Landscape Remodeling is a licensed contractor, but we know a license alone does not guarantee communication or accountability.</p>
+      <p class="line">That is why both owners remain directly involved from the property walkthrough through the completion of your project.</p>
+      <p class="line">You have a clear point of contact, regular communication, and people you have already met standing behind the work.</p>
+      <p class="line">We even return at approximately ten months to walk the completed project with you again.</p>
+      <div class="phase">Fear Two &nbsp;|&nbsp; Will the price keep climbing?</div>
+      <span class="cue">[B roll: detailed proposal, written scope, allowances, material selections, and change documentation]</span>
+      <p class="line">The second fear is, "Will the price keep climbing once construction begins?"</p>
+      <p class="line">No honest contractor can promise that a project will never change. You may choose to add something to the scope, and hidden property conditions can sometimes be discovered during construction.</p>
+      <p class="line">Our responsibility is to define the scope clearly, identify allowances, explain what is included, and document changes before additional work moves forward.</p>
+      <p class="line">You should understand why a price changed and approve that decision before paying for it.</p>
+      <div class="phase">Fear Three &nbsp;|&nbsp; Will it match the vision?</div>
+      <span class="cue">[B roll: inspiration photos, plans, renderings, material selections, and transitions from design to completed construction]</span>
+      <p class="line">The third fear is, "Will the finished yard actually look and feel the way I pictured it?"</p>
+      <p class="line">That is why we do not rush complex projects into construction without a clear plan.</p>
+      <p class="line">When professional design is needed, we recommend a designer who can help define the layout, materials, dimensions, and major details before construction begins.</p>
+      <p class="line">You will have an opportunity to see and approve the direction before we start building it.</p>
+      <span class="cue">[On camera, direct and reassuring]</span>
+      <p class="line">A good contractor should not tell you that nothing can ever go wrong.</p>
+      <p class="line">A good contractor should show you how they prevent problems, communicate changes, and remain accountable when decisions need to be made.</p>
+      <p class="line">If any of these concerns have been in the back of your mind since we met, reply to the message we sent with this video and tell us.</p>
+      <p class="line">We would rather address your questions directly than leave you wondering.</p>
+      <p class="line">Our team is reviewing everything we learned during your property walkthrough, and you will receive our recommendation within seven business days.</p>
+      <p class="line">We appreciate the opportunity to learn about your project, and we look forward to speaking with you again soon.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; <b>SAN DIEGO LANDSCAPE REMODELING</b> &nbsp;·&nbsp; <b>By design, not by dispatch</b></div>
+    </div>
+    <p class="cta-note"><b>Sequence:</b> walkthrough video on day zero, this 03B on day two or three, then the recommendation inside seven business days. Send 03B in a channel that accepts a reply, an email thread or a text, so "reply and tell us" actually reaches you.</p>
+  </div>
+
+  <!-- VIDEO 4 -->
+  <div class="video" id="v4">
+    <div class="v-head">
+      <div class="v-num">04</div>
+      <div class="v-title">
+        <h2>One honest number</h2>
+        <p class="v-sub">Neutralize the money fear and reframe price as certainty.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Buy</span>
+      <span class="chip"><b>Length</b> &nbsp;~90 sec</span>
+      <span class="chip"><b>Lives</b> &nbsp;Pricing and FAQ page, nurture, price shopper retargeting</span>
+      <span class="chip"><b>CTA</b> &nbsp;Book a consultation</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>Price is only a problem in the absence of certainty. This lowers perceived risk and pre frames the low bidder as the dangerous choice, so you never have to compete on the cheapest number. It is the spoken version of the VSL's key question.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">Let me tell you how our pricing works, because it is different, and the difference protects you.</p>
+      <p class="line">A lot of companies win the job with a low number, then climb once the walls are open. We do the opposite. We give you one honest number, in writing, for the whole scope of your project.</p>
+      <span class="cue">[B roll: plans, a written estimate on the table]</span>
+      <p class="line">When the cost depends on your taste, your paving, your fixtures, your finishes, we set a clear allowance for that product and show it to you right on the estimate. Choose something above it, you see the difference before you decide. Choose below, you keep the savings. Nothing is hidden.</p>
+      <span class="cue">[On camera]</span>
+      <p class="line">We will not be the cheapest quote you get. A cheap number on a project like this is usually a promise the company cannot keep. What we will be is the number you can actually count on, start to finish.</p>
+      <p class="line">Because the worst thing that can happen on your backyard is not paying a fair price. It is trusting a low one.</p>
+      <p class="line">If you want a real number you can plan around, book a backyard consultation. We will walk your property and give you an honest recommendation, even if that means design comes first.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; <b>By design, not by dispatch</b> &nbsp;·&nbsp; Book a backyard consultation</div>
+    </div>
+  </div>
+
+  <!-- VIDEO 5 -->
+  <div class="video" id="v5">
+    <div class="v-head">
+      <div class="v-num">05</div>
+      <div class="v-title">
+        <h2>Founders on every project</h2>
+        <p class="v-sub">Who is actually going to be in your yard.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Trust</span>
+      <span class="chip"><b>Length</b> &nbsp;~90 sec</span>
+      <span class="chip"><b>Lives</b> &nbsp;About and why us page, nurture email one</span>
+      <span class="chip"><b>CTA</b> &nbsp;Book a consultation</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>The single most common contractor betrayal is being closed by a charming salesman and then built by strangers. Owning that fear out loud, and proving you are structurally different, raises the belief that the outcome will actually happen.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">When you hire most companies, you meet a salesman. He is charming, he closes the deal, and then you never see him again. The people who actually show up in your yard are strangers.</p>
+      <p class="line">That is not how we work.</p>
+      <span class="cue">[B roll: the two founders on site, in the plans, with the crew]</span>
+      <p class="line">There are two of us who own this company. I handle the design and the vision side. My partner Mike runs the build. And between the two of us, one of us is on your project the entire way through.</p>
+      <p class="line">The person who sat with you and made the promises is the person who keeps them. When you have a question, you are not routed through an office. You are talking to an owner.</p>
+      <span class="cue">[On camera]</span>
+      <p class="line">We built it this way on purpose. When the founders are on every job, the quality does not drift, and the client is never handed off and forgotten.</p>
+      <p class="line">If that is the kind of company you want touching your home, book a backyard consultation and let us take a look at your space.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; <b>By design, not by dispatch</b> &nbsp;·&nbsp; Book a backyard consultation</div>
+    </div>
+  </div>
+
+  <!-- VIDEO 6 -->
+  <div class="video" id="v6">
+    <div class="v-head">
+      <div class="v-num">06</div>
+      <div class="v-title">
+        <h2>The free backyard concept</h2>
+        <p class="v-sub">The give. The top of funnel magnet that turns cold attention into a photo.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Attention</span>
+      <span class="chip"><b>Length</b> &nbsp;60 sec, plus a 15 sec cut</span>
+      <span class="chip"><b>Lives</b> &nbsp;Paid social, Google Business, the mailer QR page, homepage</span>
+      <span class="chip"><b>CTA</b> &nbsp;Send one photo</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>This is Hormozi's give in its purest form. The dream outcome is high, the effort is one photo, and the risk is zero because there is no visit and no pressure. The monthly cap adds honest scarcity. Note the language rule: this is a concept image, never a design or a plan, so the offer stays true.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script &nbsp;/&nbsp; 60 second version</div>
+      <span class="cue">[On camera, energy up but calm]</span>
+      <p class="line">Want to see what your backyard could actually look like, before you spend a dollar or talk to anyone? Here is how.</p>
+      <span class="cue">[B roll: a phone taking a photo of a plain yard, then a concept image appearing]</span>
+      <p class="line">Send us one photo of your yard. That is it. Our team puts together a concept image of your space and sends it back to you, free.</p>
+      <p class="line">No sales visit. No pressure. Just a picture of what is possible, so you can decide for yourself whether you want to go further.</p>
+      <p class="line">We are doing this for a limited number of homes this month, because each concept takes real work on our side.</p>
+      <span class="cue">[On camera]</span>
+      <p class="line">So if you have been staring at the same tired yard wondering what it could be, stop wondering. Tap the button, send your photo, and we will show you.</p>
+      <p class="line">By design, not by dispatch.</p>
+      <div class="s-label" style="margin-top:24px">15 second version</div>
+      <span class="cue">[On camera]</span>
+      <p class="line">Send us one photo of your backyard, and we will send back a concept image of what it could become, free, this month. No visit. No pressure. Tap below and show us your space.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; Gold logo &nbsp;·&nbsp; QR to the concept page &nbsp;·&nbsp; <b>By design, not by dispatch</b></div>
+    </div>
+  </div>
+
+  <!-- VIDEO 7 -->
+  <div class="video" id="v7">
+    <div class="v-head">
+      <div class="v-num">07</div>
+      <div class="v-title">
+        <h2>Transformation reel</h2>
+        <p class="v-sub">A reusable template. Proof and the dream, made concrete. Fill the brackets per project.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Attention and Advocacy</span>
+      <span class="chip"><b>Length</b> &nbsp;~90 sec per project</span>
+      <span class="chip"><b>Lives</b> &nbsp;Portfolio, social proof in nurture, paid social</span>
+      <span class="chip"><b>CTA</b> &nbsp;Send one photo</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>Nothing raises belief like seeing it already done for someone like them. This sells the vacation, not the flight. One client sentence in their own voice is worth more than a paragraph of your claims.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter template &nbsp;/&nbsp; replace the brackets</div>
+      <span class="cue">[On camera or voice over the before footage]</span>
+      <p class="line">This backyard in [neighborhood] started like a lot of them. [One honest line about the before: unused, dated, water pooling, whatever is true].</p>
+      <span class="cue">[B roll: the before, then the build, then the reveal]</span>
+      <p class="line">The family wanted [the real goal in their words: a place to host, a pool the kids would actually use, a yard that finally matched the house].</p>
+      <p class="line">Here is what we did. [Name the scope plainly: new paving, a pergola, a pool, lighting, drainage]. One plan, one team, one number.</p>
+      <span class="cue">[B roll: the finished space, ideally with people using it]</span>
+      <p class="line">[If you captured a client line, use it here in their words: "We use it every single weekend now."]</p>
+      <span class="cue">[On camera]</span>
+      <p class="line">This is the part that never gets old for us. Handing back a yard the family actually lives in.</p>
+      <p class="line">If you want this for your home, it starts with one photo. Send us your yard, and we will show you a concept of what it could become, free.</p>
+      <div class="endcard">Capture rule &nbsp;·&nbsp; shoot the <b>before on every first visit</b>, the build as you go, the reveal at handoff, and grab <b>one client sentence</b> on camera. That is a reel for life.</div>
+    </div>
+  </div>
+
+  <!-- VIDEO 8 -->
+  <div class="video" id="v8">
+    <div class="v-head">
+      <div class="v-num">08</div>
+      <div class="v-title">
+        <h2>Who this is not for</h2>
+        <p class="v-sub">The takeaway. Turning the wrong people away raises your value with the right ones.</p>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="chip"><b>Stage</b> &nbsp;Buy</span>
+      <span class="chip"><b>Length</b> &nbsp;~75 sec</span>
+      <span class="chip"><b>Lives</b> &nbsp;Site, nurture for tire kickers, retargeting</span>
+      <span class="chip"><b>CTA</b> &nbsp;Book a consultation</span>
+    </div>
+    <div class="why">
+      <span class="why-k">Why it works</span>
+      <p>Confidently disqualifying the wrong buyer is the strongest trust signal there is. It filters out the price only leads that waste your time and it makes the right buyer lean in, because a company that can say no is a company worth choosing. This is Hormozi's attract and filter, on camera.</p>
+    </div>
+    <div class="script">
+      <div class="s-label">Teleprompter script</div>
+      <span class="cue">[On camera, relaxed, honest]</span>
+      <p class="line">Let me save some people time. We are not the right company for everyone, and I would rather be honest about it.</p>
+      <p class="line">If you are looking for the cheapest possible number and the details do not matter to you, we are not your company. There are crews who will do that, and they will win on price.</p>
+      <span class="cue">[B roll: close ups of craftsmanship, the details]</span>
+      <p class="line">We are built for the homeowner who wants their whole yard designed and built as one plan. Done once, done right, by the people who own the company.</p>
+      <p class="line">If that is you, price is not really your question. Certainty is. And certainty is what we sell.</p>
+      <span class="cue">[On camera]</span>
+      <p class="line">So here is a simple test. If you want the cheapest quote, get three of them and go with your gut. If you want the yard done right the first time and never want to think about it again, that is us.</p>
+      <p class="line">If that sounds like you, book a backyard consultation, and let us walk your property and show you the honest next step.</p>
+      <div class="endcard">End card &nbsp;·&nbsp; <b>By design, not by dispatch</b> &nbsp;·&nbsp; Book a backyard consultation</div>
+    </div>
+  </div>
+
+  <!-- PLACEMENT MATRIX -->
+  <section id="place">
+    <div class="sec-kicker">Distribution</div>
+    <h2>Which video lives where</h2>
+    <p>The same eight assets, mapped to the places a buyer meets you, and the offer each one carries. Attention pieces ask for a photo. Trust and buy pieces ask for a consultation.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Video</th><th>Funnel door</th><th>Primary home</th><th>Offer it carries</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><b>Free concept</b></td><td>Attention</td><td>Paid social ad</td><td>Send one photo</td></tr>
+          <tr><td><b>Transformation reel</b></td><td>Attention and Advocacy</td><td>Instagram and portfolio</td><td>Send one photo</td></tr>
+          <tr><td><b>The Process VSL</b></td><td>Trust</td><td>Homepage, landing page, YouTube</td><td>Request a consultation</td></tr>
+          <tr><td><b>Three fears 03A</b></td><td>Trust</td><td>Why us page, lead nurture, retargeting</td><td>Request a consultation</td></tr>
+          <tr><td><b>Three fears 03B</b></td><td>Post visit nurture</td><td>2 to 3 days after the walkthrough</td><td>Reply with questions</td></tr>
+          <tr><td><b>Founders on every project</b></td><td>Trust</td><td>About page</td><td>Book a consultation</td></tr>
+          <tr><td><b>One honest number</b></td><td>Buy</td><td>Pricing and FAQ page</td><td>Book a consultation</td></tr>
+          <tr><td><b>After we leave your house</b></td><td>Buy</td><td>Post visit follow up</td><td>Reassurance, no ask</td></tr>
+          <tr><td><b>Who this is not for</b></td><td>Buy</td><td>Site and nurture</td><td>Book a consultation</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- SHOOT PLAN -->
+  <section id="shoot">
+    <div class="sec-kicker">Production</div>
+    <h2>How to shoot the whole set in one morning</h2>
+    <p>All of your on camera pieces are you, in the same look. Shoot them together so your light, wardrobe, and energy stay consistent, then edit into the individual videos. Here is the order and the notes that matter.</p>
+
+    <h3>Priority order, by leverage</h3>
+    <p>If you only get through a few, do them in this order. Each earns its keep the moment it goes live.</p>
+    <ol class="steps">
+      <li><b>The Process VSL.</b> The one asset that does the most work. It is longer and needs the most b roll, so give it the real time. Put it on the homepage, behind the consultation page, and on YouTube.</li>
+      <li><b>Free concept, 60 and 15.</b> This feeds the top of the funnel and the mailer you already built. It is the give that starts everything.</li>
+      <li><b>Three fears and Founders on every project.</b> The two trust videos that turn a curious visitor into a believer.</li>
+      <li><b>After we leave your house.</b> Wire it into the post visit follow up so it runs on autopilot.</li>
+      <li><b>One honest number and Who this is not for.</b> The closers that protect your margin and your time.</li>
+      <li><b>Transformation reel.</b> Starts the day you capture your first before and after. Build the habit now.</li>
+    </ol>
+
+    <h3>Notes that make it look like money</h3>
+    <p><strong>Use a teleprompter.</strong> Every script here is written for the way you actually talk, so it reads natural off the glass. Look down the lens, not at the room.</p>
+    <p><strong>Give the key question a beat.</strong> On the VSL, pause before "is everyone pricing the same clearly defined finished project," let it land, and put it on screen as text. That one line is the whole reframe.</p>
+    <p><strong>Capture the before on every single first visit.</strong> This is the one habit that pays forever. You cannot fake a before after you have already started. Two minutes of phone footage of the tired yard, every time.</p>
+    <p><strong>Weave the proof through, do not stack it.</strong> Especially on the VSL. Before and afters, plans next to finished work, a construction detail, a brief review on screen, one short testimonial. Trust should be building the entire time you talk.</p>
+    <p><strong>Shoot wide and clean.</strong> A finished project or a calm, uncluttered office. Let the yards be the color. Keep yourself in the same wardrobe across the set so the videos feel like one brand.</p>
+    <p><strong>Captions on everything.</strong> Most of this gets watched with the sound off first. Run each cut through your auto caption pipeline before it ships.</p>
+    <p><strong>One end card for all of them.</strong> Gold logo, the line "By design, not by dispatch," phone, and license number, with the right call to action for that video's stage.</p>
+    <p><strong>Two offers, by depth.</strong> Attention videos send them to the free concept. Trust and buy videos send them to a backyard consultation. One offer per stage is what makes a funnel instead of a pile of videos.</p>
+  </section>
+
+  <footer>
+    <div class="fmark">By design, not by dispatch.</div>
+    <p>San Diego Landscape Remodeling &nbsp;·&nbsp; 619 613 2511 &nbsp;·&nbsp; CSLB 1139785 &nbsp;·&nbsp; La Mesa, CA. Eight scripts, two offers, one funnel, one named process. Language rule held throughout: the free give is a concept image, never a design, a plan, or a measured package.</p>
+  </footer>
+
+</div>
+<script>
+(function(){
+  function flash(btn){
+    var original = btn.getAttribute('data-label') || btn.textContent;
+    btn.setAttribute('data-label', original);
+    btn.classList.add('copied');
+    btn.textContent = 'Copied';
+    clearTimeout(btn._t);
+    btn._t = setTimeout(function(){ btn.classList.remove('copied'); btn.textContent = original; }, 1600);
+  }
+  function fallbackCopy(text, btn){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly','');
+      ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); flash(btn);
+    }catch(e){ btn.textContent = 'Press Cmd C'; }
+  }
+  function copyText(text, btn){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ flash(btn); }).catch(function(){ fallbackCopy(text, btn); });
+    } else { fallbackCopy(text, btn); }
+  }
+  document.querySelectorAll('.script').forEach(function(s){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy script';
+    btn.setAttribute('aria-label', 'Copy the spoken script to your clipboard');
+    btn.addEventListener('click', function(){
+      var lines = Array.prototype.slice.call(s.querySelectorAll('.line, .keyline'))
+        .map(function(el){ return el.textContent.replace(/\s+/g,' ').trim(); })
+        .filter(Boolean);
+      copyText(lines.join('\n\n'), btn);
+    });
+    s.appendChild(btn);
+  });
+})();
+</script>
