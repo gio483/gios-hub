@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Oct 26 – Oct 30, 2026 · Process Carousel",
+      "folder": "week-2026-10-26",
+      "manifest": "sdlr-content/week-2026-10-26/manifest.json",
+      "generated": "2026-09-14"
+    },
+    {
       "label": "Week of Oct 19 – Oct 23, 2026",
       "folder": "week-2026-10-19",
       "manifest": "sdlr-content/week-2026-10-19/manifest.json",
