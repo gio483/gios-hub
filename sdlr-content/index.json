@@ -1,6 +1,42 @@
 {
   "weeks": [
     {
+      "label": "Week of Oct 19 – Oct 23, 2026",
+      "folder": "week-2026-10-19",
+      "manifest": "sdlr-content/week-2026-10-19/manifest.json",
+      "generated": "2026-09-13"
+    },
+    {
+      "label": "Week of Oct 12 – Oct 16, 2026",
+      "folder": "week-2026-10-12",
+      "manifest": "sdlr-content/week-2026-10-12/manifest.json",
+      "generated": "2026-08-30"
+    },
+    {
+      "label": "Week of Oct 5 – Oct 9, 2026 · World Architecture Day",
+      "folder": "week-2026-10-05",
+      "manifest": "sdlr-content/week-2026-10-05/manifest.json",
+      "generated": "2026-08-23"
+    },
+    {
+      "label": "Week of Sep 28 – Oct 2, 2026 · October in San Diego",
+      "folder": "week-2026-09-28",
+      "manifest": "sdlr-content/week-2026-09-28/manifest.json",
+      "generated": "2026-08-16"
+    },
+    {
+      "label": "Week of Sep 21 – Sep 25, 2026 · First Day of Fall",
+      "folder": "week-2026-09-21",
+      "manifest": "sdlr-content/week-2026-09-21/manifest.json",
+      "generated": "2026-08-09"
+    },
+    {
+      "label": "Week of Sep 14 – Sep 18, 2026",
+      "folder": "week-2026-09-14",
+      "manifest": "sdlr-content/week-2026-09-14/manifest.json",
+      "generated": "2026-07-26"
+    },
+    {
       "label": "Week of Sep 7 – Sep 11, 2026 · Labor Day",
       "folder": "week-2026-09-07",
       "manifest": "sdlr-content/week-2026-09-07/manifest.json",
