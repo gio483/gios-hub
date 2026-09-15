@@ -3,7 +3,7 @@
   "generated": "2026-09-14",
   "folder": "week-2026-09-14",
   "cadence": "5 posts / week (Mon–Fri)",
-  "note": "Fresh generation (2026-09-14): all five images newly created with Nano Banana Pro, no library reuse. Deliberate job-tier range — an attainable Eastlake suburban backyard up to a Santaluz estate, plus a Mount Helix curb-appeal driveway and an Encinitas coastal pool aerial — so both entry and flagship buyers see themselves. Showroom feed: every caption names the real selections and ends with a soft DM DESIGN CTA. Unified warm-neutral golden-hour grade across the grid. No people, one photograph per image. Post natively in the Instagram app.",
+  "note": "Fresh generation (2026-09-14), all newly created with Nano Banana Pro, no library reuse. Mon/Tue/Thu/Fri are single-photo feed posts spanning the job-tier range — an attainable Eastlake suburban backyard up to a Santaluz estate, plus an Encinitas coastal pool aerial. WEDNESDAY (Sep 16) is the bi-weekly PROCESS CAROUSEL (6 slides, post natively as an Instagram carousel): one Rancho Santa Fe estate shown from 2D plan → 3D design renders building out stage by stage (bones, planting, pergola, lighting) → the finished build photographed. The 3D slides are rendered in a VIP3D/Lumion design-software look on purpose (clearly 'our design'); only the last slide is photoreal ('the build'). Showroom captions name real selections, soft DM DESIGN CTA, unified warm-neutral grade, no people. Post natively in the Instagram app.",
   "posts": [
     {
       "id": "w0914-p1",
@@ -39,13 +39,21 @@
       "date": "Sep 16",
       "time": "6:30 PM",
       "platform": "Instagram + Facebook",
-      "style": "Curb Appeal · Paver Driveway",
-      "image": "sdlr-content/week-2026-09-14/post3.jpg",
-      "alt": "Mount Helix Spanish-style home with a herringbone Techo-Bloc paver driveway, contrast borders, olive tree and hillside views at golden hour",
-      "hook": "Curb appeal starts before the front door.",
-      "caption": "The driveway is the first thing anyone sees and the last thing that dates a home. Laid in herringbone, pavers lock tighter, carry the weight, and wear far better than a poured slab ever will.\n\nBorder banding frames the field, olive and lavender soften the edges, and the whole entrance finally matches the house.\n\nThe selections:\n• Techo-Bloc Blu 60 pavers\n• herringbone field\n• contrast border banding\n• mature olive tree\n• Mediterranean planting\n\nWant an entrance that makes this kind of first impression? DM “DESIGN”.",
-      "hashtags": "#sandiegolandscaping #mounthelix #paverdriveway #techobloc #curbappeal",
-      "geotag": "Mount Helix, San Diego, CA"
+      "style": "Process Carousel · Design to Build",
+      "image": "sdlr-content/week-2026-09-14/process-slide1.jpg",
+      "images": [
+        "sdlr-content/week-2026-09-14/process-slide1.jpg",
+        "sdlr-content/week-2026-09-14/process-slide2.jpg",
+        "sdlr-content/week-2026-09-14/process-slide3.jpg",
+        "sdlr-content/week-2026-09-14/process-slide4.jpg",
+        "sdlr-content/week-2026-09-14/process-slide5.jpg",
+        "sdlr-content/week-2026-09-14/process-slide6.jpg"
+      ],
+      "alt": "Six-slide SDLR process carousel of one Rancho Santa Fe estate backyard: the 2D plan, then 3D design renders building out stage by stage (hardscape, planting, pergola, lighting), then the finished build photographed",
+      "hook": "We design the whole thing in 3D before a single paver is cut.",
+      "caption": "Most people meet their backyard for the first time when it is finished. Our clients meet theirs months earlier — in 3D.\n\nSwipe through one outdoor living space, drawing to done:\n\n1. The plan — every grade and dimension resolved on paper.\n2. The bones, modeled in 3D — pool, spa, patio, kitchen.\n3. The planting goes in.\n4. The pergola and the lounge.\n5. Then we light it, for the evenings you will use it most.\n6. Then we build exactly that.\n\nNo surprises. No “that is not what I pictured.” You approve the space before we ever break ground — that is what by design, not by dispatch actually means.\n\nThe selections:\n• Belgard herringbone paver patio\n• raised spa with spillway\n• stainless Lynx grill + stacked-stone island\n• StruXure louvered pergola\n• Warming Trends linear fire feature\n• FX Luminaire landscape lighting\n\nWant to see your own outdoor living space in 3D before you commit to a thing? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #ranchosantafe #3ddesign #designbuild #outdoorliving",
+      "geotag": "Rancho Santa Fe, San Diego, CA"
     },
     {
       "id": "w0914-p4",
