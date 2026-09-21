@@ -1,0 +1,79 @@
+{
+  "week_label": "Week of Nov 2 – Nov 6, 2026",
+  "generated": "2026-09-20",
+  "folder": "week-2026-11-02",
+  "cadence": "5 posts / week (Mon–Fri)",
+  "note": "Showroom feed — every image features real products SDLR installs, and each caption names the selections so followers can DM to get the look. IMAGES: all five were REUSED from the existing SDLR image library (per this scheduled task's reuse-before-generate rule, step 4) and matched to each planned subject; captions were written to name exactly what each image shows, and every image was viewed one by one before its caption was written. No new images were generated this run — reuse keeps the drop complete without spending generation credits, and Nano Banana generation also requires interactive approval that isn't available in an unattended run. Nothing is pending/broken: the drop is complete with real 1080x1350 JPEGs. Source files: post1 rancho-santa-fe-luxury-backyard-pool-spa-travertine-deck, post2 san-diego-front-yard-wide-concrete-driveway-stone-facade-drought-tolerant-plants, post3 san-diego-mt-helix-backyard-remodel-mid-construction-hardscape-ocean-view, post4 east-lake-backyard-pergola-string-lights-outdoor-kitchen-fire-pit-curved-seating-dusk, post5 del-sur-luxury-backyard-pergola-outdoor-kitchen-fire-pit-travertine-sunset. ROTATION: full five-pillar rotation — Design & Aspiration (Rancho Santa Fe flagship pool & spa), Neighborhood/Curb Appeal (La Mesa driveway), Craft & Process (Mt Helix mid-construction bones — the base, formwork and retaining walls, a deliberate change of pace from recent fire-detail craft posts), Lifestyle (Eastlake attainable suburban weeknight yard), Trust & Difference (Del Sur — Direct Founder Access / you-meet-who-designs-it, rotating off 'one contract, one firm' used the last two cycles and the 10-Month Walk-Through used Oct 30). CURB APPEAL holds its slot: Tuesday La Mesa is a driveway & front-yard post — large-format textured concrete with charcoal contrast banding and Corten planters, a different material from the herringbone (Oct 27) and random-slate stamped concrete (Oct 20) of the last two weeks. JOB TIER is varied: a Rancho Santa Fe estate (Mon), an attainable La Mesa ranch curb-appeal (Tue), a mid Mt Helix hillside build (Wed), an attainable Eastlake suburban yard (Thu), and a mid-luxury Del Sur outdoor room (Fri) so both entry and estate buyers see themselves. NO neighborhood repeats from the last three weeks (Oct 26/19/12). SEASONAL: no on-brand holiday falls inside or adjacent to Nov 2–6 — daylight saving ends Nov 1 but that hook was already used Oct 29, and Veterans Day (Nov 11) is neither adjacent nor a luxury design-build entertaining moment — so no holiday post this week. CAROUSEL: none this week — the last process carousel ran Oct 28, and the format is bi-weekly, so Nov 2 is single-image posts only; the next carousel is due the following cycle. Nothing auto-posts. Post natively in the Instagram app; everything is left for Gio's review.",
+  "posts": [
+    {
+      "id": "w1102-p1",
+      "day": "Monday",
+      "date": "Nov 2",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Design & Aspiration · The Pool You Look At From Inside",
+      "image": "sdlr-content/week-2026-11-02/post1.jpg",
+      "alt": "A Rancho Santa Fe estate backyard at dusk with a long rectangular pool and a raised spa spilling into it, wide silver travertine deck and coping, teak chaise loungers, clipped boxwood hedging, dry-stacked stone seat walls with warm uplighting, mature olive trees, and a Mediterranean tile-roof estate home glowing beyond a level lawn",
+      "hook": "On an estate lot the pool isn't the centerpiece. The sightline to it is.",
+      "caption": "Anyone can drop a rectangle of water on an acre. The design decision is what you see the moment you look up from the kitchen island.\n\nSo the whole yard is set on one axis off the main living wing. The pool runs the long line, dead level with the lawn, so from inside the house the water reads as an extension of the floor. The spa sits raised just behind it, spilling a quiet sheet back into the pool — the sound reaches the terrace before you do. Everything around it is kept low and calm: silver travertine underfoot because it stays cool on a west-facing deck, boxwood and olive so nothing fights the architecture, and uplights tucked into the stone walls so the yard has depth after dark instead of a flat black edge.\n\nAn acre doesn't make a yard feel considered. One resolved sightline does.\n\nThe selections:\n• silver travertine deck & coping\n• raised spa with spillway\n• dry-stacked stone seat & retaining walls\n• teak chaise loungers\n• boxwood hedging & mature olive trees\n• FX Luminaire low-voltage uplighting\n\nSitting on a big lot and not sure where the water belongs? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #ranchosantafe #poolandspa #travertine #outdoorliving",
+      "geotag": "Rancho Santa Fe, CA"
+    },
+    {
+      "id": "w1102-p2",
+      "day": "Tuesday",
+      "date": "Nov 3",
+      "time": "12:00 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Neighborhood · Driveway & Curb Appeal",
+      "image": "sdlr-content/week-2026-11-02/post2.jpg",
+      "alt": "A single-story modern ranch home in La Mesa at golden hour with a wide large-format textured-concrete driveway divided by charcoal contrast bands, Corten steel raised planter walls filled with agave, blue senecio, succulents and ornamental grasses, a wood-and-stone facade, low path lighting and a warmly lit entry",
+      "hook": "The driveway is the largest single surface on the front of your house. It is almost always the least designed.",
+      "caption": "A plain gray slab is the default, and it is the first and last thing the street sees. This one does actual work instead.\n\nThe field is large-format textured concrete poured in oversized panels, so a wide run reads as architecture rather than a parking pad. The dark saw-cut bands between the panels are the whole trick — that grid is what turns a driveway into a designed plane, and it gives the concrete a place to move so it cracks on the line instead of across the middle. Corten steel planter walls lift the drought planting to eye level as you pull in, weathered to a warm rust that picks up the wood on the house, and low path lights carry the approach to the door after sundown.\n\nSame footprint every house on the street has. It just stops apologizing for itself.\n\nThe selections:\n• large-format textured concrete driveway\n• charcoal saw-cut contrast banding\n• Corten steel raised planter walls\n• agave, blue senecio & ornamental grasses\n• low-voltage path & entry lighting\n\nWant the front of the house to finally match the back? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #lamesa #curbappeal #concretedriveway #modernlandscape",
+      "geotag": "La Mesa, CA"
+    },
+    {
+      "id": "w1102-p3",
+      "day": "Wednesday",
+      "date": "Nov 4",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Craft & Process · The Half You Never See",
+      "image": "sdlr-content/week-2026-11-02/post3.jpg",
+      "alt": "A Mount Helix hillside backyard mid-construction on a clear day: poured concrete retaining and seat walls, timber formwork and steel rebar for footings, large-format limestone pavers being set on a compacted gravel base, a plate compactor on open sand, a raised fire feature framed with a rebar cage, a glass-panel view railing, and canyon homes and hills beyond",
+      "hook": "This is the stage no one photographs. It's also the stage that decides whether the finished yard is still flat in ten years.",
+      "caption": "The pretty version of this yard is months away. This is the part that actually determines whether it lasts.\n\nEverything that matters on a hillside happens before a single finish surface goes down. The pad is cut and the base is compacted in lifts — that orange plate compactor runs the sub-base until it stops moving, because pavers don't fail from the top, they fail from underneath. The retaining and seat walls are poured against timber formwork over steel rebar, footings sized for the slope, not guessed at. The fire feature is framed and reinforced before it's ever clad. Only once the bones pass do the limestone pavers get set.\n\nYou'll never see any of this once it's built. You'll only feel it — in a terrace that's still dead level after a decade of rain moving down that hill.\n\nThe selections:\n• engineered, compacted sub-base\n• steel-reinforced poured concrete retaining & seat walls\n• rebar-framed fire feature\n• large-format limestone pavers\n• glass-panel view railing\n\nWant it built from the base up, not the surface down? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #mthelix #hardscape #retainingwall #designbuild",
+      "geotag": "Mount Helix, CA"
+    },
+    {
+      "id": "w1102-p4",
+      "day": "Thursday",
+      "date": "Nov 5",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Lifestyle · The Weeknight Yard",
+      "image": "sdlr-content/week-2026-11-02/post4.jpg",
+      "alt": "A compact Eastlake suburban backyard at dusk with a stained cedar pergola strung with cafe lights over a stone-veneer outdoor kitchen island, a stainless built-in grill and four barstools at a raised bar counter, a round concrete gas fire pit burning, a cream sectional and lounge chair, a large-format paver patio, a small turf strip, an agave in a black planter and a block wall with neighboring two-story homes beyond",
+      "hook": "The yard that earns its keep isn't the one you use twice a year. It's the one you use on a Tuesday.",
+      "caption": "Nobody remodels a backyard for the big party. They think they do — but the yard that's worth it is the one that pulls you outside on an ordinary weeknight.\n\nThis one is built for exactly that, on a normal suburban lot. The pergola and cafe lights turn a flat slab into a room with a ceiling, so 6pm in November still feels like somewhere you want to sit. The stone-veneer kitchen and bar mean dinner happens out here without a project — grill's lit, someone's on a stool, the food never goes back inside. The round gas fire pit takes the chill off the moment the sun drops, and the paver patio and turf strip shrug off kids, dogs and spilled drinks.\n\nIt isn't the biggest yard on the block. It's just the one everybody's actually in.\n\nThe selections:\n• Belgard large-format paver patio\n• stained cedar pergola with cafe string lighting\n• Eldorado Stone veneer kitchen island & bar\n• stainless built-in grill\n• round concrete gas fire pit\n• SYNLawn turf inset\n\nWant the yard you'll use on a Tuesday, not just a holiday? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #eastlake #outdoorkitchen #firepit #backyarddesign",
+      "geotag": "Eastlake, Chula Vista, CA"
+    },
+    {
+      "id": "w1102-p5",
+      "day": "Friday",
+      "date": "Nov 6",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Trust & Difference · You Meet Who Designs It",
+      "image": "sdlr-content/week-2026-11-02/post5.jpg",
+      "alt": "A Del Sur backyard at dusk with a steel-and-wood pergola with integrated linear LED lighting over a travertine terrace, a stone-veneer outdoor kitchen with a stainless grill and beverage fridge, a floating bar counter with upholstered barstools, a linear concrete gas fire table burning, cushioned lounge chairs, olive trees and agave, and open sliding doors to a warmly lit modern stucco home",
+      "hook": "On most projects you never meet the person who designed it. That's usually where it goes wrong.",
+      "caption": "The design gets sold by one person, drawn by another, and handed to a crew who've never spoken to either. Every gap in that chain becomes a gap in your yard.\n\nWe run it the other way around. The person who designs your space is the person you keep talking to while it's built — Gio on the design and the client side, Mike running the build with a crew that's his own, not a rotating cast of subs nobody vetted. The plan that gets drawn is the plan that gets built, because the same people own both ends of it. When a call has to be made in the field — a grade, a material, a change you asked for on a Thursday — it's made by someone who was in the room when the design was decided, not someone reading a spec sheet for the first time.\n\nThat's the difference you can't see in a photo. It's the reason the finished yard actually matches the one you were promised.\n\nThe selections:\n• steel-and-wood pergola with integrated LED lighting\n• travertine terrace\n• Eldorado Stone veneer kitchen, Lynx grill & beverage fridge\n• floating bar counter\n• linear concrete gas fire table\n• olive trees & agave\n\nWant to talk to the person who'll actually design it? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #delsur #designbuild #outdoorliving #outdoorkitchen",
+      "geotag": "Del Sur, San Diego, CA"
+    }
+  ]
+}
