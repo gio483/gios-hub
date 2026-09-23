@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>SDLR · Page One Plan</title>
+<style>
+  :root{
+    --bg:#0b1220;--panel:#111a2c;--card:#151f33;--card2:#1a2740;--text:#f1f5f9;
+    --muted:#93a3bc;--line:#26344f;--accent:#34d399;--accent-soft:rgba(52,211,153,.14);--gold:#d8c9a3;
+    --warn:#f0a868;--warn-soft:rgba(240,168,104,.13);--stop:#f2836b;--stop-soft:rgba(242,131,107,.12);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #14243d 0%, var(--bg) 55%) fixed;color:var(--text);
+    min-height:100vh;line-height:1.55;padding:max(20px,env(safe-area-inset-top)) 16px calc(56px + env(safe-area-inset-bottom))}
+  .wrap{max-width:860px;margin:0 auto}
+  .serif{font-family:Georgia,"Times New Roman",serif}
+  a.back{display:inline-flex;align-items:center;gap:7px;color:var(--muted);text-decoration:none;font-weight:600;font-size:.9rem;padding:6px 2px}
+  a.back:hover{color:var(--text)}
+  header.masthead{margin:10px 0 6px}
+  .eyebrow{display:flex;align-items:center;gap:9px;color:var(--accent);font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+  .eyebrow .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+  h1{font-size:2rem;margin:.28em 0 .1em;letter-spacing:-.01em;line-height:1.1}
+  .dek{color:var(--muted);font-size:1rem;margin:.35em 0 0;max-width:62ch}
+  h2{font-size:1.25rem;margin:0 0 .15em;letter-spacing:-.01em}
+  h3{font-size:1rem;margin:0}
+  section{margin-top:30px}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+
+  .hero{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;background:var(--card);
+    border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:14px;padding:22px 24px;margin-top:20px}
+  .hero .fig{font-family:ui-monospace,Menlo,monospace;font-size:clamp(46px,9vw,72px);line-height:.85;color:var(--gold);font-weight:600}
+  .hero p{color:var(--muted);margin:.4em 0 0;font-size:.95rem;max-width:56ch}
+  @media(max-width:540px){.hero{grid-template-columns:1fr;gap:8px}}
+
+  .races{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  @media(max-width:760px){.races{grid-template-columns:1fr}}
+  .race{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 17px;display:flex;flex-direction:column;gap:7px}
+  .race .tier{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
+  .race p{margin:0;color:var(--muted);font-size:.88rem}
+  .race .verdict{margin-top:auto;padding-top:10px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;font-size:.8rem;font-weight:700}
+  .v-yes{color:var(--accent)}.v-mid{color:var(--warn)}.v-no{color:var(--stop)}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);margin-top:14px}
+  table{border-collapse:collapse;width:100%;min-width:520px;font-size:.88rem}
+  th,td{text-align:right;padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;white-space:normal}
+  thead th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--card2)}
+  tbody tr:last-child td{border-bottom:0}
+  td.n{font-family:ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+  .zero{color:var(--stop);font-weight:700}
+
+  .phase-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:26px 0 12px}
+  .phase-n{font-family:ui-monospace,Menlo,monospace;font-size:.78rem;color:var(--gold);font-weight:700;letter-spacing:.1em}
+  .phase-when{color:var(--muted);font-size:.82rem}
+  .tasks{display:flex;flex-direction:column;gap:10px}
+  .task{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+  .task.done{opacity:.52}
+  .task-top{display:flex;align-items:flex-start;gap:11px}
+  .task-top input[type=checkbox]{appearance:none;flex:0 0 auto;width:19px;height:19px;margin-top:2px;border:1.5px solid var(--line);
+    border-radius:5px;background:var(--card2);cursor:pointer;position:relative}
+  .task-top input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+  .task-top input[type=checkbox]:checked::after{content:"";position:absolute;left:5.5px;top:1.5px;width:5px;height:10px;
+    border:solid #0b1220;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+  .task-top input[type=checkbox]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .task-top label{flex:1;cursor:pointer;font-weight:600;font-size:1rem}
+  .who{font-size:.66rem;letter-spacing:.09em;text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .who.you{background:var(--accent-soft);color:var(--accent)}
+  .who.me{background:rgba(147,163,188,.14);color:var(--muted)}
+  .task p{margin:9px 0 0 30px;color:var(--muted);font-size:.9rem}
+  .task ul{margin:8px 0 0 30px;padding-left:17px;color:var(--muted);font-size:.86rem;display:flex;flex-direction:column;gap:4px}
+  .task b,.task strong{color:var(--text)}
+  .win{margin:11px 0 0 30px !important;padding-top:9px;border-top:1px solid var(--line);font-size:.82rem}
+  .win b{color:var(--accent)}
+
+  .stop-box{background:var(--stop-soft);border:1px solid rgba(242,131,107,.3);border-radius:12px;padding:18px 20px;margin-top:14px}
+  .stop-box ul{margin:10px 0 0;padding-left:18px;color:var(--muted);font-size:.92rem;display:flex;flex-direction:column;gap:7px}
+  .stop-box strong{color:var(--text)}
+
+  .progress{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:11px 18px;margin-top:18px}
+  .bar{flex:1;height:7px;background:var(--card2);border-radius:999px;overflow:hidden}
+  .bar span{display:block;height:100%;background:var(--accent);width:0;border-radius:999px;transition:width .25s ease}
+  .progress .cnt{font-family:ui-monospace,Menlo,monospace;font-size:.82rem;color:var(--muted);white-space:nowrap}
+  .reset{background:none;border:0;color:var(--muted);font:inherit;font-size:.78rem;cursor:pointer;text-decoration:underline;padding:0}
+  .reset:hover{color:var(--text)}
+
+  footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <a class="back" href="designs.html?c=sdlr">← SDLR Design Gallery</a>
+
+  <header class="masthead">
+    <div class="eyebrow"><span class="dot"></span>Search plan · updated 23 Sep 2026</div>
+    <h1 class="serif">Your content isn't the problem. Your authority is.</h1>
+    <p class="dek">168 pages indexed, 114 articles, 5,195 internal links — the foundation is strong. But Google counts exactly one website linking to you. That's why you sit on page three.</p>
+  </header>
+
+  <div class="progress">
+    <div class="bar"><span id="bar"></span></div>
+    <span class="cnt" id="cnt">0 / 11 done</span>
+    <button class="reset" id="reset" type="button">reset</button>
+  </div>
+
+  <section class="hero">
+    <span class="fig">1</span>
+    <div>
+      <h2 class="serif">One external backlink.</h2>
+      <p>Search Console lists a single site linking to you: <span class="mono">contractors2hire.com</span>, anchor "visit site." Your competitor has 103 Google reviews and eight years behind them. Links and reviews are how Google picks page one — and those are the only two things you're short of.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="serif">"Page one" is three races</h2>
+    <div class="races">
+      <div class="race">
+        <span class="tier">Race 1 · highest value</span>
+        <h3>The map pack</h3>
+        <p>The three local results with the map, above every blue link. Won by reviews and proximity — not by your website at all.</p>
+        <span class="verdict"><span class="v-mid">Realistic</span><span class="mono">3–9 mo</span></span>
+      </div>
+      <div class="race">
+        <span class="tier">Race 2 · already working</span>
+        <h3>Question searches</h3>
+        <p>One pergola-permit post earned 26 of your 383 visits. The turf comparison clicks at 8.8%, which only happens on page one.</p>
+        <span class="verdict"><span class="v-yes">Winning now</span><span class="mono">weeks</span></span>
+      </div>
+      <div class="race">
+        <span class="tier">Race 3 · the hard one</span>
+        <h3>"backyard remodel san diego"</h3>
+        <p>Position 13, 2,216 impressions. Closer than you'd think, but this is where one backlink hurts most.</p>
+        <span class="verdict"><span class="v-no">6–12 mo</span><span class="mono">needs links</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="serif">Already on page one, earning nothing</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Search term</th><th>Shown</th><th>Position</th><th>Clicks</th></tr></thead>
+        <tbody>
+          <tr><td>backyard remodeling</td><td class="n">948</td><td class="n">2.1</td><td class="n zero">0</td></tr>
+          <tr><td>hardscaping san miguel</td><td class="n">4,475</td><td class="n">8.8</td><td class="n zero">0</td></tr>
+          <tr><td>backyard remodeling san diego</td><td class="n">1,042</td><td class="n">9.4</td><td class="n zero">0</td></tr>
+          <tr><td>backyard remodel san diego</td><td class="n">2,216</td><td class="n">13.0</td><td class="n">4</td></tr>
+          <tr><td>outdoor remodeling san diego</td><td class="n">735</td><td class="n">16.6</td><td class="n zero">0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="dek" style="margin-top:12px">Ranking second with zero clicks means ranking isn't what's failing. On local searches the map pack and ads fill the first screen. <strong style="color:var(--text)">That's the case for the map pack in one table.</strong></p>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-n">PHASE 01</span><h2 class="serif">Doesn't need you to rank</h2><span class="phase-when">Weeks 1–4</span></div>
+    <div class="tasks">
+      <div class="task" data-id="p1a">
+        <div class="task-top"><input type="checkbox" id="p1a"><label for="p1a">Get to 25 Google reviews</label><span class="who you">You + Mike</span></div>
+        <p>You have <b>5</b>. Competitor has <b>103</b>. Reviews are ~45% of local ranking weight in construction — the most review-driven category there is. Nothing else here hits as hard.</p>
+        <ul><li>Text every past and current client the direct review link</li><li>Build it into handover so every job does it</li><li>Steady beats sudden — 20 in a week looks bought</li></ul>
+        <p class="win"><b>Done when:</b> 25+ reviews and a written handover step.</p>
+      </div>
+      <div class="task" data-id="p1b">
+        <div class="task-top"><input type="checkbox" id="p1b"><label for="p1b">Rewrite titles on the zero-click pages</label><span class="who me">Claude</span></div>
+        <p>Five terms shown thousands of times, earning nothing. The listing gets one line to win a click. Cheapest win available — no ranking change needed.</p>
+        <p class="win"><b>Done when:</b> click rate on those terms moves off zero.</p>
+      </div>
+      <div class="task" data-id="p1c">
+        <div class="task-top"><input type="checkbox" id="p1c"><label for="p1c">Work out what "hardscaping san miguel" is</label><span class="who me">Claude</span></div>
+        <p>4,475 impressions — <b>5.7% of all visibility</b> — at position 8.8 with zero clicks in six months. Either it's San Miguel Ranch and the page is wrong, or it's a different San Miguel and the traffic is worthless.</p>
+        <p class="win"><b>Done when:</b> we know whether to chase it or ignore it.</p>
+      </div>
+      <div class="task" data-id="p1d">
+        <div class="task-top"><input type="checkbox" id="p1d"><label for="p1d">Fill out and feed the Business Profile</label><span class="who you">You</span></div>
+        <p>Every service, full description, hours, service areas. Then jobsite photos weekly — Google rewards active profiles and photos are the easiest signal to produce.</p>
+        <p class="win"><b>Done when:</b> 100% complete, photos weekly.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-n">PHASE 02</span><h2 class="serif">Fix the one backlink</h2><span class="phase-when">Weeks 3–12</span></div>
+    <div class="tasks">
+      <div class="task" data-id="p2a">
+        <div class="task-top"><input type="checkbox" id="p2a"><label for="p2a">Supplier &amp; manufacturer installer listings</label><span class="who you">You + Claude</span></div>
+        <p>The easiest real links a contractor can get, because you genuinely qualify. Every brand you install runs a "find an installer" directory — relevant, permanent, free.</p>
+        <ul><li><b>Belgard, Techo-Bloc, Eldorado Stone</b> — dealer/installer programs</li><li><b>StruXure, SYNLawn, FX Luminaire, Warming Trends</b> — all already named on your project pages</li></ul>
+        <p class="win"><b>Target:</b> 6–10 links.</p>
+      </div>
+      <div class="task" data-id="p2b">
+        <div class="task-top"><input type="checkbox" id="p2b"><label for="p2b">Local &amp; industry organisations</label><span class="who you">You</span></div>
+        <p>Chambers, California Landscape Contractors Association, BBB, local business groups. Mostly paid, but they produce referrals as well as links.</p>
+        <ul><li>Verify every chamber first — <b>delmarchamber.org is a hijacked spam domain</b>, not the real Del Mar chamber</li></ul>
+        <p class="win"><b>Target:</b> 4–6 links.</p>
+      </div>
+      <div class="task" data-id="p2c">
+        <div class="task-top"><input type="checkbox" id="p2c"><label for="p2c">Your own network</label><span class="who you">You</span></div>
+        <p>Highest quality links available to you, and you already know these people. Designers, architects, realtors, your pool sub, Mike's trade contacts. A partner page or project credit is a real link.</p>
+        <p class="win"><b>Target:</b> 5–10 links.</p>
+      </div>
+      <div class="task" data-id="p2d">
+        <div class="task-top"><input type="checkbox" id="p2d"><label for="p2d">Citations &amp; NAP consistency</label><span class="who me">Claude</span></div>
+        <p>Name, address, phone identical everywhere. Not link equity, but a direct local ranking factor that feeds the map pack.</p>
+        <p class="win"><b>Done when:</b> top 20 directories carry the identical block.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="phase-head"><span class="phase-n">PHASE 03</span><h2 class="serif">Compound what works</h2><span class="phase-when">Ongoing</span></div>
+    <div class="tasks">
+      <div class="task" data-id="p3a">
+        <div class="task-top"><input type="checkbox" id="p3a"><label for="p3a">More question-shaped articles</label><span class="who me">Claude</span></div>
+        <p>The permit post produced a quarter of all search traffic. Specific questions with less competition are where a new site actually reaches page one.</p>
+        <p class="win"><b>Rhythm:</b> 2–4 a month.</p>
+      </div>
+      <div class="task" data-id="p3b">
+        <div class="task-top"><input type="checkbox" id="p3b"><label for="p3b">Photograph every job</label><span class="who you">You</span></div>
+        <p>Before, during, after — including the ugly parts. Feeds the Business Profile, project pages, social, and before/after proof. Costs nothing, unlocks four things.</p>
+        <p class="win"><b>Done when:</b> every job has a photo set.</p>
+      </div>
+      <div class="task" data-id="p3c">
+        <div class="task-top"><input type="checkbox" id="p3c"><label for="p3c">Let the drainage cluster run</label><span class="who me">Claude</span></div>
+        <p>Nine articles published in August for a season starting November. Should earn through March. No further work — just watch.</p>
+        <p class="win"><b>Watch:</b> drainage terms appearing from November.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="serif">Don't waste money on</h2>
+    <div class="stop-box">
+      <ul>
+        <li><strong>"Guaranteed page 1."</strong> Nobody controls Google. What they sell is ranking for terms nobody searches.</li>
+        <li><strong>Bought links.</strong> Fastest route to a penalty. With one real link today, a sudden thousand is unmissable.</li>
+        <li><strong>Houzz and Yelp for link value.</strong> Fine for referrals and citations, but both block the link from passing ranking value.</li>
+        <li><strong>More blog posts as the main lever.</strong> You have 114. Another hundred won't fix one backlink.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="serif">How you'll know it's working</h2>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Checkpoint</th><th>Reviews</th><th>Links</th><th>Position</th><th>Visits/mo</th></tr></thead>
+        <tbody>
+          <tr><td>Today</td><td class="n">5</td><td class="n">1</td><td class="n">23.1</td><td class="n">142</td></tr>
+          <tr><td>30 days</td><td class="n">15+</td><td class="n">5+</td><td class="n">22–23</td><td class="n">150</td></tr>
+          <tr><td>90 days</td><td class="n">25+</td><td class="n">15–20</td><td class="n">18–20</td><td class="n">250</td></tr>
+          <tr><td>6 months</td><td class="n">40+</td><td class="n">25–35</td><td class="n">12–15</td><td class="n">500+</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="dek" style="margin-top:12px">Position lags everything else — don't panic if month one looks flat. Watch reviews first; it's the only number that moves the map pack.</p>
+  </section>
+
+  <footer>
+    Built from Google Search Console (18 Apr – 20 Sep 2026) and Google Analytics 4. Backlink count is Google's own figure, 22 Sep 2026. Tick-boxes save in this browser only.
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var KEY="sdlr-page-one-plan-v1";
+  var boxes=[].slice.call(document.querySelectorAll('.task input[type=checkbox]'));
+  var bar=document.getElementById('bar'), cnt=document.getElementById('cnt');
+  function load(){ try{ return JSON.parse(localStorage.getItem(KEY)||"{}"); }catch(e){ return {}; } }
+  function save(s){ try{ localStorage.setItem(KEY, JSON.stringify(s)); }catch(e){} }
+  function paint(){
+    var done=0;
+    boxes.forEach(function(b){
+      b.closest('.task').classList.toggle('done', b.checked);
+      if(b.checked) done++;
+    });
+    bar.style.width=(done/boxes.length*100)+"%";
+    cnt.textContent=done+" / "+boxes.length+" done";
+  }
+  var state=load();
+  boxes.forEach(function(b){
+    b.checked=!!state[b.id];
+    b.addEventListener('change',function(){ var s=load(); s[b.id]=b.checked; save(s); paint(); });
+  });
+  document.getElementById('reset').addEventListener('click',function(){
+    save({}); boxes.forEach(function(b){ b.checked=false; }); paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
