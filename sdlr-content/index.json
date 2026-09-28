@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Nov 9 – Nov 13, 2026 · Veterans Day",
+      "folder": "week-2026-11-09",
+      "manifest": "sdlr-content/week-2026-11-09/manifest.json",
+      "generated": "2026-09-27"
+    },
+    {
       "label": "Week of Nov 2 – Nov 6, 2026",
       "folder": "week-2026-11-02",
       "manifest": "sdlr-content/week-2026-11-02/manifest.json",
