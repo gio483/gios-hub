@@ -1,0 +1,80 @@
+{
+  "week_label": "Week of Nov 9 – Nov 13, 2026 · Veterans Day",
+  "generated": "2026-09-27",
+  "folder": "week-2026-11-09",
+  "cadence": "5 posts / week (Mon–Fri)",
+  "note": "Showroom feed — every image features real products SDLR installs, and each caption names the selections so followers can DM to get the look. IMAGES: all five were REUSED from the SDLR image library (reuse-before-generate, task step 4). Before choosing, every library image was checked against all previously published hub images with a crop-aware perceptual-hash comparison, so none of these five has appeared in an earlier drop. Each was viewed before its caption was written, run through the realism pass (_tools/realism-pass: editorial for golden hour on posts 1 & 3, standard for dusk on posts 2 & 4, daylight for the aerial on post 5), center-cropped and exported at 1080x1350. Source files: post1 san-diego-modern-entertainment-backyard-outdoor-kitchen-fire-feature-pergola-la-jolla, post2 bonita-family-backyard-fire-pit-turf-string-lights-dusk, post3 point-loma-front-yard-paver-driveway-stone-veneer-drought-tolerant-curb-appeal, post4 north-park-craftsman-bungalow-small-courtyard-porcelain-pavers-v2, post5 carmel-valley-aerial-backyard-sport-court-basketball-pickleball-turf-pavers. NEEDS A RERUN: Nano Banana Pro generation was auto-declined in this unattended run (no one available to approve the tool). That blocked two things: (1) the custom Veterans Day image — Wednesday currently uses the reused Point Loma curb-appeal photo as a stand-in, and the finished prompt for the flag-on-the-porch holiday image is stored in that post's image_rerun_prompt field; (2) the bi-weekly process carousel, which was due this week (last one ran Oct 28) and needs a consistent generated set. No carousel this week — carry it to the next run. Once Veterans Day took Wednesday, the carousel would have moved to Thursday. ROTATION: Design & Aspiration (La Jolla louvered-pergola kitchen), Lifestyle (San Miguel Ranch attainable family fire circle), Seasonal/Curb Appeal (Point Loma — Veterans Day), Craft & Process (North Park small-lot drainage), Trust & Difference (Carmel Valley drone aerial — client privacy / references on request; that topic hasn't been used before, so it rotates off Founder Access, the 10-Month Walk-Through and One Contract). HOLIDAY: Veterans Day falls on Wed Nov 11. San Diego is a Navy town and Point Loma sits beside the base and Fort Rosecrans, so the post is a quiet thank-you with no promotion or urgency and only a soft, patient CTA. Review the tone before it goes out. CURB APPEAL keeps its slot (Wednesday driveway & front yard). Note: the paver pattern is herringbone again (Mission Hills used herringbone Oct 27); the caption leans on the stone facade and lighting instead. The regenerated holiday image uses Techo-Bloc slabs to avoid the repeat. JOB TIER varied: La Jolla upper-mid, San Miguel Ranch and North Park attainable, Point Loma and Carmel Valley mid. No flagship estate this week because the Olivenhain estate carousel was meant to cover that tier. NO neighborhood repeats from the last three weeks. Nothing auto-posts; everything is left for Gio's review.",
+  "posts": [
+    {
+      "id": "w1109-p1",
+      "day": "Monday",
+      "date": "Nov 9",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Design & Aspiration · The Kitchen That Faces the Fire",
+      "image": "sdlr-content/week-2026-11-09/post1.jpg",
+      "alt": "A modern La Jolla backyard in late-afternoon light with a black aluminum StruXure louvered pergola with recessed downlights over a large-format porcelain terrace, a sand-toned outdoor kitchen with a stainless Lynx built-in grill and bar counter with three black barstools, a long board-formed concrete linear fire table burning in front of a built-in concrete bench, potted olive trees and agave, and a two-story white stucco contemporary home with black-framed windows",
+      "hook": "Most outdoor kitchens are built with their back to the party. This one isn't.",
+      "caption": "Look at where the grill sits. The person cooking faces the fire table and the bench, not a wall. That single decision is what turns a kitchen into the middle of the evening instead of a job someone does on the edge of it.\n\nEverything else follows from it. The louvered roof opens for winter sun and closes for a July afternoon, with lighting built into the blades so the room doesn't go dark at six. The linear fire table runs parallel to the bench, so the seating reads as one long conversation rather than a circle of chairs. The porcelain underfoot doesn't stain when the wine does, and the concrete, stone and stucco stay in the same quiet palette as the house.\n\nNothing here is loud. It's just arranged around how people actually stand, cook and linger.\n\nThe selections:\n• StruXure louvered pergola with integrated downlights\n• large-format porcelain pavers\n• Lynx built-in grill & stainless cabinetry\n• board-formed concrete linear fire table & bench\n• potted olive trees & agave\n\nSee a selection you'd want in your own yard? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #lajolla #outdoorkitchen #louveredpergola #firetable",
+      "geotag": "La Jolla, CA"
+    },
+    {
+      "id": "w1109-p2",
+      "day": "Tuesday",
+      "date": "Nov 10",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Lifestyle · The Circle at Dusk",
+      "image": "sdlr-content/week-2026-11-09/post2.jpg",
+      "alt": "A San Miguel Ranch suburban backyard at dusk with a round Belgard paver fire circle around a stone gas fire pit, four cushioned wicker lounge chairs with folded throws, a wide SYNLawn artificial lawn, cedar raised planter beds with citrus trees and ornamental grasses along a wood fence, cafe string lights overhead, and two-story tile-roof homes glowing beyond",
+      "hook": "The best seat in the house in November is outside, about four feet from a fire.",
+      "caption": "Evenings in San Diego get short this time of year, but they don't get cold enough to send you in. What they need is a reason to stay out.\n\nThis yard gives it one. A paver circle set a step away from the lawn, a gas fire that lights with a switch, and four deep chairs pulled close enough to talk without raising your voice. The lawn stays green without a sprinkler schedule, so the kids have somewhere to run while the adults don't move. Cedar planters along the fence hold citrus and grasses at eye level, and the string lights give the whole thing a ceiling once the sky goes blue.\n\nA normal suburban lot. A very good reason to skip the couch.\n\nThe selections:\n• Belgard paver fire circle\n• stone-clad gas fire pit\n• SYNLawn artificial turf\n• cedar raised planters with citrus & ornamental grasses\n• cafe string lighting\n\nWant a yard your family actually lives in after dark? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #sanmiguelranch #firepit #backyarddesign #familybackyard",
+      "geotag": "San Miguel Ranch, Chula Vista, CA"
+    },
+    {
+      "id": "w1109-p3",
+      "day": "Wednesday",
+      "date": "Nov 11",
+      "time": "9:00 AM",
+      "platform": "Instagram + Facebook",
+      "style": "Seasonal · Veterans Day · Point Loma Curb Appeal",
+      "image": "sdlr-content/week-2026-11-09/post3.jpg",
+      "alt": "A single-story Point Loma home of stacked stone and horizontal wood siding at sunset, with a wide warm-grey herringbone paver driveway and entry court, mature olive trees, agave, blue grasses and drought-tolerant planting, warm wall sconces and low path lights leading to a wood front door",
+      "hook": "Today, a quiet thank you from a city built around those who served.",
+      "caption": "San Diego is a Navy town, and Point Loma wears that history closer than most. Its streets run down toward the bay, past the base and the white rows of Fort Rosecrans, and plenty of the families on them have given years of service to the rest of us.\n\nSo today isn't a day for selling anything. It's a day to say thank you — to the veterans in our neighborhoods, in our clients' homes, and in our own families. We're grateful to do our work in a city you helped shape.\n\nThe front of the house is where every homecoming starts. Here it's kept simple: a wide herringbone paver court that reads as one calm surface from the street, olive trees and drought planting set back to frame the stone and wood, and low lights that walk you to the door after dark.\n\nThe selections:\n• Belgard herringbone paver driveway & entry court\n• stacked stone veneer facade\n• mature olive trees, agave & blue grasses\n• FX Luminaire path lights & wall sconces\n\nIf you're thinking about the front of your own home, DM “DESIGN” whenever you're ready.",
+      "hashtags": "#sandiegolandscaping #pointloma #veteransday #curbappeal #paverdriveway",
+      "geotag": "Point Loma, San Diego, CA",
+      "image_rerun_prompt": "Custom holiday image still needed (Nano Banana Pro generation was declined in the unattended run). Prompt: Photorealistic, hyper realistic, magazine grade architectural photograph of the front of a Point Loma coastal cottage home in San Diego at late golden hour in November: white horizontal lap siding, grey cedar shingle roof, a deep navy blue front door with brass hardware, a covered front porch with white columns, and a full-size American flag hanging calmly from a wall-mounted bracket beside the front door. A permeable driveway of large-format Techo-Bloc Blu 60 slab pavers in warm grey with dymondia groundcover in the joints; a matching front walk. Low board-formed concrete planter wall with an olive tree, bougainvillea on the fence, agave, lavender and ornamental grasses; a mature Torrey pine and a glimpse of San Diego Bay beyond. FX Luminaire path lights just beginning to glow. Straight level verticals, eye level, 24mm architectural lens, one dominant warm low sun from the side with real cast shadows, natural highlight rolloff, deep true shadows, shallow depth of field, fine film grain, warm neutral editorial color grade, restrained saturation. A single photograph, no collage, no split screen, no grid. No people, no humans, no faces, no text, no watermark. (4:5, 4k, then realism pass --preset editorial.) If regenerated, update the selections to: Techo-Bloc Blu 60 slab driveway with dymondia joints, board-formed concrete planter wall, olive, bougainvillea & lavender, FX Luminaire path lights."
+    },
+    {
+      "id": "w1109-p4",
+      "day": "Thursday",
+      "date": "Nov 12",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Craft & Process · Where the Water Goes",
+      "image": "sdlr-content/week-2026-11-09/post4.jpg",
+      "alt": "A compact North Park backyard behind a sage-green craftsman bungalow at twilight: a large-format porcelain paver courtyard, a freestanding stained cedar pergola strung with cafe lights, a dark stone water bowl on river rock, a living green wall along the fence, potted citrus trees in terracotta, and mature street trees and power lines above the neighboring roofs",
+      "hook": "On a small lot, water has nowhere to go but where you send it.",
+      "caption": "A big yard forgives a lot. A 30-foot courtyard between a bungalow and a garage forgives nothing — get the fall wrong by a fraction and the first real rain ends up against the house.\n\nSo the part of this job you'll never notice is the part that matters most. The porcelain is set on a compacted base with a slight, deliberate pitch away from the foundation, and every surface is planned to hand its water to a drain or a planting bed before it reaches a wall. Large-format porcelain helps: fewer joints, a surface that won't absorb or stain, and a finish that stays grippy when wet. Only once the water has a path do the finishes arrive — the cedar pergola, the stone water bowl, the green wall, the citrus in terracotta.\n\nThe pretty part took a weekend to style. The grading is why it'll still look like this in ten years.\n\nThe selections:\n• large-format porcelain pavers\n• stained cedar pergola with cafe lighting\n• Bobe-style stone water bowl on river rock\n• living green wall\n• potted Meyer lemon & citrus in terracotta\n\nWorking with a tight lot? DM “DESIGN” and we'll show you how we'd handle it.",
+      "hashtags": "#sandiegolandscaping #northpark #smallbackyard #porcelainpavers #drainage",
+      "geotag": "North Park, San Diego, CA"
+    },
+    {
+      "id": "w1109-p5",
+      "day": "Friday",
+      "date": "Nov 13",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Trust & Difference · Drone Aerial · Your Address Stays Yours",
+      "image": "sdlr-content/week-2026-11-09/post5.jpg",
+      "alt": "Top-down drone aerial of a Carmel Valley backyard with a blue and grey VersaCourt half-court for basketball and pickleball framed by a light paver border, a basketball hoop on a white wall, a wide SYNLawn artificial lawn around the court, borders of agave, blue fescue and succulents, and a terracotta tile roof along the bottom edge",
+      "hook": "You won't find our clients' addresses on this page. That's on purpose.",
+      "caption": "A lot of contractors will happily send you to drive past their last job. We won't — and we'd rather tell you why than be vague about it.\n\nThe homes we work on belong to families, not to our marketing. Nobody should find a stranger slowing down outside their house because a contractor used it as a showroom. So when you're considering working with us, you get written references and a detailed photographic record during discovery, and the people who live there get left alone. It's the same discretion we'll show your home once it's finished.\n\nThis is the kind of view you'll see from us: the whole design, top-down, and not a house number in sight. A half-court set in a clean paver frame, turf to soften every edge, and drought planting that holds the boundary without a single hedge to trim.\n\nThe selections:\n• VersaCourt basketball & pickleball court tiles\n• paver border & court surround\n• SYNLawn artificial turf\n• agave, blue fescue & succulent borders\n\nReferences available on request. Want to talk through your own yard? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #carmelvalley #sportcourt #pickleball #backyarddesign",
+      "geotag": "Carmel Valley, San Diego, CA"
+    }
+  ]
+}
