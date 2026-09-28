@@ -1,0 +1,85 @@
+{
+  "week_label": "Week of Nov 16 – Nov 20, 2026 · Process Carousel",
+  "generated": "2026-09-28",
+  "folder": "week-2026-11-16",
+  "cadence": "5 posts / week (Mon–Fri)",
+  "note": "Showroom feed — every image features real products SDLR installs, and each caption names the selections so followers can DM to get the look. IMAGES: all BRAND NEW this run — generated with Google Nano Banana Pro (imagen-nano-banana-2, 4:5), downloaded and visually checked one by one, nothing reused from the old library. Every photoreal image (posts 1, 2, 4, 5 and carousel slides 1 & 4) went through the realism pass (_tools/realism-pass, editorial preset) and was exported at 1080x1350. CAROUSEL WEEK: the Nov 9 drop could not generate its carousel (generation was blocked in that unattended run), and the last carousel ran Oct 28, so Wednesday Nov 18 is a four-slide process carousel: property walk -> concept render -> plan -> build. All four slides show the SAME Rancho Bernardo design — the 3D concept render was generated first and passed as a reference image for the property-walk shot, the plan and the built photo, so the house and layout match. Slide 2 is deliberately rendered in a VIP3D / Lumion CGI style (clearly a design); slides 1 and 4 are photoreal; the plan carries no legible wording. The first built-slide pass came back looking like a copy of the render, so it was regenerated from an eye-level camera to read as a real photograph. It is presented as how the process works, never as a named client's job. JOB TIER varied: Del Mar flagship estate (Mon), Bay Park mid-century curb appeal (Tue), Rancho Bernardo mid outdoor kitchen/living (Wed carousel), Rancho San Diego attainable family yard with putting green (Thu), Solana Beach mid coastal courtyard (Fri). CURB APPEAL holds its slot on Tuesday (running-bond charcoal pavers, different from the herringbone of Oct 27 and Nov 11). Every house is a different style: limestone coastal contemporary, cedar mid-century, Spanish Mission, Craftsman board-and-batten, whitewashed-brick farmhouse. NO neighborhood repeats from Nov 9 (La Jolla, San Miguel Ranch, Point Loma, North Park, Carmel Valley) or the weeks before. TRUST & DIFFERENCE rotates to 'By design, not by dispatch' (planned and scheduled ahead), off the client-privacy angle used Nov 13. SEASONAL: no on-brand holiday in Nov 16–20; Thanksgiving is the following week. Nothing auto-posts. Post natively in the Instagram app; upload the Wednesday slides in numbered order.",
+  "posts": [
+    {
+      "id": "w1116-p1",
+      "day": "Monday",
+      "date": "Nov 16",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Design & Aspiration · The Edge Is the View",
+      "image": "sdlr-content/week-2026-11-16/post1.jpg",
+      "alt": "A Del Mar hillside estate backyard at sunset with a long vanishing-edge pool and a raised stainless-steel spa, a wide ivory travertine deck, a linear gas fire trough set into the terrace, teak chaise loungers, a low board-formed concrete wall with warm uplights over agave and ornamental grasses, olive trees, and a limestone-clad contemporary home with walls of glass open to the terrace, the Pacific coastline glowing beyond",
+      "hook": "When the ocean is the view, the pool's only job is to get out of its way.",
+      "caption": "On a coastal hillside, every element either frames the horizon or competes with it. There's no neutral.\n\nSo the pool runs parallel to the coastline and drops away at a vanishing edge — from the terrace the water simply meets the Pacific. The spa is lifted and wrapped in stainless so it reads as a clean object, not a second hole in the deck. The fire runs as a single low line set flush into the travertine, warm at eye level without a single thing rising into the sightline. The planting stays low and silver against a board-formed wall, lit from beneath so the edge of the yard glows after sunset instead of disappearing.\n\nA view like this doesn't need more design. It needs better restraint.\n\nThe selections:\n• ivory travertine deck & coping\n• vanishing-edge pool\n• Diamond Spas stainless-steel spa\n• Warming Trends linear fire trough\n• board-formed concrete wall\n• FX Luminaire uplighting · olive, agave & ornamental grasses\n\nGot a view and not sure how to build around it? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #delmar #infinitypool #travertine #outdoorliving",
+      "geotag": "Del Mar, CA"
+    },
+    {
+      "id": "w1116-p2",
+      "day": "Tuesday",
+      "date": "Nov 17",
+      "time": "12:00 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Neighborhood · Driveway & Curb Appeal · Mid-Century, Respected",
+      "image": "sdlr-content/week-2026-11-16/post2.jpg",
+      "alt": "A mid-century modern home in Bay Park at golden hour with a low-pitched overhanging roof, clerestory windows, horizontal cedar siding and a teal front door, a wide charcoal Techo-Bloc paver driveway with a light-grey border band, large-format porcelain stepping pads floating over black beach pebbles to the entry, a stacked-stone raised planter with an olive tree, dragon trees, blue fescue and agave, low bronze path lights, and sailboat masts on Mission Bay in the distance",
+      "hook": "A mid-century house was designed in straight, quiet lines. The driveway should be too.",
+      "caption": "These homes were drawn with discipline — long rooflines, clean planes, nothing extra. Most of them now sit behind a cracked slab and a strip of lawn that undo all of it.\n\nThis front yard goes back to the architecture. A charcoal paver field in a calm running bond, finished with a light border that squares the whole plane off to the street. The walk to the door becomes a series of large porcelain pads floating over black pebble, so the approach reads horizontal — just like the roofline above it. One stacked-stone planter anchors the corner with an olive and a few sculptural dragon trees, and low path lights carry the line to the entry after dark.\n\nNothing new competing with the house. Just the house, finally finished.\n\nThe selections:\n• Techo-Bloc Industria pavers, running bond with contrast border\n• large-format porcelain stepping pads\n• black Mexican beach pebble\n• Eldorado Stone ledgestone planter wall\n• olive, dragon trees, blue fescue & agave\n• FX Luminaire path lighting\n\nWant the front of the house to match how it was designed? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #baypark #curbappeal #paverdriveway #midcenturymodern",
+      "geotag": "Bay Park, San Diego, CA"
+    },
+    {
+      "id": "w1116-p3",
+      "day": "Wednesday",
+      "date": "Nov 18",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Process Carousel · Property Walk to Built",
+      "image": "sdlr-content/week-2026-11-16/process-slide1.jpg",
+      "images": [
+        "sdlr-content/week-2026-11-16/process-slide1.jpg",
+        "sdlr-content/week-2026-11-16/process-slide2.jpg",
+        "sdlr-content/week-2026-11-16/process-slide3.jpg",
+        "sdlr-content/week-2026-11-16/process-slide4.jpg"
+      ],
+      "alt": "Four-slide SDLR process carousel of one Rancho Bernardo backyard: the existing yard at the property walk with a cracked concrete slab and patchy lawn, the full 3D design render with pergola, outdoor kitchen, fire pit and turf, the overhead hand-rendered 2D landscape plan of the same layout, and the finished build photographed at golden hour",
+      "hook": "Here's how a backyard goes from “we're not sure what to do with this” to built — without a single guess along the way.",
+      "caption": "Most yards don't need more ideas. They need an order of operations.\n\nSwipe through how our design process works, start to finish:\n\n1. The property walk — we start with what's actually there. The slab, the grade, the sun, the view you want to keep and the one you don't.\n2. The concept render — the whole space modeled in 3D, so you can see the kitchen, the pergola, the fire and the lawn in place and change anything before it's real.\n3. The plan — every edge, level and dimension resolved overhead, so the crew builds exactly what you approved.\n4. The build — and it matches, because nothing was left to be figured out in the field.\n\nThe render is the design. The last slide is the build. The whole point is that they look the same.\n\nThe selections:\n• Techo-Bloc Blu 60 paver terrace\n• StruXure louvered pergola\n• Eldorado Stone outdoor kitchen with Lynx built-in grill & raised bar\n• Warming Trends gas fire pit\n• SYNLawn turf panel\n• olive, agave & lavender in raised planters · FX Luminaire lighting\n\nWant to see your own yard in 3D before anything gets built? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #ranchobernardo #3ddesign #designbuild #outdoorkitchen",
+      "geotag": "Rancho Bernardo, San Diego, CA"
+    },
+    {
+      "id": "w1116-p4",
+      "day": "Thursday",
+      "date": "Nov 19",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Lifestyle · Every Age Has a Corner",
+      "image": "sdlr-content/week-2026-11-16/post4.jpg",
+      "alt": "A family backyard behind a sage-green board-and-batten two-story home with stone wainscot in Rancho San Diego at golden hour, with a tan-and-grey paver patio, a curving turf putting green with flags, a round gas fire pit ringed by a cushioned stone seat wall, a white pergola with string lights over a dining table, potted lemon trees, lavender and rosemary in planters, a block wall and chaparral-covered hills beyond",
+      "hook": "The best family yards aren't one big space. They're four small ones that all work at once.",
+      "caption": "The trick to a yard the whole family actually uses is giving everyone somewhere to be.\n\nOn a normal suburban lot, that means zones instead of one open slab. The putting green takes the long side, so someone's always sneaking in ten minutes of practice. The fire pit sits inside a curved stone seat wall — built-in seating means no chairs to drag around and room for everyone when the sun drops. Dinner lives under the pergola and string lights, close enough to the kitchen door that eating outside is the default, not an event. Lemons and lavender in planters keep the edges soft and smell like California.\n\nKids, grandparents, a Thursday night. Everyone has a corner.\n\nThe selections:\n• Belgard Urbana paver patio\n• SYNLawn Golf putting green & SYNLawn turf\n• Warming Trends CrossFire gas fire pit\n• Eldorado Stone curved seat wall\n• Trex Pergola with cafe string lights\n• potted Meyer lemons, lavender & rosemary\n\nWant a yard with room for everyone in the family? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #ranchosandiego #puttinggreen #firepit #familybackyard",
+      "geotag": "Rancho San Diego, CA"
+    },
+    {
+      "id": "w1116-p5",
+      "day": "Friday",
+      "date": "Nov 20",
+      "time": "6:30 PM",
+      "platform": "Instagram + Facebook",
+      "style": "Trust & Difference · By Design, Not by Dispatch",
+      "image": "sdlr-content/week-2026-11-16/post5.jpg",
+      "alt": "A serene courtyard garden seen through open black steel French doors of a whitewashed-brick coastal farmhouse in Solana Beach with a standing-seam metal roof, featuring a copper water bowl spilling into river stones, large warm limestone-tone porcelain pavers with gravel joints, a white louvered pergola over teak lounge chairs, a stone bench with linen cushions, a multi-trunk olive tree, bougainvillea climbing the brick wall, rosemary, germander and feather grass with soft path lighting",
+      "hook": "A quiet yard isn't a smaller project. It's a more careful one.",
+      "caption": "The calmest spaces are the ones where nothing was rushed. You can feel it the moment you step through the doors.\n\nThat's why we don't work by dispatch. Every project is planned before it's built and scheduled well ahead, so the design gets the time it needs: the joints between the pavers set to line up with the doors, the water bowl placed where you hear it from the kitchen but not the bedroom, the pergola louvers oriented to the afternoon sun, the planting chosen to look this way in year five, not just week one. None of that happens when a crew is squeezing you in between emergency jobs.\n\nWe're not the firm you call for a patio this weekend. We're the one you call when you want it right.\n\nThe selections:\n• Arterra large-format porcelain pavers with gravel joints\n• Bobe copper water bowl\n• StruXure louvered pergola\n• Eldorado Stone built-in bench\n• olive, bougainvillea, rosemary & feather grass\n• FX Luminaire path lighting\n\nPlanning a space for next season, not next weekend? DM “DESIGN”.",
+      "hashtags": "#sandiegolandscaping #solanabeach #courtyardgarden #waterfeature #designbuild",
+      "geotag": "Solana Beach, CA"
+    }
+  ]
+}
