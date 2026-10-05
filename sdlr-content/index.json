@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Nov 23 – Nov 27, 2026 · Thanksgiving",
+      "folder": "week-2026-11-23",
+      "manifest": "sdlr-content/week-2026-11-23/manifest.json",
+      "generated": "2026-10-04"
+    },
+    {
       "label": "Week of Nov 16 – Nov 20, 2026 · Process Carousel",
       "folder": "week-2026-11-16",
       "manifest": "sdlr-content/week-2026-11-16/manifest.json",
