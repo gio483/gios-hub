@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0f09">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NC Ads">
+<title>SDLR · North County Ads</title>
+<style>
+:root{
+  --bg:#0d0f09;--panel:#171a12;--panel2:#1f2318;--line:#2e3324;
+  --ink:#f4f1e6;--muted:#a3a48b;--dim:#7c7d68;--gold:#c8a869;--green:#9fb56a;
+  --sans:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --tab-h:calc(60px + env(safe-area-inset-bottom));
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased}
+body{padding-bottom:var(--tab-h)}
+a{color:var(--gold)}
+header{position:sticky;top:0;z-index:20;background:rgba(13,15,9,.82);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:.5px solid var(--line);padding:calc(env(safe-area-inset-top) + 10px) 16px 10px;display:flex;align-items:center;gap:10px}
+header a.back{color:var(--gold);text-decoration:none;font-size:15px;white-space:nowrap}
+header .t{flex:1;text-align:center;font-weight:600;font-size:16px;margin-right:40px}
+main{max-width:760px;margin:0 auto;padding:14px 16px 30px}
+.view{display:none}.view.active{display:block}
+h1{font-size:30px;letter-spacing:-.5px;margin:6px 0 2px}
+.sub{color:var(--muted);font-size:14px;margin:0 0 16px}
+h2{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:26px 2px 10px;display:flex;justify-content:space-between;align-items:center}
+h2 button{font-size:12px;letter-spacing:0;text-transform:none}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 0 10px}
+.take .head{display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap}
+.code{font:600 12px/1 ui-monospace,Menlo,monospace;color:var(--bg);background:var(--gold);padding:4px 7px;border-radius:6px}
+.code.g{background:var(--green)}
+.who{font-size:12px;color:var(--muted)}
+.score{margin-left:auto;font-size:12px;color:var(--dim)}
+.note{font-size:12px;color:var(--gold);margin:-2px 0 6px}
+.text{font-size:17px;line-height:1.55;white-space:pre-wrap}
+.row{display:flex;gap:8px;margin-top:10px}
+button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);background:var(--panel2);color:var(--ink);padding:8px 12px;font-size:14px}
+button.primary{background:var(--gold);color:#16180f;border-color:var(--gold);font-weight:600}
+button.done{background:var(--green);border-color:var(--green);color:#16180f}
+.seg{display:flex;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px;margin:0 0 6px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);padding:8px 4px;font-size:13px;border-radius:9px}
+.seg button.on{background:var(--panel2);color:var(--ink);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:12px}
+.rank{font:700 22px/1 var(--sans);color:var(--gold);width:34px}
+.combo{font:600 13px ui-monospace,Menlo,monospace;color:var(--green)}
+ul,ol{padding-left:20px;margin:6px 0}li{margin:4px 0}
+.muted{color:var(--muted)}
+.pill{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin:2px 4px 2px 0;color:var(--muted)}
+.check{display:flex;gap:10px;align-items:flex-start;padding:6px 0}
+.check input{width:20px;height:20px;accent-color:var(--green);margin-top:2px;flex:none}
+.prog{height:6px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+.prog div{height:100%;background:var(--green);width:0;transition:width .3s}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;height:var(--tab-h);padding-bottom:env(safe-area-inset-bottom);
+  display:flex;background:rgba(13,15,9,.9);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:.5px solid var(--line)}
+nav.tabs button{flex:1;border:0;background:none;border-radius:0;color:var(--dim);font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav.tabs button span{font-size:20px}
+nav.tabs button.on{color:var(--gold)}
+.toast{position:fixed;left:50%;bottom:calc(var(--tab-h) + 14px);transform:translateX(-50%);background:var(--green);color:#16180f;font-weight:600;
+  padding:8px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40}
+.toast.show{opacity:1}
+.tp{position:fixed;inset:0;background:#000;z-index:50;display:none;flex-direction:column}
+.tp.on{display:flex}
+.tp .bar{display:flex;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;align-items:center}
+.tp .bar .lbl{flex:1;color:var(--gold);font:600 14px ui-monospace,Menlo,monospace}
+.tp .txt{flex:1;overflow-y:auto;padding:10px 26px 40vh;font-size:40px;line-height:1.35;color:#fff}
+.tp .nav2{display:flex;gap:8px;padding:10px 14px calc(env(safe-area-inset-bottom) + 10px)}
+.tp .nav2 button{flex:1;padding:14px}
+</style>
+</head>
+<body>
+<header><a class="back" href="index.html">‹ Hub</a><div class="t">North County Ads</div></header>
+<main>
+
+<!-- FILM -->
+<section class="view active" id="v-film">
+  <h1>Film</h1>
+  <p class="sub">Every take in filming order. Tap Copy to paste one take into your teleprompter, or Read to use this page as the teleprompter. Codes are for the editor, not read on camera.</p>
+  <div class="prog"><div id="progbar"></div></div>
+  <div id="film"></div>
+</section>
+
+<!-- BEST -->
+<section class="view" id="v-best">
+  <h1>Best bets</h1>
+  <p class="sub">The combinations most likely to win, ranked by how tightly the hook, body and offer line up. The test decides for real.</p>
+  <div id="best"></div>
+  <h2>Do not combine</h2>
+  <div class="card"><ul>
+    <li><b>H7 with Body B.</b> The hook promises three items that only Body A names.</li>
+    <li><b>H8 on cold audiences.</b> It opens with a price to strangers. Warm and retargeting only.</li>
+    <li><b>O3 with anything but C4.</b> It mixes the walkthrough ask with the free concept ask.</li>
+  </ul></div>
+  <h2>How many ads this makes</h2>
+  <div class="card">
+    <table><tr><th></th><th>Backyard</th><th>Front yard</th></tr>
+    <tr><td>Hooks</td><td>8</td><td>8</td></tr><tr><td>Bodies</td><td>2</td><td>2</td></tr><tr><td>Offer + CTA pairs</td><td>7</td><td>7</td></tr>
+    <tr><td><b>60 sec ads</b></td><td><b>105</b></td><td><b>105</b></td></tr></table>
+    <p class="muted" style="margin:10px 0 0">Plus 16 fifteen second Reels and 2 ninety second retargeting ads: about 228 from one session. Run about 8 at a time.</p>
+  </div>
+  <h2>Assembly</h2>
+  <div class="card"><table>
+    <tr><th>Length</th><th>Recipe</th></tr>
+    <tr><td>15 sec Reels</td><td>Hook + "One honest number, and that's what you pay." + C1</td></tr>
+    <tr><td>60 sec cold</td><td>Hook + Body A or B + Offer + CTA (about 150 to 170 words)</td></tr>
+    <tr><td>90 sec retargeting</td><td>H8 + Body A + second paragraph of Body B + Proof + O1 + C1</td></tr>
+  </table></div>
+</section>
+
+<!-- TEST -->
+<section class="view" id="v-test">
+  <h1>Test plan</h1>
+  <p class="sub">The goal is the cheapest qualified walkthrough, then the cheapest signed design. Not the cheapest lead.</p>
+  <div class="seg" id="roundseg"></div>
+  <div id="round"></div>
+  <h2>Ad name code</h2>
+  <div class="card">
+    <div class="combo" style="font-size:15px">SDLR_NC_[TRACK]_[HOOK]_[BODY]_[OFFER]_[CTA]_[LENGTH]</div>
+    <p class="muted" style="margin:6px 0 10px">Example: SDLR_NC_BY_H1_BA_O1_C1_60</p>
+    <span class="pill">BY Backyard</span><span class="pill">FY Front yard</span><span class="pill">H1 to H8</span><span class="pill">BA / FA Protection</span><span class="pill">BB / FB Organization</span><span class="pill">O1 Design credit</span><span class="pill">O2 Walkthrough</span><span class="pill">O3 Free concept</span><span class="pill">C1 to C4</span><span class="pill">15 · 60 · 90</span>
+  </div>
+  <h2>Setup checklist <button onclick="resetChecks()">Reset</button></h2>
+  <div class="card" id="setup"></div>
+  <h2>Lead score (rep, within 24 hours)</h2>
+  <div class="card"><table>
+    <tr><td><b style="color:var(--green)">A</b></td><td>Owner, $50k+, starting within 6 months, whole yard scope</td></tr>
+    <tr><td><b style="color:var(--gold)">B</b></td><td>Real project but smaller or later</td></tr>
+    <tr><td><b class="muted">C</b></td><td>Unqualified, wrong area, renter, or no response</td></tr>
+  </table></div>
+  <h2>What to measure</h2>
+  <div class="card"><table>
+    <tr><th>Metric</th><th>Use it to</th></tr>
+    <tr><td>Hook rate (3 sec views ÷ impressions)</td><td>Compare hooks. A lower rate that brings A leads beats a high one that brings C leads</td></tr>
+    <tr><td>Hold rate (ThruPlays ÷ 3 sec views)</td><td>Compare bodies</td></tr>
+    <tr><td>Link CTR</td><td>Compare offers</td></tr>
+    <tr><td>Cost per lead</td><td>Context only</td></tr>
+    <tr><td><b>Cost per A lead</b></td><td><b>Main decision metric for hooks and offers</b></td></tr>
+    <tr><td><b>Cost per walkthrough held</b></td><td><b>Main decision metric overall</b></td></tr>
+    <tr><td>Walkthrough to design signed %</td><td>Catches ads that bring tire kickers</td></tr>
+    <tr><td>Avg project value by code</td><td>Shows whether FY or BY brings the $50k to $100k jobs</td></tr>
+  </table></div>
+  <h2>Decision rules</h2>
+  <div class="card"><ul>
+    <li>Don't judge a hook before about 2,000 impressions.</li>
+    <li>Don't judge an offer until each version has spent about $300 or produced 5 leads.</li>
+    <li>A winner needs a clearly lower cost per A lead, about 30% or more.</li>
+    <li>Pause any ad with 5+ leads and zero A leads, however cheap.</li>
+    <li>Change one thing at a time.</li>
+  </ul>
+  <p class="muted" style="margin:8px 0 0">At $50k to $100k tickets lead volume is low. Early rounds read hook rate, CTR and A lead share. Cost per signed design needs 6 to 8 weeks.</p></div>
+  <h2>Weekly report columns</h2>
+  <div class="card muted">Spend · Impressions · Hook rate · Hold rate · CTR · Leads · A leads · Cost per A lead · Walkthroughs held · Designs signed · Avg project value · Keep / Kill / Scale</div>
+</section>
+
+<!-- STRATEGY -->
+<section class="view" id="v-why">
+  <h1>Strategy</h1>
+  <p class="sub">Escondido, Poway, Vista, San Marcos, Rancho Bernardo, 4S Ranch. Whole yard remodels, front or back, roughly $50,000 to $100,000.</p>
+  <h2>The argument every ad makes</h2>
+  <div class="card"><ol>
+    <li><b>Problem:</b> a big yard project feels like a gamble. Will it look like we discussed? Will the price balloon? Will I be chasing people?</li>
+    <li><b>Why it goes wrong:</b> most projects start from a rough idea and a rough number, so every decision nobody made up front becomes a change order or a shortcut.</li>
+    <li><b>Fix:</b> design the whole yard first, price that exact design, and run it with one coordinator.</li>
+    <li><b>Offer:</b> design starts at $4,500 and is credited back in full on qualifying projects you build with us.</li>
+    <li><b>Trust:</b> licensed, one honest number, a dedicated project coordinator, the ten month walkthrough, real Google reviews.</li>
+  </ol></div>
+  <h2>Four pillars</h2>
+  <div class="card"><ul>
+    <li><b>Organized project management.</b> One coordinator, a real plan, no chasing anyone.</li>
+    <li><b>Low stress.</b> You're not the one managing the job.</li>
+    <li><b>The yard you actually discussed.</b> Not a cheap knockoff of what you were shown.</li>
+    <li><b>The price you were quoted.</b> No surprise change orders at the end.</li>
+  </ul></div>
+  <h2>Scorecard</h2>
+  <div class="card"><table>
+    <tr><th>Module</th><th>Kept</th><th>Avg</th></tr>
+    <tr><td>Backyard hooks</td><td>8</td><td>85</td></tr><tr><td>Front yard hooks</td><td>8</td><td>84</td></tr>
+    <tr><td>Bodies</td><td>4</td><td>88</td></tr><tr><td>Offers</td><td>3</td><td>85</td></tr><tr><td>CTAs</td><td>4</td><td>85</td></tr>
+    <tr><td>Proof</td><td>1</td><td>82</td></tr><tr><td><b>All lines</b></td><td><b>28</b></td><td><b>85</b></td></tr>
+  </table><p class="muted" style="margin:8px 0 0">Self graded. The real grade is the test data.</p></div>
+  <h2>Confirm before filming</h2>
+  <div class="card"><ol>
+    <li>What makes a project "qualify" for the design credit.</li>
+    <li>Every change is approved in writing first.</li>
+    <li>The coordinator walks clients through the schedule before work starts.</li>
+    <li>A $50,000 front yard is realistic for North County (FY H7).</li>
+    <li>Pick 2 or 3 Google reviews that mention communication, organization, budget or the result matching the plan.</li>
+  </ol></div>
+</section>
+</main>
+
+<nav class="tabs">
+  <button class="on" data-v="film"><span>🎬</span>Film</button>
+  <button data-v="best"><span>🏆</span>Best bets</button>
+  <button data-v="test"><span>🧪</span>Test plan</button>
+  <button data-v="why"><span>🧭</span>Strategy</button>
+</nav>
+<div class="toast" id="toast">Copied</div>
+<div class="tp" id="tp">
+  <div class="bar"><div class="lbl" id="tplbl"></div><button onclick="tpSize(-4)">A−</button><button onclick="tpSize(4)">A+</button><button class="primary" onclick="tpClose()">Done</button></div>
+  <div class="txt" id="tptxt"></div>
+  <div class="nav2"><button onclick="tpGo(-1)">‹ Previous</button><button class="primary" onclick="tpGo(1)">Next ›</button></div>
+</div>
+
+<script>
+const D = {
+ "by_hooks": [
+  {
+   "code": "BY H1",
+   "score": 90,
+   "text": "Escondido homeowners, the number you sign for your backyard should be the number you pay. Here's why that almost never happens.",
+   "note": ""
+  },
+  {
+   "code": "BY H2",
+   "score": 86,
+   "text": "If you're planning a whole backyard remodel in Poway, the thing to worry about isn't the design. It's what happens to the price halfway through.",
+   "note": ""
+  },
+  {
+   "code": "BY H3",
+   "score": 85,
+   "text": "Vista homeowners, if you're worried your backyard is going to end up costing way more than the quote, you should be. Here's why it happens.",
+   "note": ""
+  },
+  {
+   "code": "BY H4",
+   "score": 85,
+   "text": "We're almost never the cheapest bid in Rancho Bernardo, and I want to show you what you get for the difference.",
+   "note": ""
+  },
+  {
+   "code": "BY H5",
+   "score": 85,
+   "text": "You get shown a beautiful backyard, and then they build the cheap knockoff version of it. Here's how to make sure that never happens to you.",
+   "note": ""
+  },
+  {
+   "code": "BY H6",
+   "score": 84,
+   "text": "San Marcos homeowners, before you sign anything for a big backyard project, ask every contractor one question. Is your price built from a finished design, or a rough idea?",
+   "note": ""
+  },
+  {
+   "code": "BY H7",
+   "score": 84,
+   "text": "Here's what a seventy five thousand dollar backyard should include, and the three things the cheap bid usually leaves out.",
+   "note": "price anchor test · Pair with BA only"
+  },
+  {
+   "code": "BY H8",
+   "score": 82,
+   "text": "Our design process starts at forty five hundred dollars. Here's how you can end up paying nothing for it.",
+   "note": "warm and retargeting only"
+  }
+ ],
+ "fy_hooks": [
+  {
+   "code": "FY H1",
+   "score": 88,
+   "text": "Escondido homeowners, if you've been fixing your front yard one piece at a time, the driveway guy, the landscaper, the lighting guy, here's why it never looks finished.",
+   "note": ""
+  },
+  {
+   "code": "FY H2",
+   "score": 86,
+   "text": "The number you sign for your front yard should be the number you pay. Here's why that almost never happens in North County.",
+   "note": ""
+  },
+  {
+   "code": "FY H3",
+   "score": 84,
+   "text": "Poway homeowners, if your driveway is the first thing people see and you've been embarrassed by it for years, this is for you.",
+   "note": ""
+  },
+  {
+   "code": "FY H4",
+   "score": 84,
+   "text": "Vista homeowners, your front yard is the one part of your house everybody sees, and most people have never actually had it designed.",
+   "note": ""
+  },
+  {
+   "code": "FY H5",
+   "score": 84,
+   "text": "We're almost never the cheapest bid on front yards in San Marcos, and I want to show you what you get for the difference.",
+   "note": ""
+  },
+  {
+   "code": "FY H6",
+   "score": 82,
+   "text": "If you're picturing a new driveway, a real entry, and lighting that makes the house look its best at night, here's how to get all of it planned once and done right.",
+   "note": ""
+  },
+  {
+   "code": "FY H7",
+   "score": 82,
+   "text": "Here's what a fifty thousand dollar front yard should include, and the three things the cheap bid usually leaves out.",
+   "note": "price anchor test · Pair with FA only"
+  },
+  {
+   "code": "FY H8",
+   "score": 82,
+   "text": "Our design process starts at forty five hundred dollars. Here's how your front yard design can end up costing you nothing.",
+   "note": "warm and retargeting only"
+  }
+ ],
+ "bodies": [
+  {
+   "code": "BY BA",
+   "name": "Backyard · Protection",
+   "who": "Mike",
+   "score": 90,
+   "text": "Here's why so many backyard projects go sideways. Most contractors start with a rough idea and a rough number. Then every decision nobody made up front turns into a change order or a shortcut. In my experience, the first things to go are the drainage, the lighting, and the base under the pavers, the parts you never see until they fail.\n\nSo we do it in the right order. We design the whole backyard first, down to the materials, and we price that exact design. You get one honest number, and that's what you pay. If anything ever changes, you see it and approve it in writing first."
+  },
+  {
+   "code": "FY FA",
+   "name": "Front Yard · Protection",
+   "who": "Mike",
+   "score": 90,
+   "text": "Here's why most front yards never look finished. People fix them one piece at a time. The driveway guy, then the landscaper, then somebody for lighting, and none of it was planned together. And every one of them gives you a rough number. In my experience, the first things that get cut are the base under the driveway, the drainage, and the lighting.\n\nWe do the whole front yard at once. We design it first, the driveway, the walkway, the entry, the planting and the lighting, so it all works together. Then we price that exact design. One honest number, and that's what you pay. If anything ever changes, you see it and approve it in writing first."
+  },
+  {
+   "code": "BY BB",
+   "name": "Backyard · Organization",
+   "who": "Gio",
+   "score": 87,
+   "text": "A lot of people don't put off the backyard because of money. They put it off because they've heard how these projects go. Nobody returns your calls, different crews show up every week, and you end up managing the whole thing yourself.\n\nThat's not how we run it. You get one project coordinator who keeps the whole job organized, keeps you updated before you have to ask, and is the one person you call. We design everything first, so the crew is building a plan, not guessing. You get your backyard without it taking over your life."
+  },
+  {
+   "code": "FY FB",
+   "name": "Front Yard · Organization",
+   "who": "Gio",
+   "score": 86,
+   "text": "Redoing the front yard means your driveway, your entry, the way you get in and out of your own house. That's exactly why people dread it. Who's going to be there, how long is the driveway torn up, who do I even call?\n\nYou get one project coordinator who keeps the whole job organized, walks you through the schedule before we start, and is the one person you call. We design everything first, so the crew is building a plan, not figuring it out in your driveway. You get the front of your house done right, without the stress."
+  }
+ ],
+ "offers": [
+  {
+   "code": "O1",
+   "name": "Design credit",
+   "score": 85,
+   "text": "Our design process starts at forty five hundred dollars. When your project qualifies and you build it with us, every dollar of that comes back to you as a credit. The plan ends up costing you nothing."
+  },
+  {
+   "code": "O2",
+   "name": "Walkthrough only",
+   "score": 85,
+   "text": "The first step is a walkthrough. We come out, walk the whole yard with you, and talk through what you want and what it realistically costs. It's about forty five minutes, and there's no pressure to decide anything that day."
+  },
+  {
+   "code": "O3",
+   "name": "Free concept",
+   "score": 84,
+   "text": "Not ready for a walkthrough? Text us a photo of your yard and we'll send you back a concept of what it could look like. It's free, and nobody has to come out."
+  }
+ ],
+ "ctas": [
+  {
+   "code": "C1",
+   "name": "Direct",
+   "score": 88,
+   "use": "O1, O2",
+   "text": "Tap the button, tell us a little about your yard, front or back, and pick a time that works for you. We'll call you to confirm your walkthrough."
+  },
+  {
+   "code": "C2",
+   "name": "Financial",
+   "score": 86,
+   "use": "O1, O2",
+   "text": "Before you spend fifty thousand dollars on anything, get it designed and priced the right way. Tap below and request your walkthrough."
+  },
+  {
+   "code": "C3",
+   "name": "Qualifying",
+   "score": 82,
+   "use": "O1, O2",
+   "text": "If you're planning the whole yard and not a patch job, tap below, tell us what you have in mind, and we'll take it from there."
+  },
+  {
+   "code": "C4",
+   "name": "Concept",
+   "score": 84,
+   "use": "O3 only",
+   "text": "Tap below, send us a photo of your yard, and we'll text you back what it could become."
+  }
+ ],
+ "proof": "We're licensed, we've got the reviews, and you can look us up. Here's what our clients say."
+};
+const LS = k => { try { return JSON.parse(localStorage.getItem('ncads_'+k)) } catch(e){ return null } };
+const SS = (k,v) => { try { localStorage.setItem('ncads_'+k, JSON.stringify(v)) } catch(e){} };
+
+// Build ordered take list
+const takes = [];
+const sec = (title, items) => { takes.push({section:title}); items.forEach(i => takes.push(i)); };
+sec('Part 1 · Backyard hooks', D.by_hooks.map(h => ({code:h.code, who:'Gio or Mike', score:h.score, note:h.note, text:h.text})));
+sec('Part 2 · Front yard hooks', D.fy_hooks.map(h => ({code:h.code, who:'Gio or Mike', score:h.score, note:h.note, text:h.text, g:1})));
+sec("Part 3 · Mike's bodies (Protection)", D.bodies.slice(0,2).map(b => ({code:b.code, who:b.name+' · '+b.who, score:b.score, text:b.text, g:b.code.startsWith('FY')})));
+sec("Part 4 · Gio's bodies (Organization)", D.bodies.slice(2).map(b => ({code:b.code, who:b.name+' · '+b.who, score:b.score, text:b.text, g:b.code.startsWith('FY')})));
+sec('Part 5 · Offers', D.offers.map(o => ({code:o.code, who:o.name, score:o.score, text:o.text})));
+sec('Part 6 · Calls to action', D.ctas.map(c => ({code:c.code, who:c.name+' · use with '+c.use, score:c.score, text:c.text})));
+sec('Part 7 · Proof (retargeting only)', [{code:'PROOF', who:'Read before the review clips', score:82, text:D.proof, note:'On screen: CSLB #1139785, then 2 or 3 real Google review clips'}]);
+const readable = takes.filter(t => !t.section);
+
+let done = LS('done') || {};
+const esc = s => s.replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function renderFilm(){
+  const el = document.getElementById('film'); let html = ''; let secIdx = -1;
+  takes.forEach(t => {
+    if (t.section){ secIdx++; html += `<h2>${t.section}<button onclick="copySection(${secIdx})">Copy section</button></h2>`; return; }
+    const i = readable.indexOf(t);
+    html += `<div class="card take"><div class="head"><span class="code ${t.g?'g':''}">${t.code}</span><span class="who">${esc(t.who)}</span><span class="score">${t.score}</span></div>`+
+      (t.note?`<div class="note">${esc(t.note)}</div>`:'')+
+      `<div class="text">${esc(t.text)}</div><div class="row"><button class="primary" onclick="copyTake(${i})">Copy</button><button onclick="tpOpen(${i})">Read</button>`+
+      `<button id="d${i}" class="${done[t.code]?'done':''}" onclick="toggleDone(${i})">${done[t.code]?'Filmed ✓':'Mark filmed'}</button></div></div>`;
+  });
+  el.innerHTML = html; updateProg();
+}
+function updateProg(){ const n = readable.filter(t => done[t.code]).length; document.getElementById('progbar').style.width = (100*n/readable.length)+'%'; }
+function toggleDone(i){ const c = readable[i].code; done[c] = !done[c]; SS('done', done); const b = document.getElementById('d'+i);
+  b.className = done[c]?'done':''; b.textContent = done[c]?'Filmed ✓':'Mark filmed'; updateProg(); }
+function toast(m){ const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('show'), 1300); }
+async function copyText(s){ try { await navigator.clipboard.writeText(s); } catch(e){ const a = document.createElement('textarea'); a.value = s; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); } }
+function copyTake(i){ copyText(readable[i].text); toast('Copied '+readable[i].code); }
+function copySection(si){ let s = -1, out = [];
+  takes.forEach(t => { if (t.section){ s++; return; } if (s === si) out.push(t.text); });
+  copyText(out.join('\n\n')); toast('Section copied'); }
+
+// Teleprompter
+let tpI = 0, tpFs = LS('fs') || 40;
+function tpOpen(i){ tpI = i; tpShow(); document.getElementById('tp').classList.add('on'); }
+function tpShow(){ const t = readable[tpI]; document.getElementById('tplbl').textContent = t.code+'  ·  '+(tpI+1)+' / '+readable.length;
+  const x = document.getElementById('tptxt'); x.textContent = t.text; x.style.fontSize = tpFs+'px'; x.scrollTop = 0; }
+function tpGo(d){ tpI = Math.max(0, Math.min(readable.length-1, tpI+d)); tpShow(); }
+function tpSize(d){ tpFs = Math.max(20, Math.min(80, tpFs+d)); SS('fs', tpFs); tpShow(); }
+function tpClose(){ document.getElementById('tp').classList.remove('on'); }
+
+// Best bets
+const BEST = [
+ ['FY H1 + FA + O1 + C1','The tightest ad in the set. The hook names the exact problem (fixing the front yard one piece at a time) and the body explains and fixes that exact problem.'],
+ ['BY H1 + BA + O1 + C1','The backyard flagship. "The number you sign should be the number you pay" is the strongest hook, and Body A pays it off word for word.'],
+ ['BY H5 + BA + O2 + C1','The cheap knockoff fear is very relatable. Body A shows why it happens, and a no pressure walkthrough is a softer ask for someone nervous.'],
+ ['BY H4 + BB + O1 + C1','"Almost never the cheapest bid" filters bargain hunters, and the organization body answers what you get for the difference. Fewer, better leads.'],
+ ['FY H3 + FB + O2 + C1','The embarrassed driveway hook hits emotion, and the low stress body answers the real worry: who shows up and how long the driveway is torn up.']
+];
+const LANES = [
+ ['Retargeting','BY or FY H8 + Body A + Proof + O1 + C1','Warm viewers already know you, so the design credit can lead.'],
+ ['Free concept','FY H6 + FA + O3 + C4','Front yards are visual, so a free picture of their own house is a natural first step.'],
+ ['Price anchor test','BY H7 + BA + O1 + C2','Tells you whether naming a dollar figure filters well.']
+];
+const findText = code => { const a = [...D.by_hooks, ...D.fy_hooks, ...D.bodies, ...D.offers, ...D.ctas]; return a.find(x => x.code === code); };
+function fullScript(combo){
+  const p = combo.split(' + '); const track = p[0].split(' ')[0];
+  const hook = findText(p[0]); const body = findText(track+' '+p[1]);
+  const offer = D.offers.find(o => o.code === p[2]); const cta = D.ctas.find(c => c.code === p[3]);
+  const parts = [hook && hook.text, body && body.text, p.includes('Proof') ? D.proof : null, offer && offer.text, cta && cta.text].filter(Boolean);
+  return parts.join('\n\n');
+}
+function renderBest(){
+  let h = '';
+  BEST.forEach((b,i) => { h += `<div class="card"><div style="display:flex;gap:12px;align-items:flex-start"><div class="rank">${i+1}</div><div style="flex:1">`+
+    `<div class="combo">${b[0]}</div><div class="muted" style="margin-top:4px">${esc(b[1])}</div>`+
+    `<div class="row"><button class="primary" onclick="copyCombo('${b[0]}')">Copy full script</button><button onclick="showCombo(this,'${b[0]}')">Preview</button></div><div class="text" style="display:none;margin-top:10px;font-size:15px"></div></div></div></div>`; });
+  h += '<h2>Strong in their lanes</h2>';
+  LANES.forEach(l => { h += `<div class="card"><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.1em">${l[0]}</div><div class="combo" style="margin:4px 0">${l[1]}</div><div class="muted">${esc(l[2])}</div></div>`; });
+  h += '<h2>Front or back?</h2><div class="card">My guess: backyard brings bigger tickets, front yard brings cheaper leads. If front yard leads mostly come in under $50k, that is the test doing its job, not a failure.</div>';
+  document.getElementById('best').innerHTML = h;
+}
+function copyCombo(c){ copyText(fullScript(c)); toast('Full script copied'); }
+function showCombo(btn,c){ const t = btn.parentNode.nextElementSibling; t.style.display = t.style.display==='none'?'block':'none'; t.textContent = fullScript(c); }
+
+// Test rounds
+const ROUNDS = [
+ ['Round 1','Hooks','Weeks 1 to 2','Which openings stop the right people?',['Two ad sets, Front Yard and Backyard, equal budget.','Each runs 4 hooks (BY H1 to H4 vs FY H1 to H4) with the same Body A, O1 and C1 at 60 sec.','Front vs back is tested at the same time: compare cost per A lead and average project value.']],
+ ['Round 2','Offers','Weeks 3 to 4','Which offer gets qualified people to raise their hand?',['Top 2 hooks per track on Body A, O1 vs O2.','O3 (free concept) runs in its own small ad set with C4, judged on how many concepts turn into walkthroughs.']],
+ ['Round 3','Bodies','Weeks 5 to 6','What message actually convinces them?',['Winning hook and offer per track, Body A vs Body B.','Tells you whether North County buyers care more about protection (price and quality) or organization (low stress).']],
+ ['Round 4','Scale','Week 7 on','Put money behind what works.',['Most of the budget on the winning combination.','Turn on the 90 sec retargeting ad for video viewers and site visitors.','Test H5 to H7 against the winner in small batches so ads don\'t go stale.','Log every winner in the SDLR Winners sheet: code, exact line, why it won, the numbers.']]
+];
+let rIdx = LS('round') || 0;
+function renderRounds(){
+  document.getElementById('roundseg').innerHTML = ROUNDS.map((r,i)=>`<button class="${i===rIdx?'on':''}" onclick="rIdx=${i};SS('round',${i});renderRounds()">${r[0]}<br><span style="font-size:11px">${r[1]}</span></button>`).join('');
+  const r = ROUNDS[rIdx];
+  document.getElementById('round').innerHTML = `<div class="card"><div class="muted" style="font-size:12px">${r[2]}</div><div style="font-size:18px;font-weight:600;margin:2px 0 6px">${r[3]}</div><ul>${r[4].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+}
+const SETUP = ['Name every ad exactly by the code','UTM on every ad: utm_source=meta & utm_campaign=sdlr_nc & utm_content={{ad.name}}',
+ 'GHL fields: Ad Code, Track, Lead Score, Walkthrough Booked, Walkthrough Held, Design Signed, Build Signed, Est. Project Value',
+ 'Form asks: front, back or both · budget range · start timeline · own the home · city','Rep scores every lead A, B or C within 24 hours',
+ 'Design credit "qualifies" rule set and shared with the rep','2 or 3 Google review clips picked','Weekly report sheet and SDLR Winners sheet created'];
+let checks = LS('checks') || {};
+function renderSetup(){ document.getElementById('setup').innerHTML = SETUP.map((s,i)=>`<label class="check"><input type="checkbox" ${checks[i]?'checked':''} onchange="checks[${i}]=this.checked;SS('checks',checks)"><span>${esc(s)}</span></label>`).join(''); }
+function resetChecks(){ checks = {}; SS('checks', checks); renderSetup(); }
+
+// Tabs
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav.tabs button').forEach(x => x.classList.toggle('on', x===b));
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id==='v-'+b.dataset.v));
+  window.scrollTo(0,0);
+});
+renderFilm(); renderBest(); renderRounds(); renderSetup();
+</script>
+</body>
+</html>
