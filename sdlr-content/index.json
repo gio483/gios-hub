@@ -1,6 +1,18 @@
 {
   "weeks": [
     {
+      "label": "Week of Dec 7 – Dec 11, 2026 · The Winter Design Window",
+      "folder": "week-2026-12-07",
+      "manifest": "sdlr-content/week-2026-12-07/manifest.json",
+      "generated": "2026-10-11"
+    },
+    {
+      "label": "Week of Nov 30 – Dec 4, 2026 · Process Carousel · First of December",
+      "folder": "week-2026-11-30",
+      "manifest": "sdlr-content/week-2026-11-30/manifest.json",
+      "generated": "2026-10-12"
+    },
+    {
       "label": "Week of Nov 23 – Nov 27, 2026 · Thanksgiving",
       "folder": "week-2026-11-23",
       "manifest": "sdlr-content/week-2026-11-23/manifest.json",
