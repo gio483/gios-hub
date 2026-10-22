@@ -7,101 +7,85 @@
 <title>Lantern</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;1,8..60,400&display=swap">
 <style>
-/* Layout: one lit column in a dark room. Every station is a single centered page; a thin line of light at the top shows how far the lantern has walked. Single-theme by choice: this is a night piece. */
+/* Layout: one thing on screen at a time. A short line of words, two or three answers. The light at the top is the only measure of time. Single dark world by choice. */
 :root{
-  --ink:#090a10;        /* the room */
-  --ink-2:#10121b;      /* raised surfaces */
-  --fog:#1b1e2b;        /* borders, dividers */
-  --bone:#e9e3d6;       /* text */
-  --dust:#8f8b93;       /* secondary text */
-  --lantern:#e3a95b;    /* the one warm light */
-  --lantern-soft:rgba(227,169,91,.16);
-  --water:#7f9fc2;      /* cool secondary, used sparingly */
-  --display:'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
-  --body:'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --ink:#07070c; --ink-2:#0e0f17; --fog:#1a1c29;
+  --bone:#ece6d9; --dust:#8a8792;
+  --lantern:#e3a95b; --lantern-soft:rgba(227,169,91,.14);
+  --violet:#5b3fa0; --teal:#2fd3c0;
+  --display:'Cormorant Garamond','Iowan Old Style',Georgia,serif;
+  --body:'Source Serif 4',Georgia,'Times New Roman',serif;
   color-scheme:dark;
 }
 html,body{height:100%}
-body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--body);font-size:17px;line-height:1.55;
-  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+body{margin:0;background:var(--ink);color:var(--bone);font-family:var(--body);font-size:17px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
   -webkit-font-smoothing:antialiased;overflow-x:hidden}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
 *{box-sizing:border-box}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
-button:focus-visible,a:focus-visible{outline:2px solid var(--lantern);outline-offset:3px;border-radius:4px}
+button:focus-visible,a:focus-visible,textarea:focus-visible{outline:2px solid var(--lantern);outline-offset:3px;border-radius:4px}
 a{color:var(--lantern)}
-
-/* ambient grain + vignette */
-#grain{position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
-  background:radial-gradient(120% 90% at 50% 20%, rgba(227,169,91,.07), transparent 60%),
-             radial-gradient(100% 100% at 50% 100%, rgba(0,0,0,.6), transparent 60%)}
-
-/* progress light */
+#grain{position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(120% 90% at 50% 15%,rgba(91,63,160,.12),transparent 60%),radial-gradient(100% 100% at 50% 100%,rgba(0,0,0,.7),transparent 60%)}
 #progress{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:2px;background:var(--fog);z-index:11}
-#progress i{display:block;height:100%;width:0;background:var(--lantern);box-shadow:0 0 12px 2px rgba(227,169,91,.45);transition:width .6s ease}
-
-main{position:relative;z-index:1;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;padding-block:56px 48px}
-
-.screen{animation:rise .7s ease both}
-.screen.leaving{animation:sink .35s ease both}
-@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-@keyframes sink{from{opacity:1}to{opacity:0;transform:translateY(-6px)}}
+#progress i{display:block;height:100%;width:0;background:var(--lantern);box-shadow:0 0 14px 2px rgba(227,169,91,.5);transition:width .8s ease}
+main{position:relative;z-index:1;max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;padding-block:56px 48px}
+.screen{animation:rise .9s ease both}
+.screen.leaving{animation:sink .4s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes sink{from{opacity:1}to{opacity:0}}
 @media (prefers-reduced-motion:reduce){.screen,.screen.leaving{animation:none}#progress i{transition:none}}
 
-.eyebrow{font-family:var(--body);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dust);margin:0 0 18px}
+.eyebrow{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dust);margin:0 0 22px}
 .eyebrow b{color:var(--lantern);font-weight:500}
-h1,h2{font-family:var(--display);font-weight:500;text-wrap:balance;margin:0}
-h1{font-size:clamp(44px,10vw,64px);line-height:1;letter-spacing:.01em}
-h2{font-size:clamp(28px,6.2vw,36px);line-height:1.15}
+h1,h2{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0}
+h1{font-size:clamp(46px,11vw,70px);line-height:.98;letter-spacing:.01em}
+h2{font-size:clamp(34px,8.4vw,48px);line-height:1.08}
 h2 em,.lead em{font-style:italic;color:var(--lantern)}
-.lead{font-family:var(--display);font-size:clamp(21px,4.8vw,25px);line-height:1.35;color:var(--bone);margin:14px 0 0}
-p{margin:0}
-.muted{color:var(--dust)}
-.small{font-size:14px}
-.stack{display:flex;flex-direction:column;gap:16px}
-
-/* buttons */
-.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 22px;border:1px solid var(--lantern);color:var(--lantern);border-radius:999px;letter-spacing:.06em;font-size:15px;transition:background .2s,color .2s}
+.lead{font-family:var(--display);font-size:clamp(22px,5vw,26px);line-height:1.3;margin:14px 0 0}
+p{margin:0}.muted{color:var(--dust)}.stack{display:flex;flex-direction:column;gap:14px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border:1px solid var(--lantern);color:var(--lantern);border-radius:999px;letter-spacing:.08em;font-size:14px;text-transform:uppercase;transition:background .25s,color .25s}
 .btn:hover{background:var(--lantern);color:var(--ink)}
-.btn.ghost{border-color:var(--fog);color:var(--dust)}
+.btn.ghost{border-color:var(--fog);color:var(--dust);text-transform:none;letter-spacing:.02em;font-size:15px}
 .btn.ghost:hover{background:var(--ink-2);color:var(--bone)}
-.btn[disabled]{opacity:.35;pointer-events:none}
+.btn[disabled]{opacity:.3;pointer-events:none}
 
-/* options */
-.options{display:flex;flex-direction:column;gap:10px;margin-top:28px}
-.opt{text-align:left;padding:16px 18px 16px 22px;border:1px solid var(--fog);border-left:2px solid var(--fog);background:var(--ink-2);border-radius:6px;line-height:1.45;font-size:16.5px;color:var(--bone);transition:border-color .2s,background .2s,transform .2s}
-.opt:hover{border-left-color:var(--lantern);background:#141726}
-.opt.picked{border-color:var(--lantern);border-left-color:var(--lantern);background:var(--lantern-soft);transform:translateX(2px)}
-.options.revealed .opt{animation:rise .6s ease both}
-.options.revealed .opt:nth-child(2){animation-delay:.08s}.options.revealed .opt:nth-child(3){animation-delay:.16s}.options.revealed .opt:nth-child(4){animation-delay:.24s}.options.revealed .opt:nth-child(5){animation-delay:.32s}
+/* answers: few, large, quiet */
+.options{display:flex;flex-direction:column;gap:14px;margin-top:34px}
+.opt{text-align:left;padding:18px 8px 18px 0;border:0;border-bottom:1px solid var(--fog);background:none;font-family:var(--display);font-size:clamp(23px,5.6vw,28px);line-height:1.2;color:var(--bone);transition:color .25s,padding-left .3s,border-color .3s;position:relative}
+.opt::before{content:"";position:absolute;left:-18px;top:50%;width:6px;height:6px;border-radius:50%;background:var(--lantern);transform:translateY(-50%) scale(0);transition:transform .3s;box-shadow:0 0 10px var(--lantern)}
+.opt:hover{color:var(--lantern)}
+.opt.picked{color:var(--lantern);padding-left:14px;border-color:var(--lantern)}
+.opt.picked::before{left:0;transform:translateY(-50%) scale(1)}
+.options.revealed .opt{animation:rise .7s ease both}
+.options.revealed .opt:nth-child(2){animation-delay:.1s}.options.revealed .opt:nth-child(3){animation-delay:.2s}
 
-/* image stations */
-.scene{margin-top:22px;border-radius:8px;overflow:hidden;border:1px solid var(--fog);background:#000;aspect-ratio:4/3;max-width:100%;box-shadow:0 30px 60px -30px rgba(0,0,0,.9)}
+/* scenes */
+.scene{margin-top:24px;border-radius:6px;overflow:hidden;background:#000;aspect-ratio:4/3;max-width:100%;box-shadow:0 40px 80px -30px rgba(0,0,0,1),0 0 0 1px rgba(255,255,255,.04)}
 .scene svg{display:block;width:100%;height:100%}
-.caption{font-family:var(--display);font-style:italic;font-size:19px;color:var(--dust);margin-top:14px}
+.caption{font-family:var(--display);font-style:italic;font-size:20px;color:var(--dust);margin-top:16px}
 
-/* sound stations */
-.player{margin-top:22px;border:1px solid var(--fog);background:var(--ink-2);border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:16px}
-.player-top{display:flex;align-items:center;gap:16px}
-.play{width:58px;height:58px;border-radius:50%;border:1px solid var(--lantern);color:var(--lantern);display:grid;place-items:center;flex:none;transition:background .2s,color .2s}
-.play:hover,.play.on{background:var(--lantern);color:var(--ink)}
-.play svg{width:20px;height:20px;fill:currentColor}
-.player-title{font-family:var(--display);font-size:22px;line-height:1.15}
-.player-sub{color:var(--dust);font-size:13.5px;margin-top:3px}
-canvas.viz{width:100%;height:54px;display:block;border-radius:4px}
+/* sound */
+.player{margin-top:24px;border:1px solid var(--fog);background:var(--ink-2);border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:18px}
+.player-top{display:flex;align-items:center;gap:18px}
+.play{width:64px;height:64px;border-radius:50%;border:1px solid var(--lantern);color:var(--lantern);display:grid;place-items:center;flex:none;transition:background .25s,color .25s,box-shadow .25s}
+.play:hover,.play.on{background:var(--lantern);color:var(--ink);box-shadow:0 0 30px rgba(227,169,91,.35)}
+.play svg{width:22px;height:22px;fill:currentColor}
+.player-title{font-family:var(--display);font-size:26px;line-height:1.1}
+.player-sub{color:var(--dust);font-size:13.5px;margin-top:4px}
+canvas.viz{width:100%;height:60px;display:block}
 .headphones{display:flex;gap:10px;align-items:center;color:var(--dust);font-size:13.5px}
 .headphones svg{width:18px;height:18px;flex:none;stroke:var(--lantern);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.listen-note{color:var(--dust);font-style:italic;font-family:var(--display);font-size:18px;margin-top:22px;min-height:1.4em}
+.listen-note{color:var(--dust);font-style:italic;font-family:var(--display);font-size:19px;margin-top:22px;min-height:1.4em}
 
-/* chapter interludes */
-.breath{display:grid;place-items:center;margin:28px auto 34px;width:180px;height:180px}
-.breath i{display:block;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle, rgba(227,169,91,.9), rgba(227,169,91,.15) 60%, transparent 72%);animation:breathe 8s ease-in-out infinite;box-shadow:0 0 40px rgba(227,169,91,.35)}
-@keyframes breathe{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(2.6);opacity:1}}
-@media (prefers-reduced-motion:reduce){.breath i{animation:none;transform:scale(1.8)}}
-
-/* threshold */
+/* interludes */
+.breath{display:grid;place-items:center;margin:30px auto 36px;width:200px;height:200px}
+.breath i{display:block;width:56px;height:56px;border-radius:50%;background:radial-gradient(circle,rgba(227,169,91,.95),rgba(227,169,91,.12) 60%,transparent 72%);animation:breathe 8s ease-in-out infinite;box-shadow:0 0 50px rgba(227,169,91,.35)}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(2.9);opacity:1}}
+@media (prefers-reduced-motion:reduce){.breath i{animation:none;transform:scale(1.9)}}
 .flame{width:22px;height:34px;margin-bottom:26px}
 .flame path{fill:var(--lantern);transform-origin:50% 100%;animation:flicker 2.8s ease-in-out infinite}
 @keyframes flicker{0%,100%{transform:scaleY(1) scaleX(1)}30%{transform:scaleY(1.08) scaleX(.94)}60%{transform:scaleY(.95) scaleX(1.05)}}
@@ -109,26 +93,28 @@ canvas.viz{width:100%;height:54px;display:block;border-radius:4px}
 .rule{height:1px;background:var(--fog);margin:30px 0}
 .fine{font-size:13.5px;color:var(--dust);line-height:1.5}
 
+/* letter station */
+textarea{width:100%;min-height:120px;margin-top:28px;background:transparent;border:0;border-bottom:1px solid var(--fog);color:var(--bone);font-family:var(--display);font-size:clamp(22px,5.4vw,26px);line-height:1.3;padding:8px 0;resize:vertical}
+textarea::placeholder{color:var(--dust);font-style:italic}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px;align-items:center}
+
 /* reading */
-.reading .name{font-size:clamp(40px,9vw,58px);line-height:1;margin-top:8px}
-.reading .tag{font-family:var(--display);font-style:italic;font-size:24px;color:var(--lantern);margin-top:10px}
-.section{margin-top:30px}
-.section .eyebrow{margin-bottom:8px}
-.section p{font-size:17px;line-height:1.6}
-.keep{margin-top:34px;padding:26px 24px;border:1px solid var(--lantern);border-radius:8px;background:var(--lantern-soft);font-family:var(--display);font-size:clamp(24px,5.4vw,30px);line-height:1.25;text-wrap:balance}
-.map{margin-top:34px;display:flex;flex-direction:column;gap:9px}
+.reading .name{font-size:clamp(42px,10vw,64px);line-height:.98;margin-top:8px}
+.reading .tag{font-family:var(--display);font-style:italic;font-size:25px;color:var(--lantern);margin-top:12px}
+.section{margin-top:32px}.section .eyebrow{margin-bottom:8px}.section p{font-size:17px;line-height:1.6}
+.keep{margin-top:36px;padding:28px 24px;border:1px solid var(--lantern);border-radius:6px;background:var(--lantern-soft);font-family:var(--display);font-size:clamp(25px,5.8vw,32px);line-height:1.22;text-wrap:balance}
+.letter{margin-top:36px;padding-left:18px;border-left:2px solid var(--lantern);font-family:var(--display);font-style:italic;font-size:22px;line-height:1.3;color:var(--bone)}
+.letter .eyebrow{font-style:normal;margin-bottom:8px}
+.map{margin-top:36px;display:flex;flex-direction:column;gap:9px}
 .row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;font-size:14px}
-.row span{color:var(--dust)}
-.row.lead-row span{color:var(--bone)}
-.bar{height:4px;background:var(--fog);border-radius:2px;overflow:hidden}
-.bar i{display:block;height:100%;background:var(--dust);border-radius:2px;width:0;transition:width 1.2s ease}
+.row span{color:var(--dust)}.row.lead-row span{color:var(--bone)}
+.bar{height:3px;background:var(--fog);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--dust);width:0;transition:width 1.4s ease}
 .row.lead-row .bar i{background:var(--lantern);box-shadow:0 0 10px rgba(227,169,91,.5)}
-.second{margin-top:30px;padding-left:18px;border-left:2px solid var(--fog)}
-.second .eyebrow{margin-bottom:6px}
-.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+.second{margin-top:32px;padding-left:18px;border-left:2px solid var(--fog)}.second .eyebrow{margin-bottom:6px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--bone);color:var(--ink);padding:10px 16px;border-radius:999px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:20}
 .toast.show{opacity:1}
-@media (max-width:420px){.row{grid-template-columns:120px 1fr}.player{padding:16px}}
+@media (max-width:420px){.row{grid-template-columns:118px 1fr}.player{padding:18px}}
 </style>
 </head>
 <body>
@@ -139,13 +125,9 @@ canvas.viz{width:100%;height:54px;display:block;border-radius:4px}
 <div class="toast" id="toast">Copied</div>
 
 <script>
-/* ============================================================
-   LANTERN — an emotional road map for people who have a lot
-   and still feel the space.
-   Patterns are drawn from schema therapy, attachment research,
-   and the literature on childhood emotional neglect. They are
-   mirrors, not diagnoses.
-   ============================================================ */
+/* LANTERN — an emotional road map for people who have a lot and still feel the space.
+   Patterns draw on schema therapy, attachment research and the work on childhood emotional neglect. Mirrors, not diagnoses. */
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const P = {
   per:{ name:'The Performer', tag:'Loved for what you do.',
@@ -167,7 +149,7 @@ const P = {
   kee:{ name:'The Keeper', tag:'Holding everyone. Held by no one.',
     opening:"You're the one people call. You know where everything is, how everyone's doing, what needs to happen next. You're good at it, and being good at it has quietly become the entire shape of your life. When someone asks what you need, the honest answer is that you stopped checking a long time ago.",
     origin:"Keepers are often made young, in homes where someone needed looking after and you were the one who noticed. Perhaps a parent was stretched thin, or sad, or simply needed you to be okay so they could manage. You became okay. You became useful. Being needed was the closest thing to being held, so you learned to be needed everywhere.",
-    void:"The space is the place where someone should be holding you. You built your worth on carrying, and the thing about carrying is that nobody thinks to ask if your arms are tired. The loneliness of the Keeper is specific: you are surrounded by people who love you and not one of them knows how to take care of you, because you never let them learn.",
+    void:"The space is the place where someone should be holding you. You built your worth on carrying, and the thing about carrying is that nobody thinks to ask if your arms are tired. You are surrounded by people who love you and not one of them knows how to take care of you, because you never let them learn.",
     want:"To be asked how you are, and to have someone wait for the real answer. To put something down and have it stay down. To be the one who gets checked on.",
     door:"Ask one person for one small thing this week that you could easily do yourself. Then let them do it, badly if they must, and don't fix it.",
     keep:"You don't have to be useful to be kept.",
@@ -215,444 +197,334 @@ const P = {
 };
 const KEYS = Object.keys(P);
 
-/* ---------- WORD STATIONS ---------- */
-const U = [ // universal, chapter one
- {q:"When someone asks how you're <em>really</em> doing, what actually happens?", o:[
-  ["I say “good” and mean it, mostly. I just don't know what else there is to say.",{uns:2,wat:1}],
-  ["I turn it around and ask about them.",{kee:2,cha:1}],
-  ["I give them the version that fits what they want to hear.",{cha:2,per:1}],
-  ["I feel something close, like a door shutting.",{for:2,fla:1}],
-  ["I honestly don't know. I'd have to think about it, and I don't.",{wat:2,uns:1}]]},
- {q:"Picture the moment you were most proud. <em>Who was there?</em>", o:[
-  ["Everyone. And it still felt like it was happening to someone else.",{wat:2,per:1}],
-  ["People who were proud of what I did. I'm not sure anyone saw me.",{per:2,uns:1}],
-  ["No one who mattered. I'd already stopped expecting that.",{lea:2,uns:1}],
-  ["I was proud for about an hour. Then I needed the next one.",{per:2,fla:1}],
-  ["I don't remember being proud. I remember relief.",{fla:2,per:1}]]},
- {q:"Growing up, feelings in your house were…", o:[
-  ["Fine, as long as they were the good ones.",{uns:2,cha:1}],
-  ["Mine to handle. Everyone else had enough going on.",{kee:2,uns:1}],
-  ["Never really discussed. We were loved. We just didn't talk like that.",{uns:3}],
-  ["Something that could get you in trouble.",{for:2,fla:1}],
-  ["Loud. I learned to be the calm one.",{kee:1,wat:2}]]},
- {q:"Someone you like starts getting close. The first thing you notice is…", o:[
-  ["A pull to become whatever they'd want.",{cha:2,fla:1}],
-  ["A countdown. I'm already bracing for when it ends.",{lea:3}],
-  ["That I'm performing, and I'm not sure where the real me went.",{cha:1,wat:1,per:1}],
-  ["A wall going up that I didn't build on purpose.",{for:3}],
-  ["Nothing yet. I feel things later, alone, if at all.",{wat:2,uns:1}]]},
- {q:"What does <em>rest</em> feel like?", o:[
-  ["Like something I have to earn and never quite do.",{per:3}],
-  ["Uncomfortable. Quiet makes the noise louder.",{wat:2,fla:1}],
-  ["Like a job. I'm usually making sure everyone else is resting.",{kee:3}],
-  ["Fine. I just don't know what I'm supposed to feel while doing it.",{uns:2}],
-  ["Dangerous. If I stop, I might feel it.",{for:1,wat:1,fla:1}]]},
- {q:"Finish the sentence. <em>“If people really knew me…”</em>", o:[
-  ["…they'd see there's less here than they think.",{fla:3}],
-  ["…they'd leave. So I keep it light.",{lea:2,for:1}],
-  ["…they'd be disappointed. The version they have is better.",{cha:2,fla:1}],
-  ["…they'd be surprised how much I hold for them.",{kee:2}],
-  ["…I'd have to know me first.",{wat:2,uns:1}]]},
- {q:"When you cry, which is rare or isn't, it's usually…", o:[
-  ["At a movie or a song. Something safely not about me.",{uns:2,wat:1}],
-  ["Alone, after I've been strong for everyone.",{kee:2,for:1}],
-  ["When I feel I've let someone down.",{per:2,fla:1}],
-  ["I don't. I used to.",{wat:2,for:1}],
-  ["When someone is kind to me for no reason.",{uns:2,fla:1}]]},
- {q:"The success, the people, the good life. And still, something. <em>What's the shape of it?</em>", o:[
-  ["A hum under everything. Like a room I can't find the door to.",{uns:2,wat:1}],
-  ["A treadmill. Arriving never lasts.",{per:3}],
-  ["A window. I can see the warmth. I'm on the wrong side of the glass.",{for:2,uns:1}],
-  ["A stage. I'm never sure who they're actually clapping for.",{cha:2,fla:1}],
-  ["An exit sign. I'm always half-looking for it.",{lea:2,wat:1}]]}
+/* ---------- WORDS: short. two or three answers. ---------- */
+const U = [
+ {q:"How are you, <em>really?</em>", o:[["Fine.",{uns:2,wat:1}],["Tired.",{kee:2,per:1}],["I don't know.",{wat:2,uns:1}]]},
+ {q:"Your proudest moment. <em>Who saw it?</em>", o:[["Everyone.",{per:2,cha:1}],["No one who mattered.",{lea:2,uns:1}],["It didn't feel like mine.",{wat:2,fla:1}]]},
+ {q:"Feelings, growing up, were…", o:[["Not discussed.",{uns:3}],["Mine to handle.",{kee:2,for:1}],["Risky.",{for:2,fla:1}]]},
+ {q:"Someone gets close. <em>You…</em>", o:[["Brace for the end.",{lea:3}],["Build the wall.",{for:3}],["Become what they want.",{cha:2,fla:1}]]},
+ {q:"Rest feels…", o:[["Unearned.",{per:3}],["Loud.",{wat:2,fla:1}],["Like a job.",{kee:3}]]},
+ {q:"If they really knew you…", o:[["They'd leave.",{lea:2,for:1}],["They'd be disappointed.",{fla:2,cha:1}],["I'd have to know me first.",{wat:2,uns:1}]]},
+ {q:"You cry…", o:[["At movies. Never about me.",{uns:2,wat:1}],["Alone, after.",{kee:2,for:1}],["I don't anymore.",{wat:2,for:1}]]},
+ {q:"The space. <em>What shape is it?</em>", o:[["A hum.",{uns:2,wat:1}],["A treadmill.",{per:3}],["A window.",{for:2,uns:1}]]}
+];
+const T = [
+ {t:['per','fla'], q:"A week off. <em>No catch.</em>", o:[["I'd worry the whole time.",{per:3}],["I'd feel like a fraud.",{fla:3}],["I'd fill it.",{per:2,kee:1}]]},
+ {t:['for','lea'], q:"<em>“I'm not going anywhere.”</em>", o:[["Everyone says that.",{lea:3}],["I can't let myself believe it.",{for:3}]]},
+ {t:['kee','uns'], q:"Sick in bed. The house is quiet.", o:[["Who's handling things?",{kee:3}],["No one's coming. That's fine.",{uns:3}]]},
+ {t:['cha','wat'], q:"Describe yourself. <em>No job. No people.</em>", o:[["I can't.",{wat:3}],["Which version?",{cha:3}]]},
+ {t:['fla','uns'], q:"A compliment lands.", o:[["I deflect it.",{fla:3}],["It doesn't go in.",{uns:2,wat:1}]]},
+ {t:['per','cha'], q:"What were you praised for?", o:[["Winning.",{per:3}],["Being easy.",{cha:2,uns:1}],["Being mature.",{kee:2,uns:1}]]},
+ {t:['wat','for'], q:"A big feeling rises.", o:[["I watch it, like weather.",{wat:3}],["I shut it down.",{for:3}],["I get busy.",{per:1,wat:2}]]},
+ {t:['lea','uns'], q:"They cancel.", o:[["Of course.",{lea:2,uns:1}],["It's fine. Always fine.",{uns:3}],["Relief.",{for:1,wat:2}]]},
+ {t:['kee','cha'], q:"Last time you asked for help?", o:[["Can't remember.",{kee:3}],["I don't need anything.",{cha:2,kee:1}],["I wouldn't know what to ask.",{uns:2,wat:1}]]},
+ {t:['fla','per'], q:"Your shame says…", o:[["Never enough.",{per:2,fla:1}],["Something in me is broken.",{fla:3}],["I can't feel what I should.",{wat:2,fla:1}]]},
+ {t:['uns','wat'], q:"<em>What do you want?</em>", o:[["Blank.",{uns:2,wat:2}],["To be noticed without asking.",{uns:3}],["To feel it all the way through.",{wat:3}]]},
+ {t:['for','fla'], q:"Falling apart in front of someone.", o:[["I never let it get that far.",{for:3}],["They'd see what I am.",{fla:3}]]},
+ {t:['lea','kee'], q:"The ones that ended…", o:[["I left first.",{lea:3}],["I gave until I was empty.",{kee:3}],["I was never fully there.",{wat:3}]]},
+ {t:['cha','fla'], q:"Alone. <em>No one watching.</em>", o:[["Smaller.",{fla:2,cha:1}],["I don't go there.",{cha:2,wat:1}],["Tired.",{kee:2}]]},
+ {t:['per','wat'], q:"The goal happens.", o:[["Gone before I can touch it.",{per:3}],["Flat.",{wat:3}],["Now I have to keep it.",{per:2,fla:1}]]},
+ {t:['uns','kee'], q:"Your parents loved you. <em>And yet.</em>", o:[["Nothing I can name.",{uns:3}],["They needed me okay.",{kee:2,uns:1}],["It had conditions.",{per:2,fla:1}]]},
+ {t:['for','cha'], q:"<em>“Just be yourself.”</em>", o:[["Which one?",{cha:3}],["I can't.",{for:2,fla:1}]]},
+ {t:['lea','wat'], q:"Something good. <em>Right now.</em>", o:[["I'm already at the ending.",{lea:3}],["I'm watching it from above.",{wat:3}],["Have I earned it?",{per:2,fla:1}]]}
 ];
 
-const T = [ // targeted, chapters two and three. t = which patterns the question separates
- {t:['per','fla'], q:"A friend tells you to take the week off. No consequences, no catch.", o:[
-  ["I'd spend it worrying about what I was supposed to be doing.",{per:3}],
-  ["I'd feel like a fraud for taking it.",{fla:3}],
-  ["I'd fill it with something productive and call that rest.",{per:2,kee:1}],
-  ["I'd enjoy it. And feel guilty that I enjoyed it.",{fla:2,per:1}]]},
- {t:['for','lea'], q:"Someone says, <em>“I'm not going anywhere.”</em> Your gut says…", o:[
-  ["Everyone says that.",{lea:3}],
-  ["I'd like to believe you. I just won't let myself.",{for:3}],
-  ["Okay. But I'll keep one foot out, just in case.",{lea:2,for:1}],
-  ["Please don't make promises. I don't do well with promises.",{for:2,lea:1}]]},
- {t:['kee','uns'], q:"You're sick in bed. The house goes quiet. First thought:", o:[
-  ["Who's handling what I usually handle?",{kee:3}],
-  ["Nobody's going to check on me, and that's just how it is.",{uns:3}],
-  ["This is nice. Which is a terrible thing to think.",{kee:2,uns:1}],
-  ["I'll be up tomorrow. I don't get to be sick.",{kee:1,per:2}]]},
- {t:['cha','wat'], q:"Describe yourself in one sentence, without mentioning what you do or who you're with.", o:[
-  ["I honestly can't. There's nothing there to describe.",{wat:3}],
-  ["I'd give you three different answers for three different rooms.",{cha:3}],
-  ["I'm whoever is useful right now.",{cha:2,kee:1}],
-  ["I'd describe the person people think I am. It's easier.",{cha:2,wat:1}]]},
- {t:['fla','uns'], q:"A compliment lands. What does your body do?", o:[
-  ["Deflects it before it reaches me.",{fla:3}],
-  ["Nothing. It doesn't go in. Like it's for someone else.",{uns:2,wat:1}],
-  ["Files it away as proof I've fooled them.",{fla:2,cha:1}],
-  ["Warms for a second, then gets suspicious.",{fla:1,for:2}]]},
- {t:['per','cha'], q:"What were you praised for as a kid?", o:[
-  ["Grades. Wins. Being impressive.",{per:3}],
-  ["Being easy. Not causing problems.",{cha:2,uns:1}],
-  ["Being mature for my age.",{kee:2,uns:1}],
-  ["I'm not sure I was, specifically. I was just… fine.",{uns:2,wat:1}]]},
- {t:['wat','for'], q:"A big emotion starts to come up. You…", o:[
-  ["Watch it from a distance, like weather.",{wat:3}],
-  ["Shut it down fast. It's not safe.",{for:3}],
-  ["Get busy.",{per:1,wat:2}],
-  ["Let it, but only where no one can see.",{for:2,kee:1}]]},
- {t:['lea','uns'], q:"Someone cancels on you. Honest reaction:", o:[
-  ["Relief. Now I don't have to show up.",{for:1,wat:2}],
-  ["Of course. People drift. I'm used to it.",{lea:2,uns:1}],
-  ["I tell them it's fine. It's always fine.",{uns:3}],
-  ["I quietly move them down a rung. Fewer chances to be hurt.",{lea:3}]]},
- {t:['kee','cha'], q:"When was the last time you asked for help?", o:[
-  ["I can't remember. It's easier to just do it.",{kee:3}],
-  ["I don't. People like me because I don't need anything.",{cha:2,kee:1}],
-  ["I asked once. It went badly. I stopped.",{for:2,lea:1}],
-  ["I wouldn't know what to ask for.",{uns:2,wat:1}]]},
- {t:['fla','per'], q:"The thing you're most ashamed of is…", o:[
-  ["That no matter what I build, it never makes me feel like enough.",{per:2,fla:1}],
-  ["That there's something broken in me that nobody else has.",{fla:3}],
-  ["That I can't feel what I'm supposed to feel for the people I love.",{wat:2,fla:1}],
-  ["That I need people more than I'd ever admit.",{for:2,lea:1}]]},
- {t:['uns','wat'], q:"<em>“What do you want?”</em> Not what's practical. What you want.", o:[
-  ["Blank. Genuinely blank.",{uns:2,wat:2}],
-  ["I want someone to notice without me having to say.",{uns:3}],
-  ["I want to feel something all the way through.",{wat:3}],
-  ["I want to stop having to be impressive to be loved.",{per:2,fla:1}]]},
- {t:['for','fla'], q:"What would happen if you let someone see you fall apart?", o:[
-  ["They'd lose respect. I'm the strong one.",{for:2,per:1}],
-  ["They'd see what I actually am, and that would be the end.",{fla:3}],
-  ["I don't know. I've never let it get that far.",{for:3}],
-  ["They'd try to help, and I'd hate it.",{for:2,kee:1}]]},
- {t:['lea','kee'], q:"The relationships that ended. What's the pattern?", o:[
-  ["I left first. Every time, if I'm honest.",{lea:3}],
-  ["I gave everything and got tired of being the one who gave.",{kee:3}],
-  ["They said they never really knew me.",{for:2,cha:1}],
-  ["They said I was never fully there.",{wat:3}]]},
- {t:['cha','fla'], q:"Alone in a room, no one watching. <em>Who are you?</em>", o:[
-  ["Smaller. Quieter. Honestly, not sure I like them.",{fla:2,cha:1}],
-  ["I don't know. I don't spend much time there.",{cha:2,wat:1}],
-  ["Tired. That's the main thing.",{kee:2}],
-  ["Finally myself, and a little sad no one gets that version.",{for:2,uns:1}]]},
- {t:['per','wat'], q:"When the goal finally happens, the feeling is…", o:[
-  ["Gone before I can touch it.",{per:3}],
-  ["Flat. Like I watched it happen on a screen.",{wat:3}],
-  ["Fear. Now I have to keep it.",{per:2,fla:1}],
-  ["Loneliness. There's no one to hand it to.",{uns:2,lea:1}]]},
- {t:['uns','kee'], q:"Your parents loved you. <em>And yet.</em> What was missing?", o:[
-  ["Nothing I can name. That's what makes it hard to explain.",{uns:3}],
-  ["They loved me. I'm not sure they knew me.",{uns:2,cha:1}],
-  ["They needed me to be okay. So I was.",{kee:2,uns:1}],
-  ["Their love had conditions, even if nobody said them out loud.",{per:2,fla:1}]]},
- {t:['for','cha'], q:"<em>“Just be yourself.”</em> What comes up?", o:[
-  ["Which one?",{cha:3}],
-  ["That's the one thing I can't do.",{for:2,fla:1}],
-  ["I would, if I thought that would be enough.",{fla:2,cha:1}],
-  ["I don't know what that would even look like.",{wat:2,cha:1}]]},
- {t:['lea','wat'], q:"Something good is happening. Right now. Your mind…", o:[
-  ["Is already at the ending.",{lea:3}],
-  ["Is somewhere above it, noting that it's happening.",{wat:3}],
-  ["Is checking whether I've earned it.",{per:2,fla:1}],
-  ["Is looking for the thing I'm supposed to be doing instead.",{kee:2,per:1}]]}
-];
-
-/* ---------- IMAGE STATIONS ---------- */
-function stars(n,w,h,top){let s='';for(let i=0;i<n;i++){const x=Math.random()*w,y=Math.random()*top,r=Math.random()*1.1+.3;s+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(2)}" fill="#e9e3d6" opacity="${(Math.random()*.6+.2).toFixed(2)}"/>`}return s}
-function grass(){let s='';for(let i=0;i<260;i++){const x=Math.random()*420-10,h=40+Math.random()*110,bend=(Math.random()-.5)*40;const c=['#3b3214','#5a4a1e','#7c6a2b','#a48c3a'][Math.floor(Math.random()*4)];s+=`<path d="M${x.toFixed(0)},300 Q${(x+bend*.4).toFixed(0)},${(300-h*.6).toFixed(0)} ${(x+bend).toFixed(0)},${(300-h).toFixed(0)}" stroke="${c}" stroke-width="${(Math.random()*1.4+.6).toFixed(1)}" fill="none" stroke-linecap="round" opacity="${(Math.random()*.5+.5).toFixed(2)}"/>`}return s}
-function seeds(){let s='';for(let i=0;i<22;i++){s+=`<circle cx="${(Math.random()*400).toFixed(0)}" cy="${(40+Math.random()*200).toFixed(0)}" r="${(Math.random()*1.6+.6).toFixed(1)}" fill="#fff4d6" opacity="${(Math.random()*.6+.3).toFixed(2)}"/>`}return s}
+/* ---------- SCENES: living drawings ---------- */
+const R=(a,b)=>a+Math.random()*(b-a);
+function anim(attr,vals,dur,extra=''){ return RM?'':`<animate attributeName="${attr}" values="${vals}" dur="${dur}s" repeatCount="indefinite" ${extra}/>`; }
+function fx(id,base,scale,dur){ return `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="${base}" numOctaves="2" seed="3" result="n">${anim('baseFrequency',`${base};${base*1.6};${base}`,dur)}</feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="${scale}" xChannelSelector="R" yChannelSelector="G"/></filter>`; }
+function grainDef(id){ return `<filter id="${id}"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="1" seed="7"/><feColorMatrix type="saturate" values="0"/></filter>`; }
+const grainRect=id=>`<rect width="400" height="300" filter="url(#${id})" opacity=".09" style="mix-blend-mode:overlay"/>`;
+const vignette=id=>`<radialGradient id="${id}" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".75"/></radialGradient>`;
+function stars(n){ let s=''; for(let i=0;i<n;i++){ const d=R(3,9); s+=`<circle cx="${R(0,400).toFixed(1)}" cy="${R(0,210).toFixed(1)}" r="${R(.3,1.3).toFixed(2)}" fill="#efe9ff" opacity="${R(.2,.8).toFixed(2)}">${anim('opacity',`${R(.1,.4).toFixed(2)};${R(.6,1).toFixed(2)};${R(.1,.4).toFixed(2)}`,d.toFixed(1))}</circle>`; } return s; }
+function motes(n,col,x0=0,x1=400,y0=0,y1=300){ let s=''; for(let i=0;i<n;i++){ const x=R(x0,x1),y=R(y0,y1),d=R(14,34); s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${R(.6,1.8).toFixed(1)}" fill="${col}" opacity="${R(.25,.8).toFixed(2)}">${anim('cy',`${y.toFixed(0)};${(y-R(30,90)).toFixed(0)}`,d.toFixed(1))}${anim('opacity',`0;${R(.5,.9).toFixed(2)};0`,d.toFixed(1))}${anim('cx',`${x.toFixed(0)};${(x+R(-25,25)).toFixed(0)};${x.toFixed(0)}`,(d*1.3).toFixed(1))}</circle>`; } return s; }
+function grass(){ let s=''; for(let i=0;i<220;i++){ const x=R(-10,410),h=R(40,140),b=R(-28,28); const c=['#3b2f14','#5c4a1c','#866c2a','#b3923d','#d9b452'][Math.floor(R(0,5))]; s+=`<path d="M${x.toFixed(0)},300 Q${(x+b*.4).toFixed(0)},${(300-h*.6).toFixed(0)} ${(x+b).toFixed(0)},${(300-h).toFixed(0)}" stroke="${c}" stroke-width="${R(.6,2).toFixed(1)}" fill="none" stroke-linecap="round" opacity="${R(.45,1).toFixed(2)}"/>`; } return s; }
+const svg=(label,inner)=>`<svg viewBox="0 0 400 300" role="img" aria-label="${label}">${inner}</svg>`;
 
 const IMG = {
- window:{ title:'The lit window', caption:'A house on a street at night. One window is on.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A dark street, a house with a single warm window, a small figure standing outside."><defs>
-   <linearGradient id="skyA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#05060d"/><stop offset="1" stop-color="#151a2c"/></linearGradient>
-   <radialGradient id="glowA"><stop offset="0" stop-color="#f0b860" stop-opacity=".85"/><stop offset="1" stop-color="#f0b860" stop-opacity="0"/></radialGradient>
-   <linearGradient id="gndA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1019"/><stop offset="1" stop-color="#05060a"/></linearGradient></defs>
-   <rect width="400" height="300" fill="url(#skyA)"/>${stars(70,400,300,200)}
-   <rect y="232" width="400" height="68" fill="url(#gndA)"/>
-   <path d="M110,232 V128 L200,66 L290,128 V232 Z" fill="#0c0f18"/><path d="M98,132 L200,60 L302,132" stroke="#1c2133" stroke-width="2" fill="none"/>
-   <ellipse cx="200" cy="236" rx="110" ry="14" fill="#f0b860" opacity=".07"/>
-   <circle cx="200" cy="172" r="78" fill="url(#glowA)" opacity=".55"/>
-   <rect x="180" y="150" width="40" height="44" rx="2" fill="#f3c270"/><path d="M200,150 V194 M180,172 H220" stroke="#0c0f18" stroke-width="3"/>
-   <circle cx="195" cy="169" r="5.5" fill="#0c0f18"/><rect x="187" y="176" width="16" height="18" rx="5" fill="#0c0f18"/>
-   <circle cx="58" cy="203" r="7" fill="#161a28" stroke="#2b3147" stroke-width="1"/><rect x="48" y="212" width="20" height="36" rx="7" fill="#161a28" stroke="#2b3147" stroke-width="1"/>
-   <ellipse cx="58" cy="250" rx="16" ry="3" fill="#000" opacity=".5"/></svg>`,
-  o:[["I want to be inside.",{uns:2,for:1}],["I'd rather stay out here. It's quieter.",{wat:2,for:1}],["Someone should come out and get me.",{uns:1,lea:1,kee:1}],["It looks warm. I don't trust it.",{for:2,fla:1}]]},
- table:{ title:'The long table', caption:'Everyone came. The room is full.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A long candlelit table full of people laughing, and one figure sitting slightly apart at the end."><defs>
-   <linearGradient id="roomB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#120d09"/><stop offset="1" stop-color="#2a1c11"/></linearGradient>
-   <radialGradient id="candle"><stop offset="0" stop-color="#ffd27a" stop-opacity=".9"/><stop offset="1" stop-color="#ffb347" stop-opacity="0"/></radialGradient></defs>
-   <rect width="400" height="300" fill="url(#roomB)"/>
-   <polygon points="30,215 370,215 320,150 80,150" fill="#3b2a1a"/><polygon points="30,215 370,215 370,222 30,222" fill="#2a1d12"/>
-   <circle cx="150" cy="170" r="46" fill="url(#candle)" opacity=".45"/><circle cx="250" cy="175" r="46" fill="url(#candle)" opacity=".45"/>
-   <rect x="148" y="150" width="4" height="22" fill="#e9dcc3"/><circle cx="150" cy="147" r="3.5" fill="#ffd27a"/>
-   <rect x="248" y="155" width="4" height="22" fill="#e9dcc3"/><circle cx="250" cy="152" r="3.5" fill="#ffd27a"/>
-   ${[[112,118,-8],[146,112,6],[182,120,-4],[216,114,8],[252,120,-6],[288,116,5]].map(([x,y,t])=>`<g transform="rotate(${t} ${x} ${y})"><circle cx="${x}" cy="${y}" r="11" fill="#1a130d" stroke="#6a4b2e" stroke-width="1"/><rect x="${x-16}" y="${y+12}" width="32" height="30" rx="10" fill="#1a130d" stroke="#6a4b2e" stroke-width="1"/></g>`).join('')}
-   <circle cx="62" cy="208" r="16" fill="#0d0906" stroke="#3b2a1c" stroke-width="1"/><rect x="38" y="226" width="48" height="60" rx="14" fill="#0d0906" stroke="#3b2a1c" stroke-width="1"/>
-   <ellipse cx="200" cy="40" rx="190" ry="40" fill="#ffb347" opacity=".05"/></svg>`,
-  o:[["That's me at the end.",{uns:3}],["I'd be the one making sure everyone was fed.",{kee:3}],["I'd be laughing the loudest and feeling it the least.",{cha:2,wat:1}],["I'd leave early.",{lea:2,for:1}]]},
- hands:{ title:'The reach', caption:'Two hands. A sliver of light between them.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="Two arms reaching toward each other across darkness, almost touching, with a thin light between them."><defs>
-   <radialGradient id="lightC"><stop offset="0" stop-color="#ffe3a8" stop-opacity="1"/><stop offset=".4" stop-color="#e3a95b" stop-opacity=".5"/><stop offset="1" stop-color="#e3a95b" stop-opacity="0"/></radialGradient></defs>
-   <rect width="400" height="300" fill="#07080f"/>
-   <ellipse cx="200" cy="150" rx="70" ry="110" fill="url(#lightC)" opacity=".35"/>
-   <path d="M0,214 C70,206 120,184 158,166 Q180,156 186,163 Q190,171 176,176 L0,226 Z" fill="#1d1f2b"/>
-   <path d="M0,214 C70,206 120,184 158,166" stroke="#3a3e52" stroke-width="1" fill="none"/>
-   <path d="M400,86 C330,94 280,116 242,134 Q220,144 214,137 Q210,129 224,124 L400,74 Z" fill="#1d1f2b"/>
-   <path d="M400,86 C330,94 280,116 242,134" stroke="#3a3e52" stroke-width="1" fill="none"/>
-   <ellipse cx="200" cy="150" rx="4" ry="22" fill="#ffe3a8" opacity=".9"/><ellipse cx="200" cy="150" rx="12" ry="40" fill="url(#lightC)" opacity=".8"/></svg>`,
-  o:[["Reach.",{kee:1,uns:1,lea:1}],["Pull back.",{for:3}],["Why doesn't the other one move?",{uns:2,lea:1}],["Nothing. I feel nothing.",{wat:3}]]},
- door:{ title:'The door, ajar', caption:'A child’s room. Light from the hallway.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A dark bedroom with a small figure in bed and a door open a crack, warm hallway light spilling across the floor."><defs>
-   <linearGradient id="wedge" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f3c270" stop-opacity="0"/><stop offset="1" stop-color="#f3c270" stop-opacity=".35"/></linearGradient>
-   <radialGradient id="glowD"><stop offset="0" stop-color="#f3c270" stop-opacity=".6"/><stop offset="1" stop-color="#f3c270" stop-opacity="0"/></radialGradient></defs>
-   <rect width="400" height="300" fill="#06070c"/><rect y="222" width="400" height="78" fill="#0a0c14"/>
-   <polygon points="296,222 304,222 240,300 120,300" fill="url(#wedge)"/>
-   <rect x="300" y="36" width="76" height="186" fill="#0b0d15" stroke="#1b1f2c" stroke-width="1.5"/>
-   <ellipse cx="300" cy="130" rx="40" ry="110" fill="url(#glowD)" opacity=".5"/>
-   <rect x="295" y="36" width="7" height="186" fill="#f3c270"/>
-   <rect x="40" y="166" width="180" height="58" rx="6" fill="#121626"/><rect x="48" y="156" width="40" height="18" rx="5" fill="#1d2236"/>
-   <ellipse cx="140" cy="180" rx="52" ry="14" fill="#1a1f33"/><circle cx="92" cy="176" r="9" fill="#1d2236"/>
-   <rect x="40" y="224" width="180" height="4" fill="#0d1020"/></svg>`,
-  o:[["Someone's coming to check on me.",{uns:1,kee:1}],["No one's coming, and that's fine.",{uns:3}],["I'd pretend to be asleep.",{for:2,wat:1}],["I'd get up and make sure everyone else was okay.",{kee:3}]]},
- summit:{ title:'The summit', caption:'You made it. The whole sky is yours.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A tiny figure standing on a mountain peak before an enormous rising sun."><defs>
-   <linearGradient id="skyE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1b3d"/><stop offset=".55" stop-color="#d4714a"/><stop offset="1" stop-color="#f7c67b"/></linearGradient>
-   <radialGradient id="sunE"><stop offset="0" stop-color="#fff2c8"/><stop offset=".5" stop-color="#ffd98a" stop-opacity=".9"/><stop offset="1" stop-color="#ffb86b" stop-opacity="0"/></radialGradient></defs>
-   <rect width="400" height="300" fill="url(#skyE)"/>
-   <circle cx="200" cy="200" r="150" fill="url(#sunE)" opacity=".7"/><circle cx="200" cy="200" r="72" fill="#ffe7a8"/>
-   <polygon points="0,300 0,236 60,196 130,232 200,176 262,224 330,184 400,230 400,300" fill="#5a2f45" opacity=".85"/>
-   <polygon points="0,300 0,268 90,214 160,252 232,204 300,248 400,224 400,300" fill="#2b1529"/>
-   <circle cx="232" cy="190" r="4.5" fill="#160a16"/><rect x="228" y="195" width="8" height="14" rx="3" fill="#160a16"/>
-   <path d="M228,197 L220,205 M236,197 L244,203" stroke="#160a16" stroke-width="2.5" stroke-linecap="round"/></svg>`,
-  o:[["Finally. And then, right away: now what?",{per:3}],["I wish someone were here to see it.",{uns:2,lea:1}],["It's beautiful and I can't feel it.",{wat:3}],["I don't belong up here.",{fla:3}]]},
- mask:{ title:'The mask on the hook', caption:'Hanging by the door. Where it always is.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A pale mask hanging from a hook on a dark wall beside a door, lit softly from the left."><defs>
-   <radialGradient id="wallF" cx=".15" cy=".2" r="1"><stop offset="0" stop-color="#2a241d"/><stop offset="1" stop-color="#0d0b09"/></radialGradient>
-   <linearGradient id="maskF" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f1e6cf"/><stop offset="1" stop-color="#bfae8f"/></linearGradient></defs>
-   <rect width="400" height="300" fill="url(#wallF)"/>
-   <rect x="330" y="0" width="70" height="300" fill="#080706"/><rect x="328" y="0" width="3" height="300" fill="#3a3024"/>
+ window:{ title:'The lit window', caption:'Everyone is inside.',
+  svg:()=>svg('A violet night, aurora in the sky, a house with one warm window, a small figure outside on the road.',`<defs>
+   <linearGradient id="skA" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a0520"/><stop offset=".7" stop-color="#1e1250"/><stop offset="1" stop-color="#2a1a5c"/></linearGradient>
+   <linearGradient id="auA" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2fd3c0" stop-opacity="0"/><stop offset=".5" stop-color="#2fd3c0" stop-opacity=".35"/><stop offset="1" stop-color="#b35cff" stop-opacity="0"/></linearGradient>
+   <radialGradient id="glA"><stop offset="0" stop-color="#ffc46b" stop-opacity=".9"/><stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/></radialGradient>
+   ${fx('fA',.012,14,22)}${grainDef('gA')}${vignette('vA')}</defs>
+   <rect width="400" height="300" fill="url(#skA)"/>${stars(80)}
+   <g filter="url(#fA)"><path d="M-20,120 C80,60 160,150 260,90 S380,70 420,110 L420,160 C320,130 240,200 140,150 S20,170 -20,150Z" fill="url(#auA)">${anim('opacity','.5;1;.5',11)}</path></g>
+   <rect y="232" width="400" height="68" fill="#06040f"/>
+   <path d="M110,232 V128 L200,66 L290,128 V232 Z" fill="#0a0716"/><path d="M98,132 L200,60 L302,132" stroke="#3a2a6e" stroke-width="2" fill="none"/>
+   <ellipse cx="200" cy="236" rx="120" ry="16" fill="#ff9a3c" opacity=".09"/>
+   <circle cx="200" cy="172" r="84" fill="url(#glA)" opacity=".55">${anim('r','80;92;80',6)}</circle>
+   <rect x="180" y="150" width="40" height="44" rx="2" fill="#ffcb7a"/><path d="M200,150 V194 M180,172 H220" stroke="#0a0716" stroke-width="3"/>
+   <circle cx="195" cy="169" r="5.5" fill="#0a0716"/><rect x="187" y="176" width="16" height="18" rx="5" fill="#0a0716"/>
+   <circle cx="58" cy="203" r="7" fill="#120d24" stroke="#4a3a86" stroke-width="1"/><rect x="48" y="212" width="20" height="36" rx="7" fill="#120d24" stroke="#4a3a86" stroke-width="1"/>
+   <ellipse cx="58" cy="250" rx="16" ry="3" fill="#000" opacity=".6"/>
+   ${motes(14,'#bfe8ff',0,400,120,290)}<rect width="400" height="300" fill="url(#vA)"/>${grainRect('gA')}`),
+  o:[["Let me in.",{uns:2,for:1}],["I'll stay out here.",{wat:2,for:1}],["Come get me.",{uns:1,lea:1,kee:1}]]},
+ table:{ title:'The long table', caption:'Everyone came.',
+  svg:()=>svg('A candlelit table full of people, deep wine light, one figure apart at the near end.',`<defs>
+   <radialGradient id="rmB" cx=".5" cy=".4" r=".8"><stop offset="0" stop-color="#4a1030"/><stop offset=".6" stop-color="#1c0614"/><stop offset="1" stop-color="#07020a"/></radialGradient>
+   <radialGradient id="cdB"><stop offset="0" stop-color="#ffd27a" stop-opacity=".95"/><stop offset=".5" stop-color="#ff7a3c" stop-opacity=".35"/><stop offset="1" stop-color="#ff3c8c" stop-opacity="0"/></radialGradient>
+   ${fx('fB',.02,6,9)}${grainDef('gB')}${vignette('vB')}</defs>
+   <rect width="400" height="300" fill="url(#rmB)"/>
+   <g filter="url(#fB)"><circle cx="150" cy="168" r="70" fill="url(#cdB)" opacity=".7">${anim('r','64;76;64',4.2)}</circle><circle cx="250" cy="172" r="70" fill="url(#cdB)" opacity=".7">${anim('r','76;64;76',5.1)}</circle></g>
+   <polygon points="30,215 370,215 320,150 80,150" fill="#3a1424"/><polygon points="30,215 370,215 370,222 30,222" fill="#220b16"/>
+   <rect x="148" y="150" width="4" height="22" fill="#f1dcc3"/><circle cx="150" cy="146" r="3.5" fill="#fff0b0">${anim('r','3;4.2;3',.9)}</circle>
+   <rect x="248" y="155" width="4" height="22" fill="#f1dcc3"/><circle cx="250" cy="151" r="3.5" fill="#fff0b0">${anim('r','4;3;4',1.1)}</circle>
+   ${[[112,118,-8],[146,112,6],[182,120,-4],[216,114,8],[252,120,-6],[288,116,5]].map(([x,y,t])=>`<g transform="rotate(${t} ${x} ${y})"><circle cx="${x}" cy="${y}" r="11" fill="#140410" stroke="#ff7ab0" stroke-opacity=".55" stroke-width="1"/><rect x="${x-16}" y="${y+12}" width="32" height="30" rx="10" fill="#140410" stroke="#ff7ab0" stroke-opacity=".45" stroke-width="1"/></g>`).join('')}
+   <circle cx="62" cy="208" r="16" fill="#07020a" stroke="#5b2a4a" stroke-width="1"/><rect x="38" y="226" width="48" height="60" rx="14" fill="#07020a" stroke="#5b2a4a" stroke-width="1"/>
+   ${motes(10,'#ffd27a',90,310,60,200)}<rect width="400" height="300" fill="url(#vB)"/>${grainRect('gB')}`),
+  o:[["That's me at the end.",{uns:3}],["I'd be feeding everyone.",{kee:3}],["I'd leave early.",{lea:2,for:1}]]},
+ hands:{ title:'The reach', caption:'Almost.',
+  svg:()=>svg('Two arms reaching across a nebula of violet and teal, a pulsing sliver of light between the fingertips.',`<defs>
+   <radialGradient id="n1C" cx=".3" cy=".3" r=".6"><stop offset="0" stop-color="#b35cff" stop-opacity=".45"/><stop offset="1" stop-color="#b35cff" stop-opacity="0"/></radialGradient>
+   <radialGradient id="n2C" cx=".75" cy=".7" r=".6"><stop offset="0" stop-color="#2fd3c0" stop-opacity=".35"/><stop offset="1" stop-color="#2fd3c0" stop-opacity="0"/></radialGradient>
+   <radialGradient id="ltC"><stop offset="0" stop-color="#fff2cc"/><stop offset=".35" stop-color="#ffc46b" stop-opacity=".6"/><stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/></radialGradient>
+   ${fx('fC',.008,22,26)}${grainDef('gC')}${vignette('vC')}</defs>
+   <rect width="400" height="300" fill="#05040d"/>
+   <g filter="url(#fC)"><rect width="400" height="300" fill="url(#n1C)"/><rect width="400" height="300" fill="url(#n2C)"/></g>${stars(40)}
+   <ellipse cx="200" cy="150" rx="80" ry="120" fill="url(#ltC)" opacity=".3">${anim('opacity','.2;.45;.2',5)}</ellipse>
+   <path d="M0,214 C70,206 120,184 158,166 Q180,156 186,163 Q190,171 176,176 L0,226 Z" fill="#161327"/><path d="M0,214 C70,206 120,184 158,166" stroke="#5b3fa0" stroke-width="1" fill="none"/>
+   <path d="M400,86 C330,94 280,116 242,134 Q220,144 214,137 Q210,129 224,124 L400,74 Z" fill="#161327"/><path d="M400,86 C330,94 280,116 242,134" stroke="#2fd3c0" stroke-opacity=".7" stroke-width="1" fill="none"/>
+   <ellipse cx="200" cy="150" rx="4" ry="24" fill="#fff2cc">${anim('ry','18;30;18',2.6)}</ellipse><ellipse cx="200" cy="150" rx="14" ry="44" fill="url(#ltC)" opacity=".9">${anim('rx','10;18;10',2.6)}</ellipse>
+   ${motes(18,'#dcd0ff',120,280,60,240)}<rect width="400" height="300" fill="url(#vC)"/>${grainRect('gC')}`),
+  o:[["Reach.",{kee:1,uns:1,lea:1}],["Pull back.",{for:3}],["Nothing.",{wat:3}]]},
+ door:{ title:'The door, ajar', caption:'A child’s room. Light from the hall.',
+  svg:()=>svg('A dark teal bedroom, a small figure in bed, a door open a crack with gold light and dust drifting in it.',`<defs>
+   <linearGradient id="wgD" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffd27a" stop-opacity="0"/><stop offset="1" stop-color="#ffd27a" stop-opacity=".4"/></linearGradient>
+   <radialGradient id="glD"><stop offset="0" stop-color="#ffd27a" stop-opacity=".7"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient>
+   <linearGradient id="rmD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#02070c"/><stop offset="1" stop-color="#062028"/></linearGradient>
+   ${grainDef('gD')}${vignette('vD')}</defs>
+   <rect width="400" height="300" fill="url(#rmD)"/><rect y="222" width="400" height="78" fill="#041419"/>
+   <polygon points="296,222 304,222 240,300 120,300" fill="url(#wgD)">${anim('opacity','.8;1;.8',6)}</polygon>
+   <rect x="300" y="36" width="76" height="186" fill="#06111a" stroke="#1c3a46" stroke-width="1.5"/>
+   <ellipse cx="300" cy="130" rx="46" ry="120" fill="url(#glD)" opacity=".55">${anim('rx','40;52;40',6)}</ellipse>
+   <rect x="295" y="36" width="7" height="186" fill="#ffd27a"/>
+   <rect x="40" y="166" width="180" height="58" rx="6" fill="#0a1f2a"/><rect x="48" y="156" width="40" height="18" rx="5" fill="#123340"/>
+   <ellipse cx="140" cy="180" rx="52" ry="14" fill="#10303d"/><circle cx="92" cy="176" r="9" fill="#123340"/>
+   ${motes(22,'#ffe3a8',200,310,120,290)}<rect width="400" height="300" fill="url(#vD)"/>${grainRect('gD')}`),
+  o:[["Someone's coming.",{uns:1,kee:1}],["No one's coming. That's fine.",{uns:3}],["I'd pretend to sleep.",{for:2,wat:1}]]},
+ summit:{ title:'The summit', caption:'You made it.',
+  svg:()=>svg('A tiny figure on a peak before an enormous sun ringed with slowly turning halos, violet to gold sky.',`<defs>
+   <linearGradient id="skE" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b0f4d"/><stop offset=".5" stop-color="#c8456b"/><stop offset=".8" stop-color="#f08a4b"/><stop offset="1" stop-color="#ffd27a"/></linearGradient>
+   <radialGradient id="snE"><stop offset="0" stop-color="#fff6d8"/><stop offset=".45" stop-color="#ffd98a" stop-opacity=".9"/><stop offset="1" stop-color="#ff7a5c" stop-opacity="0"/></radialGradient>
+   ${grainDef('gE')}${vignette('vE')}</defs>
+   <rect width="400" height="300" fill="url(#skE)"/>
+   <circle cx="200" cy="200" r="160" fill="url(#snE)" opacity=".75">${anim('r','150;170;150',7)}</circle>
+   <g fill="none" stroke="#fff1c4" stroke-opacity=".35"><circle cx="200" cy="200" r="100" stroke-dasharray="3 9">${RM?'':'<animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="90s" repeatCount="indefinite"/>'}</circle><circle cx="200" cy="200" r="124" stroke-dasharray="1 14" stroke-opacity=".25">${RM?'':'<animateTransform attributeName="transform" type="rotate" from="360 200 200" to="0 200 200" dur="140s" repeatCount="indefinite"/>'}</circle><circle cx="200" cy="200" r="84" stroke-opacity=".2"/></g>
+   <circle cx="200" cy="200" r="70" fill="#fff0c0"/>
+   <polygon points="0,300 0,236 60,196 130,232 200,176 262,224 330,184 400,230 400,300" fill="#5a1f48" opacity=".85"/>
+   <polygon points="0,300 0,268 90,214 160,252 232,204 300,248 400,224 400,300" fill="#230b24"/>
+   <circle cx="232" cy="190" r="4.5" fill="#120514"/><rect x="228" y="195" width="8" height="14" rx="3" fill="#120514"/><path d="M228,197 L220,205 M236,197 L244,203" stroke="#120514" stroke-width="2.5" stroke-linecap="round"/>
+   ${motes(12,'#fff6d8',60,340,40,200)}<rect width="400" height="300" fill="url(#vE)"/>${grainRect('gE')}`),
+  o:[["Now what?",{per:3}],["I wish someone saw this.",{uns:2,lea:1}],["I can't feel it.",{wat:2,fla:1}]]},
+ mask:{ title:'The mask', caption:'By the door. Where it always is.',
+  svg:()=>svg('A pale mask hanging on a breathing dark wall, casting two shadows, beside a door edge.',`<defs>
+   <radialGradient id="wlF" cx=".15" cy=".2" r="1"><stop offset="0" stop-color="#3a2340"/><stop offset=".6" stop-color="#140c18"/><stop offset="1" stop-color="#070409"/></radialGradient>
+   <linearGradient id="mkF" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f5ead3"/><stop offset="1" stop-color="#b9a88c"/></linearGradient>
+   ${fx('fF',.01,10,18)}${grainDef('gF')}${vignette('vF')}</defs>
+   <rect width="400" height="300" fill="url(#wlF)"/>
+   <g filter="url(#fF)"><rect width="400" height="300" fill="#b35cff" opacity=".07"/></g>
+   <rect x="330" y="0" width="70" height="300" fill="#060407"/><rect x="328" y="0" width="3" height="300" fill="#5b3fa0"/>
    <path d="M196,52 q4,-8 8,0 v10 h-8z" fill="#8a7a62"/><path d="M200,62 v34" stroke="#a89a80" stroke-width="1.2"/>
-   <ellipse cx="206" cy="162" rx="50" ry="64" fill="#000" opacity=".45"/>
-   <ellipse cx="200" cy="156" rx="48" ry="62" fill="url(#maskF)"/>
+   <ellipse cx="214" cy="166" rx="50" ry="64" fill="#2fd3c0" opacity=".12"/><ellipse cx="190" cy="164" rx="50" ry="64" fill="#b35cff" opacity=".14"/>
+   <g>${RM?'':'<animateTransform attributeName="transform" type="rotate" values="-1.5 200 96;1.5 200 96;-1.5 200 96" dur="7s" repeatCount="indefinite"/>'}<ellipse cx="200" cy="156" rx="48" ry="62" fill="url(#mkF)"/>
    <ellipse cx="182" cy="142" rx="10" ry="6" fill="#0d0b09"/><ellipse cx="218" cy="142" rx="10" ry="6" fill="#0d0b09"/>
    <path d="M182,186 q18,10 36,0" stroke="#5a4b36" stroke-width="2" fill="none" stroke-linecap="round"/>
-   <path d="M160,120 q8,-30 40,-36" stroke="#fff" stroke-width="2" opacity=".35" fill="none" stroke-linecap="round"/></svg>`,
-  o:[["I put it on every morning.",{cha:3}],["Without it, I'm not enough.",{fla:2,per:1}],["I don't remember what's under it.",{wat:2,cha:1}],["People only like the mask.",{cha:2,fla:1}]]},
- field:{ title:'The field', caption:'Late light. Tall grass. Nowhere to be.',
-  svg:()=>`<svg viewBox="0 0 400 300" role="img" aria-label="A figure lying in tall golden grass at sunset, seeds drifting in the air."><defs>
-   <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6c98f"/><stop offset=".6" stop-color="#ec9a5b"/><stop offset="1" stop-color="#c9823f"/></linearGradient>
-   <radialGradient id="sunG"><stop offset="0" stop-color="#fff6d8"/><stop offset="1" stop-color="#ffd38a" stop-opacity="0"/></radialGradient></defs>
-   <rect width="400" height="300" fill="url(#skyG)"/><circle cx="300" cy="120" r="90" fill="url(#sunG)" opacity=".8"/><circle cx="300" cy="120" r="34" fill="#fff6d8"/>
+   <path d="M160,120 q8,-30 40,-36" stroke="#fff" stroke-width="2" opacity=".35" fill="none" stroke-linecap="round"/></g>
+   <rect width="400" height="300" fill="url(#vF)"/>${grainRect('gF')}`),
+  o:[["I wear it every day.",{cha:3}],["Without it I'm not enough.",{fla:2,per:1}],["I forget what's under it.",{wat:2,cha:1}]]},
+ field:{ title:'The field', caption:'Nowhere to be.',
+  svg:()=>svg('A figure lying in tall gold grass under a huge soft sun, seeds rising into the light.',`<defs>
+   <linearGradient id="skG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7c98f"/><stop offset=".55" stop-color="#ef8f5a"/><stop offset="1" stop-color="#c56f3f"/></linearGradient>
+   <radialGradient id="snG"><stop offset="0" stop-color="#fff8e0"/><stop offset="1" stop-color="#ffd38a" stop-opacity="0"/></radialGradient>
+   ${fx('fG',.015,6,7)}${grainDef('gG')}${vignette('vG')}</defs>
+   <rect width="400" height="300" fill="url(#skG)"/><circle cx="300" cy="120" r="110" fill="url(#snG)" opacity=".85">${anim('r','100;120;100',8)}</circle><circle cx="300" cy="120" r="36" fill="#fff8e0"/>
    <rect y="180" width="400" height="120" fill="#6a5524"/>
    <ellipse cx="190" cy="226" rx="74" ry="16" fill="#2b2210"/><circle cx="120" cy="222" r="12" fill="#2b2210"/>
-   ${grass()}${seeds()}</svg>`,
-  o:[["I'd feel guilty just lying there.",{kee:2,per:1}],["This is what I want and don't let myself have.",{per:2,kee:1}],["I'd be waiting for it to end.",{lea:2,wat:1}],["I'd be fully here. That's rare for me.",{uns:1,wat:1}]]}
+   <g filter="url(#fG)">${grass()}</g>${motes(34,'#fff8e0',0,400,30,260)}
+   <rect width="400" height="300" fill="url(#vG)"/>${grainRect('gG')}`),
+  o:[["I'd feel guilty.",{kee:2,per:1}],["I'd be waiting for it to end.",{lea:2,wat:1}],["I'd be here. That's rare.",{uns:1,wat:1}]]}
 };
 
-/* ---------- SOUND STATIONS ---------- */
+/* ---------- SOUNDS ---------- */
 const SND = {
- rain:{ title:'Rain on the window', sub:'Filtered noise, slow gusts, the occasional drip.', prompt:'Where does this land in you?',
-  o:[["Cozy, and then lonely. In that order.",{uns:2,for:1}],["Like the world giving me permission to stop.",{per:2,kee:1}],["Like I'm the only one awake.",{wat:1,lea:1,for:1}],["Nothing. It's just rain.",{wat:2,for:1}]]},
- room:{ title:'The music in another room', sub:'Muffled chords through a wall. Voices you can’t make out.', prompt:'Where are you, in this?',
-  o:[["In bed as a kid, while the adults laughed downstairs.",{uns:2,for:1}],["I should be in there, making sure it's going well.",{kee:3}],["I was in there an hour ago, performing. Now I'm out here.",{cha:2,wat:1}],["Outside. I'm always just outside.",{fla:2,lea:1}]]},
- heart:{ title:'Heartbeat, underwater', sub:'A slow pulse under the swell of the sea.', prompt:'What does your body say?',
-  o:[["Held. For once.",{uns:2,kee:1}],["Trapped. I want up.",{for:2,wat:1}],["Like the inside of me, before I learned to hide it.",{for:1,fla:1,wat:1}],["Like the only thing I can trust is my own pulse.",{lea:2,for:1}]]},
- note:{ title:'One note, repeating', sub:'A single tone in a large empty space.', prompt:'What is it saying?',
-  o:[["It's waiting for someone who isn't coming.",{lea:2,uns:1}],["It's me. Doing the thing again, hoping it adds up.",{per:3}],["It's peaceful. I like the emptiness.",{wat:2}],["It's asking something I don't know how to answer.",{uns:2,fla:1}]]},
- dawn:{ title:'Dawn', sub:'A chord that keeps rising. Birds. A bell.', prompt:'If this were a feeling, it would be…',
-  o:[["Like I could cry, and I'm not sure why.",{uns:2,wat:1}],["Like something I'm not allowed to have.",{fla:2,per:1}],["Like I want to call someone, and can't think who.",{uns:1,lea:1,for:1}],["Like I'm supposed to go do something with it. Immediately.",{per:2,kee:1}]]}
+ rain:{ title:'Rain on the window', sub:'Gusts, drips, far thunder.', prompt:'Where does it land?',
+  o:[["Cozy, then lonely.",{uns:2,for:1}],["Permission to stop.",{per:2,kee:1}],["Nothing. It's rain.",{wat:2,for:1}]]},
+ room:{ title:'Music in another room', sub:'A party through the wall. A clock in here.', prompt:'Where are you?',
+  o:[["In bed, as a kid.",{uns:2,for:1}],["I should be in there helping.",{kee:3}],["Outside. Always outside.",{fla:2,lea:1}]]},
+ heart:{ title:'Heartbeat, underwater', sub:'A slow pulse under the swell.', prompt:'Your body says…',
+  o:[["Held.",{uns:2,kee:1}],["Trapped.",{for:2,wat:1}],["Only this is mine.",{lea:2,for:1}]]},
+ note:{ title:'One note, repeating', sub:'A single tone in an empty hall.', prompt:'It is…',
+  o:[["Waiting for someone.",{lea:2,uns:1}],["Me. Trying again.",{per:3}],["Asking something I can't answer.",{uns:2,fla:1}]]},
+ dawn:{ title:'Dawn', sub:'A chord that keeps rising.', prompt:'If this were a feeling…',
+  o:[["I could cry.",{uns:2,wat:1}],["Not mine to have.",{fla:2,per:1}],["I should go do something with it.",{per:2,kee:1}]]}
 };
 
-/* Web Audio engine: everything is synthesized, nothing is loaded. */
+/* Web Audio engine. Everything synthesized. Headphone-first: a wide stereo field, a long hall, and a faint binaural pulse (theta, ~5 Hz) under every piece. */
 const Audio = (()=>{
-  let ctx, master, analyser, live=null;
+  let ctx, master, analyser, hall, hallSend, live=null;
   function ensure(){
     if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=0;
-      analyser=ctx.createAnalyser(); analyser.fftSize=128; master.connect(analyser); analyser.connect(ctx.destination); }
-    if(ctx.state==='suspended') ctx.resume();
-    return ctx;
-  }
-  function noise(kind){ const len=ctx.sampleRate*4, buf=ctx.createBuffer(1,len,ctx.sampleRate), d=buf.getChannelData(0); let b0=0,b1=0,b2=0;
-    for(let i=0;i<len;i++){ const w=Math.random()*2-1; if(kind==='pink'){ b0=0.99765*b0+w*0.0990460; b1=0.96300*b1+w*0.2965164; b2=0.57000*b2+w*1.0526913; d[i]=(b0+b1+b2+w*0.1848)*0.12; } else d[i]=w*0.3; }
-    const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; return s; }
-  function env(g,t,peak,att,dec){ g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(0.0001,t); g.gain.linearRampToValueAtTime(peak,t+att); g.gain.exponentialRampToValueAtTime(0.0001,t+att+dec); }
-  function tone(freq,type,peak,att,dec,out,t){ const o=ctx.createOscillator(), g=ctx.createGain(); o.type=type; o.frequency.value=freq; env(g,t,peak,att,dec); o.connect(g).connect(out); o.start(t); o.stop(t+att+dec+.05); return o; }
-  function reverb(seconds,decay){ const len=ctx.sampleRate*seconds, buf=ctx.createBuffer(2,len,ctx.sampleRate); for(let c=0;c<2;c++){ const d=buf.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay); } const cv=ctx.createConvolver(); cv.buffer=buf; return cv; }
+      analyser=ctx.createAnalyser(); analyser.fftSize=128; analyser.smoothingTimeConstant=.85;
+      hall=reverb(4.5,2.2); hallSend=ctx.createGain(); hallSend.gain.value=.5; hallSend.connect(hall); hall.connect(master);
+      master.connect(analyser); analyser.connect(ctx.destination); }
+    if(ctx.state==='suspended') ctx.resume(); return ctx; }
+  function reverb(sec,decay){ const len=ctx.sampleRate*sec, buf=ctx.createBuffer(2,len,ctx.sampleRate); for(let c=0;c<2;c++){ const d=buf.getChannelData(c); for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,decay)*(c?1:.9); } const cv=ctx.createConvolver(); cv.buffer=buf; return cv; }
+  function noise(kind){ const len=ctx.sampleRate*5, buf=ctx.createBuffer(2,len,ctx.sampleRate); for(let c=0;c<2;c++){ const d=buf.getChannelData(c); let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0; for(let i=0;i<len;i++){ const w=Math.random()*2-1; if(kind==='pink'){ b0=.99886*b0+w*.0555179; b1=.99332*b1+w*.0750759; b2=.969*b2+w*.153852; b3=.8665*b3+w*.3104856; b4=.55*b4+w*.5329522; b5=-.7616*b5-w*.016898; d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.09; b6=w*.115926; } else d[i]=w*.3; } } const s=ctx.createBufferSource(); s.buffer=buf; s.loop=true; return s; }
+  function env(g,t,peak,att,dec){ g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(.0001,t); g.gain.linearRampToValueAtTime(peak,t+att); g.gain.exponentialRampToValueAtTime(.0001,t+att+dec); }
+  function pan(node,p){ const sp=ctx.createStereoPanner(); sp.pan.value=p; node.connect(sp); return sp; }
+  function tone(freq,type,peak,att,dec,out,t,p=0){ const o=ctx.createOscillator(), g=ctx.createGain(); o.type=type; o.frequency.value=freq; env(g,t,peak,att,dec); o.connect(g); pan(g,p).connect(out); o.start(t); o.stop(t+att+dec+.05); }
+  /* a struck string: partials with inharmonicity, each decaying at its own rate */
+  function string(f0,peak,out,t,p=0,dec=3.2){ const parts=[1,2.01,3.02,4.05,5.1,6.2]; parts.forEach((r,i)=>{ const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=f0*r; const pk=peak*Math.pow(.5,i); env(g,t,pk,.006+i*.002,dec/(1+i*.45)); o.connect(g); pan(g,p).connect(out); o.start(t); o.stop(t+dec+.2); }); }
+  function binaural(out,base,beat,level){ const l=ctx.createOscillator(), r=ctx.createOscillator(), m=ctx.createChannelMerger(2), g=ctx.createGain(); l.frequency.value=base; r.frequency.value=base+beat; g.gain.value=level; l.connect(m,0,0); r.connect(m,0,1); m.connect(g).connect(out); l.start(); r.start(); return ()=>{ l.stop(); r.stop(); }; }
+  function breathLFO(target,base,depth,period){ const o=ctx.createOscillator(), g=ctx.createGain(); o.frequency.value=1/period; g.gain.value=depth; target.value=base; o.connect(g).connect(target); o.start(); return o; }
 
   const scapes={
-    rain(out){ const n=noise('pink'), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1500; const g=ctx.createGain(); g.gain.value=.7;
-      const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=.07; lg.gain.value=.25; lfo.connect(lg).connect(g.gain);
-      n.connect(lp).connect(g).connect(out); n.start(); lfo.start();
-      const t=setInterval(()=>{ tone(1600+Math.random()*1800,'sine',.05,.004,.12,out,ctx.currentTime); },260+Math.random()*600);
-      const t2=setInterval(()=>{ tone(600+Math.random()*300,'triangle',.02,.01,.4,out,ctx.currentTime); },1800+Math.random()*2600);
-      return ()=>{ clearInterval(t); clearInterval(t2); n.stop(); lfo.stop(); }; },
-    room(out){ const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; lp.Q.value=.7; const g=ctx.createGain(); g.gain.value=.22; lp.connect(g).connect(out);
-      const chords=[[220,261.6,329.6],[174.6,220,261.6],[130.8,164.8,196],[196,246.9,293.7]]; let i=0;
-      function play(){ const t=ctx.currentTime; chords[i%4].forEach(f=>{ const o=ctx.createOscillator(), og=ctx.createGain(); o.type='triangle'; o.frequency.value=f; o.detune.value=(Math.random()-.5)*8;
-        og.gain.setValueAtTime(0,t); og.gain.linearRampToValueAtTime(.5,t+.9); og.gain.setValueAtTime(.5,t+2.3); og.gain.linearRampToValueAtTime(0,t+3.4); o.connect(og).connect(lp); o.start(t); o.stop(t+3.5); }); i++; }
-      play(); const t=setInterval(play,3400);
-      const m=noise('pink'), bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=330; bp.Q.value=1.2; const mg=ctx.createGain(); mg.gain.value=.35;
-      const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.type='sine'; lfo.frequency.value=.9; lg.gain.value=.18; lfo.connect(lg).connect(mg.gain);
-      m.connect(bp).connect(mg).connect(out); m.start(); lfo.start();
-      return ()=>{ clearInterval(t); m.stop(); lfo.stop(); }; },
-    heart(out){ const sea=noise('pink'), lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=420; const lfo=ctx.createOscillator(), lg=ctx.createGain(); lfo.frequency.value=.11; lg.gain.value=300; lfo.connect(lg).connect(lp.frequency);
-      const sg=ctx.createGain(); sg.gain.value=.55; sea.connect(lp).connect(sg).connect(out); sea.start(); lfo.start();
-      const t=setInterval(()=>{ const now=ctx.currentTime; tone(52,'sine',.9,.012,.16,out,now); tone(48,'sine',.6,.012,.14,out,now+.2); },900);
-      return ()=>{ clearInterval(t); sea.stop(); lfo.stop(); }; },
-    note(out){ const rv=reverb(3.2,3), rg=ctx.createGain(); rg.gain.value=.9; rv.connect(rg).connect(out); const dry=ctx.createGain(); dry.gain.value=.35; dry.connect(out);
-      let n=0; function hit(){ const t=ctx.currentTime; const o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.value=440; env(g,t,.5,.015,2.2); o.connect(g); g.connect(rv); g.connect(dry); o.start(t); o.stop(t+2.4);
-        if(n>=8 && n%2===0){ const o2=ctx.createOscillator(), g2=ctx.createGain(); o2.type='sine'; o2.frequency.value=329.6; env(g2,t+1.1,.22,.02,2.2); o2.connect(g2); g2.connect(rv); o2.start(t+1.1); o2.stop(t+3.5); } n++; }
-      hit(); const t=setInterval(hit,2400); return ()=>{ clearInterval(t); }; },
-    dawn(out){ const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800; const pad=ctx.createGain(); pad.gain.setValueAtTime(0,ctx.currentTime); pad.gain.linearRampToValueAtTime(.16,ctx.currentTime+16); lp.connect(pad).connect(out);
-      const oscs=[]; [146.8,220,370,587.3].forEach(f=>{ [0,4].forEach(dt=>{ const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=f; o.detune.value=dt; const vg=ctx.createGain(); vg.gain.value=.5; const v=ctx.createOscillator(), vgn=ctx.createGain(); v.frequency.value=.15+Math.random()*.2; vgn.gain.value=2; v.connect(vgn).connect(o.detune); o.connect(vg).connect(lp); o.start(); v.start(); oscs.push(o,v); }); });
-      const rv=reverb(2.5,2.5), rg=ctx.createGain(); rg.gain.value=.6; rv.connect(rg).connect(out);
-      const bells=setInterval(()=>{ tone([1174.7,1480,1760][Math.floor(Math.random()*3)],'sine',.08,.01,2.4,rv,ctx.currentTime); },4200+Math.random()*2500);
-      const birds=setInterval(()=>{ const t=ctx.currentTime, o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(2300,t); o.frequency.exponentialRampToValueAtTime(3600,t+.07); o.frequency.exponentialRampToValueAtTime(2700,t+.16); env(g,t,.035,.01,.18); o.connect(g).connect(rv); o.start(t); o.stop(t+.25);
-        setTimeout(()=>{ const t2=ctx.currentTime, o2=ctx.createOscillator(), g2=ctx.createGain(); o2.type='sine'; o2.frequency.setValueAtTime(2800,t2); o2.frequency.exponentialRampToValueAtTime(3900,t2+.06); env(g2,t2,.03,.01,.14); o2.connect(g2).connect(rv); o2.start(t2); o2.stop(t2+.2); },220); },1800+Math.random()*2600);
-      return ()=>{ clearInterval(bells); clearInterval(birds); oscs.forEach(o=>{ try{o.stop()}catch(e){} }); }; }
+    rain(out){ const T=[]; const n=noise('pink'), lp=ctx.createBiquadFilter(); lp.type='lowpass'; const g=ctx.createGain(); g.gain.value=.6;
+      n.connect(lp).connect(g).connect(out); n.start(); T.push(breathLFO(lp.frequency,1300,500,9)); T.push(breathLFO(g.gain,.55,.18,13));
+      const gs=ctx.createGain(); gs.gain.value=.5; g.connect(gs).connect(hallSend);
+      const d1=setInterval(()=>tone(R(1400,3400),'sine',.045,.004,.14,out,ctx.currentTime,R(-.9,.9)),220+R(0,500));
+      const d2=setInterval(()=>tone(R(500,900),'triangle',.02,.01,.5,hallSend,ctx.currentTime,R(-.6,.6)),1600+R(0,2500));
+      const th=setInterval(()=>{ const b=noise('white'), f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=90; const bg=ctx.createGain(); env(bg,ctx.currentTime,.9,.6,5); b.connect(f).connect(bg); pan(bg,R(-.7,.7)).connect(hallSend); bg.connect(out); b.start(); b.stop(ctx.currentTime+6.5); },14000+R(0,16000));
+      const bn=binaural(out,90,5,.018);
+      return ()=>{ [d1,d2,th].forEach(clearInterval); n.stop(); T.forEach(o=>o.stop()); bn(); }; },
+    room(out){ const T=[]; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=360; lp.Q.value=.8; const g=ctx.createGain(); g.gain.value=.26; lp.connect(g); pan(g,-.55).connect(out); g.connect(hallSend);
+      const prog=[[220,261.6,329.6,392],[174.6,220,261.6,349.2],[130.8,164.8,196,261.6],[196,246.9,293.7,392]]; let i=0;
+      function play(){ const t=ctx.currentTime; prog[i%4].forEach((f,k)=>{ const o=ctx.createOscillator(), og=ctx.createGain(); o.type=k<2?'sawtooth':'triangle'; o.frequency.value=f; o.detune.value=R(-7,7); og.gain.setValueAtTime(0,t); og.gain.linearRampToValueAtTime(.35,t+1.1); og.gain.setValueAtTime(.35,t+2.6); og.gain.linearRampToValueAtTime(0,t+3.7); o.connect(og).connect(lp); o.start(t); o.stop(t+3.8); }); if(i%2===1){ for(let k=0;k<4;k++){ tone(prog[i%4][0]/2,'sine',.5,.01,.18,lp,t+k*.95); } } i++; }
+      play(); const pt=setInterval(play,3800);
+      const m=noise('pink'), bp=ctx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=320; bp.Q.value=1.4; const mg=ctx.createGain(); m.connect(bp).connect(mg); pan(mg,-.4).connect(out); m.start(); T.push(breathLFO(mg.gain,.28,.14,1.7));
+      const tick=setInterval(()=>{ const b=noise('white'), f=ctx.createBiquadFilter(); f.type='highpass'; f.frequency.value=2500; const bg=ctx.createGain(); env(bg,ctx.currentTime,.12,.002,.03); b.connect(f).connect(bg); pan(bg,.75).connect(out); b.start(); b.stop(ctx.currentTime+.06); },1000);
+      const bn=binaural(out,100,4.5,.016);
+      return ()=>{ clearInterval(pt); clearInterval(tick); m.stop(); T.forEach(o=>o.stop()); bn(); }; },
+    heart(out){ const T=[]; const sea=noise('pink'), lp=ctx.createBiquadFilter(); lp.type='lowpass'; const sg=ctx.createGain(); sg.gain.value=.5; sea.connect(lp).connect(sg).connect(out); sea.start(); T.push(breathLFO(lp.frequency,420,300,9)); T.push(breathLFO(sg.gain,.45,.2,9));
+      const sw=ctx.createGain(); sw.gain.value=.35; sg.connect(sw).connect(hallSend);
+      const hb=setInterval(()=>{ const t=ctx.currentTime; tone(50,'sine',1,.012,.17,out,t); tone(46,'sine',.65,.012,.15,out,t+.21); const k=ctx.createOscillator(), kg=ctx.createGain(); k.frequency.setValueAtTime(120,t); k.frequency.exponentialRampToValueAtTime(40,t+.1); env(kg,t,.35,.004,.12); k.connect(kg).connect(out); k.start(t); k.stop(t+.2); },1000);
+      const bn=binaural(out,80,6,.02);
+      return ()=>{ clearInterval(hb); sea.stop(); T.forEach(o=>o.stop()); bn(); }; },
+    note(out){ let n=0; const dry=ctx.createGain(); dry.gain.value=.4; dry.connect(out); const wet=ctx.createGain(); wet.gain.value=1.4; wet.connect(hallSend);
+      function hit(){ const t=ctx.currentTime; string(440,.55,dry,t,-.15,3.6); string(440,.55,wet,t,-.15,3.6); if(n>=7 && n%2===0){ string(329.6,.28,wet,t+1.2,.35,3.2); string(329.6,.2,dry,t+1.2,.35,3.2); } if(n>=14 && n%4===1){ string(220,.3,wet,t+.6,.1,4); } n++; }
+      hit(); const h=setInterval(hit,2600); const bn=binaural(out,110,5,.02);
+      return ()=>{ clearInterval(h); bn(); }; },
+    dawn(out){ const T=[]; const lp=ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.setValueAtTime(500,ctx.currentTime); lp.frequency.linearRampToValueAtTime(3200,ctx.currentTime+26);
+      const pad=ctx.createGain(); pad.gain.setValueAtTime(0,ctx.currentTime); pad.gain.linearRampToValueAtTime(.14,ctx.currentTime+18); lp.connect(pad).connect(out); const ps=ctx.createGain(); ps.gain.value=.9; pad.connect(ps).connect(hallSend);
+      const oscs=[]; [146.8,220,293.7,370,440,587.3].forEach((f,i)=>{ [-6,6].forEach((dt,s)=>{ const o=ctx.createOscillator(); o.type=i<2?'triangle':'sine'; o.frequency.value=f; o.detune.value=dt; const vg=ctx.createGain(); vg.gain.value=.35/(1+i*.25); const v=ctx.createOscillator(), vgn=ctx.createGain(); v.frequency.value=R(.08,.25); vgn.gain.value=3; v.connect(vgn).connect(o.detune); o.connect(vg); pan(vg,s?.6:-.6).connect(lp); o.start(); v.start(); oscs.push(o,v); }); });
+      const bells=setInterval(()=>string([1174.7,1480,1760,2349][Math.floor(R(0,4))],.12,hallSend,ctx.currentTime,R(-.8,.8),2.8),3800+R(0,3000));
+      const birds=setInterval(()=>{ const p=R(-.9,.9); const chirp=(t0)=>{ const t=ctx.currentTime+t0, o=ctx.createOscillator(), g=ctx.createGain(); o.type='sine'; o.frequency.setValueAtTime(R(2100,2600),t); o.frequency.exponentialRampToValueAtTime(R(3300,3900),t+.07); o.frequency.exponentialRampToValueAtTime(R(2500,2900),t+.16); env(g,t,.03,.01,.17); o.connect(g); pan(g,p).connect(hallSend); g.connect(out); o.start(t); o.stop(t+.3); }; chirp(0); chirp(.23); if(Math.random()<.5) chirp(.42); },1700+R(0,2800));
+      const shimmer=setTimeout(()=>{ const sh=setInterval(()=>{ const t=ctx.currentTime; [1174.7,1480,1760,2349,2960].forEach((f,k)=>string(f,.05,hallSend,t+k*.19,(k%2?.7:-.7),1.6)); },5200); T.push({stop:()=>clearInterval(sh)}); },22000);
+      const bn=binaural(out,120,7,.018);
+      return ()=>{ clearInterval(bells); clearInterval(birds); clearTimeout(shimmer); oscs.forEach(o=>{try{o.stop()}catch(e){}}); T.forEach(o=>o.stop()); bn(); }; }
   };
-
   function play(name){ ensure(); stop(true); const bus=ctx.createGain(); bus.gain.value=1; bus.connect(master); const stopFn=scapes[name](bus); live={stopFn,bus};
-    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(1,ctx.currentTime+1.6); }
+    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(1,ctx.currentTime+2.2); }
   function stop(instant){ if(!live) return; const l=live; live=null; if(instant){ try{l.stopFn()}catch(e){} try{l.bus.disconnect()}catch(e){} master.gain.setValueAtTime(0,ctx.currentTime); return; }
-    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(0,ctx.currentTime+1.2);
-    setTimeout(()=>{ try{l.stopFn()}catch(e){} try{l.bus.disconnect()}catch(e){} },1300); }
+    master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(0,ctx.currentTime+1.6);
+    setTimeout(()=>{ try{l.stopFn()}catch(e){} try{l.bus.disconnect()}catch(e){} },1700); }
   function levels(arr){ if(!analyser) return false; analyser.getByteFrequencyData(arr); return true; }
   return {ensure,play,stop,levels,get playing(){return !!live}};
 })();
 
 /* ---------- JOURNEY ---------- */
 const CHAPTERS=[
-  {num:'I', name:'The Threshold', line:'There are no right answers here. Pick what is true, not what is nice.'},
-  {num:'II', name:'The Rooms', line:'The lantern has found a direction. We walk closer now.'},
-  {num:'III', name:'The Door', line:'Only a few more. Slow down. Let the last ones land.'}
+  {num:'I', name:'The Threshold', line:'Pick what is true. Not what is nice.'},
+  {num:'II', name:'The Rooms', line:'The light has found a direction.'},
+  {num:'III', name:'The Door', line:'Slow down. Let the last ones land.'}
 ];
-const TOTAL=28;
-let S={ screen:'threshold', chapter:0, idx:0, stations:[], usedT:new Set(), scores:{}, step:0, picks:[] };
-KEYS.forEach(k=>S.scores[k]=0);
-
+const TOTAL=27;
+let S=fresh();
+function fresh(){ const s={ chapter:0, idx:0, stations:[], usedT:new Set(), scores:{}, step:0, letter:'' }; KEYS.forEach(k=>s.scores[k]=0); return s; }
 function shuffle(a){ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function ranked(){ return KEYS.slice().sort((a,b)=>S.scores[b]-S.scores[a]); }
 function pickT(top,n){ const want=new Set(top); const pool=T.map((q,i)=>({q,i})).filter(x=>!S.usedT.has(x.i)).map(x=>({...x,hit:x.q.t.filter(k=>want.has(k)).length})).filter(x=>x.hit>0);
   const sorted=shuffle(pool).sort((a,b)=>b.hit-a.hit).slice(0,n); sorted.forEach(x=>S.usedT.add(x.i)); return sorted.map(x=>({type:'word',data:x.q})); }
 function buildChapter(c){
-  if(c===0){ const w=shuffle(U).map(q=>({type:'word',data:q})); return [w[0],w[1],{type:'img',key:'window'},w[2],w[3],{type:'snd',key:'rain'},w[4],{type:'img',key:'table'},w[5],w[6],w[7]]; }
+  if(c===0){ const w=shuffle(U).map(q=>({type:'word',data:q})); return [w[0],w[1],{type:'img',key:'window'},w[2],w[3],{type:'snd',key:'rain'},w[4],{type:'img',key:'table'},w[5],w[6]]; }
   if(c===1){ const w=pickT(ranked().slice(0,3),5); return [w[0],{type:'img',key:'hands'},w[1],{type:'snd',key:'room'},w[2],{type:'img',key:'door'},w[3],{type:'snd',key:'heart'},w[4],{type:'img',key:'summit'}]; }
-  const w=pickT(ranked().slice(0,2),3); return [w[0],{type:'img',key:'mask'},w[1],{type:'snd',key:'note'},w[2],{type:'img',key:'field'},{type:'snd',key:'dawn'}];
+  const w=pickT(ranked().slice(0,2),3); return [w[0],{type:'img',key:'mask'},w[1],{type:'snd',key:'note'},w[2],{type:'img',key:'field'},{type:'snd',key:'dawn'},{type:'letter'}];
 }
 
 /* ---------- RENDER ---------- */
 const app=document.getElementById('app');
 function setProgress(){ document.querySelector('#progress i').style.width=(Math.min(S.step,TOTAL)/TOTAL*100)+'%'; }
 function swap(html,after){ const cur=app.firstElementChild; const go=()=>{ app.innerHTML=`<div class="screen">${html}</div>`; window.scrollTo({top:0,behavior:'instant'}); if(after) after(app.firstElementChild); };
-  if(cur && !matchMedia('(prefers-reduced-motion: reduce)').matches){ cur.classList.add('leaving'); setTimeout(go,330); } else go(); }
+  if(cur && !RM){ cur.classList.add('leaving'); setTimeout(go,380); } else go(); }
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function threshold(){
-  Audio.stop(true); S.screen='threshold';
-  let saved=null; try{ saved=JSON.parse(localStorage.getItem('lantern.reading')||'null'); }catch(e){}
+  Audio.stop(true); let saved=null; try{ saved=JSON.parse(localStorage.getItem('lantern.reading')||'null'); }catch(e){}
   swap(`
     <svg class="flame" viewBox="0 0 22 34" aria-hidden="true"><path d="M11 0c2 7 9 10 9 19a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 3 4 3 7 0 0 2-3 2-15z"/></svg>
     <h1>Lantern</h1>
     <p class="lead">For the ones who have so much, <em>and still feel the space.</em></p>
     <div class="rule"></div>
     <div class="stack">
-      <p>You were loved. Things went well. By every outside measure, your life works. And still, around people, around family, in the middle of a good day, there's a quiet that doesn't have a name.</p>
-      <p>This is a walk through that quiet. Twenty-eight small stations: questions, drawn scenes, and sounds. At each one, you choose what resonates. Nothing is scored right or wrong. The lantern just notices where you keep looking, and at the end it reads back what it found.</p>
-      <p class="muted">About ten minutes. It adapts as you go, so two people rarely walk the same path.</p>
-      <div class="headphones"><svg viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="13" width="4" height="7" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg><span>Headphones on. The sound stations don't work on a tiny speaker.</span></div>
+      <p>You were loved. Life worked out. And still, in the middle of a good day, there's a quiet that doesn't have a name.</p>
+      <p>This is a walk through it. Short questions. A few drawings. A few sounds. Choose what's true. At the end, the lantern reads back what it found.</p>
+      <p class="muted">About eight minutes. It adapts to you.</p>
+      <div class="headphones"><svg viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="13" width="4" height="7" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg><span>Headphones. Somewhere you can be alone.</span></div>
     </div>
-    <div class="actions">
-      <button class="btn" id="begin">Begin the walk</button>
-      ${saved?`<button class="btn ghost" id="resume">Return to your reading</button>`:''}
-    </div>
+    <div class="actions"><button class="btn" id="begin">Begin</button>${saved?`<button class="btn ghost" id="resume">Return to your reading</button>`:''}</div>
     <div class="rule"></div>
-    <p class="fine">Lantern is a mirror, not a diagnosis, and not a replacement for a therapist. It isn't built for fresh grief or acute crisis. If you're in the US and in danger right now, call or text 988.</p>
-  `, root=>{
-    root.querySelector('#begin').onclick=()=>{ Audio.ensure(); start(); };
-    const r=root.querySelector('#resume'); if(r) r.onclick=()=>{ S.scores=saved.scores; reading(); };
-  });
+    <p class="fine">A mirror, not a diagnosis. Not a replacement for a therapist, and not built for fresh grief or crisis. In the US, if you're in danger right now, call or text 988.</p>
+  `, root=>{ root.querySelector('#begin').onclick=()=>{ Audio.ensure(); start(); }; const r=root.querySelector('#resume'); if(r) r.onclick=()=>{ S=fresh(); S.scores=saved.scores; S.letter=saved.letter||''; reading(); }; });
 }
-
-function start(){ S={ screen:'walk', chapter:0, idx:0, stations:[], usedT:new Set(), scores:{}, step:0, picks:[] }; KEYS.forEach(k=>S.scores[k]=0); setProgress(); interlude(0); }
-
+function start(){ S=fresh(); setProgress(); interlude(0); }
 function interlude(c){
   S.chapter=c; S.stations=buildChapter(c); S.idx=0; const ch=CHAPTERS[c];
-  swap(`
-    <p class="eyebrow">Chapter <b>${ch.num}</b> of III</p>
-    <h2>${ch.name}</h2>
-    <div class="breath" aria-hidden="true"><i></i></div>
-    <p class="lead" style="margin:0">${ch.line}</p>
-    <p class="muted" style="margin-top:14px">Breathe in as the light grows. Out as it fades.</p>
-    <div class="actions"><button class="btn" id="go" disabled>Walk on</button></div>
-  `, root=>{ const b=root.querySelector('#go'); setTimeout(()=>{ b.disabled=false; },matchMedia('(prefers-reduced-motion: reduce)').matches?300:5000); b.onclick=()=>station(); });
+  swap(`<p class="eyebrow">Chapter <b>${ch.num}</b> of III</p><h2>${ch.name}</h2><div class="breath" aria-hidden="true"><i></i></div><p class="lead" style="margin:0">${ch.line}</p><p class="muted" style="margin-top:14px">In as the light grows. Out as it fades.</p><div class="actions"><button class="btn" id="go" disabled>Walk on</button></div>`,
+    root=>{ const b=root.querySelector('#go'); setTimeout(()=>{ b.disabled=false; },RM?300:5000); b.onclick=()=>station(); });
 }
-
 function station(){
   const st=S.stations[S.idx]; if(!st){ if(S.chapter<2) return interlude(S.chapter+1); return reading(); }
   const ch=CHAPTERS[S.chapter]; const eyebrow=`<p class="eyebrow"><b>${ch.name}</b> &nbsp;·&nbsp; ${S.idx+1} of ${S.stations.length}</p>`;
-  if(st.type==='word'){ const q=st.data;
-    swap(`${eyebrow}<h2>${q.q}</h2>${optionsHTML(q.o)}`, root=>wireOptions(root,q.o)); }
-  else if(st.type==='img'){ const im=IMG[st.key];
-    swap(`${eyebrow}<h2>Look. Sit with it for a moment.</h2><div class="scene">${im.svg()}</div><p class="caption">${im.title}. ${im.caption}</p><p class="lead" style="font-size:21px">What does it stir?</p>${optionsHTML(im.o)}`, root=>wireOptions(root,im.o)); }
+  if(st.type==='word'){ const q=st.data; swap(`${eyebrow}<h2>${q.q}</h2>${optionsHTML(q.o)}`, root=>wireOptions(root,q.o)); }
+  else if(st.type==='img'){ const im=IMG[st.key]; swap(`${eyebrow}<h2>Look.</h2><div class="scene">${im.svg()}</div><p class="caption">${im.title}. ${im.caption}</p>${optionsHTML(im.o)}`, root=>wireOptions(root,im.o)); }
+  else if(st.type==='letter'){ swap(`${eyebrow}<h2>One line, to the kid in that room.</h2><p class="lead muted" style="font-size:20px">Whatever you'd say if you could reach them. Or skip it.</p><textarea id="letter" placeholder="You…"></textarea><div class="actions"><button class="btn" id="done">Send it</button><button class="btn ghost" id="skip">Skip</button></div>`,
+      root=>{ const ta=root.querySelector('#letter'); root.querySelector('#done').onclick=()=>{ S.letter=ta.value.trim(); S.step++; setProgress(); S.idx++; station(); }; root.querySelector('#skip').onclick=()=>{ S.step++; setProgress(); S.idx++; station(); }; }); }
   else { const sn=SND[st.key];
-    swap(`${eyebrow}<h2>Listen. Eyes closed if you can.</h2>
-      <div class="player"><div class="player-top"><button class="play" id="play" aria-label="Play"><svg viewBox="0 0 20 20" id="playIcon"><path d="M5 3l12 7-12 7z"/></svg></button><div><div class="player-title">${sn.title}</div><div class="player-sub">${sn.sub}</div></div></div><canvas class="viz" id="viz" width="600" height="54"></canvas></div>
-      <p class="listen-note" id="note">Press play. Give it at least a few breaths before you answer.</p>
-      <p class="lead" id="prompt" hidden style="font-size:21px">${sn.prompt}</p>
-      <div id="opts" hidden>${optionsHTML(sn.o)}</div>`, root=>{
+    swap(`${eyebrow}<h2>Listen.</h2>
+      <div class="player"><div class="player-top"><button class="play" id="play" aria-label="Play"><svg viewBox="0 0 20 20" id="playIcon"><path d="M5 3l12 7-12 7z"/></svg></button><div><div class="player-title">${sn.title}</div><div class="player-sub">${sn.sub}</div></div></div><canvas class="viz" id="viz" width="600" height="60"></canvas></div>
+      <p class="listen-note" id="note">Eyes closed if you can. Give it a few breaths.</p>
+      <p class="lead" id="prompt" hidden>${sn.prompt}</p><div id="opts" hidden>${optionsHTML(sn.o)}</div>`, root=>{
         const play=root.querySelector('#play'), icon=root.querySelector('#playIcon'), note=root.querySelector('#note'), opts=root.querySelector('#opts'), prompt=root.querySelector('#prompt');
-        const cv=root.querySelector('#viz'), cx=cv.getContext('2d'); const buf=new Uint8Array(64); let raf, listened=0, lastT=0, revealed=false;
-        const gate=matchMedia('(prefers-reduced-motion: reduce)').matches?2000:9000;
+        const cv=root.querySelector('#viz'), cx=cv.getContext('2d'); const buf=new Uint8Array(64); let raf, listened=0, lastT=0, revealed=false; const gate=RM?2000:12000;
         function draw(ts){ raf=requestAnimationFrame(draw); if(Audio.playing){ if(lastT) listened+=ts-lastT; lastT=ts; } else lastT=0;
           cx.clearRect(0,0,cv.width,cv.height); const ok=Audio.levels(buf); const n=48, w=cv.width/n;
-          for(let i=0;i<n;i++){ const v=ok&&Audio.playing?buf[i+2]/255:0.03; const h=Math.max(2,v*cv.height); cx.fillStyle=i<n*.5?'rgba(227,169,91,.9)':'rgba(227,169,91,.5)'; cx.fillRect(i*w+1,cv.height-h,w-2,h); }
-          if(!revealed && listened>gate){ revealed=true; note.textContent='Stay as long as you like. When you\u2019re ready:'; prompt.hidden=false; opts.hidden=false; opts.firstElementChild.classList.add('revealed'); } }
+          for(let i=0;i<n;i++){ const v=ok&&Audio.playing?buf[i+1]/255:0.03; const h=Math.max(2,v*cv.height); cx.fillStyle=`rgba(227,169,91,${(.25+v*.7).toFixed(2)})`; cx.fillRect(i*w+1,cv.height-h,w-2,h); }
+          if(!revealed && listened>gate){ revealed=true; note.textContent='Stay as long as you like.'; prompt.hidden=false; opts.hidden=false; opts.firstElementChild.classList.add('revealed'); } }
         draw(0);
         play.onclick=()=>{ if(Audio.playing){ Audio.stop(); play.classList.remove('on'); icon.innerHTML='<path d="M5 3l12 7-12 7z"/>'; play.setAttribute('aria-label','Play'); }
           else { Audio.play(st.key); play.classList.add('on'); icon.innerHTML='<rect x="4" y="3" width="4" height="14"/><rect x="12" y="3" width="4" height="14"/>'; play.setAttribute('aria-label','Pause'); if(!revealed) note.textContent='Listening…'; } };
-        wireOptions(root,sn.o,()=>{ cancelAnimationFrame(raf); Audio.stop(); });
-      }); }
+        wireOptions(root,sn.o,()=>{ cancelAnimationFrame(raf); Audio.stop(); }); }); }
 }
 function optionsHTML(o){ return `<div class="options">${o.map((x,i)=>`<button class="opt" data-i="${i}">${esc(x[0])}</button>`).join('')}</div>`; }
-function wireOptions(root,o,before){ root.querySelectorAll('.opt').forEach(b=>{ b.onclick=()=>{ if(root.dataset.locked) return; root.dataset.locked=1; b.classList.add('picked'); const w=o[+b.dataset.i][1]; Object.keys(w).forEach(k=>S.scores[k]+=w[k]); S.picks.push(b.textContent); S.step++; setProgress(); if(before) before(); setTimeout(()=>{ S.idx++; station(); },420); }; }); }
+function wireOptions(root,o,before){ root.querySelectorAll('.opt').forEach(b=>{ b.onclick=()=>{ if(root.dataset.locked) return; root.dataset.locked=1; b.classList.add('picked'); const w=o[+b.dataset.i][1]; Object.keys(w).forEach(k=>S.scores[k]+=w[k]); S.step++; setProgress(); if(before) before(); setTimeout(()=>{ S.idx++; station(); },RM?150:650); }; }); }
 
 function reading(){
-  Audio.stop(true); S.screen='reading'; const r=ranked(); const top=r[0], sec=r[1]; const p=P[top], s=P[sec];
-  const max=Math.max(1,S.scores[top]); try{ localStorage.setItem('lantern.reading',JSON.stringify({scores:S.scores,when:Date.now()})); }catch(e){}
+  Audio.stop(true); const r=ranked(); const top=r[0], sec=r[1]; const p=P[top], s=P[sec]; const max=Math.max(1,S.scores[top]);
+  try{ localStorage.setItem('lantern.reading',JSON.stringify({scores:S.scores,letter:S.letter,when:Date.now()})); }catch(e){}
   swap(`<div class="reading">
-    <p class="eyebrow">What the lantern found</p>
-    <h1 class="name">${p.name}</h1>
-    <p class="tag">${p.tag}</p>
+    <p class="eyebrow">What the lantern found</p><h1 class="name">${p.name}</h1><p class="tag">${p.tag}</p>
     <div class="section"><p class="eyebrow">You might know this</p><p>${p.opening}</p></div>
     <div class="section"><p class="eyebrow">Where it often comes from</p><p>${p.origin}</p></div>
     <div class="section"><p class="eyebrow">What the space actually is</p><p>${p.void}</p></div>
     <div class="section"><p class="eyebrow">What your heart may be asking for</p><p>${p.want}</p></div>
     <div class="section"><p class="eyebrow">One small door</p><p>${p.door}</p></div>
     <div class="keep">“${p.keep}”</div>
-    <div class="second"><p class="eyebrow">Also in you: <b>${s.name}</b></p><p class="muted">${s.second} The two often travel together. If the first reading didn't land, read ${s.name.replace('The ','the ')} instead.</p></div>
-    <div class="map" aria-label="Your map">
-      <p class="eyebrow" style="margin-bottom:4px">Your map</p>
-      ${r.map(k=>`<div class="row ${k===top?'lead-row':''}"><span>${P[k].name}</span><div class="bar"><i data-w="${Math.round(S.scores[k]/max*100)}"></i></div></div>`).join('')}
-    </div>
+    ${S.letter?`<div class="letter"><p class="eyebrow">What you sent back</p>${esc(S.letter)}</div>`:''}
+    <div class="second"><p class="eyebrow">Also in you: <b>${s.name}</b></p><p class="muted">${s.second} The two often travel together.</p></div>
+    <div class="map" aria-label="Your map"><p class="eyebrow" style="margin-bottom:4px">Your map</p>${r.map(k=>`<div class="row ${k===top?'lead-row':''}"><span>${P[k].name}</span><div class="bar"><i data-w="${Math.round(S.scores[k]/max*100)}"></i></div></div>`).join('')}</div>
     <div class="rule"></div>
-    <p class="fine">This is a mirror, not a diagnosis. The patterns come from schema therapy, attachment research, and the work on childhood emotional neglect. If something here hit hard, that's information, not a verdict. A therapist who works with attachment, schema therapy, or Internal Family Systems can take it further than a page can. Two books that go deeper: <i>Running on Empty</i> by Jonice Webb, and <i>Adult Children of Emotionally Immature Parents</i> by Lindsay Gibson.</p>
+    <p class="fine">A mirror, not a diagnosis. The patterns come from schema therapy, attachment research, and the work on childhood emotional neglect. If something hit hard, that's information, not a verdict. A therapist who works with attachment, schema therapy, or Internal Family Systems can take it further than a page can. Two books that go deeper: <i>Running on Empty</i> by Jonice Webb, and <i>Adult Children of Emotionally Immature Parents</i> by Lindsay Gibson.</p>
     <div class="actions"><button class="btn" id="copy">Copy my reading</button><button class="btn ghost" id="again">Walk it again</button></div>
   </div>`, root=>{
     requestAnimationFrame(()=>root.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'));
     root.querySelector('#again').onclick=start;
-    root.querySelector('#copy').onclick=()=>{ const txt=`Lantern found: ${p.name}. ${p.tag}\n\n“${p.keep}”\n\nAlso in me: ${s.name}.\n\nLantern is a mirror, not a diagnosis.`;
+    root.querySelector('#copy').onclick=()=>{ const txt=`Lantern found: ${p.name}. ${p.tag}\n\n“${p.keep}”\n\nAlso in me: ${s.name}.${S.letter?`\n\nTo the kid in that room: ${S.letter}`:''}\n\nLantern is a mirror, not a diagnosis.`;
       const done=()=>{ const t=document.getElementById('toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600); };
-      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done).catch(()=>fallback(txt,done)); } else fallback(txt,done); };
-    function fallback(txt,done){ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity=0; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} ta.remove(); }
+      const fb=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity=0; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} ta.remove(); };
+      if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done).catch(fb); } else fb(); };
   });
 }
-
-/* boot (hot-update aware, falls back to a plain start) */
 function boot(){ threshold(); }
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot();
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) Audio.stop(); });
