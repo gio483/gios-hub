@@ -65,7 +65,7 @@ p{margin:0}.muted{color:var(--dust)}.stack{display:flex;flex-direction:column;ga
 
 /* scenes */
 .scene{margin-top:24px;border-radius:6px;overflow:hidden;background:#000;aspect-ratio:4/3;max-width:100%;box-shadow:0 40px 80px -30px rgba(0,0,0,1),0 0 0 1px rgba(255,255,255,.04)}
-.scene svg{display:block;width:100%;height:100%}
+.scene{position:relative}.scene svg{display:block;width:100%;height:100%}.scene img,.scene svg.ov{position:absolute;inset:0;width:100%;height:100%}.scene img{object-fit:cover;animation:drift 46s ease-in-out infinite alternate;transform-origin:50% 60%}@keyframes drift{from{transform:scale(1) translate(0,0)}to{transform:scale(1.08) translate(-1.2%,.8%)}}@media (prefers-reduced-motion:reduce){.scene img{animation:none}}
 .caption{font-family:var(--display);font-style:italic;font-size:20px;color:var(--dust);margin-top:16px}
 
 /* sound */
@@ -240,6 +240,8 @@ function stars(n){ let s=''; for(let i=0;i<n;i++){ const d=R(3,9); s+=`<circle c
 function motes(n,col,x0=0,x1=400,y0=0,y1=300){ let s=''; for(let i=0;i<n;i++){ const x=R(x0,x1),y=R(y0,y1),d=R(14,34); s+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${R(.6,1.8).toFixed(1)}" fill="${col}" opacity="${R(.25,.8).toFixed(2)}">${anim('cy',`${y.toFixed(0)};${(y-R(30,90)).toFixed(0)}`,d.toFixed(1))}${anim('opacity',`0;${R(.5,.9).toFixed(2)};0`,d.toFixed(1))}${anim('cx',`${x.toFixed(0)};${(x+R(-25,25)).toFixed(0)};${x.toFixed(0)}`,(d*1.3).toFixed(1))}</circle>`; } return s; }
 function grass(){ let s=''; for(let i=0;i<220;i++){ const x=R(-10,410),h=R(40,140),b=R(-28,28); const c=['#3b2f14','#5c4a1c','#866c2a','#b3923d','#d9b452'][Math.floor(R(0,5))]; s+=`<path d="M${x.toFixed(0)},300 Q${(x+b*.4).toFixed(0)},${(300-h*.6).toFixed(0)} ${(x+b).toFixed(0)},${(300-h).toFixed(0)}" stroke="${c}" stroke-width="${R(.6,2).toFixed(1)}" fill="none" stroke-linecap="round" opacity="${R(.45,1).toFixed(2)}"/>`; } return s; }
 const svg=(label,inner)=>`<svg viewBox="0 0 400 300" role="img" aria-label="${label}">${inner}</svg>`;
+const overlay=(id,col,x0,x1,y0,y1,n)=>`<svg class="ov" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true"><defs>${grainDef('og'+id)}${vignette('ov'+id)}</defs>${motes(n,col,x0,x1,y0,y1)}<rect width="400" height="300" fill="url(#ov${id})"/>${grainRect('og'+id)}</svg>`;
+const OV={ window:['A','#bfe8ff',0,400,100,290,16], table:['B','#ffd27a',60,340,60,220,14], hands:['C','#dcd0ff',100,300,40,260,22], door:['D','#ffe3a8',180,330,100,290,24], summit:['E','#fff6d8',60,340,30,220,14], mask:['F','#d8c8ff',40,360,40,280,10], field:['G','#fff8e0',0,400,20,270,36] };
 
 const IMG = {
  window:{ title:'The lit window', caption:'Everyone is inside.',
@@ -477,7 +479,7 @@ function station(){
   const st=S.stations[S.idx]; if(!st){ if(S.chapter<2) return interlude(S.chapter+1); return reading(); }
   const ch=CHAPTERS[S.chapter]; const eyebrow=`<p class="eyebrow"><b>${ch.name}</b> &nbsp;·&nbsp; ${S.idx+1} of ${S.stations.length}</p>`;
   if(st.type==='word'){ const q=st.data; swap(`${eyebrow}<h2>${q.q}</h2>${optionsHTML(q.o)}`, root=>wireOptions(root,q.o)); }
-  else if(st.type==='img'){ const im=IMG[st.key]; swap(`${eyebrow}<h2>Look.</h2><div class="scene">${im.svg()}</div><p class="caption">${im.title}. ${im.caption}</p>${optionsHTML(im.o)}`, root=>wireOptions(root,im.o)); }
+  else if(st.type==='img'){ const im=IMG[st.key]; const o=OV[st.key]; swap(`${eyebrow}<h2>Look.</h2><div class="scene">${im.svg()}<img src="lantern-scenes/${st.key}.jpg" alt="" onerror="this.remove()">${overlay(...o)}</div><p class="caption">${im.title}. ${im.caption}</p>${optionsHTML(im.o)}`, root=>wireOptions(root,im.o)); }
   else if(st.type==='letter'){ swap(`${eyebrow}<h2>One line, to the kid in that room.</h2><p class="lead muted" style="font-size:20px">Whatever you'd say if you could reach them. Or skip it.</p><textarea id="letter" placeholder="You…"></textarea><div class="actions"><button class="btn" id="done">Send it</button><button class="btn ghost" id="skip">Skip</button></div>`,
       root=>{ const ta=root.querySelector('#letter'); root.querySelector('#done').onclick=()=>{ S.letter=ta.value.trim(); S.step++; setProgress(); S.idx++; station(); }; root.querySelector('#skip').onclick=()=>{ S.step++; setProgress(); S.idx++; station(); }; }); }
   else { const sn=SND[st.key];
