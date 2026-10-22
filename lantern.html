@@ -103,6 +103,7 @@ textarea::placeholder{color:var(--dust);font-style:italic}
 .reading .tag{font-family:var(--display);font-style:italic;font-size:25px;color:var(--lantern);margin-top:12px}
 .section{margin-top:32px}.section .eyebrow{margin-bottom:8px}.section p{font-size:17px;line-height:1.6}
 .keep{margin-top:36px;padding:28px 24px;border:1px solid var(--lantern);border-radius:6px;background:var(--lantern-soft);font-family:var(--display);font-size:clamp(25px,5.8vw,32px);line-height:1.22;text-wrap:balance}
+.narr{margin-top:28px;display:flex;align-items:center;gap:16px;padding:18px;border:1px solid var(--fog);background:var(--ink-2);border-radius:6px}.narr .player-title{font-size:22px}.narr .player-sub{margin-top:2px}
 .letter{margin-top:36px;padding-left:18px;border-left:2px solid var(--lantern);font-family:var(--display);font-style:italic;font-size:22px;line-height:1.3;color:var(--bone)}
 .letter .eyebrow{font-style:normal;margin-bottom:8px}
 .map{margin-top:36px;display:flex;flex-direction:column;gap:9px}
@@ -364,7 +365,12 @@ const SND = {
 
 /* Web Audio engine. Everything synthesized. Headphone-first: a wide stereo field, a long hall, and a faint binaural pulse (theta, ~5 Hz) under every piece. */
 const Audio = (()=>{
-  let ctx, master, analyser, hall, hallSend, live=null;
+  let ctx, master, analyser, hall, hallSend, live=null, voiceEl=null, musicEl=null, ambEl=null;
+  const AMB={rain:[.95,.45],room:[.9,.55],heart:[.85,.6],note:[.55,1],dawn:[.9,.6]}; /* [ambience level, synth level] */
+  function element(src){ const el=document.createElement('audio'); el.src=src; el.preload='auto'; el.crossOrigin='anonymous'; return el; }
+  function amb(key,out){ const el=element('lantern-audio/amb-'+key+'.mp3'); el.loop=true; ambEl=el; let g=ctx.createGain(); g.gain.value=0; try{ ctx.createMediaElementSource(el).connect(g); g.connect(out); }catch(e){ g=null; el.volume=0; }
+    el.play().then(()=>{ const t=ctx.currentTime; if(g){ g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(AMB[key][0],t+3); } else { el.volume=AMB[key][0]; } }).catch(()=>{});
+    return ()=>{ try{ el.pause(); el.removeAttribute('src'); el.load(); }catch(e){} }; }
   function ensure(){
     if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); master=ctx.createGain(); master.gain.value=0;
       analyser=ctx.createAnalyser(); analyser.fftSize=128; analyser.smoothingTimeConstant=.85;
@@ -416,13 +422,19 @@ const Audio = (()=>{
       const bn=binaural(out,120,7,.018);
       return ()=>{ clearInterval(bells); clearInterval(birds); clearTimeout(shimmer); oscs.forEach(o=>{try{o.stop()}catch(e){}}); T.forEach(o=>o.stop()); bn(); }; }
   };
-  function play(name){ ensure(); stop(true); const bus=ctx.createGain(); bus.gain.value=1; bus.connect(master); const stopFn=scapes[name](bus); live={stopFn,bus};
+  function play(name,synthLevel){ ensure(); stop(true); const lvl=synthLevel!=null?synthLevel:(AMB[name]?AMB[name][1]:1); const bus=ctx.createGain(); bus.gain.value=lvl; hallSend.gain.value=.5*lvl; bus.connect(master); const stopSynth=scapes[name](bus); const stopAmb=(synthLevel==null && AMB[name])?amb(name,master):()=>{}; const stopFn=()=>{ stopSynth(); stopAmb(); }; live={stopFn,bus};
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(1,ctx.currentTime+2.2); }
   function stop(instant){ if(!live) return; const l=live; live=null; if(instant){ try{l.stopFn()}catch(e){} try{l.bus.disconnect()}catch(e){} master.gain.setValueAtTime(0,ctx.currentTime); return; }
     master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(master.gain.value,ctx.currentTime); master.gain.linearRampToValueAtTime(0,ctx.currentTime+1.6);
     setTimeout(()=>{ try{l.stopFn()}catch(e){} try{l.bus.disconnect()}catch(e){} },1700); }
   function levels(arr){ if(!analyser) return false; analyser.getByteFrequencyData(arr); return true; }
-  return {ensure,play,stop,levels,get playing(){return !!live}};
+  /* narrator: the voice over a quiet dawn pad */
+  function voice(key,onEnd){ ensure(); voiceStop(); play('dawn',.38); const el=element('lantern-audio/voice-'+key+'.mp3'); voiceEl=el; try{ ctx.createMediaElementSource(el).connect(master); }catch(e){} el.onended=()=>{ voiceStop(); if(onEnd) onEnd(); }; el.onerror=()=>{ voiceStop(); if(onEnd) onEnd(); }; el.play().catch(()=>{ voiceStop(); if(onEnd) onEnd(); }); }
+  function voiceStop(){ if(voiceEl){ try{ voiceEl.onended=null; voiceEl.pause(); voiceEl.removeAttribute('src'); voiceEl.load(); }catch(e){} voiceEl=null; stop(); } }
+  /* interlude music, quiet, looping */
+  function music(){ ensure(); musicStop(true); const el=element('lantern-audio/music.mp3'); el.loop=true; musicEl=el; let g=null; try{ g=ctx.createGain(); g.gain.value=0; ctx.createMediaElementSource(el).connect(g); g.connect(master); }catch(e){ el.volume=0; } master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setValueAtTime(1,ctx.currentTime); el.play().then(()=>{ if(g){ g.gain.linearRampToValueAtTime(.5,ctx.currentTime+4); } else el.volume=.5; }).catch(()=>{}); el._g=g; }
+  function musicStop(instant){ const el=musicEl; if(!el) return; musicEl=null; const done=()=>{ try{ el.pause(); el.removeAttribute('src'); el.load(); }catch(e){} }; if(instant||!el._g){ done(); return; } el._g.gain.cancelScheduledValues(ctx.currentTime); el._g.gain.setValueAtTime(el._g.gain.value,ctx.currentTime); el._g.gain.linearRampToValueAtTime(0,ctx.currentTime+1.5); setTimeout(done,1600); }
+  return {ensure,play,stop,levels,voice,voiceStop,music,musicStop,get playing(){return !!live},get speaking(){return !!voiceEl},_els(){return {amb:ambEl,music:musicEl,voice:voiceEl}}};
 })();
 
 /* ---------- JOURNEY ---------- */
@@ -452,7 +464,7 @@ function swap(html,after){ const cur=app.firstElementChild; const go=()=>{ app.i
 const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function threshold(){
-  Audio.stop(true); let saved=null; try{ saved=JSON.parse(localStorage.getItem('lantern.reading')||'null'); }catch(e){}
+  Audio.voiceStop(); Audio.musicStop(true); Audio.stop(true); let saved=null; try{ saved=JSON.parse(localStorage.getItem('lantern.reading')||'null'); }catch(e){}
   swap(`
     <svg class="flame" viewBox="0 0 22 34" aria-hidden="true"><path d="M11 0c2 7 9 10 9 19a9 9 0 0 1-18 0c0-5 3-7 4-11 1 3 3 4 3 7 0 0 2-3 2-15z"/></svg>
     <h1>Lantern</h1>
@@ -460,7 +472,7 @@ function threshold(){
     <div class="rule"></div>
     <div class="stack">
       <p>You were loved. Life worked out. And still, in the middle of a good day, there's a quiet that doesn't have a name.</p>
-      <p>This is a walk through it. Short questions. A few drawings. A few sounds. Choose what's true. At the end, the lantern reads back what it found.</p>
+      <p>This is a walk through it. Short questions. A few images. A few sounds. Choose what's true. At the end, the lantern reads back what it found, in words and in a voice.</p>
       <p class="muted">About eight minutes. It adapts to you.</p>
       <div class="headphones"><svg viewBox="0 0 24 24"><path d="M4 14v-3a8 8 0 0 1 16 0v3"/><rect x="3" y="13" width="4" height="7" rx="1.5"/><rect x="17" y="13" width="4" height="7" rx="1.5"/></svg><span>Headphones. Somewhere you can be alone.</span></div>
     </div>
@@ -472,8 +484,9 @@ function threshold(){
 function start(){ S=fresh(); setProgress(); interlude(0); }
 function interlude(c){
   S.chapter=c; S.stations=buildChapter(c); S.idx=0; const ch=CHAPTERS[c];
+  Audio.music();
   swap(`<p class="eyebrow">Chapter <b>${ch.num}</b> of III</p><h2>${ch.name}</h2><div class="breath" aria-hidden="true"><i></i></div><p class="lead" style="margin:0">${ch.line}</p><p class="muted" style="margin-top:14px">In as the light grows. Out as it fades.</p><div class="actions"><button class="btn" id="go" disabled>Walk on</button></div>`,
-    root=>{ const b=root.querySelector('#go'); setTimeout(()=>{ b.disabled=false; },RM?300:5000); b.onclick=()=>station(); });
+    root=>{ const b=root.querySelector('#go'); setTimeout(()=>{ b.disabled=false; },RM?300:5000); b.onclick=()=>{ Audio.musicStop(); station(); }; });
 }
 function station(){
   const st=S.stations[S.idx]; if(!st){ if(S.chapter<2) return interlude(S.chapter+1); return reading(); }
@@ -502,10 +515,11 @@ function optionsHTML(o){ return `<div class="options">${o.map((x,i)=>`<button cl
 function wireOptions(root,o,before){ root.querySelectorAll('.opt').forEach(b=>{ b.onclick=()=>{ if(root.dataset.locked) return; root.dataset.locked=1; b.classList.add('picked'); const w=o[+b.dataset.i][1]; Object.keys(w).forEach(k=>S.scores[k]+=w[k]); S.step++; setProgress(); if(before) before(); setTimeout(()=>{ S.idx++; station(); },RM?150:650); }; }); }
 
 function reading(){
-  Audio.stop(true); const r=ranked(); const top=r[0], sec=r[1]; const p=P[top], s=P[sec]; const max=Math.max(1,S.scores[top]);
+  Audio.voiceStop(); Audio.musicStop(true); Audio.stop(true); const r=ranked(); const top=r[0], sec=r[1]; const p=P[top], s=P[sec]; const max=Math.max(1,S.scores[top]);
   try{ localStorage.setItem('lantern.reading',JSON.stringify({scores:S.scores,letter:S.letter,when:Date.now()})); }catch(e){}
   swap(`<div class="reading">
     <p class="eyebrow">What the lantern found</p><h1 class="name">${p.name}</h1><p class="tag">${p.tag}</p>
+    <div class="narr"><button class="play" id="narr" aria-label="Listen"><svg viewBox="0 0 20 20" id="narrIcon"><path d="M5 3l12 7-12 7z"/></svg></button><div><div class="player-title">Hear it read to you</div><div class="player-sub">A voice, and the dawn underneath. About three minutes.</div></div></div>
     <div class="section"><p class="eyebrow">You might know this</p><p>${p.opening}</p></div>
     <div class="section"><p class="eyebrow">Where it often comes from</p><p>${p.origin}</p></div>
     <div class="section"><p class="eyebrow">What the space actually is</p><p>${p.void}</p></div>
@@ -520,7 +534,9 @@ function reading(){
     <div class="actions"><button class="btn" id="copy">Copy my reading</button><button class="btn ghost" id="again">Walk it again</button></div>
   </div>`, root=>{
     requestAnimationFrame(()=>root.querySelectorAll('.bar i').forEach(i=>i.style.width=i.dataset.w+'%'));
-    root.querySelector('#again').onclick=start;
+    root.querySelector('#again').onclick=()=>{ Audio.voiceStop(); start(); };
+    const nb=root.querySelector('#narr'), ni=root.querySelector('#narrIcon'); const PLAY='<path d="M5 3l12 7-12 7z"/>', PAUSE='<rect x="4" y="3" width="4" height="14"/><rect x="12" y="3" width="4" height="14"/>';
+    nb.onclick=()=>{ if(Audio.speaking){ Audio.voiceStop(); nb.classList.remove('on'); ni.innerHTML=PLAY; } else { Audio.voice(top,()=>{ nb.classList.remove('on'); ni.innerHTML=PLAY; }); nb.classList.add('on'); ni.innerHTML=PAUSE; } };
     root.querySelector('#copy').onclick=()=>{ const txt=`Lantern found: ${p.name}. ${p.tag}\n\n“${p.keep}”\n\nAlso in me: ${s.name}.${S.letter?`\n\nTo the kid in that room: ${S.letter}`:''}\n\nLantern is a mirror, not a diagnosis.`;
       const done=()=>{ const t=document.getElementById('toast'); t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1600); };
       const fb=()=>{ const ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity=0; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){} ta.remove(); };
@@ -529,7 +545,7 @@ function reading(){
 }
 function boot(){ threshold(); }
 window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot();
-document.addEventListener('visibilitychange',()=>{ if(document.hidden) Audio.stop(); });
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ Audio.stop(); Audio.musicStop(); } });
 </script>
 </body>
 </html>
