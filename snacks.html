@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf8f5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Snack Board">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<title>Snack Board</title>
+<style>
+:root{
+  --bg:#fbf8f5; --card:#fff; --card2:#f7f1ea; --line:#e8ded2;
+  --text:#2c2620; --muted:#857668; --accent:#e0703a; --accent2:#c2522a; --good:#4f9a45;
+  --pantry:#8a6a3a; --freezer:#3a7cc2; --fridge:#4f9a45; --fresh:#d0453b;
+  --shadow:0 1px 3px rgba(80,50,30,.07),0 1px 2px rgba(80,50,30,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#16110d; --card:#221a14; --card2:#2b2119; --line:#3b2f25;
+    --text:#f6ece3; --muted:#b9a593; --shadow:0 1px 3px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);
+  padding:max(18px,env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom));}
+.wrap{max-width:1100px;margin:0 auto}
+a.back{display:inline-flex;gap:7px;color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:600;margin-bottom:10px}
+header.top{text-align:center;margin:4px 0 18px}
+.logo{width:56px;height:56px;border-radius:17px;margin:0 auto 10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:30px;box-shadow:0 10px 30px rgba(224,112,58,.3)}
+h1{font-family:Georgia,serif;font-size:1.6rem;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.93rem;margin:0 auto;max-width:560px;line-height:1.45}
+.tabs{display:flex;gap:5px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:5px;margin:0 auto 16px;max-width:620px;box-shadow:var(--shadow);overflow-x:auto}
+.tab{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:650;font-size:.85rem;padding:10px 8px;border-radius:10px;cursor:pointer;white-space:nowrap}
+.tab.active{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.view{display:none}.view.active{display:block}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+.flabel{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px;min-width:62px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:.83rem;font-weight:600;padding:7px 12px;border-radius:999px;cursor:pointer}
+.chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:14px 0 18px}
+.lg{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;border-left:5px solid;box-shadow:var(--shadow)}
+.lg b{display:block;font-size:.95rem;margin-bottom:2px}.lg span{color:var(--muted);font-size:.83rem;line-height:1.35}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;position:relative}
+.thumb{aspect-ratio:1/1;background:#fff;display:flex;align-items:center;justify-content:center;font-size:64px;border-bottom:1px solid var(--line)}
+.thumb img{width:100%;height:100%;object-fit:contain;padding:10px;mix-blend-mode:multiply}
+.life{position:absolute;top:8px;left:8px;color:#fff;font-size:.7rem;font-weight:750;padding:4px 8px;border-radius:999px;letter-spacing:.02em}
+.add{position:absolute;top:8px;right:8px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.18);font-size:20px;font-weight:700;color:var(--accent2);cursor:pointer;line-height:1}
+.add.on{background:var(--good);color:#fff}
+.body{padding:11px 12px 12px;display:flex;flex-direction:column;gap:6px;flex:1}
+.nm{font-weight:750;font-size:.95rem;line-height:1.25}
+.cal{font-size:.8rem;font-weight:700;color:var(--accent2)}
+.why{font-size:.8rem;color:var(--muted);line-height:1.38;flex:1}
+.stores{display:flex;flex-wrap:wrap;gap:4px}
+.st{font-size:.68rem;font-weight:700;padding:3px 7px;border-radius:6px;background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.keep{font-size:.74rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+h2{font-family:Georgia,serif;font-size:1.25rem;margin:22px 0 10px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);margin-bottom:12px}
+.panel p,.panel li{line-height:1.5;font-size:.93rem}
+.panel ul{padding-left:18px;margin:6px 0}
+.swap{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin:8px 0;padding:10px 12px;background:var(--card2);border-radius:12px}
+.swap .from{color:var(--muted);font-size:.88rem}.swap .to{font-weight:650;font-size:.9rem}.swap .arr{color:var(--accent);font-weight:800}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.day{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)}
+.day h3{margin:0 0 8px;font-size:1rem}.day .tag{font-size:.72rem;font-weight:700;color:#fff;background:var(--fresh);padding:3px 8px;border-radius:999px;margin-left:6px;vertical-align:middle}
+.day li{font-size:.88rem;margin-bottom:5px;line-height:1.4}
+.recipe{border-left:4px solid var(--accent);padding-left:12px;margin:12px 0}
+.recipe b{display:block;margin-bottom:3px}
+.listgrp{margin-bottom:14px}
+.listgrp h3{margin:0 0 8px;font-size:1rem}
+.li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.li img,.li .em{width:42px;height:42px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px}
+.li .t{flex:1;font-size:.92rem;font-weight:600}.li .t small{display:block;color:var(--muted);font-weight:500}
+.li input{width:20px;height:20px;accent-color:var(--good)}
+.li.done .t{text-decoration:line-through;opacity:.55}
+.btn{border:0;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font:inherit;font-weight:700;padding:10px 16px;border-radius:12px;cursor:pointer}
+.btn.ghost{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));background:var(--text);color:var(--bg);border:0;font:inherit;font-weight:750;padding:13px 22px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);cursor:pointer;display:none}
+.note{font-size:.78rem;color:var(--muted);text-align:center;margin-top:26px;line-height:1.5}
+@media (max-width:520px){.grid{grid-template-columns:repeat(2,1fr);gap:9px}.thumb{font-size:48px}.nm{font-size:.88rem}.why{font-size:.76rem}.swap{grid-template-columns:1fr}.swap .arr{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="index.html">&larr; Hub</a>
+<header class="top">
+  <div class="logo">&#x1F96B;</div>
+  <h1>Snack Board</h1>
+  <p class="sub">Low calorie snacks and drinks you actually like, sorted by how long they last and where to buy them. Tap + to build a shopping list.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab active" data-v="browse">Browse</button>
+  <button class="tab" data-v="dip">Chips &amp; Dip</button>
+  <button class="tab" data-v="plan">4 Day Plan</button>
+  <button class="tab" data-v="list">My List <span id="cnt"></span></button>
+</div>
+
+<section class="view active" id="v-browse">
+  <div class="filters" id="f-life"><span class="flabel">Lasts</span></div>
+  <div class="filters" id="f-store"><span class="flabel">Store</span></div>
+  <div class="filters" id="f-cat"><span class="flabel">Type</span></div>
+  <div class="legend">
+    <div class="lg" style="border-left-color:var(--pantry)"><b>Pantry &middot; weeks to months</b><span>Bags, jars, bars, drinks. Safest to stock up on.</span></div>
+    <div class="lg" style="border-left-color:var(--freezer)"><b>Freezer &middot; 1 to 3 months</b><span>Buy big, pull a portion when you want it.</span></div>
+    <div class="lg" style="border-left-color:var(--fridge)"><b>Fridge &middot; 1 to 4 weeks</b><span>Cheese, yogurt, eggs. Check the date on the pack.</span></div>
+    <div class="lg" style="border-left-color:var(--fresh)"><b>Fresh &middot; 3 to 7 days</b><span>Buy only what the 4 Day Plan uses.</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<section class="view" id="v-dip">
+  <h2>Keep the salsa, change the scooper</h2>
+  <div class="panel">
+    <p>Salsa and hot sauce are already great: about 10 to 20 calories for 2 tablespoons. The chips are where the calories hide. A handful of regular tortilla chips is about 140 to 150 calories, and it's never one handful.</p>
+    <div class="swap"><div class="from">Tortilla chips from the bag</div><div class="arr">&rarr;</div><div class="to">Cucumber rounds or jicama sticks. Crunchy, almost no calories.</div></div>
+    <div class="swap"><div class="from">Tortilla chips</div><div class="arr">&rarr;</div><div class="to">Quest protein tortilla chips (about 140 cal, 18g protein per bag)</div></div>
+    <div class="swap"><div class="from">Chips with salsa</div><div class="arr">&rarr;</div><div class="to">Baby carrots or snap peas with salsa or Greek yogurt ranch</div></div>
+    <div class="swap"><div class="from">Salty craving</div><div class="arr">&rarr;</div><div class="to">SkinnyPop 100 cal bag with hot sauce shaken on</div></div>
+    <div class="swap"><div class="from">Eating from the bag</div><div class="arr">&rarr;</div><div class="to">Pour one portion into a bowl, put the bag away</div></div>
+  </div>
+  <h2>Creamy dips, rebuilt</h2>
+  <div class="panel">
+    <div class="recipe"><b>Greek yogurt ranch</b>1 cup plain Greek yogurt + 1 to 2 tbsp Hidden Valley ranch seasoning + a splash of milk. About a third of the calories of bottled ranch, with protein. Keeps 5 days in the fridge.</div>
+    <div class="recipe"><b>Greek yogurt French onion</b>1 cup plain Greek yogurt + half a packet of onion soup mix. Let it sit 30 minutes so the onion softens. Tastes like the sour cream version.</div>
+    <div class="recipe"><b>Creamy salsa</b>Half salsa, half plain Greek yogurt, plus hot sauce to taste. Great with cucumbers and carrots.</div>
+    <div class="recipe"><b>Buffalo dip</b>Plain Greek yogurt + Frank's or Cholula + garlic powder. For when you want something spicy.</div>
+    <p style="color:var(--muted);font-size:.85rem">Get the big tub of plain Greek yogurt for dips (Kirkland at Costco is the cheapest). Plain tastes tangy on its own, but once seasoning goes in you won't notice.</p>
+  </div>
+</section>
+
+<section class="view" id="v-plan">
+  <h2>Fresh food, zero waste</h2>
+  <div class="panel"><p><b>The rule:</b> fresh stuff only lasts a few days, so buy just what these 4 days use. Everything else on the board comes from the pantry, fridge and freezer, which you can stock up on.</p>
+  <p><b>Fresh buy list:</b> 1 pack strawberries, 1 pack blueberries, 1 bag snap peas, 1 tray mini cucumbers, 1 bunch grapes, 1 small fresh salsa. (Baby carrots and whole jicama last 2 weeks or more, so they aren't on the clock.)</p>
+  <p><b>Same day you shop:</b> wash the grapes, pull them off the stems and freeze half. Make one batch of Greek yogurt ranch.</p></div>
+  <div class="days">
+    <div class="day"><h3>Day 1 <span class="tag">berries first</span></h3><ul>
+      <li>Strawberries + string cheese</li><li>Cucumber rounds + fresh salsa</li><li>Night: frozen grapes</li></ul></div>
+    <div class="day"><h3>Day 2</h3><ul>
+      <li>Two Good yogurt + blueberries</li><li>Snap peas + Greek yogurt ranch</li><li>Meat stick when you're on the road</li></ul></div>
+    <div class="day"><h3>Day 3 <span class="tag">finish strawberries</span></h3><ul>
+      <li>Last of the strawberries (or freeze them)</li><li>Jicama sticks with lime + creamy salsa</li><li>Night: Yasso bar or Jello cup</li></ul></div>
+    <div class="day"><h3>Day 4 <span class="tag">clear it out</span></h3><ul>
+      <li>Finish snap peas and cucumbers</li><li>Leftover blueberries go in the freezer</li><li>Fresh salsa should be gone. Switch to a jar.</li></ul></div>
+  </div>
+  <div class="panel" style="margin-top:12px"><p><b>Days 5 and beyond:</b> run on pantry and freezer (jerky, meat sticks, SkinnyPop, frozen berries, edamame, Yasso, string cheese, yogurt) until your next shop, then repeat.</p></div>
+</section>
+
+<section class="view" id="v-list">
+  <h2>My shopping list</h2>
+  <div id="listwrap"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+    <button class="btn" id="copyList">Copy list</button>
+    <button class="btn ghost" id="clearDone">Remove checked</button>
+    <button class="btn ghost" id="clearAll">Clear all</button>
+  </div>
+</section>
+
+<p class="note">Calories are approximate per serving. Store stock changes, so check the store app before a trip. Vons is the Albertsons brand in San Diego, and its digital coupons are where the deals are.</p>
+</div>
+<button class="fab" id="fab"></button>
+
+<script>
+const IMGS = {"stringcheese": "https://images.albertsons-media.com/is/image/ABS/960087737?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "babybel": "https://images.albertsons-media.com/is/image/ABS/970499350?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "chomps": "https://images.albertsons-media.com/is/image/ABS/960333668?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "kirkjerky": "https://images.albertsons-media.com/is/image/ABS/960130434?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "twogood": "https://images.albertsons-media.com/is/image/ABS/970010820?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "oikospro": "https://images.albertsons-media.com/is/image/ABS/970031924?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "eggs": "https://images.albertsons-media.com/is/image/ABS/960307215?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "deliturkey": "https://images.albertsons-media.com/is/image/ABS/960152208?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "turkeybacon": "https://images.albertsons-media.com/is/image/ABS/188560205?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "edamame": "https://images.albertsons-media.com/is/image/ABS/971006229?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "skinnypop": "https://images.albertsons-media.com/is/image/ABS/971195922?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "quest": "https://images.albertsons-media.com/is/image/ABS/970577520?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "snappeas": "https://images.albertsons-media.com/is/image/ABS/184660263?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "cucumber": "https://images.albertsons-media.com/is/image/ABS/970003597?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "spicycarrots": "https://images.albertsons-media.com/is/image/ABS/960215447?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "babycarrots": "https://images.albertsons-media.com/is/image/ABS/960053953?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "jicama": "https://images.albertsons-media.com/is/image/ABS/184540057?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "tjsalsa": "https://images.albertsons-media.com/is/image/ABS/970688509?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "freshsalsa": "https://images.albertsons-media.com/is/image/ABS/960160208?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "hotsauce": "https://images.albertsons-media.com/is/image/ABS/105400014?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "plaingreek": "https://images.albertsons-media.com/is/image/ABS/960050143?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "ranchmix": "https://images.albertsons-media.com/is/image/ABS/960212717?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "hummus": "https://images.albertsons-media.com/is/image/ABS/971321282?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "strawberries": "https://images.albertsons-media.com/is/image/ABS/184070124?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "blueberries": "https://images.albertsons-media.com/is/image/ABS/184070083?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "berriesfz": "https://images.albertsons-media.com/is/image/ABS/960069901?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "grapes": "https://images.albertsons-media.com/is/image/ABS/184100012?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "yasso": "https://images.albertsons-media.com/is/image/ABS/970010890?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "jello": "https://images.albertsons-media.com/is/image/ABS/960076181?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "pudding": "https://images.albertsons-media.com/is/image/ABS/960076177?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "awzero": "https://images.albertsons-media.com/is/image/ABS/960036099?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "dietcoke": "https://images.albertsons-media.com/is/image/ABS/108010224?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "sparkice": "https://images.albertsons-media.com/is/image/ABS/960101389?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "peachtea": "https://images.albertsons-media.com/is/image/ABS/970008118?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "pureleaf": "https://images.albertsons-media.com/is/image/ABS/960132133?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "mio": "https://images.albertsons-media.com/is/image/ABS/960051263?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "crystal": "https://images.albertsons-media.com/is/image/ABS/960022062?$ng-ecom-pdp-desktop$&defaultImage=Not_Available", "barebells": "https://images.openfoodfacts.org/images/products/734/000/180/0623/front_en.115.400.jpg"};
+const LIFE = {
+  pantry:{label:'Pantry',color:'var(--pantry)'}, freezer:{label:'Freezer',color:'var(--freezer)'},
+  fridge:{label:'Fridge',color:'var(--fridge)'}, fresh:{label:'Fresh',color:'var(--fresh)'}
+};
+const STORES = {costco:'Costco', tj:"Trader Joe's", vons:'Vons / Albertsons', sf:'Smart & Final'};
+const CATS = {protein:'Protein', crunch:'Crunchy & Salty', sweet:'Sweet', dip:'Dips & Salsa', drink:'Drinks'};
+const ITEMS = [
+ {id:'stringcheese',em:'🧀',name:'String Cheese',cal:'80 cal · 7g protein',why:'You already like it. Easy protein that keeps you full.',life:'fridge',keep:'About 3 to 4 weeks unopened',stores:['costco','tj','vons','sf'],cat:'protein'},
+ {id:'babybel',em:'🧀',name:'Babybel Light (Reduced Fat)',cal:'50 cal · 6g protein',why:'Wax wrapped so it travels well in a lunch bag.',life:'fridge',keep:'About 4 weeks unopened',stores:['costco','vons','sf'],cat:'protein'},
+ {id:'chomps',em:'🥩',name:'Chomps Meat Sticks',cal:'About 90 cal · 9 to 10g protein',why:'Keep a few in the car and at the office for hungry moments.',life:'pantry',keep:'Months, no fridge needed',stores:['costco','vons'],cat:'protein'},
+ {id:'kirkjerky',em:'🥩',name:'Beef Jerky',cal:'About 80 cal per oz · 12g protein',why:'Jack Link\'s at Vons, or Kirkland at Costco for the best price per ounce. Count out a portion.',life:'pantry',keep:'Months unopened, about 1 week once open',stores:['costco','tj','vons','sf'],cat:'protein'},
+ {id:'twogood',em:'🥣',name:'Too Good & Co. Yogurt',cal:'80 cal · 12g protein',why:'Used to be called Two Good. Closest to regular yogurt taste, so try this first.',life:'fridge',keep:'2 to 3 weeks unopened',stores:['costco','vons','sf'],cat:'protein'},
+ {id:'oikospro',em:'🥣',name:'Oikos Pro Yogurt',cal:'About 140 cal · 20g protein',why:'Thicker, more protein. A mini meal.',life:'fridge',keep:'2 to 3 weeks unopened',stores:['costco','vons','sf'],cat:'protein'},
+ {id:'eggs',em:'🥚',name:'Peeled Hard Boiled Eggs',cal:'70 cal · 6g protein each',why:'Already peeled. Salt, pepper and hot sauce.',life:'fridge',keep:'About 1 to 2 weeks, check the date',stores:['costco','tj','vons'],cat:'protein'},
+ {id:'deliturkey',em:'🦃',name:'Deli Turkey Roll Ups',cal:'About 60 cal per 2 oz',why:'Roll turkey around a string cheese. Salty, filling, fast.',life:'fresh',keep:'3 to 5 days once opened (freezes ok)',stores:['costco','tj','vons','sf'],cat:'protein'},
+ {id:'turkeybacon',em:'🥓',name:'Center Cut Bacon',cal:'About 35 cal per slice',why:'Keeps the bacon habit with less fat than regular. Cook a batch, snack on 2 slices.',life:'freezer',keep:'Freeze the pack, pull slices as needed',stores:['costco','vons','sf'],cat:'protein'},
+ {id:'edamame',em:'🫛',name:'Frozen Edamame',cal:'About 100 cal per ½ cup · 9g protein',why:'Microwave, salt, done. Protein and fiber together.',life:'freezer',keep:'Months in the freezer',stores:['costco','tj','vons','sf'],cat:'crunch'},
+ {id:'skinnypop',em:'🍿',name:'SkinnyPop 100 Cal Bags',cal:'100 cal per bag',why:'Your favorite, already portioned so the bag can\'t run away from you.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'crunch'},
+ {id:'quest',em:'🌮',name:'Quest Protein Chips',cal:'About 140 cal · 18g protein',why:'Real chip crunch for salsa, with protein instead of just carbs.',life:'pantry',keep:'Months',stores:['costco','vons'],cat:'crunch'},
+ {id:'snappeas',em:'🫛',name:'Sugar Snap Peas',cal:'About 35 cal per cup',why:'Crunchy, sweet, great with Greek yogurt ranch.',life:'fresh',keep:'5 to 7 days',stores:['costco','tj','vons'],cat:'crunch'},
+ {id:'cucumber',em:'🥒',name:'Mini Cucumbers',cal:'About 15 cal each',why:'Slice into rounds for dipping.',life:'fresh',keep:'About 1 week',stores:['costco','tj','vons','sf'],cat:'crunch'},
+ {id:'spicycarrots',em:'🥕',name:'Spicy Pickled Carrots',cal:'About 10 to 15 cal per serving',why:'Escabeche style carrots and jalapeños. Crunchy and spicy for almost nothing. Salty, so keep portions normal.',life:'pantry',keep:'Months in the can, about 2 weeks in the fridge once open',stores:['vons','sf','costco'],cat:'crunch'},
+ {id:'babycarrots',em:'🥕',name:'Baby Carrots',cal:'About 35 cal per cup',why:'Great scooper for salsa and Greek yogurt ranch.',life:'fridge',keep:'2 to 3 weeks in the fridge',stores:['costco','tj','vons','sf'],cat:'crunch'},
+ {id:'jicama',em:'🥔',name:'Jicama',cal:'About 45 cal per cup',why:'Crisp, slightly sweet, like a juicy chip. Cut into sticks and add lime and Tajín.',life:'fridge',keep:'Whole: 2 to 3 weeks. Cut sticks: about 5 days',stores:['tj','vons','sf'],cat:'crunch'},
+ {id:'tjsalsa',em:'🌶️',name:'Jarred Salsa',cal:'About 10 to 20 cal per 2 tbsp',why:'Keep the salsa. Siete Spicy at Vons, or Trader Joe\'s Chunky or Autentica.',life:'pantry',keep:'Months unopened, about 2 weeks in the fridge once open',stores:['tj','costco','vons','sf'],cat:'dip'},
+ {id:'freshsalsa',em:'🍅',name:'Fresh Salsa',cal:'About 10 to 15 cal per 2 tbsp',why:'Del Real Molcajete tastes homemade. Find it in the refrigerated section.',life:'fresh',keep:'About 1 week once opened',stores:['tj','vons','costco'],cat:'dip'},
+ {id:'hotsauce',em:'🔥',name:'Hot Sauce',cal:'0 cal',why:'Tabasco, Cholula, Tapatio, Frank\'s. Put it on everything.',life:'pantry',keep:'Months',stores:['costco','tj','vons','sf'],cat:'dip'},
+ {id:'plaingreek',em:'🥣',name:'Plain Greek Yogurt (big tub)',cal:'About 120 cal per cup · 20g protein',why:'The base for ranch and French onion dip makeovers.',life:'fridge',keep:'About 2 weeks once open',stores:['costco','tj','vons','sf'],cat:'dip'},
+ {id:'ranchmix',em:'🧂',name:'Ranch Seasoning Packets',cal:'Few calories',why:'Mix into Greek yogurt for ranch that tastes like the real thing.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'dip'},
+ {id:'hummus',em:'🫘',name:'Hummus',cal:'About 70 cal per 2 tbsp',why:'Good with carrots and cucumbers. Measure it, it adds up.',life:'fridge',keep:'About 1 week once open',stores:['costco','tj','vons','sf'],cat:'dip'},
+ {id:'strawberries',em:'🍓',name:'Strawberries',cal:'About 50 cal per cup',why:'One of the best snacks there is. Eat these first.',life:'fresh',keep:'3 to 4 days',stores:['costco','tj','vons','sf'],cat:'sweet'},
+ {id:'blueberries',em:'🫐',name:'Blueberries',cal:'About 85 cal per cup',why:'Great on Two Good yogurt.',life:'fresh',keep:'5 to 7 days',stores:['costco','tj','vons','sf'],cat:'sweet'},
+ {id:'berriesfz',em:'🍇',name:'Frozen Berries',cal:'About 70 cal per cup',why:'Berries that never go bad. Eat half thawed or on yogurt.',life:'freezer',keep:'Months',stores:['costco','tj','vons','sf'],cat:'sweet'},
+ {id:'grapes',em:'🍇',name:'Frozen Grapes (DIY)',cal:'About 100 cal per cup',why:'Freeze them yourself. Tastes like a little sorbet bite.',life:'freezer',keep:'Weeks once frozen',stores:['costco','tj','vons','sf'],cat:'sweet'},
+ {id:'yasso',em:'🍦',name:'Yasso Bars',cal:'About 100 cal',why:'Real dessert feeling for a small number.',life:'freezer',keep:'Months',stores:['costco','vons'],cat:'sweet'},
+ {id:'jello',em:'🍮',name:'Sugar Free Jello Cups',cal:'About 10 cal',why:'Sweet fix for almost nothing.',life:'pantry',keep:'Months, no fridge needed',stores:['vons','sf'],cat:'sweet'},
+ {id:'pudding',em:'🍫',name:'Sugar Free Pudding Cups',cal:'About 60 cal',why:'Chocolate craving fix.',life:'pantry',keep:'Months, no fridge needed',stores:['vons','sf'],cat:'sweet'},
+ {id:'barebells',em:'🍫',name:'Barebells Protein Bars',cal:'About 200 cal · 20g protein',why:'Tastes like a candy bar. A treat or a meal replacement, not a side snack.',life:'pantry',keep:'Months',stores:['costco','vons'],cat:'sweet'},
+ {id:'awzero',em:'🥤',name:'A&W Zero Sugar',cal:'0 cal',why:'Your top pick. Stock up when Vons has it on sale.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'drink'},
+ {id:'dietcoke',em:'🥤',name:'Diet Coke',cal:'0 cal',why:'Your favorite cola.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'drink'},
+ {id:'sparkice',em:'💧',name:'Sparkling Ice',cal:'0 to 10 cal',why:'Lots of flavors, big multipacks at Costco and Smart & Final.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'drink'},
+ {id:'peachtea',em:'🍑',name:'Snapple Zero Sugar Peach Tea',cal:'About 5 cal',why:'Six pack of plastic bottles at Vons. This may be the one you\'ve been buying.',life:'pantry',keep:'Months',stores:['vons','sf','costco'],cat:'drink'},
+ {id:'pureleaf',em:'🍵',name:'Gold Peak Zero Sugar Tea',cal:'0 cal',why:'Sweet tea taste with no sugar. Six packs at Vons.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'drink'},
+ {id:'mio',em:'💧',name:'MiO Water Enhancer',cal:'0 cal',why:'Cheapest way to flavor water all day. One bottle flavors dozens.',life:'pantry',keep:'Months',stores:['vons','sf'],cat:'drink'},
+ {id:'crystal',em:'💧',name:'Crystal Light Packets',cal:'5 cal',why:'Peach tea and lemonade flavors for your water bottle.',life:'pantry',keep:'Months',stores:['costco','vons','sf'],cat:'drink'}
+];
+
+const store = { get(k,d){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):d }catch(e){ return d } },
+                set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)) }catch(e){} } };
+let list = store.get('snack-list', {});   // id -> done(bool)
+const F = { life:'all', store:'all', cat:'all' };
+
+function chips(el, key, opts){
+  const box=document.getElementById(el);
+  const all=[['all','All'],...Object.entries(opts).map(([k,v])=>[k,typeof v==='string'?v:v.label])];
+  all.forEach(([k,v])=>{ const b=document.createElement('button'); b.className='chip'+(F[key]===k?' on':''); b.textContent=v;
+    b.onclick=()=>{F[key]=k; box.querySelectorAll('.chip').forEach(c=>c.classList.remove('on')); b.classList.add('on'); render();}; box.appendChild(b); });
+}
+function thumb(it){ return IMGS[it.id] ? `<img src="${IMGS[it.id]}" alt="${it.name}" loading="lazy">` : it.em; }
+function render(){
+  const g=document.getElementById('grid');
+  const order={pantry:0,freezer:1,fridge:2,fresh:3};
+  const rows=ITEMS.filter(it=>(F.life==='all'||it.life===F.life)&&(F.store==='all'||it.stores.includes(F.store))&&(F.cat==='all'||it.cat===F.cat))
+                  .sort((a,b)=>order[a.life]-order[b.life]);
+  g.innerHTML = rows.length? rows.map(it=>`
+   <div class="card">
+     <div class="thumb">${thumb(it)}</div>
+     <span class="life" style="background:${LIFE[it.life].color}">${LIFE[it.life].label}</span>
+     <button class="add ${it.id in list?'on':''}" data-id="${it.id}" aria-label="Add to list">${it.id in list?'✓':'+'}</button>
+     <div class="body">
+       <div class="nm">${it.name}</div><div class="cal">${it.cal}</div>
+       <div class="why">${it.why}</div>
+       <div class="stores">${it.stores.map(s=>`<span class="st">${STORES[s]}</span>`).join('')}</div>
+       <div class="keep">⏱ ${it.keep}</div>
+     </div>
+   </div>`).join('') : '<div class="empty">Nothing matches those filters.</div>';
+  g.querySelectorAll('.add').forEach(b=>b.onclick=()=>{ const id=b.dataset.id; if(id in list) delete list[id]; else list[id]=false; store.set('snack-list',list); render(); renderList(); });
+  updCount();
+}
+function updCount(){ const n=Object.keys(list).length; document.getElementById('cnt').textContent=n?`(${n})`:'';
+  const fab=document.getElementById('fab'); fab.style.display = n && !document.getElementById('v-list').classList.contains('active') ? 'block':'none'; fab.textContent=`🛒 View list (${n})`; }
+function bestStore(it){ return F.store!=='all' && it.stores.includes(F.store) ? F.store : it.stores[0]; }
+function renderList(){
+  const w=document.getElementById('listwrap'); const ids=Object.keys(list);
+  if(!ids.length){ w.innerHTML='<div class="panel empty">Your list is empty. Tap + on anything in Browse.</div>'; updCount(); return; }
+  const groups={}; ids.forEach(id=>{ const it=ITEMS.find(i=>i.id===id); if(!it) return; const s=bestStore(it); (groups[s]=groups[s]||[]).push(it); });
+  w.innerHTML=Object.keys(STORES).filter(s=>groups[s]).map(s=>`<div class="panel listgrp"><h3>${STORES[s]}</h3>${groups[s].map(it=>`
+     <label class="li ${list[it.id]?'done':''}"><input type="checkbox" data-id="${it.id}" ${list[it.id]?'checked':''}>
+     ${IMGS[it.id]?`<img src="${IMGS[it.id]}" alt="">`:`<span class="em">${it.em}</span>`}
+     <span class="t">${it.name}<small>${LIFE[it.life].label} · also at ${it.stores.filter(x=>x!==s).map(x=>STORES[x]).join(', ')||'this store only'}</small></span></label>`).join('')}</div>`).join('');
+  w.querySelectorAll('input').forEach(c=>c.onchange=()=>{ list[c.dataset.id]=c.checked; store.set('snack-list',list); renderList(); });
+  updCount();
+}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>show(t.dataset.v));
+function show(v){ document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.v===v));
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id==='v-'+v)); if(v==='list') renderList(); updCount(); window.scrollTo({top:0,behavior:'smooth'}); }
+document.getElementById('fab').onclick=()=>show('list');
+document.getElementById('clearDone').onclick=()=>{ Object.keys(list).forEach(k=>{ if(list[k]) delete list[k]; }); store.set('snack-list',list); renderList(); render(); };
+document.getElementById('clearAll').onclick=()=>{ list={}; store.set('snack-list',list); renderList(); render(); };
+document.getElementById('copyList').onclick=()=>{
+  const groups={}; Object.keys(list).forEach(id=>{ const it=ITEMS.find(i=>i.id===id); if(!it) return; const s=bestStore(it); (groups[s]=groups[s]||[]).push(it.name); });
+  const txt=Object.keys(STORES).filter(s=>groups[s]).map(s=>STORES[s]+'\n'+groups[s].map(n=>'• '+n).join('\n')).join('\n\n');
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{ const b=document.getElementById('copyList'); b.textContent='Copied!'; setTimeout(()=>b.textContent='Copy list',1500); }).catch(()=>prompt('Copy your list:',txt));
+};
+chips('f-life','life',LIFE); chips('f-store','store',STORES); chips('f-cat','cat',CATS);
+render(); renderList();
+</script>
+</body>
+</html>
