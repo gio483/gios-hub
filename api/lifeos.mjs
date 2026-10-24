@@ -1,4 +1,5 @@
 import { put, list } from '@vercel/blob';
+import momHandler, { isMomCron } from './_mom.mjs';
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const PATHS = { lifeos: 'lifeos/data.json', bni: 'sdlr-bni/outreach.json' };
@@ -16,6 +17,7 @@ async function readBlob(p) {
 
 export default async function handler(req, res) {
   const NS = nsOf(req);
+  if (NS === 'mom' || isMomCron(req)) return momHandler(req, res);
   const PATH = PATHS[NS] || PATHS.lifeos;
 const host = req.headers.host || '';
 const ref = req.headers.referer || req.headers.origin || '';
