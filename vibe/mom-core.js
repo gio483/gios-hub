@@ -1,6 +1,6 @@
 // The Making of a Man: shared state, cloud sync and notifications
 (function(){
-  const API = '/api/mom';
+  const API = '/api/lifeos?ns=mom';
   const LS = {
     get(k,d){ try{ const v=localStorage.getItem('mom:'+k); return v===null?d:JSON.parse(v);}catch(e){return d} },
     set(k,v){ try{ localStorage.setItem('mom:'+k, JSON.stringify(v)); }catch(e){} },
@@ -37,7 +37,7 @@
   async function syncNow(){
     if(!MOM.id || syncing) return; syncing=true; MOM.status='Syncing'; emit();
     try{
-      const r=await fetch(API+'?id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{done:state.done,j:state.j,vm:state.vm}})});
+      const r=await fetch(API+'&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{done:state.done,j:state.j,vm:state.vm}})});
       const js=await r.json(); if(!r.ok) throw new Error(js.error||'sync failed');
       absorb(js.data); MOM.status='Synced'; MOM.lastSync=Date.now();
     }catch(e){ MOM.status='Offline, saved on this device'; }
@@ -72,21 +72,21 @@
     const perm=await Notification.requestPermission(); if(perm!=='granted') throw new Error('Notifications were not allowed. You can turn them on in iPhone Settings, Notifications.');
     const reg=await registerSW(); if(!reg) throw new Error('Could not start the background service.');
     await navigator.serviceWorker.ready;
-    const {key}=await fetch(API+'?action=vapid').then(r=>r.json());
+    const {key}=await fetch(API+'&action=vapid').then(r=>r.json());
     if(!key) throw new Error('Notifications are not switched on for the server yet.');
     let sub=await reg.pushManager.getSubscription();
     if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToU8(key)});
-    const r=await fetch(API+'?action=subscribe&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON(), tz:Intl.DateTimeFormat().resolvedOptions().timeZone})});
+    const r=await fetch(API+'&action=subscribe&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON(), tz:Intl.DateTimeFormat().resolvedOptions().timeZone})});
     if(!r.ok) throw new Error((await r.json()).error||'Could not save your subscription.');
     LS.set('pushOn', true); MOM.pushOn=true; emit(); return true;
   }
   async function disablePush(){
     try{ const reg=await navigator.serviceWorker.getRegistration('/vibe/'); const s=reg&&await reg.pushManager.getSubscription(); if(s) await s.unsubscribe(); }catch(e){}
-    if(MOM.id) await fetch(API+'?action=unsubscribe&id='+MOM.id,{method:'POST'});
+    if(MOM.id) await fetch(API+'&action=unsubscribe&id='+MOM.id,{method:'POST'});
     LS.set('pushOn', false); MOM.pushOn=false; emit();
   }
   async function testPush(slot){
-    const r=await fetch(API+'?action=test&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slot||'test'})});
+    const r=await fetch(API+'&action=test&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slot||'test'})});
     const js=await r.json(); if(!r.ok) throw new Error(js.error||'Test failed'); return true;
   }
 
