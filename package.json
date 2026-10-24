@@ -1,6 +1,7 @@
 {
   "private": true,
   "dependencies": {
-    "@vercel/blob": "latest"
+    "@vercel/blob": "latest",
+    "web-push": "^3.6.7"
   }
 }
