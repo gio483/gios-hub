@@ -1,10 +1,20 @@
 {
   "functions": {
-    "api/**/*.js": { "maxDuration": 60 },
-    "api/**/*.mjs": { "maxDuration": 60 }
+    "api/**/*.js": {
+      "maxDuration": 60
+    },
+    "api/**/*.mjs": {
+      "maxDuration": 60
+    }
   },
   "crons": [
-    { "path": "/api/mom-cron", "schedule": "0 14 * * *" },
-    { "path": "/api/mom-cron", "schedule": "0 3 * * *" }
+    {
+      "path": "/api/lifeos?ns=mom&action=cron",
+      "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/lifeos?ns=mom&action=cron",
+      "schedule": "0 3 * * *"
+    }
   ]
 }
