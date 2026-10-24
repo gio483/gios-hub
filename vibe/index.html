@@ -30,6 +30,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .chips::-webkit-scrollbar{display:none}
 .chip{padding:7px 14px;border:1px solid var(--line);border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
 .chip.on{background:var(--gold);color:#120e08;border-color:var(--gold)}
+.read-btn{padding:7px 14px;border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--gold);color:var(--gold2);text-decoration:none;white-space:nowrap}
 .ambient-btn{padding:7px 14px;border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:#120e08;white-space:nowrap}
 
 /* hero */
@@ -128,7 +129,7 @@ footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;fon
 @media (max-width:640px){
   .bar{padding:10px 12px;flex-wrap:wrap}
   .chips{order:3;width:100%;margin-left:0}
-  .ambient-btn{margin-left:auto}
+  .read-btn{margin-left:auto}
   .wall{columns:1;padding:0 12px}
   .reel{height:560px}
   .tile .cap{opacity:1;font-size:16px}
@@ -147,6 +148,7 @@ footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;fon
     <button class="chip" data-f="motion">Motion</button>
     <button class="chip" data-f="words">Words</button>
   </div>
+  <a class="read-btn" href="readings.html">Readings</a>
   <button class="ambient-btn" id="ambOpen">&#9654; Ambient</button>
 </div>
 
@@ -164,6 +166,11 @@ footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;fon
 
 <nav class="index" id="index"></nav>
 <main id="main"></main>
+
+<section class="reels" style="text-align:center;padding-top:70px">
+  <div class="sec-title"><h3>THE MAKING OF A MAN</h3><p>Twenty one readings with Scripture, reflection, a journal, and the videos that go with them</p></div>
+  <a href="readings.html" style="display:inline-block;padding:14px 26px;border-radius:99px;background:var(--gold);color:#120e08;text-decoration:none;font-size:12px;letter-spacing:.16em;text-transform:uppercase">Open the readings</a>
+</section>
 
 <section class="reels" id="reels">
   <div class="sec-title">

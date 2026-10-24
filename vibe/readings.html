@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Making of a Man</title>
+<meta name="theme-color" content="#0b0907">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0907; --bg2:#14110d; --bg3:#1b1712; --ink:#efe8dc; --muted:#a39885; --gold:#c9a35a; --gold2:#e6c88a; --line:rgba(201,163,90,.22);
+  --serif:'Cormorant Garamond', Georgia, serif; --roman:'Cinzel', 'Times New Roman', serif; --sans:'Inter', system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;padding:14px 20px;background:linear-gradient(to bottom,rgba(11,9,7,.9),rgba(11,9,7,0))}
+.bar.solid{background:rgba(11,9,7,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar a{font-family:var(--roman);letter-spacing:.2em;font-size:12px;text-decoration:none;color:var(--muted);white-space:nowrap}
+.bar a.on,.bar a:hover{color:var(--gold2)}
+.bar .sp{flex:1}
+
+.hero{position:relative;height:88svh;min-height:520px;display:grid;place-items:center;text-align:center;overflow:hidden}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at center,rgba(11,9,7,.2),rgba(11,9,7,.8) 75%),linear-gradient(to bottom,transparent 55%,var(--bg))}
+.hero .in{position:relative;z-index:2;padding:0 24px;max-width:860px}
+.eyebrow{font-family:var(--roman);letter-spacing:.45em;font-size:12px;color:var(--gold2);text-transform:uppercase}
+.hero h1{font-family:var(--roman);font-weight:400;font-size:clamp(40px,7.5vw,96px);letter-spacing:.06em;line-height:1.05;margin:16px 0 22px}
+.hero p{font-family:var(--serif);font-style:italic;font-size:clamp(20px,2.4vw,28px);line-height:1.4}
+.hero .cta{display:inline-flex;gap:12px;margin-top:30px;flex-wrap:wrap;justify-content:center}
+.btn{padding:12px 22px;border-radius:99px;font-size:12px;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line)}
+.btn.solid{background:var(--gold);color:#120e08;border-color:var(--gold)}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:30px auto 10px}
+.how div{border:1px solid var(--line);border-radius:8px;padding:18px;background:var(--bg2)}
+.how b{display:block;font-family:var(--roman);color:var(--gold2);letter-spacing:.14em;font-size:12px;margin-bottom:8px;font-weight:400}
+.how span{color:var(--muted);font-size:14px;line-height:1.6}
+
+.sec{padding:70px 0 20px}
+.sec-h{text-align:center;margin-bottom:34px}
+.sec-h .num{font-family:var(--roman);color:var(--gold);letter-spacing:.5em;font-size:12px}
+.sec-h h2{font-family:var(--roman);font-weight:400;font-size:clamp(28px,4.4vw,52px);letter-spacing:.08em;margin-top:10px}
+.sec-h p{color:var(--muted);margin:10px auto 0;max-width:620px;line-height:1.6;font-size:15px}
+.progress{display:flex;gap:6px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.progress i{width:14px;height:14px;border-radius:50%;border:1px solid var(--line);display:block}
+.progress i.done{background:var(--gold);border-color:var(--gold)}
+
+.move{margin:46px 0 16px;display:flex;align-items:baseline;gap:14px;border-bottom:1px solid var(--line);padding-bottom:12px}
+.move b{font-family:var(--roman);color:var(--gold);letter-spacing:.3em;font-size:12px;font-weight:400}
+.move h3{font-family:var(--roman);font-weight:400;font-size:clamp(20px,2.4vw,28px);letter-spacing:.08em}
+.move span{margin-left:auto;color:var(--muted);font-family:var(--serif);font-style:italic;font-size:17px}
+.days{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.day{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:16/10;text-decoration:none;display:block;background:var(--bg2);border:1px solid transparent}
+.day img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1s ease,filter .5s;filter:brightness(.62)}
+.day:hover img{transform:scale(1.05);filter:brightness(.8)}
+.day .t{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 16px;background:linear-gradient(transparent,rgba(8,6,4,.88))}
+.day .d{font-family:var(--roman);font-size:11px;letter-spacing:.3em;color:var(--gold2)}
+.day h4{font-family:var(--serif);font-weight:500;font-size:24px;line-height:1.15;margin-top:4px}
+.day .ref{font-size:12px;color:#d9cfbe;margin-top:4px;letter-spacing:.04em}
+.day .ck{position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;border:1px solid rgba(255,255,255,.4);display:grid;place-items:center;font-size:13px;background:rgba(0,0,0,.35)}
+.day.done .ck{background:var(--gold);border-color:var(--gold);color:#120e08}
+
+/* watch */
+.vgroup{margin-bottom:40px}
+.vgroup h3{font-family:var(--roman);font-weight:400;letter-spacing:.12em;font-size:18px;margin-bottom:6px}
+.vgroup p{color:var(--muted);font-size:14px;margin-bottom:16px}
+.vids{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.vid{cursor:pointer;text-align:left}
+.vid .th{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
+.vid .th img{width:100%;height:100%;object-fit:cover;transition:transform .8s ease}
+.vid:hover .th img{transform:scale(1.05)}
+.vid .th::after{content:"\25B6";position:absolute;inset:0;display:grid;place-items:center;font-size:26px;color:#fff;background:radial-gradient(circle,rgba(0,0,0,.25),transparent 60%);opacity:.85}
+.vid .len{position:absolute;right:8px;bottom:8px;z-index:2;font-size:11px;background:rgba(0,0,0,.75);padding:2px 6px;border-radius:3px}
+.vid .vt{font-family:var(--serif);font-size:19px;line-height:1.25;margin-top:10px}
+.vid .vc{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.04em}
+.vid.star .th{outline:1px solid var(--gold);outline-offset:3px}
+
+/* reader */
+.reader{position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;display:none}
+.reader.open{display:block}
+.r-top{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;padding:12px 18px;background:rgba(11,9,7,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.r-top .x{font-family:var(--roman);letter-spacing:.18em;font-size:12px;color:var(--muted)}
+.r-top .pos{margin-left:auto;font-family:var(--roman);letter-spacing:.2em;font-size:12px;color:var(--gold2)}
+.r-hero{position:relative;height:62svh;min-height:380px;display:flex;align-items:flex-end;overflow:hidden}
+.r-hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.r-hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(to bottom,rgba(11,9,7,.15),rgba(11,9,7,.35) 50%,var(--bg))}
+.r-hero .in{position:relative;z-index:2;width:100%;max-width:760px;margin:0 auto;padding:0 22px 26px}
+.r-hero .d{font-family:var(--roman);letter-spacing:.4em;font-size:12px;color:var(--gold2)}
+.r-hero h2{font-family:var(--roman);font-weight:400;font-size:clamp(32px,5.5vw,62px);letter-spacing:.05em;line-height:1.08;margin-top:10px}
+.r-body{max-width:760px;margin:0 auto;padding:10px 22px 80px}
+.scripture{margin:24px 0 34px;padding:30px 28px;border-left:2px solid var(--gold);background:linear-gradient(90deg,rgba(201,163,90,.08),transparent)}
+.scripture p{font-family:var(--serif);font-size:clamp(22px,2.6vw,30px);line-height:1.45;font-style:italic}
+.scripture p + p{margin-top:12px}
+.scripture cite{display:block;margin-top:14px;font-style:normal;font-size:12px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold)}
+.reflect p{font-family:var(--serif);font-size:21px;line-height:1.7;color:#e9e1d3;margin-bottom:18px}
+.reflect p:first-child::first-letter{font-family:var(--roman);float:left;font-size:62px;line-height:.9;padding:6px 10px 0 0;color:var(--gold2)}
+.label{font-family:var(--roman);letter-spacing:.3em;font-size:11px;color:var(--gold);margin:40px 0 14px;text-transform:uppercase}
+.echo{text-align:center;padding:26px 20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.echo q{display:block;quotes:none;font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.4}
+.echo cite{display:block;font-style:normal;margin-top:10px;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--muted)}
+.qs{list-style:none;counter-reset:q}
+.qs li{counter-increment:q;position:relative;padding:14px 0 14px 46px;border-bottom:1px solid rgba(255,255,255,.06);font-family:var(--serif);font-size:20px;line-height:1.45}
+.qs li::before{content:counter(q);position:absolute;left:0;top:13px;width:30px;height:30px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--roman);font-size:12px;color:var(--gold2)}
+textarea{width:100%;min-height:200px;margin-top:6px;padding:18px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.6;resize:vertical}
+textarea:focus{outline:none;border-color:var(--gold)}
+.saved{font-size:11px;color:var(--muted);letter-spacing:.08em;margin-top:6px;min-height:14px}
+.practice{padding:22px 24px;border-radius:8px;background:var(--bg3);border:1px solid var(--line);font-size:16px;line-height:1.65}
+.watch-one{margin-top:6px}
+.watch-one .frame{aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#000}
+.watch-one iframe{width:100%;height:100%;border:0}
+.r-nav{display:flex;gap:12px;margin-top:46px;flex-wrap:wrap}
+.r-nav button{flex:1;min-width:140px;padding:16px;border-radius:8px;border:1px solid var(--line);font-family:var(--roman);letter-spacing:.14em;font-size:12px}
+.r-nav .mark{background:var(--gold);color:#120e08;border-color:var(--gold)}
+.r-nav .mark.is{background:transparent;color:var(--gold2)}
+
+/* video modal */
+.vm{position:fixed;inset:0;z-index:200;background:rgba(5,4,3,.96);display:none;align-items:center;justify-content:center;padding:20px}
+.vm.open{display:flex}
+.vm .frame{width:min(1100px,100%);aspect-ratio:16/9}
+.vm iframe{width:100%;height:100%;border:0;border-radius:8px}
+.vm .x{position:absolute;top:16px;right:18px;font-size:30px;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.08)}
+
+footer{text-align:center;padding:60px 20px 80px;color:var(--muted);font-size:12px;line-height:1.8}
+@media (max-width:640px){.move span{display:none}.reflect p{font-size:19px}.bar{gap:14px}}
+</style>
+</head>
+<body>
+
+<div class="bar" id="bar">
+  <a href="./">&#8592; BOARD</a>
+  <span class="sp"></span>
+  <a href="#readings" class="on">READINGS</a>
+  <a href="#watch">WATCH</a>
+</div>
+
+<header class="hero">
+  <img src="img/the-stoa.jpg" alt="">
+  <div class="in">
+    <div class="eyebrow">Twenty one readings</div>
+    <h1>THE MAKING<br>OF A MAN</h1>
+    <p>Before you ask God for the woman you want, ask Him to prepare you to love the woman you receive.</p>
+    <div class="cta"><a class="btn solid" href="#" id="startBtn">Begin Day 1</a><a class="btn" href="#watch">Watch</a></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="how">
+    <div><b>ONE A DAY</b><span>Read one in the morning, slowly. Read the Scripture out loud.</span></div>
+    <div><b>SIT WITH IT</b><span>Answer the questions in the journal box. It saves on this device as you type.</span></div>
+    <div><b>LIVE IT</b><span>Each day has one practice. Do it before you sleep.</span></div>
+    <div><b>WATCH</b><span>Every reading is paired with a video in the same spirit as the one that spoke to you.</span></div>
+  </div>
+</div>
+
+<section class="sec wrap" id="readings">
+  <div class="sec-h">
+    <div class="num">THE READINGS</div>
+    <h2>THREE MOVEMENTS</h2>
+    <p>Become the man. Endure the waiting and the fire. Learn to love her well. Strong and gentle, all the way through.</p>
+    <div class="progress" id="progress"></div>
+  </div>
+  <div id="list"></div>
+</section>
+
+<section class="sec wrap" id="watch">
+  <div class="sec-h">
+    <div class="num">THE LIBRARY</div>
+    <h2>WATCH</h2>
+    <p>Hand picked from the channel that made your video and the ones that share its spirit: Scripture first, cinematic, made for men who want to be ready.</p>
+  </div>
+  <div id="watchList"></div>
+</section>
+
+<footer>
+  Scripture from the King James Version and the World English Bible, both public domain. Stoic lines from public domain translations.<br>
+  Videos belong to their creators and play from YouTube. Journal entries and progress save in this browser only.
+</footer>
+
+<div class="reader" id="reader">
+  <div class="r-top"><button class="x" id="rClose">&#8592; ALL READINGS</button><span class="pos" id="rPos"></span></div>
+  <div id="rContent"></div>
+</div>
+
+<div class="vm" id="vm"><button class="x" id="vmX" aria-label="Close">&times;</button><div class="frame" id="vmFrame"></div></div>
+
+<script>
+// ---------- VIDEOS ----------
+const V = {
+ '2--4Y3aDPFg':['God sent you this before you give her your heart.','Yeshualetter','6:54'],
+ 'OlOI6Xyz2DY':['God wants you prepared for the woman you’re praying for.','Yeshualetter','5:13'],
+ 'UIR13mylgas':['God wants you to be the man she needs.','Yeshualetter','5:18'],
+ '-NUZiUbaKh4':['Your future wife is watching','Yeshualetter','5:47'],
+ 'A3OGWxsEj3A':['God sent this before you choose her.','Yeshualetter','6:55'],
+ 'ZJieDnBtscA':['God is preparing you for the love you asked for.','Yeshualetter','5:01'],
+ 'X3BFKMgp9zo':['Why God is delaying your love life?','Yeshualetter','8:05'],
+ 'hBoDPeY6heI':['God sent this before you fall in love again.','Yeshualetter','6:08'],
+ 'GsExFcFgxmE':['Why God broke your heart to save you.','Yeshualetter','9:09'],
+ '0UCgkE6mxcQ':['God is telling you to let her go.','Yeshualetter','12:13'],
+ 'CXR6NWrsR5c':['God wants you to stop chasing love.','Yeshualetter','7:15'],
+ '2vHqowi9E_0':['Stop chasing her, chase God.','Yeshualetter','5:55'],
+ 'QFnA3nuFTF0':['God knows you like this person.','Yeshualetter','11:08'],
+ 'UnfVe3Jb6Qk':['Signs God is asking you to stay single, for now.','Yeshualetter','6:55'],
+ 'CJ0A2BwMANs':['You loved her, but God has more for you.','Yeshualetter','5:55'],
+ 'Msm6TpTcJ-M':['Being a Christian Man','Goded','3:57'],
+ 'D5GP8NO8S14':['Sons of God','Goded','4:08'],
+ 'gfc8agENt2k':['Didn’t You Pray For This?','Goded','4:02'],
+ 'lQZM8hTe-2M':['Being a Christian Father','Goded','4:53'],
+ 'UHnLejXjCbo':['Your Story Does Not End Here','Goded','5:19'],
+ 'ayVKwoN4laM':['BE A GODLY MAN','ABOVE INSPIRATION','12:11'],
+ 'Bh_Z1I2Jhzs':['Biblical Masculinity: What It Means To Be A Godly Man','ABOVE INSPIRATION','10:29'],
+ 'KuF3VnYdYZA':['WAITING ON GOD: Trust God Is Working','ABOVE INSPIRATION','13:43'],
+ '99uREt3GWWg':['God Has Not Forgotten You','ABOVE INSPIRATION','11:42'],
+ 'Jh0oWOJFtWk':['GOD FIRST','ABOVE INSPIRATION','1:05:10'],
+ 'E6k080oB9e8':['Stand as a Soldier of Christ','Motiversity','25:41'],
+ '95QKeX8Cmwg':['Stand as a Soldier of Christ, Not as a Slave to Sin','Order Without Name','27:26'],
+ 'RBjXk-VPq8o':['NEVER GIVE UP: God Is With You In The Battle','Lion of Judah','11:00'],
+ 'RQr3V_1JEAA':['God Breaks The Man He Wants To Use','Building Mindset','22:52'],
+ '0xQLuPEXMUI':['5 Things Godly Men Do to Prepare for Their Future Wife (Ruth 2)','Mark Ballenger','14:02'],
+ '_CfMnG2Nll8':['Act Like Men Conference','Pastor Joby Martin','49:46'],
+ 'ncOacmlq5Rk':['The Code of A Godly Man','Pastor Josh Howerton','56:45'],
+ 'eg7PjtPLzlw':['The Building Blocks For Godly Dating','Pastor Josh Howerton','47:40']
+};
+const GROUPS = [
+ {t:'Where you started', d:'The one that spoke to you, and the rest of the Yeshualetter series on becoming the man before finding her.',
+  ids:['2--4Y3aDPFg','OlOI6Xyz2DY','UIR13mylgas','-NUZiUbaKh4','A3OGWxsEj3A','ZJieDnBtscA','hBoDPeY6heI','2vHqowi9E_0']},
+ {t:'The waiting and the letting go', d:'For the seasons when the answer is not yet, or not her.',
+  ids:['X3BFKMgp9zo','QFnA3nuFTF0','UnfVe3Jb6Qk','CXR6NWrsR5c','0UCgkE6mxcQ','CJ0A2BwMANs','GsExFcFgxmE','KuF3VnYdYZA','99uREt3GWWg']},
+ {t:'Man of God', d:'Short, cinematic, Scripture driven. Same B roll energy.',
+  ids:['Msm6TpTcJ-M','D5GP8NO8S14','gfc8agENt2k','UHnLejXjCbo','lQZM8hTe-2M','ayVKwoN4laM','Bh_Z1I2Jhzs']},
+ {t:'The fire', d:'When you need fight in you.',
+  ids:['E6k080oB9e8','95QKeX8Cmwg','RBjXk-VPq8o','RQr3V_1JEAA','Jh0oWOJFtWk']},
+ {t:'Go deeper', d:'Longer teaching for a Sunday afternoon with a notebook.',
+  ids:['0xQLuPEXMUI','_CfMnG2Nll8','ncOacmlq5Rk','eg7PjtPLzlw']}
+];
+
+// ---------- READINGS ----------
+const MOVES = [
+ {n:'I', t:'BECOME THE MAN', s:'Days 1 to 7'},
+ {n:'II', t:'THE WAITING AND THE FIRE', s:'Days 8 to 14'},
+ {n:'III', t:'TO LOVE HER WELL', s:'Days 15 to 21'}
+];
+const R = [
+{t:'Guard the Wellspring', img:'olive-grove-moon', vid:'2--4Y3aDPFg',
+ sc:[['Keep thy heart with all diligence; for out of it are the issues of life.','Proverbs 4:23']],
+ r:['Solomon does not say guard your reputation, your money, or your schedule. He says guard your heart, because everything else flows out of it. The way you speak to a stranger, the way you handle a lost deal, the way you will one day hold a wife’s trust: all of it starts upstream, in what you let settle in you when no one is watching.',
+    'A wellspring is not poisoned in a day. It is shaped by what you feed it. The scroll at midnight. The fantasy you replay. The bitterness you rehearse on the drive home. None of it feels like much. All of it flows downstream.',
+    'Guarding your heart is not closing it. A sealed well is useless. It is choosing, with diligence, what gets in and who gets the keys. Before you hand your heart to a woman, hand it to God, and let Him show you what is actually in there.'],
+ e:['The soul becomes dyed with the color of its thoughts.','Marcus Aurelius'],
+ q:['Honestly, what has been flowing into my heart this week?','What have I let in that I would not want my future wife to see?','What would it look like to guard my heart without going cold?'],
+ p:'Remove one input today that muddies the well: an app, a show, an account. Replace it with ten minutes of silence before bed.'},
+{t:'Become What You Pray For', img:'the-weight', vid:'UIR13mylgas',
+ sc:[['Let no man despise thy youth; but be thou an example of the believers, in word, in conversation, in charity, in spirit, in faith, in purity.','1 Timothy 4:12']],
+ r:['It is easy to make a list of what you want in a woman. Loyal. Honest. Rooted in faith. Kind when there is nothing to gain. Now read the list again and put your own name at the top.',
+    'Paul tells a young man not to let anyone look down on his youth, and then he immediately raises the bar: be an example. Not someday. Not once you are married or once the business is stable. Now. In word, in conduct, in love, in faith, in purity.',
+    'The prayer for a godly wife is a good prayer. But it is incomplete without its partner: Lord, make me a man worth trusting. God rarely answers the first prayer by skipping the second. He builds the man, and in building him, He begins building the marriage before it exists.'],
+ e:['Waste no more time arguing what a good man should be. Be one.','Marcus Aurelius'],
+ q:['Write the qualities you want in a wife. Which of them am I living right now?','Which one am I weakest in?','Who is watching how I live, even when I think no one is?'],
+ p:'Pick one quality from your list and practice it on purpose today with someone who cannot repay you.'},
+{t:'Build the Field First', img:'the-harvest', vid:'0xQLuPEXMUI',
+ sc:[['Prepare thy work without, and make it fit for thyself in the field; and afterwards build thine house.','Proverbs 24:27']],
+ r:['Before Eve, Adam had work. God put him in the garden to dress it and to keep it. Purpose came before partnership.',
+    'Proverbs says the same thing in a farmer’s language: get your fields ready, then build your house. This is not against romance. It is order. A man who brings a woman into a life with no direction is asking her to become his direction, and that is too heavy for anyone but God.',
+    'The field is bigger than revenue. It is your habits, your money, your word, your body, your walk with God. Ask whether your field could hold a family, not in luxury but in stability. Then keep plowing. Not to earn love, but to be ready to steward it.'],
+ e:['First say to yourself what you would be; and then do what you have to do.','Epictetus'],
+ q:['If she walked into my life tomorrow, what would she be walking into?','Which part of my field is overgrown?','Am I building for my own glory, or for a household?'],
+ p:'Write one page describing the household you hope to lead in ten years. Then list three things you can do this month to prepare the ground.'},
+{t:'Slow to Wrath', img:'lion-and-man', vid:'Msm6TpTcJ-M',
+ sc:[['Wherefore, my beloved brethren, let every man be swift to hear, slow to speak, slow to wrath: for the wrath of man worketh not the righteousness of God.','James 1:19 to 20']],
+ r:['Anger feels like strength. It is loud and fast, and for a moment it makes you feel in control. James says it produces nothing God wants.',
+    'Swift to hear. Slow to speak. Slow to wrath. Notice the order. Most men live it backwards: quick to react, slow to listen, and only afterward do they hear what was actually said.',
+    'A lion that roars at everything is not powerful. It is unwell. Real strength is the ability to absorb, to wait, to let a moment pass without letting it own you. One day the woman you love will say something that cuts, and your children will test you on a day you have nothing left. What you practice now, in traffic and with clients and with your own family, is what will come out then.'],
+ e:['How much more grievous are the consequences of anger than the causes of it.','Marcus Aurelius'],
+ q:['When did I last let anger speak first? What did it cost?','What usually sits underneath my anger: fear, pride, or exhaustion?','Who deserves an apology from me?'],
+ p:'Today, when something irritates you, count to five and ask one question before you respond.'},
+{t:'Faithful in Little', img:'roots-through-marble', vid:'ZJieDnBtscA',
+ sc:[['He that is faithful in that which is least is faithful also in much: and he that is unjust in the least is unjust also in much.','Luke 16:10']],
+ r:['Nobody becomes faithful on the wedding day. Faithfulness is a muscle built in small rooms. Returning the call you said you would return. Showing up on time. Paying back the small debt. Keeping the promise you made to yourself at six in the morning.',
+    'Jesus says the little things are not little. They are the test for the larger things. The man who cuts small corners will cut them on his vows, not because he is wicked, but because he has trained himself to believe small breaches do not count.',
+    'They count. Heaven counts them. And they count you: every small faithfulness tells your own soul who you are. Do enough of them and integrity stops being a decision. It becomes your nature. Like a root through marble, slow and quiet and unstoppable.'],
+ e:['Wellbeing is realized by small steps, but is truly no small thing.','Zeno of Citium'],
+ q:['What small promise have I been breaking?','Where do I act differently when no one is watching?','What would it mean to be trusted with much?'],
+ p:'Keep every small promise for one full day, including the ones only you know about. Write them down tonight.'},
+{t:'Humble Yourself', img:'marble-tear', vid:'Bh_Z1I2Jhzs',
+ sc:[['Humble yourselves therefore under the mighty hand of God, that he may exalt you in due time.','1 Peter 5:6']],
+ r:['Pride is the quiet killer of good men. It rarely looks like arrogance. More often it looks like never asking for help, never admitting you were wrong, needing to win the conversation, needing to be seen.',
+    'Peter says humble yourself, and God will lift you in due time. Due time is His timing, not yours. Pride wants the lift now. Humility is willing to stay low until the hand comes.',
+    'In a marriage, pride will cost you more than any financial mistake. The man who cannot say I was wrong makes his wife carry every argument alone. Learn it now. Say it to your mother. Say it to a client. Say it to a brother. Say it to God. It gets lighter every time, and you get stronger.'],
+ e:['It is impossible for a man to learn what he thinks he already knows.','Epictetus'],
+ q:['Where am I hardest to correct?','When did I last say I was wrong without adding a but?','What am I trying to make people see in me?'],
+ p:'Ask one person you trust: what is one thing I do that makes me hard to be close to? Listen without defending yourself.'},
+{t:'Iron and Brothers', img:'breaking-bread', vid:'_CfMnG2Nll8',
+ sc:[['Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.','Proverbs 27:17'],
+     ['Two are better than one; because they have a good reward for their labour. For if they fall, the one will lift up his fellow: but woe to him that is alone when he falleth.','Ecclesiastes 4:9 to 10']],
+ r:['A man alone is easy to deceive, mostly by himself. Isolation feels like independence until you fall and realize there is no one close enough to see it.',
+    'Iron sharpens iron, and sharpening involves friction. The friends you need are not only the ones who cheer for you. They are the ones who will look at your plans, your relationships, your habits, and tell you the truth.',
+    'Before marriage, build brotherhood. A wife was never meant to be your only friend, your only counselor, your only source of encouragement. Men who come into marriage with strong brothers bring a fortified heart. Find them at church, in the gym, in the work. Be the kind of brother you are looking for, and the right ones will recognize it.'],
+ e:['Associate with people who are likely to improve you.','Seneca'],
+ q:['Who are the men who can tell me the truth?','Who could I invest in this month?','Where am I hiding from accountability?'],
+ p:'Reach out to one man today and set a time to get together. Not for business. For brotherhood.'},
+{t:'Mount Up', img:'the-summit', vid:'KuF3VnYdYZA',
+ sc:[['But they that wait upon the LORD shall renew their strength; they shall mount up with wings as eagles; they shall run, and not be weary; and they shall walk, and not faint.','Isaiah 40:31']],
+ r:['Waiting is not doing nothing. The Hebrew word Isaiah uses for wait carries the picture of a cord being twisted and bound together. To wait on the Lord is to be braided into Him while the answer is still out of sight.',
+    'Notice the order: fly, run, walk. You would expect it the other way around. But Isaiah ends with walking, because most of life is not soaring. It is the long, ordinary walk of faithfulness when nothing dramatic is happening. Renewed strength is not only for the breakthrough. It is for Tuesday.',
+    'If you are waiting right now, for her, for a breakthrough, for clarity, you are not wasted. You are being bound to the One who holds the timeline.'],
+ e:['Life is long if you know how to use it.','Seneca'],
+ q:['What am I waiting for right now?','Am I waiting on God, or just waiting?','What would faithful walking look like this week?'],
+ p:'Take a long walk without your phone. Pray as you walk, and hand Him each thing you are waiting for, one at a time.'},
+{t:'A Time to Every Purpose', img:'olive-watercolor', vid:'X3BFKMgp9zo',
+ sc:[['To every thing there is a season, and a time to every purpose under the heaven.','Ecclesiastes 3:1'],['He hath made every thing beautiful in his time.','Ecclesiastes 3:11']],
+ r:['Some seasons are for planting. Some are for building. Some are for being alone with God in a way you may never get again once a wife and children fill the house with good noise.',
+    'Do not despise the season you are in because it is not the one you want. Single men often treat these years as a waiting room. They are a workshop. The freedom you have right now, your time, your focus, your ability to go where God sends, is a gift with an expiration date.',
+    'He makes everything beautiful in its time. Its time, not before. Picking fruit early does not make it ripe. It makes it sour. Trust the season. Use the season.'],
+ e:['It is not that we have a short time to live, but that we waste a lot of it.','Seneca'],
+ q:['What does this season allow me to do that a later season will not?','Am I rushing anything God has not released?','What do I want to say I did with these years?'],
+ p:'Write a letter to yourself to open on your wedding day, describing how you used this season.'},
+{t:'The Refiner Sits', img:'the-forge', vid:'GsExFcFgxmE',
+ sc:[['And he shall sit as a refiner and purifier of silver.','Malachi 3:3']],
+ r:['A silversmith does not walk away from the fire. He sits. He watches. It is said he knows the silver is ready when he can see his own reflection in it.',
+    'If you are in the heat right now, a closed door, a loss, a heartbreak, a season that feels like it is burning away more than it is building, know this: the Refiner is seated. He is not careless with the temperature. He is not absent. He is watching for His image to appear in you.',
+    'Heat reveals what is in the metal. That is the point. The impurities have to rise before they can be removed. The pain is not proof that God has left. Often it is proof that He is close.'],
+ e:['Fire tests gold, misfortune tests brave men.','Seneca'],
+ q:['What has the fire revealed in me lately?','What impurity keeps rising to the surface?','Can I trust the One who is sitting by the furnace?'],
+ p:'Name the hardest thing in your life right now, and write one way it is shaping you into His image.'},
+{t:'Open Hands', img:'hand-and-dove', vid:'0UCgkE6mxcQ',
+ sc:[['Trust in the LORD with all thine heart; and lean not unto thine own understanding. In all thy ways acknowledge him, and he shall direct thy paths.','Proverbs 3:5 to 6']],
+ r:['Some of the hardest obedience is letting go of what you want to keep. A person. A plan. A version of the future you already furnished in your mind.',
+    'Trust in the Lord with all your heart and lean not on your own understanding. Your understanding is real, but it is short. You see the chapter. He sees the book.',
+    'Letting go is not losing. It is moving your grip from the gift to the Giver. A closed hand cannot receive anything new. If God is asking you to release someone or something, do it with dignity, without bitterness, with open hands. What is truly meant for you will not be lost through your obedience.'],
+ e:['Some things are within our power, while others are not.','Epictetus'],
+ q:['What am I holding that God has asked me to release?','What am I afraid will happen if I let go?','What is actually within my control here?'],
+ p:'Write down what you need to release. Pray it out loud, then do one concrete thing that matches the prayer.'},
+{t:'Content in Every State', img:'chapel', vid:'CXR6NWrsR5c',
+ sc:[['For I have learned, in whatsoever state I am, therewith to be content.','Philippians 4:11'],['I can do all things through Christ which strengtheneth me.','Philippians 4:13']],
+ r:['Paul wrote these words from prison. Contentment was not something he felt because things were going well. It was something he learned.',
+    'Learned. That means it is a skill. You can practice it. You can get better at it.',
+    'Discontent whispers that life starts when: when she shows up, when the business hits the number, when the project is done, when the house is bought. Contentment says life is here, now, and Christ is enough in it. That does not kill ambition. It purifies it. A content man can pursue big things without being owned by them. And a man who is content while single will be a far better husband than a man who is desperate.'],
+ e:['Wealth consists not in having great possessions, but in having few wants.','Epictetus'],
+ q:['What is my when?','What would contentment look like today, specifically?','Is my ambition serving God, or replacing Him?'],
+ p:'Write down ten things you are grateful for that already exist in your life today.'},
+{t:'Every Thought Captive', img:'philosopher-portrait', vid:'D5GP8NO8S14',
+ sc:[['Casting down imaginations, and every high thing that exalteth itself against the knowledge of God, and bringing into captivity every thought to the obedience of Christ.','2 Corinthians 10:5'],
+     ['Whatsoever things are true, whatsoever things are honest, whatsoever things are just, whatsoever things are pure, whatsoever things are lovely, whatsoever things are of good report; if there be any virtue, and if there be any praise, think on these things.','Philippians 4:8']],
+ r:['The battle is lost or won in the mind long before it shows up in your actions. Paul uses the language of war: cast down, bring into captivity. Thoughts are not neutral. They are either building you or taking ground from you.',
+    'You cannot stop every thought from arriving. You can decide which ones get a seat at the table. When the anxious thought comes, put it on trial. Is it true? Is it honest? Is it worthy of my attention? Most of what keeps you up at night would not survive the questioning.',
+    'Then fill the space. Philippians gives you the menu: whatever is true, honest, just, pure, lovely, of good report. Think on these things. The mind follows what it is fed.'],
+ e:['Our life is what our thoughts make it.','Marcus Aurelius'],
+ q:['What thought has been running my mind this week?','Is it true?','What true thing can I put in its place?'],
+ p:'Each time an anxious or impure thought shows up today, say one line of Scripture out loud in its place.'},
+{t:'In Due Season', img:'the-push', vid:'RBjXk-VPq8o',
+ sc:[['And let us not be weary in well doing: for in due season we shall reap, if we faint not.','Galatians 6:9']],
+ r:['Farmers know something modern men forget: there is a long, quiet, unglamorous gap between planting and harvest. Nothing visible happens for weeks. That is exactly where most people quit.',
+    'Paul says do not grow weary in doing good, because in due season you will reap, if you do not give up. The harvest depends on not quitting, not on how fast it comes.',
+    'The discipline you are building, the purity you are guarding, the prayers you keep praying, the work you keep doing well when nobody sees: none of it is wasted. It is in the ground. Keep watering. Due season is a real season, and it is coming.'],
+ e:['Difficulties strengthen the mind, as labor does the body.','Seneca'],
+ q:['Where am I tempted to quit?','What seed have I planted that I need to keep watering?','What would I tell a younger brother in my position?'],
+ p:'Do the thing you have been putting off, today, even if it is small.'},
+{t:'Meek Is Not Weak', img:'lion-charcoal', vid:'ayVKwoN4laM',
+ sc:[['Blessed are the meek: for they shall inherit the earth.','Matthew 5:5'],['Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.','Matthew 11:29']],
+ r:['The Greek word for meek, praus, was used of a war horse that had been trained. All of its power was still there. It had simply been brought under control so it could be directed.',
+    'Jesus calls Himself meek and lowly, and He is the One who calmed storms and drove the money changers out of the temple. Meekness is not the absence of strength. It is strength that answers to something higher than its own impulses.',
+    'This is what a woman needs from a man. Not a man with no fire, and not a man who burns everything around him, but a man whose fire is under command. Gentle with her, fierce for her. Soft in his voice, steady in his spine.'],
+ e:['Nothing is so strong as gentleness, nothing so gentle as real strength.','Saint Francis de Sales'],
+ q:['Where is my strength not yet under control?','When have I been harsh when I should have been gentle?','When have I been passive when I should have been strong?'],
+ p:'Use your strength in service today: carry something, fix something, protect someone. Quietly.'},
+{t:'Love Suffers Long', img:'father-and-child-charcoal', vid:'hBoDPeY6heI',
+ sc:[['Love is patient and is kind. Love doesn’t envy. Love doesn’t brag, is not proud.','1 Corinthians 13:4'],['Bears all things, believes all things, hopes all things, and endures all things.','1 Corinthians 13:7']],
+ r:['Read 1 Corinthians 13 and put your own name where the word love is. It gets uncomfortable fast.',
+    'That discomfort is the point. This chapter is not a wedding decoration. It is a mirror. It describes a love made mostly of restraint: not envying, not boasting, not insisting on its own way, not keeping score. Most of what love is, according to Paul, is what you choose not to do.',
+    'Then the last line: bears all things, believes all things, hopes all things, endures all things. This is not the love of feelings. It is the love of a decision made again every morning. Practice it now, with your family and your friends. It is the same love she will need.'],
+ e:['If you wish to be loved, love.','Seneca'],
+ q:['Which line of this passage is hardest for me?','Who in my life needs my patience right now?','Do I keep score?'],
+ p:'Read the passage with your name in it every morning this week.'},
+{t:'He Gave Himself', img:'shepherd-storm', vid:'-NUZiUbaKh4',
+ sc:[['Husbands, love your wives, even as Christ also loved the church, and gave himself for it.','Ephesians 5:25']],
+ r:['The standard for a husband is not set by culture, or by your father, or by the guys at the gym. It is set by the cross. Love her as Christ loved the church and gave Himself for it.',
+    'Gave Himself. Not gave her things. Not gave her his opinions. Gave Himself.',
+    'Leadership in a Christian home is not a throne. It is a towel and a basin. It is being the first to serve, the first to apologize, the first to pray, the first to sacrifice. Any man who reads this verse and feels entitled has not really read it. Any man who reads it and feels its weight is beginning to understand. Start practicing that kind of giving now. It does not switch on at the altar. Like the shepherd who carries the lamb through the storm, it is learned in the carrying.'],
+ e:['In marriage there must be above all perfect companionship and mutual love of husband and wife.','Musonius Rufus'],
+ q:['What does giving myself look like in daily life?','Where am I still mostly a taker?','Who can I serve this week in a way that costs me something?'],
+ p:'Serve someone today in a way that costs you time or comfort, and tell no one.'},
+{t:'The Heart Behind the Face', img:'red-chalk-hand', vid:'A3OGWxsEj3A',
+ sc:[['For the LORD seeth not as man seeth; for man looketh on the outward appearance, but the LORD looketh on the heart.','1 Samuel 16:7'],['Favour is deceitful, and beauty is vain: but a woman that feareth the LORD, she shall be praised.','Proverbs 31:30']],
+ r:['Attraction is real and good. God made beauty. But attraction is a door, not a foundation.',
+    'When Samuel looked at the sons of Jesse, he was impressed by height and appearance. God corrected him: man looks at the outward appearance, but the Lord looks at the heart. Proverbs adds that charm deceives and beauty fades, but a woman who fears the Lord is to be praised.',
+    'Learn to see the way God sees. Watch how she treats people who can do nothing for her. Watch what she does with disappointment. Watch whether her faith is a feeling or a foundation. Then turn the same eyes on yourself. Would a wise woman, looking past your looks and your success, find a heart that fears God?'],
+ e:['If it is not right, do not do it; if it is not true, do not say it.','Marcus Aurelius'],
+ q:['Honestly, what have I been most drawn to in women?','Which qualities of character matter most for a lifetime?','What would she find if she looked past my surface?'],
+ p:'Write the five qualities of character that matter most to you in a wife and rank them. Then rank yourself on each.'},
+{t:'A Clean Way', img:'unmoved-column', vid:'2vHqowi9E_0',
+ sc:[['Wherewithal shall a young man cleanse his way? by taking heed thereto according to thy word.','Psalm 119:9'],['Thy word have I hid in mine heart, that I might not sin against thee.','Psalm 119:11']],
+ r:['The psalmist asks the question every young man eventually asks: how do I keep my way pure? The answer is not willpower alone. It is the Word, hidden in the heart.',
+    'Purity is not only about what you avoid. It is about what you are saving and who you are becoming. Every compromise teaches your heart that desire is the master. Every act of restraint teaches it that you are.',
+    'If you have failed here, and most men have, hear this: the same verse is for you. Cleanse your way. Not someday. Today. Grace is not permission to stay where you are. It is power to walk out. Hide the Word in your heart, because in the moment of temptation you will only have what is already there. Be the column in the storm.'],
+ e:['No man is free who is not master of himself.','Epictetus'],
+ q:['Where is my way not clean?','What usually comes right before I fall?','Which Scripture will I hide in my heart this week?'],
+ p:'Memorize Psalm 119:9 and 11 today, and set up one guardrail that makes failing harder.'},
+{t:'Except the Lord Build', img:'the-return', vid:'lQZM8hTe-2M',
+ sc:[['Except the LORD build the house, they labour in vain that build it.','Psalm 127:1'],['Lo, children are an heritage of the LORD. As arrows are in the hand of a mighty man; so are children of the youth.','Psalm 127:3 to 4']],
+ r:['You can build a beautiful house and still labor in vain. Square footage, money, and status do not make a home. Only God does.',
+    'Then the psalm turns to children and calls them arrows in the hand of a mighty man. Arrows are not decorations. They are shaped, aimed, and released toward a target. A father’s strength is not for himself. It is for launching his children into a future he will not fully see.',
+    'Start building the legacy now, before the children exist. Your faith, your habits, your finances, the stories you will one day tell them about what God did in these years. You are already raising them by the man you are becoming.'],
+ e:['A society grows great when old men plant trees in whose shade they shall never sit.','Greek proverb'],
+ q:['What am I building that God is not building?','What do I want my children to know about God from watching me?','What legacy starts today?'],
+ p:'Write a short letter to your future children. Keep it somewhere safe.'},
+{t:'Stand Firm, in Love', img:'before-battle', vid:'E6k080oB9e8',
+ sc:[['Watch! Stand firm in the faith! Be courageous! Be strong! Let all that you do be done in love.','1 Corinthians 16:13 to 14']],
+ r:['Paul ends a long letter with a short charge, like a coach in the final seconds: watch, stand firm, be courageous, be strong. Then, without a breath, he adds the line that holds the rest together: let all that you do be done in love.',
+    'Strength without love becomes domination. Love without strength becomes a softness that cannot protect anything. The man of God is both. That has been the whole journey of these readings: strong and gentle, rooted and reaching, disciplined and tender.',
+    'You are not finished. No man is. But you are further than you were twenty one days ago. Keep watch. Stand firm. Be strong. Do it all in love. Then start again at day one and see how much deeper it goes the second time.'],
+ e:['Be like the promontory against which the waves continually break, but it stands firm and tames the fury of the water around it.','Marcus Aurelius'],
+ q:['What has changed in me over these readings?','Which day do I need to return to?','What is my charge to myself going forward?'],
+ p:'Write your own charge in four short lines, like Paul’s. Put it where you will see it every morning.'}
+];
+
+// ---------- STORAGE (per device, safe) ----------
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem('mom:'+k); return v===null?d:JSON.parse(v);}catch(e){return d} },
+  set(k,v){ try{ localStorage.setItem('mom:'+k, JSON.stringify(v)); }catch(e){} }
+};
+let done = store.get('done',[]);
+
+// ---------- LIST ----------
+const list=document.getElementById('list');
+MOVES.forEach((m,mi)=>{
+  list.insertAdjacentHTML('beforeend',`<div class="move"><b>${m.n}</b><h3>${m.t}</h3><span>${m.s}</span></div><div class="days" id="mv${mi}"></div>`);
+  const box=document.getElementById('mv'+mi);
+  R.slice(mi*7,mi*7+7).forEach((d,k)=>{
+    const n=mi*7+k+1;
+    box.insertAdjacentHTML('beforeend',`<a class="day" href="#day-${n}" data-n="${n}"><img src="img/${d.img}.jpg" alt="" loading="lazy"><span class="ck">&#10003;</span><div class="t"><div class="d">DAY ${n}</div><h4>${d.t}</h4><div class="ref">${d.sc.map(s=>s[1]).join(' · ')}</div></div></a>`);
+  });
+});
+function paintProgress(){
+  document.querySelectorAll('.day').forEach(a=>a.classList.toggle('done',done.includes(+a.dataset.n)));
+  document.getElementById('progress').innerHTML=R.map((_,k)=>`<i class="${done.includes(k+1)?'done':''}"></i>`).join('');
+  const next=(R.findIndex((_,k)=>!done.includes(k+1))+1)||1;
+  const sb=document.getElementById('startBtn'); sb.textContent = done.length? (done.length===21?'Begin again':'Continue: Day '+next) : 'Begin Day 1'; sb.href='#day-'+next;
+}
+paintProgress();
+
+// ---------- WATCH ----------
+const thumb=id=>`https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+const card=(id,star)=>{const v=V[id];return `<button class="vid${star?' star':''}" data-id="${id}"><div class="th"><img src="${thumb(id)}" alt="" loading="lazy"><span class="len">${v[2]}</span></div><div class="vt">${v[0]}</div><div class="vc">${v[1]}</div></button>`};
+document.getElementById('watchList').innerHTML = GROUPS.map(g=>`<div class="vgroup"><h3>${g.t.toUpperCase()}</h3><p>${g.d}</p><div class="vids">${g.ids.map((id,k)=>card(id,id==='2--4Y3aDPFg')).join('')}</div></div>`).join('');
+const vm=document.getElementById('vm'), vmf=document.getElementById('vmFrame');
+const embed=id=>`<iframe src="https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video"></iframe>`;
+document.addEventListener('click',e=>{const b=e.target.closest('.vid'); if(!b) return; vmf.innerHTML=embed(b.dataset.id); vm.classList.add('open');});
+function closeVm(){vm.classList.remove('open'); vmf.innerHTML='';}
+document.getElementById('vmX').onclick=closeVm; vm.addEventListener('click',e=>{if(e.target===vm) closeVm();});
+
+// ---------- READER ----------
+const reader=document.getElementById('reader'), rc=document.getElementById('rContent');
+function openDay(n){
+  const d=R[n-1]; if(!d) return;
+  const mv=MOVES[Math.floor((n-1)/7)];
+  const isDone=done.includes(n);
+  document.getElementById('rPos').textContent=`${mv.n} · DAY ${n} OF 21`;
+  rc.innerHTML=`
+   <div class="r-hero"><img src="img/${d.img}.jpg" alt=""><div class="in"><div class="d">DAY ${n} · ${mv.t}</div><h2>${d.t}</h2></div></div>
+   <div class="r-body">
+     <div class="scripture">${d.sc.map(s=>`<p>${s[0]}</p><cite>${s[1]}</cite>`).join('')}</div>
+     <div class="reflect">${d.r.map(p=>`<p>${p}</p>`).join('')}</div>
+     <div class="label">An echo from the ancients</div>
+     <div class="echo"><q>${d.e[0]}</q><cite>${d.e[1]}</cite></div>
+     <div class="label">Sit with it</div>
+     <ol class="qs">${d.q.map(x=>`<li>${x}</li>`).join('')}</ol>
+     <textarea id="journal" placeholder="Write here. It saves on this device as you type."></textarea>
+     <div class="saved" id="saved"></div>
+     <div class="label">Live it today</div>
+     <div class="practice">${d.p}</div>
+     <div class="label">Watch</div>
+     <div class="watch-one"><div class="frame" id="dayVid">${card(d.vid)}</div></div>
+     <div class="r-nav">
+       ${n>1?`<button id="prevD">&#8592; DAY ${n-1}</button>`:''}
+       <button class="mark ${isDone?'is':''}" id="markD">${isDone?'&#10003; COMPLETED':'MARK COMPLETE'}</button>
+       ${n<21?`<button id="nextD">DAY ${n+1} &#8594;</button>`:''}
+     </div>
+   </div>`;
+  const ta=document.getElementById('journal'), sv=document.getElementById('saved');
+  ta.value=store.get('j'+n,'');
+  let tm; ta.addEventListener('input',()=>{clearTimeout(tm); tm=setTimeout(()=>{store.set('j'+n,ta.value); sv.textContent='Saved';},400);});
+  const dv=document.getElementById('dayVid'); dv.querySelector('.vid').addEventListener('click',e=>{e.stopPropagation(); dv.innerHTML=embed(d.vid).replace('autoplay=1','autoplay=1');},{capture:true});
+  document.getElementById('markD').onclick=()=>{ if(done.includes(n)) done=done.filter(x=>x!==n); else done.push(n); store.set('done',done); paintProgress(); openDay(n); };
+  const pv=document.getElementById('prevD'), nx=document.getElementById('nextD');
+  if(pv) pv.onclick=()=>location.hash='day-'+(n-1);
+  if(nx) nx.onclick=()=>location.hash='day-'+(n+1);
+  reader.classList.add('open'); reader.scrollTop=0; document.body.style.overflow='hidden';
+}
+function closeReader(){reader.classList.remove('open'); rc.innerHTML=''; document.body.style.overflow='';}
+document.getElementById('rClose').onclick=()=>{ history.pushState('', document.title, location.pathname); closeReader(); document.getElementById('readings').scrollIntoView(); };
+function route(){ const m=location.hash.match(/^#day-(\d+)$/); if(m) openDay(+m[1]); else closeReader(); }
+addEventListener('hashchange',route); route();
+addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(vm.classList.contains('open')) closeVm(); else if(reader.classList.contains('open')) document.getElementById('rClose').click(); }});
+const bar=document.getElementById('bar'); addEventListener('scroll',()=>bar.classList.toggle('solid',scrollY>innerHeight*.5),{passive:true});
+</script>
+</body>
+</html>
