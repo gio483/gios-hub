@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Strong &amp; Gentle</title>
+<meta name="theme-color" content="#0b0907">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0907; --bg2:#14110d; --ink:#efe8dc; --muted:#a39885; --gold:#c9a35a; --gold2:#e6c88a; --line:rgba(201,163,90,.22);
+  --serif:'Cormorant Garamond', Georgia, serif; --roman:'Cinzel', 'Times New Roman', serif; --sans:'Inter', system-ui, sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:50;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* top bar */
+.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:12px;padding:14px 20px;
+  background:linear-gradient(to bottom,rgba(11,9,7,.85),rgba(11,9,7,0));transition:background .3s}
+.bar.solid{background:rgba(11,9,7,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar .home{font-family:var(--roman);letter-spacing:.2em;font-size:13px;text-decoration:none;color:var(--gold2);white-space:nowrap}
+.chips{display:flex;gap:6px;margin-left:auto;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{padding:7px 14px;border:1px solid var(--line);border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.chip.on{background:var(--gold);color:#120e08;border-color:var(--gold)}
+.ambient-btn{padding:7px 14px;border-radius:99px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:#120e08;white-space:nowrap}
+
+/* hero */
+.hero{position:relative;height:100svh;min-height:560px;display:grid;place-items:center;text-align:center;overflow:hidden}
+.hero video,.hero img.poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse at center,rgba(11,9,7,.05),rgba(11,9,7,.6) 75%),linear-gradient(to bottom,rgba(11,9,7,0) 60%,var(--bg))}
+.hero .in{position:relative;z-index:2;padding:0 24px;max-width:900px}
+.eyebrow{font-family:var(--roman);letter-spacing:.45em;font-size:12px;color:var(--gold2);text-transform:uppercase}
+.hero h1{font-family:var(--roman);font-weight:400;font-size:clamp(44px,9vw,120px);letter-spacing:.06em;line-height:1;margin:18px 0 26px;text-shadow:0 4px 40px rgba(0,0,0,.6)}
+.hero p{font-family:var(--serif);font-style:italic;font-size:clamp(20px,2.6vw,30px);line-height:1.35;color:#f4ecdf}
+.hero cite{display:block;margin-top:14px;font-style:normal;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--muted)}
+.scroll{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);z-index:2;font-size:11px;letter-spacing:.3em;color:var(--muted);text-transform:uppercase;text-decoration:none}
+.scroll::after{content:"";display:block;width:1px;height:40px;margin:10px auto 0;background:linear-gradient(var(--gold),transparent);animation:drip 2s infinite}
+@keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* chapter index */
+.index{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 28px;padding:40px 20px 10px;font-family:var(--roman);letter-spacing:.18em;font-size:13px}
+.index a{text-decoration:none;color:var(--muted)}
+.index a:hover{color:var(--gold2)}
+.index b{color:var(--gold);font-weight:400;margin-right:8px}
+
+/* chapter */
+.chapter{padding:40px 0 30px}
+.ch-head{position:relative;height:78svh;min-height:440px;display:grid;place-items:center;overflow:hidden;margin-bottom:28px}
+.ch-head img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.08);transition:transform 1.6s ease}
+.ch-head.seen img{transform:scale(1)}
+.ch-head::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(11,9,7,.35),rgba(11,9,7,.55)),linear-gradient(to bottom,var(--bg) 0,transparent 18%,transparent 70%,var(--bg))}
+.ch-head .in{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:860px;opacity:0;transform:translateY(20px);transition:all 1.2s ease .2s}
+.ch-head.seen .in{opacity:1;transform:none}
+.num{font-family:var(--roman);color:var(--gold2);letter-spacing:.5em;font-size:13px}
+.ch-head h2{font-family:var(--roman);font-weight:400;font-size:clamp(36px,6.5vw,84px);letter-spacing:.08em;margin:12px 0 22px}
+.ch-head blockquote{font-family:var(--serif);font-style:italic;font-size:clamp(20px,2.4vw,30px);line-height:1.4}
+.ch-head cite{display:block;margin-top:12px;font-style:normal;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:#d8cdb9}
+
+/* masonry */
+.wall{columns:4 300px;column-gap:14px;padding:0 14px;max-width:1800px;margin:0 auto}
+.tile{break-inside:avoid;margin:0 0 14px;position:relative;border-radius:6px;overflow:hidden;background:var(--bg2);cursor:zoom-in;
+  opacity:0;transform:translateY(24px);transition:opacity .9s ease,transform .9s ease}
+.tile.seen{opacity:1;transform:none}
+.tile img,.tile video{display:block;width:100%;height:auto;transition:transform 1.2s ease,filter .6s}
+.tile:hover img,.tile:hover video{transform:scale(1.04)}
+.tile .cap{position:absolute;left:0;right:0;bottom:0;padding:30px 14px 12px;font-family:var(--serif);font-style:italic;font-size:18px;
+  background:linear-gradient(transparent,rgba(0,0,0,.75));opacity:0;transition:opacity .4s}
+.tile:hover .cap{opacity:1}
+.tag{position:absolute;top:10px;left:10px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;padding:4px 8px;border-radius:3px;background:rgba(11,9,7,.6);backdrop-filter:blur(6px);color:var(--gold2)}
+.tile.hidden,.word.hidden{display:none}
+.word{break-inside:avoid;margin:0 0 14px;padding:38px 28px;border:1px solid var(--line);border-radius:6px;text-align:center;
+  background:radial-gradient(ellipse at top,rgba(201,163,90,.08),transparent 70%),var(--bg2);opacity:0;transform:translateY(24px);transition:opacity .9s,transform .9s}
+.word.seen{opacity:1;transform:none}
+.word q{display:block;font-family:var(--serif);font-size:clamp(22px,2vw,28px);line-height:1.35;quotes:none}
+.word.big q{font-size:clamp(28px,2.8vw,40px);font-family:var(--roman);letter-spacing:.04em;line-height:1.2}
+.word cite{display:block;margin-top:16px;font-style:normal;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+.word .rule{width:36px;height:1px;background:var(--gold);margin:0 auto 20px;opacity:.7}
+
+/* reels */
+.reels{padding:60px 14px 40px;max-width:1500px;margin:0 auto}
+.sec-title{text-align:center;margin-bottom:30px}
+.sec-title h3{font-family:var(--roman);font-weight:400;font-size:clamp(28px,4vw,48px);letter-spacing:.1em}
+.sec-title p{color:var(--muted);margin-top:8px;font-size:14px}
+.reel-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.reel{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000;height:640px}
+.reel iframe{width:100%;height:100%;border:0}
+
+footer{text-align:center;padding:60px 20px 90px;color:var(--muted);font-size:12px;letter-spacing:.06em;line-height:1.8}
+footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;font-size:14px;margin-bottom:10px}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:100;background:rgba(5,4,3,.97);display:none;align-items:center;justify-content:center;flex-direction:column}
+.lb.open{display:flex}
+.lb .stage{max-width:94vw;max-height:80vh;display:flex;align-items:center;justify-content:center}
+.lb img,.lb video{max-width:94vw;max-height:80vh;object-fit:contain;border-radius:4px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.lb .say{margin-top:22px;max-width:760px;text-align:center;padding:0 20px;font-family:var(--serif);font-style:italic;font-size:clamp(18px,2vw,24px)}
+.lb .say cite{display:block;font-style:normal;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-top:8px}
+.lb .x,.lb .nav{position:absolute;color:var(--ink);font-size:28px;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.06)}
+.lb .x{top:16px;right:16px}
+.lb .prev{left:14px;top:50%;transform:translateY(-50%)}
+.lb .next{right:14px;top:50%;transform:translateY(-50%)}
+
+/* ambient */
+.amb{position:fixed;inset:0;z-index:200;background:#000;display:none;overflow:hidden;cursor:none}
+.amb.open{display:block}
+.amb .layer{position:absolute;inset:0;opacity:0;transition:opacity 2.2s ease}
+.amb .layer.on{opacity:1}
+.amb .layer img,.amb .layer video{width:100%;height:100%;object-fit:cover}
+.amb .layer.draw img{object-fit:contain;background:#efe8dc}
+.amb .layer.on img.kb{animation:kb 11s ease-out forwards}
+@keyframes kb{from{transform:scale(1.12) translate(1.5%,1%)}to{transform:scale(1) translate(0,0)}}
+.amb .shade{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.65));pointer-events:none}
+.amb .words{position:absolute;left:0;right:0;bottom:12vh;text-align:center;padding:0 8vw;opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+.amb .words.on{opacity:1}
+.amb .words q{display:block;quotes:none;font-family:var(--serif);font-style:italic;font-size:clamp(24px,3.4vw,46px);line-height:1.3;text-shadow:0 2px 30px rgba(0,0,0,.9)}
+.amb .words cite{display:block;margin-top:14px;font-style:normal;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2);text-shadow:0 2px 20px #000}
+.amb .exit{position:absolute;top:18px;right:18px;z-index:3;font-size:11px;letter-spacing:.25em;text-transform:uppercase;padding:8px 14px;border:1px solid rgba(255,255,255,.25);border-radius:99px;opacity:.5;cursor:pointer}
+.amb .exit:hover{opacity:1}
+
+@media (max-width:640px){
+  .bar{padding:10px 12px;flex-wrap:wrap}
+  .chips{order:3;width:100%;margin-left:0}
+  .ambient-btn{margin-left:auto}
+  .wall{columns:1;padding:0 12px}
+  .reel{height:560px}
+  .tile .cap{opacity:1;font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="bar" id="bar">
+  <a class="home" href="../">&#8592; HUB</a>
+  <div class="chips" id="chips">
+    <button class="chip on" data-f="all">All</button>
+    <button class="chip" data-f="photo">Photo</button>
+    <button class="chip" data-f="drawing">Drawing</button>
+    <button class="chip" data-f="motion">Motion</button>
+    <button class="chip" data-f="words">Words</button>
+  </div>
+  <button class="ambient-btn" id="ambOpen">&#9654; Ambient</button>
+</div>
+
+<header class="hero">
+  <img class="poster" src="vid/summit.jpg" alt="">
+  <video src="vid/summit.mp4" poster="vid/summit.jpg" autoplay muted loop playsinline></video>
+  <div class="in">
+    <div class="eyebrow">A vibe board</div>
+    <h1>STRONG &amp; GENTLE</h1>
+    <p>Nothing is so strong as gentleness, nothing so gentle as real strength.</p>
+    <cite>Saint Francis de Sales</cite>
+  </div>
+  <a class="scroll" href="#index">Enter</a>
+</header>
+
+<nav class="index" id="index"></nav>
+<main id="main"></main>
+
+<section class="reels" id="reels">
+  <div class="sec-title">
+    <h3>THE DAILY STOIC</h3>
+    <p>Reels to keep the fire lit</p>
+  </div>
+  <div class="reel-row" id="reelRow"></div>
+</section>
+
+<footer>
+  <div class="mark">STRONG &amp; GENTLE</div>
+  Images and drawings made for Gio in Magnific. Moving footage from Pexels (free license). Reels embedded from @dailystoic on Instagram.<br>
+  Scripture from the KJV and World English Bible. Stoic lines from public domain translations.
+</footer>
+
+<div class="lb" id="lb">
+  <button class="x" id="lbX" aria-label="Close">&times;</button>
+  <button class="nav prev" id="lbPrev" aria-label="Previous">&#8249;</button>
+  <button class="nav next" id="lbNext" aria-label="Next">&#8250;</button>
+  <div class="stage" id="lbStage"></div>
+  <div class="say" id="lbSay"></div>
+</div>
+
+<div class="amb" id="amb">
+  <div class="layer" id="ambA"></div>
+  <div class="layer" id="ambB"></div>
+  <div class="shade"></div>
+  <div class="words" id="ambWords"></div>
+  <div class="exit" id="ambExit">Esc to exit</div>
+</div>
+
+<script>
+const PX = 'https://videos.pexels.com/video-files/';
+const PXI = 'https://images.pexels.com/videos/';
+
+// Sayings
+const W = {
+  francis:['Nothing is so strong as gentleness, nothing so gentle as real strength.','Saint Francis de Sales'],
+  beone:['Waste no more time arguing what a good man should be. Be one.','Marcus Aurelius'],
+  way:['The impediment to action advances action. What stands in the way becomes the way.','Marcus Aurelius'],
+  little:['Very little is needed to make a happy life; it is all within yourself, in your way of thinking.','Marcus Aurelius'],
+  right:['If it is not right, do not do it; if it is not true, do not say it.','Marcus Aurelius'],
+  cliff:['Be like the promontory against which the waves continually break, but it stands firm and tames the fury of the water around it.','Marcus Aurelius'],
+  stars:['Dwell on the beauty of life. Watch the stars, and see yourself running with them.','Marcus Aurelius'],
+  dead:['Think of yourself as dead. You have lived your life. Now take what is left and live it properly.','Marcus Aurelius'],
+  imagine:['We suffer more often in imagination than in reality.','Seneca'],
+  labor:['Difficulties strengthen the mind, as labor does the body.','Seneca'],
+  fire:['Fire tests gold, misfortune tests brave men.','Seneca'],
+  postpone:['While we are postponing, life speeds by.','Seneca'],
+  master:['No man is free who is not master of himself.','Epictetus'],
+  first:['First say to yourself what you would be; and then do what you have to do.','Epictetus'],
+  wants:['Wealth consists not in having great possessions, but in having few wants.','Epictetus'],
+  trees:['A society grows great when old men plant trees in whose shade they shall never sit.','Greek proverb'],
+  river:['No man ever steps in the same river twice, for it is not the same river and he is not the same man.','Heraclitus'],
+  standfirm:['Watch! Stand firm in the faith! Be courageous! Be strong! Let all that you do be done in love.','1 Corinthians 16:13 to 14'],
+  slow:['One who is slow to anger is better than the mighty; one who rules his spirit, than he who takes a city.','Proverbs 16:32'],
+  micah:['To act justly, to love mercy, and to walk humbly with your God.','Micah 6:8'],
+  eagles:['They that wait upon the Lord shall renew their strength; they shall mount up with wings as eagles.','Isaiah 40:31'],
+  iron:['Iron sharpeneth iron; so a man sharpeneth the countenance of his friend.','Proverbs 27:17'],
+  meek:['For I am meek and lowly in heart: and ye shall find rest unto your souls.','Matthew 11:29'],
+  weary:['Let us not be weary in well doing: for in due season we shall reap, if we faint not.','Galatians 6:9'],
+  courage:['Be strong and of a good courage; be not afraid.','Joshua 1:9'],
+  softheart:['Strong hands. Soft heart.',''],
+  carry:['Carry the weight. Do not become it.',''],
+  calm:['Be the calm in the room.',''],
+  quiet:['Discipline is quiet.',''],
+  leash:['Gentle is not weak. Gentle is strength under control.',''],
+  mori:['Memento mori. Remember you will die. Then live like it.',''],
+  plant:['Plant the tree anyway.','']
+};
+
+// Media helpers: i(file, kind, word) ; px(path, poster, word) ; mv(local video)
+const i  = (f,k,w)=>({type:k,src:'img/'+f+'.jpg',w});
+const mv = (f,w)=>({type:'motion',src:'vid/'+f+'.mp4',poster:'vid/'+f+'.jpg',w});
+const px = (p,poster,w)=>({type:'motion',src:PX+p,poster:PXI+poster,w});
+const q  = (k,big)=>({type:'words',k,big});
+
+const CHAPTERS = [
+ { n:'I', id:'weight', title:'THE WEIGHT', head:'atlas', say:'carry', items:[
+   i('atlas','photo','master'), q('carry',true), i('the-weight','photo','first'), i('torso-study','drawing','labor'),
+   px('6719225/6719225-hd_1280_720_25fps.mp4','6719225/pexels-photo-6719225.jpeg','beone'),
+   i('hand-of-a-fallen-god','photo','way'), q('beone'), i('shepherd-storm','photo','leash'),
+   i('shepherd-charcoal','drawing','standfirm'),
+   px('30129839/12920686_720_1280_25fps.mp4','30129839/ancient-history-ancient-statue-ancient-statues-close-up-30129839.jpeg','right'),
+   q('standfirm') ]},
+ { n:'II', id:'fire', title:'THE FIRE', head:'the-forge', say:'fire', items:[
+   mv('the-forge','fire'), i('the-forge','photo','quiet'), q('quiet',true), mv('the-arena','master'),
+   px('31638148/13478949_1280_720_24fps.mp4','31638148/pexels-photo-31638148.jpeg','labor'),
+   i('the-arena','photo','master'), q('labor'),
+   px('14090582/14090582-hd_1280_720_60fps.mp4','14090582/pexels-photo-14090582.jpeg','fire'),
+   q('iron'), q('master') ]},
+ { n:'III', id:'storm', title:'THE STORM', head:'unmoved-column', say:'cliff', items:[
+   mv('the-push','first'), i('unmoved-column','photo','cliff'), q('imagine',true), i('storm-engraving','drawing','courage'),
+   px('1879456/1879456-hd_1280_720_30fps.mp4','1879456/free-video-1879456.jpg','cliff'),
+   i('the-summit','photo','eagles'), q('courage'), i('the-push','photo','way'),
+   px('37259189/15784118_1280_720_24fps.mp4','37259189/cinematic-crest-dark-deep-37259189.jpeg','imagine'),
+   px('26583632/11964892_1280_720_60fps.mp4','26583632/pexels-photo-26583632.jpeg','eagles'),
+   q('eagles') ]},
+ { n:'IV', id:'olive', title:'THE OLIVE', head:'olive-grove-moon', say:'trees', items:[
+   i('olive-grove-moon','photo','trees'), q('plant',true), i('olive-watercolor','drawing','little'),
+   px('11274307/11274307-hd_720_1280_30fps.mp4','11274307/fresh-fresh-fruit-fresh-fruits-fruits-11274307.jpeg','weary'),
+   i('roots-through-marble','photo','weary'), i('red-chalk-hand','drawing','leash'), q('weary'),
+   i('the-harvest','photo','trees'),
+   i('marble-hand-graphite','drawing','wants'),
+   q('wants'), q('river') ]},
+ { n:'V', id:'hearth', title:'THE HEARTH', head:'the-return', say:'francis', items:[
+   i('hand-and-dove','photo','softheart'), q('softheart',true), i('before-battle','photo','francis'),
+   i('father-and-child-charcoal','drawing','calm'), i('breaking-bread','photo','micah'), q('micah'),
+   i('lion-and-man','photo','slow'), i('lion-charcoal','drawing','slow'), q('slow'),
+   i('chapel','photo','meek'), i('the-return','photo','calm'), q('calm',true), q('meek') ]},
+ { n:'VI', id:'mori', title:'MEMENTO MORI', head:'sunken-emperor', say:'dead', items:[
+   i('memento-mori','photo','mori'), q('mori',true), i('philosopher-portrait','drawing','beone'),
+   i('marble-tear','photo','postpone'), q('postpone'),
+   i('the-stoa','photo','stars'), i('colonnade-ink','drawing','dead'), i('sunken-emperor','photo','river'),
+   mv('summit','stars'), q('stars') ]}
+];
+
+const REELS = ['De4gzgQTIVg','De2JwrfzD1_','De1w_HptlPf','DezrzOiz-8r','DezUDp7zUPw','Dew3yuKz6-8'];
+
+// Build
+const main = document.getElementById('main'), idx = document.getElementById('index');
+const ALL = []; // visual items for lightbox/ambient
+CHAPTERS.forEach(ch=>{
+  idx.insertAdjacentHTML('beforeend',`<a href="#${ch.id}"><b>${ch.n}</b>${ch.title}</a>`);
+  const [t,a] = W[ch.say];
+  const sec = document.createElement('section'); sec.className='chapter'; sec.id=ch.id;
+  sec.innerHTML = `<div class="ch-head"><img src="img/${ch.head}.jpg" alt="" loading="lazy">
+    <div class="in"><div class="num">${ch.n}</div><h2>${ch.title}</h2><blockquote>${t}</blockquote>${a?`<cite>${a}</cite>`:''}</div></div>
+    <div class="wall"></div>`;
+  const wall = sec.querySelector('.wall');
+  ch.items.forEach(it=>{
+    if(it.type==='words'){
+      const [qt,qa]=W[it.k];
+      wall.insertAdjacentHTML('beforeend',`<div class="word${it.big?' big':''}" data-kind="words"><div class="rule"></div><q>${qt}</q>${qa?`<cite>${qa}</cite>`:''}</div>`);
+      return;
+    }
+    const n = ALL.push(it)-1;
+    const [qt,qa] = W[it.w]||['',''];
+    const tag = it.type==='drawing'?'Drawing':it.type==='motion'?'Motion':'';
+    const media = it.type==='motion'
+      ? `<video data-src="${it.src}" poster="${it.poster}" muted loop playsinline preload="none"></video>`
+      : `<img src="${it.src}" alt="" loading="lazy">`;
+    wall.insertAdjacentHTML('beforeend',`<div class="tile" data-kind="${it.type}" data-n="${n}">${media}${tag?`<span class="tag">${tag}</span>`:''}<div class="cap">${qt}</div></div>`);
+  });
+  main.appendChild(sec);
+});
+document.getElementById('reelRow').innerHTML = REELS.map(c=>`<div class="reel"><iframe src="https://www.instagram.com/reel/${c}/embed" loading="lazy" allowtransparency="true" allow="encrypted-media" title="Daily Stoic reel"></iframe></div>`).join('');
+
+// Reveal + lazy video play
+const io = new IntersectionObserver(es=>es.forEach(e=>{
+  const el=e.target;
+  if(e.isIntersecting){
+    el.classList.add('seen');
+    const v=el.querySelector('video[data-src]');
+    if(v){ if(!v.src) v.src=v.dataset.src; v.play().catch(()=>{}); }
+  } else {
+    const v=el.querySelector('video[data-src]'); if(v) v.pause();
+  }
+}),{rootMargin:'120px 0px',threshold:.08});
+document.querySelectorAll('.tile,.word,.ch-head').forEach(el=>io.observe(el));
+
+// Top bar
+const bar=document.getElementById('bar');
+addEventListener('scroll',()=>bar.classList.toggle('solid',scrollY>innerHeight*.6),{passive:true});
+
+// Filters
+document.getElementById('chips').addEventListener('click',e=>{
+  const b=e.target.closest('.chip'); if(!b) return;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b));
+  const f=b.dataset.f;
+  document.querySelectorAll('.tile,.word').forEach(el=>el.classList.toggle('hidden',f!=='all'&&el.dataset.kind!==f));
+  document.querySelectorAll('.ch-head').forEach(h=>h.style.display=f==='all'?'':'none');
+  document.getElementById('index').scrollIntoView({behavior:'smooth'});
+});
+
+// Lightbox
+const lb=document.getElementById('lb'), stage=document.getElementById('lbStage'), say=document.getElementById('lbSay');
+let cur=0;
+function visible(){return [...document.querySelectorAll('.tile:not(.hidden)')].map(t=>+t.dataset.n)}
+function show(n){
+  cur=n; const it=ALL[n]; const [qt,qa]=W[it.w]||['',''];
+  stage.innerHTML = it.type==='motion' ? `<video src="${it.src}" poster="${it.poster}" autoplay muted loop playsinline controls></video>` : `<img src="${it.src}" alt="">`;
+  say.innerHTML = qt?`${qt}${qa?`<cite>${qa}</cite>`:''}`:'';
+}
+function step(d){const v=visible(); const p=v.indexOf(cur); show(v[(p+d+v.length)%v.length]);}
+main.addEventListener('click',e=>{const t=e.target.closest('.tile'); if(!t) return; show(+t.dataset.n); lb.classList.add('open'); document.body.style.overflow='hidden';});
+function closeLb(){lb.classList.remove('open'); stage.innerHTML=''; document.body.style.overflow='';}
+document.getElementById('lbX').onclick=closeLb;
+document.getElementById('lbPrev').onclick=()=>step(-1);
+document.getElementById('lbNext').onclick=()=>step(1);
+lb.addEventListener('click',e=>{if(e.target===lb) closeLb();});
+let tx=0; lb.addEventListener('touchstart',e=>tx=e.touches[0].clientX,{passive:true});
+lb.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-tx; if(Math.abs(d)>50) step(d<0?1:-1);});
+
+// Ambient mode
+const amb=document.getElementById('amb'), A=document.getElementById('ambA'), B=document.getElementById('ambB'), words=document.getElementById('ambWords');
+let ambTimer=null, front=A, order=[], pos=0;
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]]}return a}
+function ambNext(){
+  if(pos>=order.length){order=shuffle(ALL.map((_,k)=>k)); pos=0;}
+  const it=ALL[order[pos++]]; const back = front===A?B:A;
+  back.className='layer'+(it.type==='drawing'?' draw':'');
+  back.innerHTML = it.type==='motion' ? `<video src="${it.src}" autoplay muted loop playsinline></video>` : `<img class="kb" src="${it.src}" alt="">`;
+  const go=()=>{ back.classList.add('on'); front.classList.remove('on'); const old=front; front=back; setTimeout(()=>{ if(old!==front) old.innerHTML=''; },2300); };
+  const m=back.querySelector('img,video'); if(m.tagName==='IMG' && !m.complete){ m.onload=go; m.onerror=go; } else go();
+  words.classList.remove('on');
+  setTimeout(()=>{ const [qt,qa]=W[it.w]||['','']; words.innerHTML=qt?`<q>${qt}</q>${qa?`<cite>${qa}</cite>`:''}`:''; words.classList.add('on'); },1500);
+  ambTimer=setTimeout(ambNext, it.type==='motion'?12000:10000);
+}
+function openAmb(){
+  amb.classList.add('open'); document.body.style.overflow='hidden';
+  try{ amb.requestFullscreen && amb.requestFullscreen().catch(()=>{}); }catch(e){}
+  order=[]; pos=0; ambNext();
+}
+function closeAmb(){
+  clearTimeout(ambTimer); amb.classList.remove('open'); A.innerHTML=B.innerHTML=''; A.className=B.className='layer'; words.classList.remove('on'); document.body.style.overflow='';
+  if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+}
+document.getElementById('ambOpen').onclick=openAmb;
+document.getElementById('ambExit').onclick=closeAmb;
+amb.addEventListener('click',e=>{ if(e.target.id!=='ambExit'){ clearTimeout(ambTimer); ambNext(); } });
+document.addEventListener('fullscreenchange',()=>{ if(!document.fullscreenElement && amb.classList.contains('open')) closeAmb(); });
+
+addEventListener('keydown',e=>{
+  if(amb.classList.contains('open')){ if(e.key==='Escape') closeAmb(); if(e.key==='ArrowRight'||e.key===' '){clearTimeout(ambTimer); ambNext();} return; }
+  if(!lb.classList.contains('open')) return;
+  if(e.key==='Escape') closeLb(); if(e.key==='ArrowRight') step(1); if(e.key==='ArrowLeft') step(-1);
+});
+</script>
+</body>
+</html>
