@@ -1,6 +1,12 @@
 {
   "weeks": [
     {
+      "label": "Week of Dec 21 – Dec 25, 2026 · Process Carousel · Christmas Eve",
+      "folder": "week-2026-12-21",
+      "manifest": "sdlr-content/week-2026-12-21/manifest.json",
+      "generated": "2026-10-26"
+    },
+    {
       "label": "Week of Dec 7 – Dec 11, 2026 · The Winter Design Window",
       "folder": "week-2026-12-07",
       "manifest": "sdlr-content/week-2026-12-07/manifest.json",
