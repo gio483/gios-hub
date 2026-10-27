@@ -27,20 +27,30 @@
   // ---- sync ----
   let syncTimer=null, syncing=false;
   async function hash(s){ const b=await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  function ensureId(){
+    if(MOM.id) return MOM.id;
+    const r=new Uint8Array(32); crypto.getRandomValues(r);
+    MOM.id=[...r].map(x=>x.toString(16).padStart(2,'0')).join(''); LS.set('id',MOM.id); LS.set('phrased',false); MOM.phrased=false;
+    return MOM.id;
+  }
   async function setPhrase(phrase){
     const p=(phrase||'').trim().toLowerCase().replace(/\s+/g,' ');
     if(p.length<8) throw new Error('Use at least 8 characters. A short sentence works best.');
     const id=await hash('making-of-a-man|'+p);
-    LS.set('id', id); MOM.id=id; await syncNow(); return id;
+    const old=MOM.id;
+    if(old && old!==id && MOM.pushOn){ try{ await fetch(API+'&action=unsubscribe&id='+old,{method:'POST'}); }catch(e){} }
+    LS.set('id', id); MOM.id=id; LS.set('phrased',true); MOM.phrased=true;
+    await syncNow();
+    if(MOM.pushOn){ try{ await resubscribe(); }catch(e){} }
+    return id;
   }
-  function forget(){ LS.del('id'); MOM.id=null; emit(); }
   async function syncNow(){
     if(!MOM.id || syncing) return; syncing=true; MOM.status='Syncing'; emit();
     try{
       const r=await fetch(API+'&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({data:{done:state.done,j:state.j,vm:state.vm}})});
       const js=await r.json(); if(!r.ok) throw new Error(js.error||'sync failed');
       absorb(js.data); MOM.status='Synced'; MOM.lastSync=Date.now();
-    }catch(e){ MOM.status='Offline, saved on this device'; }
+    }catch(e){ MOM.status='Offline right now. Everything is saved on this device and will sync later.'; }
     syncing=false; emit();
   }
   function queueSync(){ clearTimeout(syncTimer); syncTimer=setTimeout(syncNow, 1200); }
@@ -59,54 +69,79 @@
   const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
   const standalone = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone===true;
   function pushSupport(){
+    if(isIOS && !standalone) return {ok:false, ios:true, why:'On iPhone, notifications only work from the Home Screen app. Add it to your Home Screen (steps above), then open it from the icon and come back here.'};
     if(!('serviceWorker' in navigator)) return {ok:false, why:'This browser cannot receive notifications.'};
-    if(isIOS && !standalone) return {ok:false, ios:true, why:'On iPhone, add this app to your Home Screen first, then open it from the icon.'};
-    if(!('PushManager' in window) || !('Notification' in window)) return {ok:false, why:'Notifications are not supported here. Update iOS to 16.4 or later.'};
+    if(!('PushManager' in window) || !('Notification' in window)) return {ok:false, why:'Notifications need iOS 16.4 or later. Update your iPhone in Settings, General, Software Update.'};
     return {ok:true};
   }
   async function registerSW(){ if(!('serviceWorker' in navigator)) return null; try{ return await navigator.serviceWorker.register('/vibe/sw.js',{scope:'/vibe/'}); }catch(e){ return null; } }
   function b64ToU8(b){ const p='='.repeat((4-b.length%4)%4); const s=atob((b+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from([...s].map(c=>c.charCodeAt(0))); }
+  async function getSub(create){
+    const reg=await registerSW(); if(!reg) throw new Error('Could not start the background service. Close the app fully and open it again.');
+    await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub && create){
+      const {key}=await fetch(API+'&action=vapid',{cache:'no-store'}).then(r=>r.json());
+      if(!key) throw new Error('The server is not ready for notifications yet. Try again in a few minutes.');
+      sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToU8(key)});
+    }
+    return sub;
+  }
+  async function postSub(sub){
+    const r=await fetch(API+'&action=subscribe&id='+ensureId(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON(), tz:Intl.DateTimeFormat().resolvedOptions().timeZone})});
+    if(!r.ok) throw new Error((await r.json().catch(()=>({}))).error||'Could not save your notification settings. Check your connection and try again.');
+  }
+  async function resubscribe(){ const sub=await getSub(true); await postSub(sub); }
   async function enablePush(){
     const sup=pushSupport(); if(!sup.ok) throw new Error(sup.why);
-    if(!MOM.id) throw new Error('Set your sync phrase first, so your notifications know your progress.');
-    const perm=await Notification.requestPermission(); if(perm!=='granted') throw new Error('Notifications were not allowed. You can turn them on in iPhone Settings, Notifications.');
-    const reg=await registerSW(); if(!reg) throw new Error('Could not start the background service.');
-    await navigator.serviceWorker.ready;
-    const {key}=await fetch(API+'&action=vapid').then(r=>r.json());
-    if(!key) throw new Error('Notifications are not switched on for the server yet.');
-    let sub=await reg.pushManager.getSubscription();
-    if(!sub) sub=await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64ToU8(key)});
-    const r=await fetch(API+'&action=subscribe&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({subscription:sub.toJSON(), tz:Intl.DateTimeFormat().resolvedOptions().timeZone})});
-    if(!r.ok) throw new Error((await r.json()).error||'Could not save your subscription.');
-    LS.set('pushOn', true); MOM.pushOn=true; emit(); return true;
+    const perm = Notification.permission==='granted' ? 'granted' : await Notification.requestPermission();
+    if(perm!=='granted') throw new Error('Notifications are blocked. Open iPhone Settings, Notifications, The Making, and turn on Allow Notifications. Then tap the button again.');
+    ensureId();
+    await resubscribe();
+    LS.set('pushOn', true); MOM.pushOn=true; emit(); syncNow(); return true;
   }
   async function disablePush(){
-    try{ const reg=await navigator.serviceWorker.getRegistration('/vibe/'); const s=reg&&await reg.pushManager.getSubscription(); if(s) await s.unsubscribe(); }catch(e){}
-    if(MOM.id) await fetch(API+'&action=unsubscribe&id='+MOM.id,{method:'POST'});
+    try{ const s=await getSub(false); if(s) await s.unsubscribe(); }catch(e){}
+    if(MOM.id){ try{ await fetch(API+'&action=unsubscribe&id='+MOM.id,{method:'POST'}); }catch(e){} }
     LS.set('pushOn', false); MOM.pushOn=false; emit();
   }
   async function testPush(slot){
+    if(!MOM.pushOn) throw new Error('Turn on notifications first.');
     const r=await fetch(API+'&action=test&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slot||'test'})});
-    const js=await r.json(); if(!r.ok) throw new Error(js.error||'Test failed'); return true;
+    const js=await r.json().catch(()=>({})); if(!r.ok) throw new Error(js.error||'The test did not send. Tap Turn on notifications again, then retry.'); return true;
+  }
+  // keep the subscription fresh every time the app opens, so notifications never silently stop
+  async function refreshPush(){
+    if(!MOM.pushOn || !pushSupport().ok) return;
+    if(Notification.permission!=='granted'){ LS.set('pushOn',false); MOM.pushOn=false; emit(); return; }
+    try{ await resubscribe(); }catch(e){}
   }
 
   async function invite(){
     const url=location.origin+'/vibe/readings.html';
     const text='Brother, I am going through these 21 readings: Scripture, a reflection, a prayer and a memory verse each day. Do them with me and let’s talk once a week.';
     if(navigator.share){ try{ await navigator.share({title:'The Making of a Man', text, url}); return 'shared'; }catch(e){ return 'cancel'; } }
-    try{ await navigator.clipboard.writeText(text+' '+url); return 'copied'; }catch(e){ prompt('Copy this link', url); return 'copied'; }
+    try{ await navigator.clipboard.writeText(text+' '+url); return 'copied'; }catch(e){ return 'manual'; }
   }
 
   const MOM = window.MOM = {
-    id: LS.get('id', null), status: '', pushOn: LS.get('pushOn', false), push:null,
+    id: LS.get('id', null), phrased: LS.get('phrased', !!LS.get('id', null)), status: '', pushOn: LS.get('pushOn', false), push:null,
     state, on(f){ listeners.push(f); }, emit,
     setDone, isDone, setJournal, journal, setVerse, verse, doneCount, nextDay,
-    setPhrase, forget, syncNow, pushSupport, enablePush, disablePush, testPush, registerSW, invite, isIOS, standalone,
+    setPhrase, syncNow, ensureId, refreshPush, pushSupport, enablePush, disablePush, testPush, registerSW, invite, isIOS, standalone,
     data: null,
-    async load(){ if(!MOM.data) MOM.data = await fetch('/vibe/mom-data.json',{cache:'no-cache'}).then(r=>r.json()); return MOM.data; }
+    async load(){
+      for(let i=0;i<3 && !MOM.data;i++){ try{ const r=await fetch('/vibe/mom-data.json',{cache:'no-cache'}); if(r.ok) MOM.data=await r.json(); }catch(e){} if(!MOM.data) await new Promise(r=>setTimeout(r,400*(i+1))); }
+      if(!MOM.data){ const d=document.createElement('div'); d.style.cssText='position:fixed;inset:0;z-index:500;display:grid;place-items:center;background:#0b0907;color:#efe8dc;font:16px Inter,system-ui;text-align:center;padding:30px';
+        d.innerHTML='<div><p style="font-family:Cinzel,serif;letter-spacing:.2em;margin-bottom:12px">NO CONNECTION</p><p style="color:#a39885;margin-bottom:20px">The readings could not load. Check your signal and try again.</p><button style="padding:12px 22px;border-radius:99px;background:#c9a35a;color:#120e08;border:0;font:inherit" onclick="location.reload()">Try again</button></div>';
+        document.body.appendChild(d); throw new Error('data load failed'); }
+      return MOM.data;
+    }
   };
   registerSW();
   if(MOM.id) syncNow();
+  refreshPush();
+  if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e=>{ const m=e.data||{}; if(m.type==='open' && m.url) location.href=m.url; if(m.type==='resub') refreshPush(); });
   document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible' && MOM.id) syncNow(); });
 })();
 
@@ -132,31 +167,34 @@
    <div class="grp"><b>1 · SYNC YOUR JOURNAL</b><p id="syncInfo"></p>
      <input id="phrase" type="password" placeholder="Your private sync phrase" autocomplete="off">
      <p style="font-size:12px">Pick a short sentence only you would know. Type the same phrase on your phone and laptop to share one journal. A brother uses his own phrase for his own journal.</p>
-     <div class="row"><button class="b solid" id="setPhrase">Save phrase</button><button class="b" id="syncBtn">Sync now</button><button class="b" id="forget">Use a different phrase</button></div><div class="msg" id="syncMsg"></div></div>
+     <div class="row"><button class="b solid" id="setPhrase">Save phrase</button><button class="b" id="syncBtn">Sync now</button></div><div class="msg" id="syncMsg"></div></div>
    <div class="grp" id="installGrp"><b>2 · PUT IT ON YOUR HOME SCREEN</b>
      <ol><li>Open this page in <strong>Safari</strong> on your iPhone.</li><li>Tap the <strong>Share</strong> button, then <strong>Add to Home Screen</strong>.</li><li>Open <strong>The Making</strong> from its new icon, then come back to this panel.</li></ol></div>
    <div class="grp"><b>3 · MORNING AND EVENING NOTIFICATIONS</b><p>About 7 AM: your next reading. About 8 PM: tonight’s memory verse. (One hour earlier after the clocks change in November.)</p>
-     <div class="row"><button class="b solid" id="pushOn">Turn on notifications</button><button class="b" id="pushTest">Send a test</button><button class="b" id="pushOff">Turn off</button></div><div class="msg" id="pushMsg"></div></div>
+     <p id="pushState" style="color:#efe8dc"></p><div class="row"><button class="b solid" id="pushOn">Turn on notifications</button><button class="b solid" id="pushTest">Send a test</button><button class="b" id="pushOff">Turn off</button></div><div class="msg" id="pushMsg"></div></div>
    <div class="grp"><b>4 · DO IT WITH A BROTHER</b><p>Send him the link. He picks his own sync phrase, and on days 7, 14 and 21 there is a question for the two of you to talk through.</p>
      <div class="row"><button class="b solid" id="invite">Invite a brother</button></div><div class="msg" id="invMsg"></div></div></div>`;
   document.body.appendChild(el);
   const $=s=>el.querySelector(s);
   function paint(){
-    $('#syncInfo').textContent = MOM.id ? `Sync is on. ${MOM.status||''}` : 'Sync is off. Your journal is only on this device right now.';
-    $('#forget').style.display = MOM.id?'':'none';
+    $('#syncInfo').textContent = MOM.phrased ? `Sync is on. ${MOM.status==='Syncing'?'Syncing...':(MOM.status||'')}` : 'Sync is off. Your journal is saved on this device only. Add a phrase to carry it to your other devices.';
+    $('#phrase').placeholder = MOM.phrased ? 'Type a new phrase to switch journals' : 'Your private sync phrase';
+    $('#syncBtn').style.display = MOM.phrased?'':'none';
     $('#installGrp').style.display = (MOM.isIOS && !MOM.standalone) ? '' : 'none';
     const sup=MOM.pushSupport();
-    $('#pushMsg').textContent = sup.ok ? (MOM.pushOn?'Notifications are on for this device.':'') : sup.why;
+    $('#pushState').textContent = !sup.ok ? sup.why : (MOM.pushOn ? '\u2713 Notifications are on for this device.' : 'Notifications are off.');
+    $('#pushOn').style.display = (sup.ok && !MOM.pushOn) ? '' : 'none';
+    $('#pushTest').style.display = MOM.pushOn ? '' : 'none';
+    $('#pushOff').style.display = MOM.pushOn ? '' : 'none';
   }
   MOM.on(paint);
   el.addEventListener('click',e=>{ if(e.target===el||e.target.dataset.x!==undefined) el.classList.remove('open'); });
-  $('#setPhrase').onclick=async()=>{ $('#syncMsg').textContent='Saving...'; try{ await MOM.setPhrase($('#phrase').value); $('#phrase').value=''; $('#syncMsg').textContent='Saved. Your journal now follows you.'; }catch(e){ $('#syncMsg').textContent=e.message; } paint(); };
+  $('#setPhrase').onclick=async()=>{ $('#syncMsg').textContent='Saving...'; try{ await MOM.setPhrase($('#phrase').value); $('#phrase').value=''; $('#syncMsg').textContent='Saved. Type this same phrase on your other devices and they will share one journal.'; }catch(e){ $('#syncMsg').textContent=e.message; } paint(); };
   $('#syncBtn').onclick=async()=>{ await MOM.syncNow(); $('#syncMsg').textContent=MOM.status; };
-  $('#forget').onclick=()=>{ MOM.forget(); $('#syncMsg').textContent='Enter a phrase to sync again.'; paint(); };
-  $('#pushOn').onclick=async()=>{ $('#pushMsg').textContent='Asking...'; try{ await MOM.enablePush(); $('#pushMsg').textContent='Done. You will hear from it tomorrow morning. Tap Send a test to check now.'; }catch(e){ $('#pushMsg').textContent=e.message; } };
-  $('#pushTest').onclick=async()=>{ $('#pushMsg').textContent='Sending...'; try{ await MOM.testPush('morning'); $('#pushMsg').textContent='Sent. It should appear in a few seconds.'; }catch(e){ $('#pushMsg').textContent=e.message; } };
-  $('#pushOff').onclick=async()=>{ await MOM.disablePush(); $('#pushMsg').textContent='Notifications are off.'; };
-  $('#invite').onclick=async()=>{ const r=await MOM.invite(); $('#invMsg').textContent = r==='copied'?'Link copied. Send it to him.': r==='shared'?'Sent.':''; };
+  $('#pushOn').onclick=async()=>{ const b=$('#pushOn'); b.disabled=true; $('#pushMsg').textContent='Turning on...'; try{ await MOM.enablePush(); $('#pushMsg').textContent='Done. Tap Send a test to check it now.'; }catch(e){ $('#pushMsg').textContent=e.message; } b.disabled=false; paint(); };
+  $('#pushTest').onclick=async()=>{ $('#pushMsg').textContent='Sending...'; try{ await MOM.testPush('morning'); $('#pushMsg').textContent='Sent. It should appear in a few seconds. If you are inside the app it may only show in Notification Center, so swipe down to check.'; }catch(e){ $('#pushMsg').textContent=e.message; } };
+  $('#pushOff').onclick=async()=>{ await MOM.disablePush(); $('#pushMsg').textContent=''; paint(); };
+  $('#invite').onclick=async()=>{ const r=await MOM.invite(); $('#invMsg').textContent = r==='copied'?'Link copied. Send it to him.': r==='shared'?'Sent.': r==='manual'?'Send him this link: '+location.origin+'/vibe/readings.html':''; };
   MOM.openSettings=()=>{ paint(); el.classList.add('open'); };
   paint();
 })();

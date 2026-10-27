@@ -290,7 +290,7 @@ function openDay(n){
   const ta=document.getElementById('journal'), sv=document.getElementById('saved');
   ta.value=MOM.journal(n);
   let tm; ta.addEventListener('input',()=>{clearTimeout(tm); sv.textContent=''; tm=setTimeout(()=>{MOM.setJournal(n,ta.value); sv.textContent=MOM.id?'Saved and syncing':'Saved on this device';},500);});
-  const dv=document.getElementById('dayVid'); dv.querySelector('.vid').addEventListener('click',()=>{ dv.innerHTML=embed(d.vid); });
+  const dv=document.getElementById('dayVid'); dv.querySelector('.vid').addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); dv.innerHTML=embed(d.vid); });
   document.getElementById('markD').onclick=()=>{ MOM.setDone(n,!MOM.isDone(n)); openDay(n); };
   const iv=document.getElementById('inv'); if(iv) iv.onclick=()=>MOM.invite();
   const pv=document.getElementById('prevD'), nx=document.getElementById('nextD');
@@ -300,7 +300,7 @@ function openDay(n){
 }
 function closeReader(){reader.classList.remove('open'); rc.innerHTML=''; document.body.style.overflow='';}
 document.getElementById('rClose').onclick=()=>{ history.pushState('', document.title, location.pathname); closeReader(); document.getElementById('readings').scrollIntoView(); };
-function route(){ const m=location.hash.match(/^#day-(\d+)$/); if(m) openDay(+m[1]); else closeReader(); }
+function route(){ const m=location.hash.match(/^#day-(\d+)$/); if(m && R[+m[1]-1]) openDay(+m[1]); else closeReader(); }
 addEventListener('hashchange',route); route();
 addEventListener('keydown',e=>{ if(e.key==='Escape'){ if(vm.classList.contains('open')) closeVm(); else if(reader.classList.contains('open')) document.getElementById('rClose').click(); }});
 const bar=document.getElementById('bar'); addEventListener('scroll',()=>bar.classList.toggle('solid',scrollY>innerHeight*.5),{passive:true});

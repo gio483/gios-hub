@@ -132,6 +132,7 @@ document.getElementById('showAll').onclick=()=>{ showAll=!showAll; render(); };
 document.querySelectorAll('[data-settings]').forEach(b=>b.onclick=e=>{e.preventDefault(); MOM.openSettings();});
 const m=location.hash.match(/^#d-(\d+)$/); if(m){ cur=+m[1]; if(cur>unlocked()) showAll=true; }
 MOM.on(()=>grid());
+addEventListener('hashchange',()=>{ const h=location.hash.match(/^#d-(\d+)$/); if(h && +h[1]>=1 && +h[1]<=21){ cur=+h[1]; if(cur>unlocked()) showAll=true; revealed=false; render(); } });
 render();
 })();
 </script>
