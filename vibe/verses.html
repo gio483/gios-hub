@@ -6,7 +6,7 @@
 <title>Memory Verses</title>
 <meta name="theme-color" content="#0b0907">
 <link rel="manifest" href="/vibe/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/vibe/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/vibe/apple-touch-icon-v2.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="The Making">
@@ -20,7 +20,7 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;min-height:100svh}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 a{color:inherit}
-.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;padding:14px 18px;padding-top:max(14px,env(safe-area-inset-top));background:rgba(11,9,7,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;padding:calc(14px + env(safe-area-inset-top)) 18px 14px;background:rgba(11,9,7,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar a{font-family:var(--roman);letter-spacing:.18em;font-size:11px;text-decoration:none;color:var(--muted)}
 .bar a.on{color:var(--gold2)}
 .bar .sp{flex:1}
@@ -31,7 +31,8 @@ a{color:inherit}
 .modes{display:flex;justify-content:center;gap:6px;margin:20px 0 6px;flex-wrap:wrap;padding:0 12px}
 .mode{padding:8px 14px;border-radius:99px;border:1px solid var(--line);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 .mode.on{background:var(--gold);color:#120e08;border-color:var(--gold)}
-.stage{max-width:720px;margin:0 auto;padding:16px 18px 40px}
+.stage{max-width:720px;margin:0 auto;padding:16px 18px calc(40px + env(safe-area-inset-bottom))}
+@media (max-width:760px){.bar a:not(.home),.bar .appbtn{display:none}.bar a.home{font-size:12px}.card{min-height:340px}}
 .card{position:relative;border-radius:16px;border:1px solid var(--line);overflow:hidden;min-height:380px;display:flex;flex-direction:column;justify-content:flex-end;background:#000}
 .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.35)}
 .card .in{position:relative;padding:30px 26px;text-align:center}
@@ -64,7 +65,7 @@ textarea{width:100%;min-height:110px;margin-top:16px;padding:14px;border-radius:
 </head>
 <body>
 <div class="bar">
-  <a href="readings.html">&#8592; READINGS</a>
+  <a href="readings.html" class="home">&#8592; READINGS</a>
   <span class="sp"></span>
   <a href="verses.html" class="on">VERSES</a>
   <a href="#" data-settings class="appbtn">&#9881; APP</a>

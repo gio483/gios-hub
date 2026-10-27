@@ -114,7 +114,7 @@
 (function(){
   const css=`.mset{position:fixed;inset:0;z-index:300;background:rgba(5,4,3,.82);backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
   .mset.open{display:flex}
-  .mset .sheet{width:min(640px,100%);max-height:92svh;overflow-y:auto;background:#14110d;border:1px solid rgba(201,163,90,.25);border-radius:18px 18px 0 0;padding:22px 22px 34px;color:#efe8dc;font-family:Inter,system-ui,sans-serif}
+  .mset .sheet{width:min(640px,100%);max-height:88svh;overflow-y:auto;background:#14110d;border:1px solid rgba(201,163,90,.25);border-radius:18px 18px 0 0;padding:22px 22px calc(34px + env(safe-area-inset-bottom));color:#efe8dc;font-family:Inter,system-ui,sans-serif}
   .mset h3{font-family:Cinzel,serif;font-weight:400;letter-spacing:.14em;font-size:18px;margin-bottom:4px}
   .mset .grp{border-top:1px solid rgba(201,163,90,.18);padding:18px 0 4px;margin-top:14px}
   .mset .grp b{display:block;font-family:Cinzel,serif;font-weight:400;letter-spacing:.2em;font-size:11px;color:#e6c88a;margin-bottom:8px}
@@ -159,4 +159,45 @@
   $('#invite').onclick=async()=>{ const r=await MOM.invite(); $('#invMsg').textContent = r==='copied'?'Link copied. Send it to him.': r==='shared'?'Sent.':''; };
   MOM.openSettings=()=>{ paint(); el.classList.add('open'); };
   paint();
+})();
+
+// ---- iPhone style tab bar (phones only) ----
+(function(){
+  const page = location.pathname.endsWith('verses.html') ? 'verses' : 'readings';
+  const ic = {
+    read:'<svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg>',
+    verse:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+    watch:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z" class="f"/></svg>',
+    app:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>'
+  };
+  const css=`.tabbar{display:none}
+  @media (max-width:760px){
+    .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;justify-content:space-around;
+      padding:8px 6px calc(8px + env(safe-area-inset-bottom));background:rgba(14,11,8,.86);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid rgba(201,163,90,.18)}
+    .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#8f8573;font:500 10px Inter,system-ui,sans-serif;letter-spacing:.06em;padding:4px 0;-webkit-tap-highlight-color:transparent}
+    .tabbar svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+    .tabbar svg .f{fill:currentColor;stroke:none}
+    .tabbar a.on{color:#e6c88a}
+    .tabbar a.on svg{filter:drop-shadow(0 0 6px rgba(230,200,138,.35))}
+    body{padding-bottom:calc(68px + env(safe-area-inset-bottom))}
+  }`;
+  const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
+  const nav=document.createElement('nav'); nav.className='tabbar';
+  nav.innerHTML=`<a href="readings.html#readings" data-t="readings">${ic.read}<span>Readings</span></a>
+    <a href="verses.html" data-t="verses">${ic.verse}<span>Verses</span></a>
+    <a href="readings.html#watch" data-t="watch">${ic.watch}<span>Watch</span></a>
+    <a href="#" data-t="app">${ic.app}<span>App</span></a>`;
+  document.body.appendChild(nav);
+  function mark(){
+    let cur = page;
+    if(page==='readings'){ const w=document.getElementById('watch'); if(w && w.getBoundingClientRect().top < innerHeight*0.5) cur='watch'; }
+    nav.querySelectorAll('a').forEach(a=>a.classList.toggle('on', a.dataset.t===cur));
+  }
+  mark(); addEventListener('scroll', mark, {passive:true});
+  nav.querySelector('[data-t=app]').onclick=e=>{ e.preventDefault(); MOM.openSettings && MOM.openSettings(); };
+  nav.querySelectorAll('a[href^="readings.html#"]').forEach(a=>a.addEventListener('click',e=>{
+    if(page!=='readings') return; e.preventDefault(); const id=a.getAttribute('href').split('#')[1];
+    if(location.hash.startsWith('#day-')){ history.pushState('', document.title, location.pathname); dispatchEvent(new HashChangeEvent('hashchange')); }
+    const t=document.getElementById(id); if(t) t.scrollIntoView({behavior:'smooth'});
+  }));
 })();

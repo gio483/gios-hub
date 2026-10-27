@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Strong &amp; Gentle</title>
 <meta name="theme-color" content="#0b0907">
+<link rel="apple-touch-icon" href="/vibe/apple-touch-icon-v2.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Strong &amp; Gentle">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -22,7 +26,7 @@ a{color:inherit}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* top bar */
-.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:12px;padding:14px 20px;
+.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:12px;padding:calc(14px + env(safe-area-inset-top)) calc(20px + env(safe-area-inset-right)) 14px calc(20px + env(safe-area-inset-left));
   background:linear-gradient(to bottom,rgba(11,9,7,.85),rgba(11,9,7,0));transition:background .3s}
 .bar.solid{background:rgba(11,9,7,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar .home{font-family:var(--roman);letter-spacing:.2em;font-size:13px;text-decoration:none;color:var(--gold2);white-space:nowrap}
@@ -94,7 +98,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .reel{border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#000;height:640px}
 .reel iframe{width:100%;height:100%;border:0}
 
-footer{text-align:center;padding:60px 20px 90px;color:var(--muted);font-size:12px;letter-spacing:.06em;line-height:1.8}
+footer{text-align:center;padding:60px 20px calc(90px + env(safe-area-inset-bottom));color:var(--muted);font-size:12px;letter-spacing:.06em;line-height:1.8}
 footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;font-size:14px;margin-bottom:10px}
 
 /* lightbox */
@@ -105,7 +109,7 @@ footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;fon
 .lb .say{margin-top:22px;max-width:760px;text-align:center;padding:0 20px;font-family:var(--serif);font-style:italic;font-size:clamp(18px,2vw,24px)}
 .lb .say cite{display:block;font-style:normal;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-top:8px}
 .lb .x,.lb .nav{position:absolute;color:var(--ink);font-size:28px;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.06)}
-.lb .x{top:16px;right:16px}
+.lb .x{top:calc(16px + env(safe-area-inset-top));right:16px}
 .lb .prev{left:14px;top:50%;transform:translateY(-50%)}
 .lb .next{right:14px;top:50%;transform:translateY(-50%)}
 
@@ -119,15 +123,15 @@ footer .mark{font-family:var(--roman);color:var(--gold2);letter-spacing:.4em;fon
 .amb .layer.on img.kb{animation:kb 11s ease-out forwards}
 @keyframes kb{from{transform:scale(1.12) translate(1.5%,1%)}to{transform:scale(1) translate(0,0)}}
 .amb .shade{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.65));pointer-events:none}
-.amb .words{position:absolute;left:0;right:0;bottom:12vh;text-align:center;padding:0 8vw;opacity:0;transition:opacity 1.6s ease;pointer-events:none}
+.amb .words{position:absolute;left:0;right:0;bottom:calc(12vh + env(safe-area-inset-bottom));text-align:center;padding:0 8vw;opacity:0;transition:opacity 1.6s ease;pointer-events:none}
 .amb .words.on{opacity:1}
 .amb .words q{display:block;quotes:none;font-family:var(--serif);font-style:italic;font-size:clamp(24px,3.4vw,46px);line-height:1.3;text-shadow:0 2px 30px rgba(0,0,0,.9)}
 .amb .words cite{display:block;margin-top:14px;font-style:normal;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--gold2);text-shadow:0 2px 20px #000}
-.amb .exit{position:absolute;top:18px;right:18px;z-index:3;font-size:11px;letter-spacing:.25em;text-transform:uppercase;padding:8px 14px;border:1px solid rgba(255,255,255,.25);border-radius:99px;opacity:.5;cursor:pointer}
+.amb .exit{position:absolute;top:calc(18px + env(safe-area-inset-top));right:18px;z-index:3;font-size:11px;letter-spacing:.25em;text-transform:uppercase;padding:8px 14px;border:1px solid rgba(255,255,255,.25);border-radius:99px;opacity:.5;cursor:pointer}
 .amb .exit:hover{opacity:1}
 
 @media (max-width:640px){
-  .bar{padding:10px 12px;flex-wrap:wrap}
+  .bar{padding:calc(10px + env(safe-area-inset-top)) 12px 10px;flex-wrap:wrap}
   .chips{order:3;width:100%;margin-left:0}
   .read-btn{margin-left:auto}
   .wall{columns:1;padding:0 12px}
