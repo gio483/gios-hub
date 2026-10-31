@@ -108,8 +108,15 @@
   }
   async function testPush(slot){
     if(!MOM.pushOn) throw new Error('Turn on notifications first.');
-    const r=await fetch(API+'&action=test&id='+MOM.id,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slot||'test'})});
-    const js=await r.json().catch(()=>({})); if(!r.ok) throw new Error(js.error||'The test did not send. Tap Turn on notifications again, then retry.'); return true;
+    const send=()=>fetch(API+'&action=test&id='+ensureId(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slot:slot||'test'})});
+    let r=await send();
+    if(r.status===409){ // server lost this device: reconnect automatically, then retry once
+      if(Notification.permission!=='granted') throw new Error('Notifications are blocked. Open iPhone Settings, Notifications, The Making, and turn on Allow Notifications.');
+      await resubscribe(); r=await send();
+    }
+    const js=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(r.status===409?'Could not reconnect this device. Tap Turn off, then Turn on notifications again.':(js.error||'The test did not send. Check your connection and try again.'));
+    return true;
   }
   // keep the subscription fresh every time the app opens, so notifications never silently stop
   async function refreshPush(){
