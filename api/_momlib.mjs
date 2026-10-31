@@ -3,6 +3,7 @@ import { put, list } from '@vercel/blob';
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 export const DATA_URL = 'https://gios-hub.vercel.app/vibe/mom-data.json';
 export const pathOf = id => `mom/u/${id}.json`;
+export const pushPathOf = id => `mom/p/${id}.json`;
 export const validId = id => typeof id === 'string' && /^[a-f0-9]{64}$/.test(id);
 
 export async function readJSON(p) {
@@ -15,10 +16,10 @@ export async function readJSON(p) {
 export async function writeJSON(p, obj) {
   await put(p, JSON.stringify(obj), { access: 'public', addRandomSuffix: false, allowOverwrite: true, contentType: 'application/json', token: TOKEN });
 }
-export async function listUsers() {
+export async function listUsers(prefix = 'mom/u/') {
   const out = []; let cursor;
   do {
-    const r = await list({ prefix: 'mom/u/', token: TOKEN, cursor });
+    const r = await list({ prefix, token: TOKEN, cursor });
     for (const b of r.blobs || []) out.push(b.pathname);
     cursor = r.hasMore ? r.cursor : undefined;
   } while (cursor);
