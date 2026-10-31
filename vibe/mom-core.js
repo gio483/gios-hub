@@ -62,6 +62,7 @@
   function journal(n){ return (state.j[n]&&state.j[n].t)||''; }
   function setVerse(n,l){ state.vm[n]={l,u:Date.now()}; LS.set('state',state); emit(); queueSync(); }
   function verse(n){ return (state.vm[n]&&state.vm[n].l)||0; }
+  function setRec(k,o){ state.done[k]=Object.assign({},o,{v:true,u:Date.now()}); LS.set('state',state); emit(); queueSync(); }
   function doneCount(){ let c=0; for(let n=1;n<=21;n++) if(isDone(n)) c++; return c; }
   function nextDay(){ for(let n=1;n<=21;n++) if(!isDone(n)) return n; return 0; }
 
@@ -127,7 +128,7 @@
   const MOM = window.MOM = {
     id: LS.get('id', null), phrased: LS.get('phrased', !!LS.get('id', null)), status: '', pushOn: LS.get('pushOn', false), push:null,
     state, on(f){ listeners.push(f); }, emit,
-    setDone, isDone, setJournal, journal, setVerse, verse, doneCount, nextDay,
+    setDone, isDone, setRec, setJournal, journal, setVerse, verse, doneCount, nextDay,
     setPhrase, syncNow, ensureId, refreshPush, pushSupport, enablePush, disablePush, testPush, registerSW, invite, isIOS, standalone,
     data: null,
     async load(){
@@ -201,9 +202,10 @@
 
 // ---- iPhone style tab bar (phones only) ----
 (function(){
-  const page = location.pathname.endsWith('verses.html') ? 'verses' : 'readings';
+  const page = location.pathname.endsWith('verses.html') ? 'verses' : location.pathname.endsWith('academy.html') ? 'academy' : 'readings';
   const ic = {
     read:'<svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5C4.7 20 4 19.3 4 18.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg>',
+    academy:'<svg viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg>',
     verse:'<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
     watch:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z" class="f"/></svg>',
     app:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></svg>'
@@ -212,7 +214,7 @@
   @media (max-width:760px){
     .tabbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:60;justify-content:space-around;
       padding:8px 6px calc(8px + env(safe-area-inset-bottom));background:rgba(14,11,8,.86);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid rgba(201,163,90,.18)}
-    .tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#8f8573;font:500 10px Inter,system-ui,sans-serif;letter-spacing:.06em;padding:4px 0;-webkit-tap-highlight-color:transparent}
+    .tabbar a{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;text-decoration:none;color:#8f8573;font:500 10px Inter,system-ui,sans-serif;letter-spacing:.06em;padding:4px 0;-webkit-tap-highlight-color:transparent}
     .tabbar svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
     .tabbar svg .f{fill:currentColor;stroke:none}
     .tabbar a.on{color:#e6c88a}
@@ -222,6 +224,7 @@
   const st=document.createElement('style'); st.textContent=css; document.head.appendChild(st);
   const nav=document.createElement('nav'); nav.className='tabbar';
   nav.innerHTML=`<a href="readings.html#readings" data-t="readings">${ic.read}<span>Readings</span></a>
+    <a href="academy.html" data-t="academy">${ic.academy}<span>Academy</span></a>
     <a href="verses.html" data-t="verses">${ic.verse}<span>Verses</span></a>
     <a href="readings.html#watch" data-t="watch">${ic.watch}<span>Watch</span></a>
     <a href="#" data-t="app">${ic.app}<span>App</span></a>`;

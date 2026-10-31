@@ -1,0 +1,728 @@
+{
+ "week": {
+  "n": 1,
+  "title": "How Power Moves",
+  "sub": "Seven moments where one decision bent history, and the human patterns underneath them."
+ },
+ "sessions": [
+  {
+   "title": "The Point of No Return",
+   "img": "ac-rubicon",
+   "era": "Rome",
+   "year": "49 BC",
+   "yearNum": -49,
+   "place": "Northern Italy",
+   "story": [
+    "January, 49 BC. A small river in northern Italy, the Rubicon, marked the line between the province Julius Caesar governed and Italy itself. Roman law was blunt: a general who led his army across that line was committing treason.",
+    "Caesar had just spent nine years conquering Gaul. He was rich, famous and loved by his soldiers. His enemies in the Senate, now allied with his old partner Pompey, ordered him to give up his army and come home as a private citizen. Caesar knew what that meant: prosecution, exile, maybe death.",
+    "The ancient writers say he hesitated at the bank. Then he crossed with a single legion. Suetonius has him saying “the die is cast.” Plutarch says he quoted a Greek playwright: let the die be cast. Either way the meaning was the same. There was no way back.",
+    "The crossing forced everyone to pick a side. Pompey and much of the Senate fled Rome, and civil war spread across the Roman world. Caesar won, was named dictator, and was assassinated on the Ides of March, 44 BC. His heir Octavian finished what the crossing started. In 27 BC he became Augustus, the first emperor, and a Republic that had stood for nearly five hundred years was gone.",
+    "Caesar’s genius that morning was not courage alone. He used one irreversible act to remove every option except forward, for himself, for his men and for his enemies."
+   ],
+   "pattern": {
+    "name": "Commitment and Consistency",
+    "what": "Once people take a stand, especially in public or in a way that is hard to undo, they feel strong pressure to stay consistent with it. Small commitments grow into big ones. Caesar used it on himself: by making retreat impossible, he made total effort inevitable.",
+    "onyou": "The free trial that asks for your card. The salesman who collects three small yeses before the big ask. The survey that asks “Do you care about your family’s safety?” right before the alarm system pitch. Notice when you are being walked up a staircase of tiny agreements.",
+    "use": "Ask clients for a small first step: a site visit, a design consult, a deposit. Have them say their goals out loud. Use it on yourself too: announce the goal, pay before you feel ready, put it on the calendar.",
+    "line": "Never lock someone into a commitment they would not make with full information. If they would back out once they knew the truth, it is manipulation.",
+    "source": "Robert Cialdini named this principle in Influence."
+   },
+   "word": {
+    "w": "irrevocable",
+    "say": "ih REV uh kuh bul",
+    "pos": "adjective",
+    "d": "Impossible to change, undo or call back.",
+    "root": "Latin ir (not) + re (back) + vocare (to call)",
+    "fam": [
+     "revoke",
+     "vocal",
+     "vocation",
+     "advocate",
+     "invoke",
+     "provoke"
+    ],
+    "use": "Once the deposit cleared, the decision was irrevocable."
+   },
+   "spot": {
+    "q": "A gym offers a free week. On day one the trainer has you write down your goal and share it with the group. On day six he asks if you are serious about that goal, then shows you the annual plan. What is mainly working on you?",
+    "o": [
+     "Scarcity",
+     "Commitment and consistency",
+     "Social proof",
+     "Authority"
+    ],
+    "a": 1,
+    "why": "You publicly committed to a goal, then were asked to act consistent with it. The free week adds a little reciprocity, but the engine is your own words."
+   },
+   "quiz": [
+    {
+     "q": "Under Roman law, what did leading an army across the Rubicon mean?",
+     "o": [
+      "A declaration of war on Gaul",
+      "Treason",
+      "A bid to become consul",
+      "A religious ceremony"
+     ],
+     "a": 1,
+     "why": "Generals had to give up command before entering Italy. Crossing with troops was treason."
+    },
+    {
+     "q": "Who became the first Roman emperor, finishing what the crossing started?",
+     "o": [
+      "Pompey",
+      "Brutus",
+      "Augustus",
+      "Nero"
+     ],
+     "a": 2,
+     "why": "Caesar’s heir Octavian took the name Augustus in 27 BC."
+    },
+    {
+     "q": "Irrevocable shares a Latin root with which word?",
+     "o": [
+      "vocation",
+      "revenge",
+      "reveal",
+      "recover"
+     ],
+     "a": 0,
+     "why": "Both come from vocare, to call. A vocation is a calling."
+    }
+   ],
+   "speak": "In 60 seconds, explain what crossing the Rubicon means, tell the story behind it, and name one Rubicon you need to cross.",
+   "anchor": {
+    "v": "No man, having put his hand to the plough, and looking back, is fit for the kingdom of God.",
+    "ref": "Luke 9:62",
+    "habit": "Make one commitment today that is hard to walk back: tell someone, pay for it, or put it on the calendar."
+   },
+   "read": {
+    "t": "Life of Caesar",
+    "by": "Plutarch",
+    "why": "Free and public domain. Plutarch writes history as character study, which is exactly the skill you are building."
+   },
+   "id": "a1",
+   "n": 1
+  },
+  {
+   "title": "From Prison to Palace",
+   "img": "ac-joseph",
+   "era": "Ancient Egypt",
+   "year": "c. 1700 BC (date debated)",
+   "yearNum": -1700,
+   "place": "Egypt",
+   "story": [
+    "Joseph was seventeen when his brothers sold him into slavery. In Egypt he rose to run the household of Potiphar, an officer of Pharaoh, until a false accusation from Potiphar’s wife landed him in prison.",
+    "Even there he rose. He correctly read the dreams of two prisoners, Pharaoh’s cupbearer and baker, and asked the cupbearer to remember him. The cupbearer forgot him for two full years.",
+    "Then Pharaoh dreamed of seven fat cows swallowed by seven thin ones, and seven full ears of grain swallowed by seven withered ones. No one in the court could explain it. Finally the cupbearer remembered the young Hebrew in prison.",
+    "Joseph was shaved, dressed and brought before the most powerful man on earth. His first words: “It is not in me: God shall give Pharaoh an answer of peace.” He explained the dream as seven years of plenty followed by seven years of famine. Then he did something no one had asked for. He gave Pharaoh a plan: appoint a wise man, store a fifth of the harvest during the good years, and Egypt will survive the bad ones.",
+    "Pharaoh put Joseph in charge of the whole plan and made him second only to himself. Joseph was thirty. Years later his starving brothers came to Egypt to buy grain and bowed before the brother they had sold."
+   ],
+   "pattern": {
+    "name": "Solve the King’s Problem",
+    "what": "Power flows to the person who solves the decision maker’s most urgent problem, and comes with a plan instead of just an opinion. Joseph also gave the credit away: he made Pharaoh look wise for listening, and gave God the glory.",
+    "onyou": "Consultants and salespeople who diagnose your problem so they become the obvious cure. Sometimes they inflate the danger so the solution feels urgent. Ask for evidence before you accept the diagnosis.",
+    "use": "Find the most urgent problem your client, partner or boss has. Bring a plan with options, not a complaint. Make the decision maker look wise for choosing you.",
+    "line": "Never invent or exaggerate the famine. If the problem has to sound worse than it is to sell the solution, you have crossed the line.",
+    "source": "Robert Greene’s first law, “Never outshine the master,” is Joseph done for selfish reasons. Joseph did it out of humility."
+   },
+   "word": {
+    "w": "providence",
+    "say": "PRAH vih dence",
+    "pos": "noun",
+    "d": "God’s care and guidance over events. Also, wise preparation for the future.",
+    "root": "Latin pro (ahead) + videre (to see): seeing ahead",
+    "fam": [
+     "provide",
+     "provision",
+     "prudent",
+     "video",
+     "evidence",
+     "envision"
+    ],
+    "use": "It felt like a setback, but looking back it was providence."
+   },
+   "spot": {
+    "q": "A roofer inspects your home for free. He shows you photos of your actual roof, explains what will happen in the rainy season, and offers three options at three prices. What is he doing?",
+    "o": [
+     "Manufacturing fear",
+     "Solving the king’s problem with a plan",
+     "Bait and switch",
+     "Creating false scarcity"
+    ],
+    "a": 1,
+    "why": "Real evidence plus a clear plan with options. If the photos were fake or the damage exaggerated, it would become manipulation."
+   },
+   "quiz": [
+    {
+     "q": "Besides interpreting the dream, what did Joseph give Pharaoh?",
+     "o": [
+      "A warning to flee Egypt",
+      "A plan to store grain during the good years",
+      "A prophecy about Pharaoh’s son",
+      "A new calendar"
+     ],
+     "a": 1,
+     "why": "He proposed storing a fifth of the harvest during the seven good years."
+    },
+    {
+     "q": "How long did the cupbearer forget about Joseph?",
+     "o": [
+      "Seven days",
+      "Two full years",
+      "Seven years",
+      "Twenty years"
+     ],
+     "a": 1,
+     "why": "Genesis 41:1 says two full years passed."
+    },
+    {
+     "q": "Providence comes from Latin roots meaning:",
+     "o": [
+      "for the people",
+      "to see ahead",
+      "great power",
+      "to call back"
+     ],
+     "a": 1,
+     "why": "Pro (ahead) and videre (to see)."
+    }
+   ],
+   "speak": "In 60 seconds, tell Joseph’s rise from prison to palace, then name the urgent problem one of your clients would gladly pay to have solved.",
+   "anchor": {
+    "v": "But as for you, ye thought evil against me; but God meant it unto good, to bring to pass, as it is this day, to save much people alive.",
+    "ref": "Genesis 50:20",
+    "habit": "Write down the most urgent problem one client or partner has, and bring them a plan this week."
+   },
+   "read": {
+    "t": "Genesis 37 to 50",
+    "by": "The Bible",
+    "why": "One of the greatest stories ever written about betrayal, patience, power and forgiveness."
+   },
+   "id": "a2",
+   "n": 2
+  },
+  {
+   "title": "Bread and Circuses",
+   "img": "ac-circus",
+   "era": "Rome",
+   "year": "AD 80",
+   "yearNum": 80,
+   "place": "Rome",
+   "story": [
+    "In 123 BC a Roman politician named Gaius Gracchus pushed through a law selling grain to citizens below market price. It made him wildly popular. In 58 BC another politician, Clodius, went further and made the grain free. Rulers had discovered something powerful: a fed crowd is a quiet crowd.",
+    "The emperors perfected it. Grain was handed out to some two hundred thousand people in the city. And there were the games: chariot races, beast hunts, gladiators. In AD 80 the emperor Titus opened the great amphitheater we call the Colosseum with one hundred days of spectacle. It could seat about fifty thousand people.",
+    "Around the beginning of the second century, the satirist Juvenal looked at his fellow Romans with disgust. The people who once gave out armies and high offices, he wrote, now anxiously long for just two things: bread and circuses.",
+    "Juvenal’s point was not that food or fun are evil. It was that a people who are comfortable and entertained stop asking hard questions. They hand over their power without noticing it is gone.",
+    "Two thousand years later the bread is cheaper and the circus fits in your pocket."
+   ],
+   "pattern": {
+    "name": "Comfort as Control",
+    "what": "People reliably trade long term freedom for short term comfort. Psychologists call it present bias. Add unpredictable rewards, the slot machine effect, and attention becomes easy to capture. Whoever holds your attention steers your direction.",
+    "onyou": "Endless feeds, autoplay and notifications built on variable rewards so you keep checking. Cheap pleasure at the exact moment you meant to do something hard. Ask: who profits from my distraction?",
+    "use": "Delighting customers is good business: a surprise touch, a beautiful experience, a reason to smile. Delight that serves them is generosity.",
+    "line": "Never use pleasure or distraction to hide the real cost, or to keep someone from thinking clearly about a decision.",
+    "source": "The phrase comes from Juvenal’s tenth Satire."
+   },
+   "word": {
+    "w": "complacent",
+    "say": "kum PLAY sent",
+    "pos": "adjective",
+    "d": "Pleased with yourself and blind to real danger.",
+    "root": "Latin com (thoroughly) + placere (to please)",
+    "fam": [
+     "please",
+     "placate",
+     "placid",
+     "pleasant",
+     "complacency"
+    ],
+    "use": "Comfort made the empire complacent long before it made it weak."
+   },
+   "spot": {
+    "q": "An app gives you a random reward when you open it: sometimes a like, sometimes a new video you love, sometimes nothing. You catch yourself checking it eighty times a day. What is the main mechanism?",
+    "o": [
+     "Authority",
+     "Variable rewards",
+     "Reciprocity",
+     "Commitment"
+    ],
+    "a": 1,
+    "why": "Unpredictable rewards are the most habit forming kind. It is the slot machine principle, the modern bread and circuses."
+   },
+   "quiz": [
+    {
+     "q": "Which Roman writer coined the phrase bread and circuses?",
+     "o": [
+      "Virgil",
+      "Juvenal",
+      "Cicero",
+      "Ovid"
+     ],
+     "a": 1,
+     "why": "Juvenal, in his tenth Satire."
+    },
+    {
+     "q": "The Colosseum opened in AD 80 with how many days of games?",
+     "o": [
+      "Seven",
+      "Thirty",
+      "One hundred",
+      "Three hundred sixty five"
+     ],
+     "a": 2,
+     "why": "Titus held one hundred days of games."
+    },
+    {
+     "q": "Complacent comes from a Latin root meaning:",
+     "o": [
+      "to please",
+      "to fight",
+      "to sleep",
+      "to rule"
+     ],
+     "a": 0,
+     "why": "Placere, to please. Same root as placid and placate."
+    }
+   ],
+   "speak": "In 60 seconds, explain what bread and circuses means and give one modern example you see in your own life.",
+   "anchor": {
+    "v": "And be not conformed to this world: but be ye transformed by the renewing of your mind.",
+    "ref": "Romans 12:2",
+    "habit": "Tonight your phone sleeps outside your bedroom. Tomorrow, no screen for the first twenty minutes."
+   },
+   "read": {
+    "t": "Amusing Ourselves to Death",
+    "by": "Neil Postman",
+    "why": "Written about television in 1985. It reads like a description of your phone."
+   },
+   "id": "a3",
+   "n": 3
+  },
+  {
+   "title": "The Team of Rivals",
+   "img": "ac-lincoln",
+   "era": "America",
+   "year": "1861",
+   "yearNum": 1861,
+   "place": "Washington, D.C.",
+   "story": [
+    "In 1860 Abraham Lincoln was the long shot. His rivals for the Republican nomination were better known and better connected: William Seward, Salmon Chase and Edward Bates. Lincoln beat them all.",
+    "Then he did something that shocked Washington. He put all three in his cabinet. Seward became Secretary of State, Chase ran the Treasury, Bates became Attorney General. Each of them thought he was the better man.",
+    "Seward assumed he would be the real power. A month in, he sent Lincoln a memo offering to take over policy himself. Lincoln answered calmly and privately: the decisions would be his. He never humiliated Seward. About two months later Seward wrote to his wife that the President was the best of us.",
+    "Lincoln went further. Edwin Stanton had treated him with open contempt when they worked a legal case together in 1855. In 1862 Lincoln made him Secretary of War because Stanton was the best man for the job. Stanton became one of his most devoted allies. At Lincoln’s deathbed in 1865, Stanton is reported to have said: now he belongs to the ages.",
+    "Lincoln understood that a secure leader can afford to surround himself with strong people, and that respect turns rivals into allies more reliably than fear does."
+   ],
+   "pattern": {
+    "name": "Respect Disarms",
+    "what": "People who are respected, trusted with real responsibility and never humiliated tend to become loyal, even former enemies. Insecure leaders surround themselves with weaker people. Secure leaders recruit strength and let it work.",
+    "onyou": "Flattery used to buy your loyalty. A big title with no real authority. Notice whether someone’s respect for you shows up in decisions, or only in compliments.",
+    "use": "Partner with people who are stronger than you where you are weak. Ask a competitor for advice. Give critics a seat at the table where you can hear them.",
+    "line": "Respect used as a tactic is hollow. Real magnanimity means you would treat them well even if it gained you nothing.",
+    "source": "Doris Kearns Goodwin’s 2005 book Team of Rivals made this story famous."
+   },
+   "word": {
+    "w": "magnanimous",
+    "say": "mag NAN ih mus",
+    "pos": "adjective",
+    "d": "Generous and forgiving, especially toward a rival. Literally, great souled.",
+    "root": "Latin magnus (great) + animus (soul, mind)",
+    "fam": [
+     "magnify",
+     "magnitude",
+     "magnate",
+     "animate",
+     "unanimous",
+     "animosity"
+    ],
+    "use": "He was magnanimous in victory and offered his old rival a seat at the table."
+   },
+   "spot": {
+    "q": "A local competitor criticizes your pricing at a networking group. A week later you invite him to coffee, ask what he is seeing in the market, and refer him a job you cannot take. What are you practicing?",
+    "o": [
+     "Creating scarcity",
+     "Magnanimity that turns a rival into an ally",
+     "A commitment trap",
+     "Social proof"
+    ],
+    "a": 1,
+    "why": "You answered criticism with respect and real help. Done sincerely, this is how Lincoln built loyalty."
+   },
+   "quiz": [
+    {
+     "q": "Which former rival did Lincoln make Secretary of State?",
+     "o": [
+      "Edwin Stanton",
+      "William Seward",
+      "Salmon Chase",
+      "Edward Bates"
+     ],
+     "a": 1,
+     "why": "Seward, who had expected to win the nomination himself."
+    },
+    {
+     "q": "Who wrote the 2005 book Team of Rivals?",
+     "o": [
+      "Doris Kearns Goodwin",
+      "Barbara Tuchman",
+      "Ron Chernow",
+      "David McCullough"
+     ],
+     "a": 0,
+     "why": "Doris Kearns Goodwin."
+    },
+    {
+     "q": "Magnanimous literally means:",
+     "o": [
+      "great soul",
+      "great wealth",
+      "many friends",
+      "strong arm"
+     ],
+     "a": 0,
+     "why": "Magnus (great) + animus (soul)."
+    }
+   ],
+   "speak": "In 60 seconds, tell the story of Lincoln and Seward, then name one rival you could turn into an ally.",
+   "anchor": {
+    "v": "When a man’s ways please the LORD, he maketh even his enemies to be at peace with him.",
+    "ref": "Proverbs 16:7",
+    "habit": "This week, ask someone you compete with for their advice on one thing."
+   },
+   "read": {
+    "t": "Team of Rivals",
+    "by": "Doris Kearns Goodwin",
+    "why": "A masterclass in leadership, ego and how to handle people who think they are smarter than you."
+   },
+   "id": "a4",
+   "n": 4
+  },
+  {
+   "title": "The Man Who Cornered Oil",
+   "img": "ac-oil",
+   "era": "Industrial America",
+   "year": "1870",
+   "yearNum": 1870,
+   "place": "Cleveland, Ohio",
+   "story": [
+    "At sixteen, John D. Rockefeller took a job as an assistant bookkeeper in Cleveland. He kept a small personal ledger of every cent he earned, spent and gave to his church. That obsession with the numbers would make him the richest man in America.",
+    "Oil was the wild new industry of the 1860s. Drilling was chaos, prices swung wildly, and hundreds of small refiners fought for scraps. Rockefeller saw that the real power was not in the wells. It was in refining and transport, the narrow point every barrel had to pass through.",
+    "In 1870 he founded Standard Oil. He cut costs relentlessly, made his own barrels, and used his huge volume to win secret discounts from the railroads, which his rivals could not get. In early 1872 he bought out most of the refiners in Cleveland within a few weeks. Many sold because they felt they could not compete. By around 1880 Standard Oil controlled about ninety percent of American refining.",
+    "The secret deals caught up with him. Journalist Ida Tarbell exposed Standard Oil’s methods in a famous series of articles, and in 1911 the Supreme Court ordered the company broken into thirty four pieces.",
+    "Rockefeller spent his later decades giving money away on a scale the world had never seen: the University of Chicago, medical research, the Rockefeller Foundation. The same man is studied as a genius of efficiency and as a warning about unchecked power."
+   ],
+   "pattern": {
+    "name": "Control the Bottleneck",
+    "what": "Whoever controls the narrow point that everything must pass through holds the leverage. Rockefeller ignored the crowded, chaotic part of the market and owned the chokepoint. Scale and efficiency then let him outlast everyone.",
+    "onyou": "Platforms that become your only road to customers, then raise prices once you depend on them. Lead marketplaces, ad platforms, a single giant client. If one gatekeeper can shut you off, they own you.",
+    "use": "Own your bottlenecks: your customer list, your reputation, your referral relationships, your systems. Be so efficient you can win on value.",
+    "line": "Rockefeller’s secret rebates and pressure tactics are what brought him down. Leverage is fair. Hidden deals and coercion are not.",
+    "source": "Ron Chernow’s biography Titan tells the full story, the genius and the ruthlessness."
+   },
+   "word": {
+    "w": "leverage",
+    "say": "LEV er ij",
+    "pos": "noun and verb",
+    "d": "Power that multiplies your force because of your position or tools.",
+    "root": "Latin levare (to lift), through lever",
+    "fam": [
+     "lever",
+     "elevate",
+     "relieve",
+     "alleviate",
+     "levity",
+     "relevant"
+    ],
+    "use": "Owning the customer relationship gave him leverage in every negotiation."
+   },
+   "spot": {
+    "q": "A lead platform sends you cheap leads for a year. Once eighty percent of your jobs come from them, they triple the price. What happened?",
+    "o": [
+     "Reciprocity",
+     "They controlled your bottleneck",
+     "Social proof",
+     "Authority"
+    ],
+    "a": 1,
+    "why": "You let one gatekeeper become the only road to your customers. The fix is owning your own pipeline."
+   },
+   "quiz": [
+    {
+     "q": "In what year did the Supreme Court break up Standard Oil?",
+     "o": [
+      "1870",
+      "1890",
+      "1911",
+      "1929"
+     ],
+     "a": 2,
+     "why": "1911, into thirty four companies."
+    },
+    {
+     "q": "Which journalist exposed Standard Oil’s tactics?",
+     "o": [
+      "Ida Tarbell",
+      "Nellie Bly",
+      "Upton Sinclair",
+      "Jacob Riis"
+     ],
+     "a": 0,
+     "why": "Ida Tarbell, in McClure’s Magazine."
+    },
+    {
+     "q": "Leverage comes from the Latin levare, meaning:",
+     "o": [
+      "to lift",
+      "to leave",
+      "to bind",
+      "to lend"
+     ],
+     "a": 0,
+     "why": "To lift. Same root as elevate and relieve."
+    }
+   ],
+   "speak": "In 60 seconds, explain how Rockefeller won, why the company was broken up, and where the bottleneck is in your own business.",
+   "anchor": {
+    "v": "For unto whomsoever much is given, of him shall be much required.",
+    "ref": "Luke 12:48",
+    "habit": "Write down who controls the road between you and your customers. Take one step this week to own more of it."
+   },
+   "read": {
+    "t": "Titan: The Life of John D. Rockefeller, Sr.",
+    "by": "Ron Chernow",
+    "why": "The definitive biography. Read it as a business book and a moral warning at the same time."
+   },
+   "id": "a5",
+   "n": 5
+  },
+  {
+   "title": "Their Finest Hour",
+   "img": "ac-churchill",
+   "era": "World War II",
+   "year": "1940",
+   "yearNum": 1940,
+   "place": "London",
+   "story": [
+    "Winston Churchill became Prime Minister on 10 May 1940, the same day Germany invaded France and the Low Countries. Within weeks the French army was collapsing and the British army was trapped on the beaches at Dunkirk.",
+    "Inside the government, some powerful men wanted to explore peace terms with Hitler. It sounded reasonable. Churchill believed it would mean slow surrender. He had no army ready, no allies arriving and no good news. What he had was words.",
+    "Three days into the job he told Parliament he had nothing to offer but blood, toil, tears and sweat. After more than three hundred thousand soldiers were rescued from Dunkirk, he refused to let the nation celebrate too much and warned that wars are not won by evacuations. Then came the promise to fight on the beaches and never surrender. And as France fell he asked the British people to act so that, a thousand years from now, men would say this was their finest hour.",
+    "He never hid how bad things were. That honesty was the source of his power. People trusted the hope because they could see he was not lying about the danger.",
+    "Years later President Kennedy, borrowing a line from the broadcaster Edward R. Murrow, said Churchill mobilized the English language and sent it into battle."
+   ],
+   "pattern": {
+    "name": "Ethos, Pathos, Logos",
+    "what": "Aristotle taught that persuasion runs on three things: ethos, the credibility of the speaker; pathos, the emotion of the listener; and logos, the logic of the argument. Churchill had ethos because he had warned about Hitler for years, pathos in every line, and logos in his honest facts.",
+    "onyou": "Ads and politicians that hit pathos hard and skip logos: big feelings, no facts. Ask three questions: who is speaking and why should I trust them, what do they want me to feel, and where is the evidence?",
+    "use": "In any pitch: earn trust first with proof and past work, then help them feel the outcome, then show the numbers. Trust first, always.",
+    "line": "Emotion without truth is manipulation. Churchill moved people by telling them hard truths, not by hiding them.",
+    "source": "From Aristotle’s Rhetoric, written around 350 BC and still the foundation of persuasion."
+   },
+   "word": {
+    "w": "eloquent",
+    "say": "EL uh kwent",
+    "pos": "adjective",
+    "d": "Speaking clearly, powerfully and persuasively.",
+    "root": "Latin e (out) + loqui (to speak)",
+    "fam": [
+     "elocution",
+     "loquacious",
+     "colloquial",
+     "soliloquy",
+     "ventriloquist"
+    ],
+    "use": "He was not loud. He was eloquent, and every word earned its place."
+   },
+   "spot": {
+    "q": "A pitch opens with five star reviews and photos of past projects, then tells the story of a family who now uses their backyard every night, then walks through a clear price breakdown. What structure is this?",
+    "o": [
+     "Ethos, pathos, logos",
+     "Bait and switch",
+     "False scarcity",
+     "Foot in the door"
+    ],
+    "a": 0,
+    "why": "Credibility first, then emotion, then logic. Aristotle would approve."
+   },
+   "quiz": [
+    {
+     "q": "In what year did Churchill give his finest hour speech?",
+     "o": [
+      "1914",
+      "1939",
+      "1940",
+      "1945"
+     ],
+     "a": 2,
+     "why": "June 1940, as France fell."
+    },
+    {
+     "q": "Ethos, pathos and logos come from which thinker?",
+     "o": [
+      "Plato",
+      "Aristotle",
+      "Socrates",
+      "Cicero"
+     ],
+     "a": 1,
+     "why": "Aristotle, in the Rhetoric."
+    },
+    {
+     "q": "Eloquent shares a Latin root with:",
+     "o": [
+      "loquacious",
+      "elegant",
+      "eleven",
+      "liquid"
+     ],
+     "a": 0,
+     "why": "Loqui, to speak. Loquacious means talkative."
+    }
+   ],
+   "speak": "Pick one thing you believe deeply. In 60 seconds, argue for it using ethos, then pathos, then logos.",
+   "anchor": {
+    "v": "A word fitly spoken is like apples of gold in pictures of silver.",
+    "ref": "Proverbs 25:11",
+    "habit": "Before your next important conversation, say your opening out loud three times."
+   },
+   "read": {
+    "t": "The Splendid and the Vile",
+    "by": "Erik Larson",
+    "why": "Churchill’s first year as Prime Minister, told like a thriller."
+   },
+   "id": "a6",
+   "n": 6
+  },
+  {
+   "title": "For Such a Time as This",
+   "img": "ac-esther",
+   "era": "Persia",
+   "year": "c. 480 BC",
+   "yearNum": -480,
+   "place": "Susa, Persia",
+   "story": [
+    "Esther was a young Jewish woman who became queen of Persia under King Ahasuerus, usually identified as Xerxes. Few in the palace knew her background.",
+    "The king’s chief minister, Haman, hated Esther’s cousin Mordecai for refusing to bow to him. In revenge he persuaded the king to issue a decree to destroy every Jew in the empire on a single day.",
+    "Mordecai begged Esther to go to the king. But the law was clear: anyone who approached the king uninvited could be put to death unless he held out his golden scepter. Mordecai answered her fear with one of the most famous lines in Scripture: who knows whether you have come to the kingdom for such a time as this?",
+    "Esther asked her people to fast with her for three days, and decided: if I perish, I perish. She entered the court. The king held out the scepter. But she did not blurt out her request. She invited the king and Haman to a banquet, then to a second one. Only when the king had asked her twice what she wanted, and promised her up to half his kingdom, did she speak.",
+    "She told the truth about Haman. The king turned on him, Haman was executed on the gallows he had built for Mordecai, and the Jews were given the right to defend themselves. The feast of Purim still remembers it."
+   ],
+   "pattern": {
+    "name": "Timing and the Right Room",
+    "what": "The same request can fail or succeed depending on when, where and how it is made. Esther prepared, built goodwill, waited until the king was eager to say yes, and made her case in a setting where he was relaxed and generous. This week’s principles all show up in her story: commitment, goodwill, credibility and a true cause.",
+    "onyou": "Pressure to decide right now: this price is only good today. Real opportunities can almost always wait one night. Urgency that will not let you think is a warning sign.",
+    "use": "Prepare and pray. Build goodwill first. Make your big ask when the other person is ready to hear it, in the right setting.",
+    "line": "Esther’s timing served a true and just cause, and she told the truth. Timing is wisdom when the cause is true. It becomes manipulation when it is used to slip something past someone.",
+    "source": "The Book of Esther, ten short chapters."
+   },
+   "word": {
+    "w": "discernment",
+    "say": "dih SURN ment",
+    "pos": "noun",
+    "d": "The ability to judge well: to see what is true, what matters and what to do.",
+    "root": "Latin dis (apart) + cernere (to sift, separate)",
+    "fam": [
+     "discern",
+     "discreet",
+     "discrete",
+     "certain",
+     "secret",
+     "crisis (a Greek cousin)"
+    ],
+    "use": "Learning how power works is safe in the hands of a man with discernment."
+   },
+   "spot": {
+    "q": "Before asking your best client for a referral, you finish their project early, send a handwritten thank you, and wait until they tell you how happy they are. Then you ask. What are you using?",
+    "o": [
+     "Timing and goodwill",
+     "A commitment trap",
+     "False scarcity",
+     "Authority"
+    ],
+    "a": 0,
+    "why": "You earned goodwill honestly and asked at the right moment. That is Esther’s method."
+   },
+   "quiz": [
+    {
+     "q": "What was the danger of approaching the Persian king uninvited?",
+     "o": [
+      "A fine",
+      "Death, unless he held out his scepter",
+      "Exile",
+      "Losing her crown"
+     ],
+     "a": 1,
+     "why": "Esther 4:11."
+    },
+    {
+     "q": "What did Esther do before making her request?",
+     "o": [
+      "Wrote him a letter",
+      "Held two banquets",
+      "Sent Mordecai instead",
+      "Raised an army"
+     ],
+     "a": 1,
+     "why": "She hosted two banquets and waited for the right moment."
+    },
+    {
+     "q": "Discernment comes from a Latin root meaning:",
+     "o": [
+      "to sift or separate",
+      "to burn",
+      "to rule",
+      "to hide"
+     ],
+     "a": 0,
+     "why": "Cernere, to sift. Same family as certain and discreet."
+    }
+   ],
+   "speak": "In 60 seconds, tell Esther’s story, then explain what this whole week taught you about why people say yes.",
+   "anchor": {
+    "v": "And who knoweth whether thou art come to the kingdom for such a time as this?",
+    "ref": "Esther 4:14",
+    "habit": "Pick one important ask you need to make. Plan the right time and setting instead of blurting it out."
+   },
+   "read": {
+    "t": "The Book of Esther",
+    "by": "The Bible",
+    "why": "God is never named in it, yet His hand is on every page. A study in courage and timing."
+   },
+   "id": "a7",
+   "n": 7
+  }
+ ],
+ "ranks": [
+  [
+   "Student",
+   0
+  ],
+  [
+   "Apprentice",
+   150
+  ],
+  [
+   "Scholar",
+   400
+  ],
+  [
+   "Orator",
+   800
+  ],
+  [
+   "Strategist",
+   1400
+  ],
+  [
+   "Sage",
+   2200
+  ]
+ ],
+ "xp": {
+  "session": 50,
+  "quiz": 10,
+  "spot": 15,
+  "speak": 20,
+  "boss": 10,
+  "reading": 15,
+  "verse": 5
+ }
+}
