@@ -1,6 +1,49 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="15" fill="#0b0e14"/>
-  <text x="32" y="34" fill="#ffffff" text-anchor="middle" dominant-baseline="central"
-        font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif"
-        font-size="40" font-weight="800">G</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1a1d24"/>
+      <stop offset="1" stop-color="#06070a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="512" cy="120" r="620" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".16"/>
+      <stop offset=".55" stop-color="#ffffff" stop-opacity=".03"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="ink" x1="160" y1="160" x2="870" y2="870" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#b9bec8"/>
+    </linearGradient>
+    <radialGradient id="hub" cx=".4" cy=".35" r=".8">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d4d8e0"/>
+    </radialGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="22"/>
+    </filter>
+    <filter id="drop" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dy="12" result="o"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".55"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="clip"><rect width="1024" height="1024" rx="230"/></clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <!-- faint orbit rings: depth without clutter -->
+    <circle cx="512" cy="512" r="436" fill="none" stroke="#ffffff" stroke-opacity=".07" stroke-width="3"/>
+    <circle cx="512" cy="512" r="300" fill="none" stroke="#ffffff" stroke-opacity=".05" stroke-width="2" stroke-dasharray="4 30"/>
+    <!-- halo behind the mark -->
+    <circle cx="512" cy="512" r="330" fill="#ffffff" fill-opacity=".07" filter="url(#soft)"/>
+    <!-- the G: a ring open at the upper right, with one spoke from the hub out to the rim -->
+    <g filter="url(#drop)" fill="none" stroke="url(#ink)" stroke-width="108" stroke-linecap="round">
+      <path d="M724,300 A300,300 0 1 0 812,512"/>
+      <path d="M668,512 L812,512"/>
+    </g>
+    <!-- the hub -->
+    <circle cx="512" cy="512" r="96" fill="#ffffff" fill-opacity=".4" filter="url(#soft)"/>
+    <circle cx="512" cy="512" r="66" fill="url(#hub)"/>
+    <circle cx="512" cy="512" r="66" fill="none" stroke="#06070a" stroke-opacity=".22" stroke-width="8"/>
+  </g>
 </svg>
