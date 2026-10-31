@@ -57,9 +57,12 @@ export function payloadFor(slot, state, data) {
   const R = data.R; const n = nextDay(state, R.length);
   if (slot === 'test') return { title: 'Notifications are on', body: 'Your morning reading will arrive here each day. Strong and gentle.', url: '/vibe/readings.html' };
   if (slot === 'morning') {
-    if (!n) return { title: 'All 21 readings complete', body: 'Well done, brother. Begin again and see how much deeper it goes.', url: '/vibe/readings.html#day-1' };
+    if (!n) return { title: 'Your daily session is ready', body: 'All 21 readings are done. Today: the Academy, or begin the readings again.', url: '/vibe/academy.html' };
     const r = R[n - 1];
-    return { title: `Day ${n}: ${r.t}`, body: `“${r.m[0]}” ${r.m[1]}`, url: `/vibe/readings.html#day-${n}` };
+    const A = data.A || []; let an = 0;
+    for (let k = 1; k <= A.length; k++) { const v = (state.done || {})['a' + k]; if (!v || !v.v) { an = k; break; } }
+    const extra = an ? `\nAcademy: ${A[an - 1]}` : '';
+    return { title: `Day ${n}: ${r.t}`, body: `“${r.m[0]}” ${r.m[1]}${extra}`, url: `/vibe/readings.html#day-${n}` };
   }
   // evening: memory verse from the latest completed day, else today's
   const d = lastDoneDay(state, R.length) || n || 1; const r = R[d - 1];
