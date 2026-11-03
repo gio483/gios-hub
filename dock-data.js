@@ -16,7 +16,7 @@
      b      businesses: sdlr | svm | ksh | standby | mts | personal
      i      emoji icon (our own stuff)          dom  domain for a real logo (tools)
      c      card color
-     p      price: [amount, 'mo'|'yr'|'life'] | 'free' | 'usage' | null (unknown, needs a price)
+     p      price: [amount, 'mo'|'yr'|'life'] | 'free' | 'usage' | 'incl' (comes with another plan) | null (unknown, needs a price)
      s      status chip: live | preview | local | building
      ours   true = we built it
      add    date it joined the dock (drives "Recently added")
@@ -90,7 +90,29 @@ window.DOCK_ITEMS = [
   { id:'part107', n:'Part 107 Study', d:'55 lessons, daily drills and mock exams for the FAA drone test', u:'part107/', k:'course', b:['personal','svm'], i:'🛩️', c:'#1d2c44', ours:true, add:'2026-08-16' },
   { id:'faa-dronezone', n:'FAA DroneZone', d:'Register drones and manage the Part 107 certificate', u:'https://faadronezone-access.faa.gov', k:'course', b:['svm'], dom:'faa.gov', c:'#ffffff', p:'free' },
   { id:'hormozi', n:'$100M Trilogy', d:'Offers, Leads, Money Models. The hormozi-strategist agent walks it', u:'https://www.acquisition.com/books', k:'course', b:['sdlr','svm'], dom:'acquisition.com', c:'#0a0a0a', p:null, note:'Physical books' },
-  { id:'skool', n:'Skool', d:'Online community and course platform', u:'https://www.skool.com', k:'course', b:['svm'], dom:'skool.com', c:'#ffffff', p:null, note:'Charged $16 in March 2026' },
+  { id:'hormozi-trainings', n:'Hormozi Trainings', d:'Free Acquisition.com video trainings that go with the books', u:'https://www.acquisition.com/training', k:'course', b:['sdlr','svm'], dom:'acquisition.com', c:'#111111', p:'free', add:'2026-11-02' },
+  { id:'mike-andes', n:"Mike Andes' School of Business", d:'Augusta Lawn Care founder on building a service business', u:'https://mikeandes.teachable.com/courses/enrolled', k:'course', b:['sdlr'], dom:'teachable.com', c:'#1d3b2a', p:null, add:'2026-11-02' },
+  { id:'erin-stetzer', n:'Erin Stetzer Homes', d:'Remodeling business community and trainings', u:'https://erin-stetzer-homes.circle.so/feed', k:'course', b:['sdlr','ksh'], dom:'circle.so', c:'#2b2622', p:null, add:'2026-11-02' },
+  { id:'modern-craftsman', n:'Modern Craftsman', d:'Construction business course', u:'https://modern-craftsman.teachable.com/l/dashboard', k:'course', b:['sdlr','ksh'], dom:'teachable.com', c:'#26302b', p:null, add:'2026-11-02' },
+  { id:'jesse-lane', n:'Jesse Lane Course', d:'Contractor course dashboard', u:'https://jesselane.samcart.com/courses/dashboard', k:'course', b:['sdlr','ksh'], dom:'samcart.com', c:'#2c2a33', p:null, add:'2026-11-02' },
+  { id:'architect-entrepreneur', n:'Architect + Entrepreneur', d:'Running a design and architecture business', u:'https://architect-entrepreneur.teachable.com/l/dashboard', k:'course', b:['ksh','sdlr'], dom:'teachable.com', c:'#23272e', p:null, add:'2026-11-02' },
+  { id:'cinemarketer', n:'Cinemarketer Program', d:'Video marketing program: Skool classroom, Notion dashboard and Slack', u:'https://www.skool.com/cinemarketerio-7695/classroom', k:'course', b:['svm'], dom:'skool.com', c:'#2a1d3a', p:null, add:'2026-11-02', note:'Dashboard: cinemarketer.notion.site' },
+  { id:'cmcc', n:'Cinemarketing Cheat Code', d:'CMCC membership area', u:'https://www.cinemarketingcheatcode.com/membership-area1', k:'course', b:['svm'], dom:'cinemarketingcheatcode.com', c:'#301a1a', p:null, add:'2026-11-02' },
+  { id:'video-strategist', n:'Video Strategist Collective', d:'Club of Closers community for video strategists', u:'https://club-of-closers-video-strategist-masted.mn.co/feed', k:'course', b:['svm'], dom:'mn.co', c:'#1a2633', p:null, add:'2026-11-02' },
+  { id:'full-time-filmmaker', n:'Full Time Filmmaker', d:'The online film school library', u:'https://www.fulltimefilmmaker.com/library', k:'course', b:['svm'], dom:'fulltimefilmmaker.com', c:'#1f1f1f', p:null, add:'2026-11-02' },
+  { id:'audio-guy', n:"Filmmaker's Guide to Audio", d:'Audio Guy course: clean sound for video', u:'https://www.audioguy.co/products/the-filmmaker-s-guide-to-audio-2/categories/370799/posts/1277557', k:'course', b:['svm'], dom:'audioguy.co', c:'#1c2a2a', p:null, add:'2026-11-02' },
+  { id:'content-creator', n:'Become a Content Creator', d:'Content creator course and apprenticeships', u:'https://www.contentcreator.com/library', k:'course', b:['svm'], dom:'contentcreator.com', c:'#2d2416', p:null, add:'2026-11-02' },
+  { id:'micro-content', n:'Micro-Content Mastery', d:'Short-form content course', u:'https://wxkactzjruoypyhgmkd4.memberships.msgsndr.com/library-v2', k:'course', b:['svm'], i:'🎞️', c:'#2a2238', p:null, add:'2026-11-02' },
+  { id:'billy-gene', n:'Billy Gene Is Marketing', d:'Ads and marketing education library', u:'https://billy-genes-gene-pool.mykajabi.com/library', k:'course', b:['svm'], dom:'billygeneismarketing.com', c:'#3a2a12', p:null, add:'2026-11-02' },
+  { id:'mark-cloutier', n:'Mark Cloutier Course', d:'Course Conqueror membership library', u:'https://membership.courseconqueror.com/library-v2', k:'course', b:['svm'], i:'🎓', c:'#1f2b3a', p:null, add:'2026-11-02' },
+  { id:'agency-accelerator', n:'Agency Accelerator', d:'Agency growth program', u:'https://app.agency-accelerator.io/', k:'course', b:['svm'], dom:'agency-accelerator.io', c:'#14263b', p:null, add:'2026-11-02' },
+  { id:'digital-delegator', n:'Digital Delegator Academy', d:'Hiring and delegating to virtual assistants', u:'https://academy.thedigitaldelegator.com/courses/library-v2', k:'course', b:['svm','sdlr'], dom:'thedigitaldelegator.com', c:'#1d2f2a', p:null, add:'2026-11-02', note:'Skool classroom too' },
+  { id:'smma-course', n:'Free SMMA Course', d:'Social media marketing agency course on Skool', u:'https://www.skool.com/free-smma-course/classroom/17310ecd?md=c318bc346fe64ff4b35ddef44cdc4270', k:'course', b:['svm'], dom:'skool.com', c:'#22262e', p:'free', add:'2026-11-02' },
+  { id:'trdvsc', n:'TRDVSC (The Real Deal)', d:'The Real Deal course library on Teachable', u:'https://therealdeal.teachable.com/courses/', k:'course', b:['svm'], dom:'teachable.com', c:'#26262b', p:null, add:'2026-11-02' },
+  { id:'drone-launch', n:'Drone Launch Academy', d:'Part 107 and drone business training', u:'https://courses.dronelaunchacademy.com/courses/enrolled/80274', k:'course', b:['svm','personal'], dom:'dronelaunchacademy.com', c:'#13263a', p:null, add:'2026-11-02' },
+  { id:'exotic-car-hacks', n:'Exotic Car Hacks', d:'How to buy exotic cars smart', u:'https://www.exoticcarhacks.com/homev2/', k:'course', b:['personal'], dom:'exoticcarhacks.com', c:'#2a1515', p:null, add:'2026-11-02' },
+  { id:'ghl-notion-board', n:'GHL Web Design Board', d:'Notion board of GoHighLevel web design resources', u:'https://sunny-sauce-74d.notion.site/GHL-Web-Design-Notion-Board-a921f6780ad942978e81e0935ced088a', k:'course', b:['svm'], dom:'notion.so', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'skool', n:'Skool', d:'Account behind the Cinemarketer, Digital Delegator and SMMA communities', u:'https://www.skool.com', k:'tool', b:['svm'], dom:'skool.com', c:'#ffffff', p:null, note:'Charged $16 in March 2026' },
 
   /* ---------------- Websites we built ---------------- */
   { id:'site-sdlr', n:'SDLR Website', d:'sandiegolandscaperemodeling.com. The #1-for-pergolas machine', u:'https://sandiegolandscaperemodeling.com', k:'site', b:['sdlr'], dom:'sandiegolandscaperemodeling.com', c:'#24301b', ours:true, s:'live', add:'2026-06-01' },
@@ -153,5 +175,44 @@ window.DOCK_ITEMS = [
   { id:'chrome', n:'Google Chrome', d:'Where Claude in Chrome runs', u:'https://www.google.com/chrome', k:'tool', b:['personal'], dom:'google.com', c:'#ffffff', p:'free' },
   { id:'vlc', n:'VLC', d:'Plays anything', u:'https://www.videolan.org', k:'tool', b:['svm'], dom:'videolan.org', c:'#ffffff', p:'free' },
   { id:'rode', n:'RØDE Central', d:'Mic firmware for the VideoMic NTG', u:'https://rode.com/en/apps/rode-central', k:'tool', b:['svm'], dom:'rode.com', c:'#000000', p:'free' },
-  { id:'logi', n:'Logi Options+', d:'Mouse shortcuts. Keep it on at login', u:'https://www.logitech.com/software/logi-options-plus.html', k:'tool', b:['personal'], dom:'logitech.com', c:'#ffffff', p:'free' }
+  { id:'logi', n:'Logi Options+', d:'Mouse shortcuts. Keep it on at login', u:'https://www.logitech.com/software/logi-options-plus.html', k:'tool', b:['personal'], dom:'logitech.com', c:'#ffffff', p:'free' },
+  /* ---------------- From the gio@shiftvisionmedia.com Chrome profile (bookmarks + most visited), 2026-11-02 ---------------- */
+  { id:'svm-highlevel', n:'SVM HighLevel', d:'app.shiftvisionmedia.com: the agency CRM, white-labeled GoHighLevel. Most-visited app after Magnific', u:'https://app.shiftvisionmedia.com', k:'tool', b:['svm','sdlr'], dom:'gohighlevel.com', c:'#06344a', p:'incl', note:'Part of the GoHighLevel plan', add:'2026-11-02' },
+  { id:'vidlead', n:'VIDLEAD', d:'Social planner (another white-labeled GoHighLevel)', u:'https://studio.vidlead.com/v2/location/cTn4ILTSaCzgqhAhEh47/marketing/social-planner/', k:'tool', b:['svm'], i:'📆', c:'#1d2a3a', p:null, add:'2026-11-02' },
+  { id:'stripe', n:'Stripe', d:'Payments and payouts', u:'https://dashboard.stripe.com', k:'tool', b:['svm','sdlr'], dom:'stripe.com', c:'#635bff', p:'usage', add:'2026-11-02' },
+  { id:'quickbooks', n:'QuickBooks Online', d:'Books and invoices', u:'https://qbo.intuit.com', k:'tool', b:['svm'], dom:'quickbooks.intuit.com', c:'#2ca01c', p:null, add:'2026-11-02' },
+  { id:'smartvault', n:'SmartVault', d:'Document portal with the accountant (Halbert James)', u:'https://halbertjames.smartvault.com/secure/SignIn.aspx', k:'tool', b:['svm','personal'], dom:'smartvault.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'legalzoom', n:'LegalZoom', d:'Shift Vision Media (CA) business filings', u:'https://www.legalzoom.com/my/account/d9c81186-5593-4c32-a776-1d75afefb512', k:'tool', b:['svm'], dom:'legalzoom.com', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'notion', n:'Notion', d:'Shift Vision task list and boards', u:'https://www.notion.so/SHIFT-VISION-TASK-LIST-1357fdbd0d1a804c81e7fafaa114c7af', k:'tool', b:['svm'], dom:'notion.so', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'fb-leads', n:'Facebook Leads List', d:'Daily check-in: new instant-form leads', u:'https://business.facebook.com/latest/instant_forms/forms/', k:'tool', b:['sdlr','svm'], dom:'business.facebook.com', c:'#0866ff', p:'free', add:'2026-11-02' },
+  { id:'instagram', n:'Instagram', d:'SDLR and SVM accounts', u:'https://www.instagram.com', k:'tool', b:['sdlr','svm'], dom:'instagram.com', c:'#2b1530', p:'free', add:'2026-11-02' },
+  { id:'linkedin', n:'LinkedIn', d:'Profile and posts', u:'https://www.linkedin.com', k:'tool', b:['svm','sdlr'], dom:'linkedin.com', c:'#0a66c2', p:'free', add:'2026-11-02' },
+  { id:'youtube', n:'YouTube', d:'Research, tutorials and references', u:'https://www.youtube.com', k:'tool', b:['svm','personal'], dom:'youtube.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'yt-music', n:'YouTube Music', d:'Music (installed as a Chrome app)', u:'https://music.youtube.com', k:'tool', b:['personal'], dom:'music.youtube.com', c:'#000000', p:null, add:'2026-11-02' },
+  { id:'gdocs', n:'Google Docs', d:'Docs, Sheets and Slides', u:'https://docs.google.com', k:'tool', b:['svm','sdlr','personal'], dom:'docs.google.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'bni-connect', n:'BNI Connect', d:'Chapter roster, referrals and 1-to-1s', u:'https://www.bniconnectglobal.com', k:'tool', b:['svm','sdlr','personal'], dom:'bniconnectglobal.com', c:'#cf2030', p:null, note:'Membership dues', add:'2026-11-02' },
+  { id:'chatgpt', n:'ChatGPT', d:'Second-opinion AI next to Claude', u:'https://chatgpt.com', k:'tool', b:['svm','personal'], dom:'chatgpt.com', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'gemini', n:'Google Gemini', d:'Google AI', u:'https://gemini.google.com/app', k:'tool', b:['svm'], dom:'gemini.google.com', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'claude-console', n:'Claude Console', d:'API keys and usage for the apps that call Claude', u:'https://platform.claude.com', k:'tool', b:['svm','ksh'], dom:'claude.com', c:'#f0e9e1', p:'usage', add:'2026-11-02' },
+  { id:'sora', n:'Sora', d:'OpenAI video generation', u:'https://sora.chatgpt.com/profile', k:'tool', b:['svm'], dom:'sora.chatgpt.com', c:'#000000', p:'incl', note:'Comes with ChatGPT', add:'2026-11-02' },
+  { id:'flow', n:'Google Flow', d:'Veo video generation from Google Labs', u:'https://labs.google/fx/tools/flow', k:'tool', b:['svm'], dom:'labs.google', c:'#1a1a2e', p:null, add:'2026-11-02' },
+  { id:'envato', n:'Envato Elements', d:'Unlimited stock video, music, templates', u:'https://elements.envato.com', k:'tool', b:['svm'], dom:'envato.com', c:'#1a1a1a', p:null, add:'2026-11-02' },
+  { id:'otter', n:'Otter.ai', d:'Call recording and transcripts', u:'https://otter.ai', k:'tool', b:['svm'], dom:'otter.ai', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'answerthepublic', n:'AnswerThePublic', d:'What people search for, for SEO and content ideas', u:'https://answerthepublic.com/iyhbzq/member/searches', k:'tool', b:['svm','sdlr'], dom:'answerthepublic.com', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'same-energy', n:'Same Energy', d:'Visual search engine for mood boards', u:'https://same.energy', k:'tool', b:['svm'], dom:'same.energy', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'pixlmob', n:'Pixlmob', d:'Real estate photo editing service', u:'https://app.pixlmob.com/dashboard/projects', k:'tool', b:['svm'], dom:'pixlmob.com', c:'#ffffff', p:'usage', add:'2026-11-02' },
+  { id:'groove', n:'Groove', d:'Groove.cm marketing suite', u:'https://app.groove.cm', k:'tool', b:['svm'], dom:'groove.cm', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'supabase', n:'Supabase', d:'Database behind the SDLR Command Center', u:'https://supabase.com/dashboard', k:'tool', b:['sdlr'], dom:'supabase.com', c:'#1c1c1c', p:null, add:'2026-11-02' },
+  { id:'zapier', n:'Zapier', d:'Automations between apps', u:'https://zapier.com/app/zaps', k:'tool', b:['svm','sdlr'], dom:'zapier.com', c:'#ff4f00', p:null, add:'2026-11-02' },
+  { id:'formspree', n:'Formspree', d:'Contact forms on the client sites', u:'https://formspree.io/forms', k:'tool', b:['svm'], dom:'formspree.io', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'featurable', n:'Featurable', d:'Google review widgets on the sites', u:'https://app.featurable.com', k:'tool', b:['svm','sdlr'], dom:'featurable.com', c:'#ffffff', p:null, add:'2026-11-02' },
+  { id:'gcloud', n:'Google Cloud Console', d:'APIs and keys (Maps, Drive connections)', u:'https://console.cloud.google.com', k:'tool', b:['svm','sdlr'], dom:'cloud.google.com', c:'#ffffff', p:'usage', add:'2026-11-02' },
+  { id:'pagespeed', n:'PageSpeed Insights', d:'Speed score for any site', u:'https://pagespeed.web.dev', k:'tool', b:['svm','sdlr'], dom:'web.dev', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'adobe-fonts', n:'Adobe Fonts', d:'Fonts for brand work', u:'https://fonts.adobe.com', k:'tool', b:['svm'], dom:'fonts.adobe.com', c:'#2b0a0a', p:'incl', note:'Comes with Creative Cloud', add:'2026-11-02' },
+  { id:'gotprint', n:'GotPrint', d:'Print runs: cards, flyers, door hangers', u:'https://www.gotprint.com', k:'tool', b:['sdlr','svm'], dom:'gotprint.com', c:'#ffffff', p:'usage', add:'2026-11-02' },
+  { id:'signs-com', n:'Signs.com', d:'Yard signs and banners', u:'https://www.signs.com', k:'tool', b:['sdlr'], dom:'signs.com', c:'#ffffff', p:'usage', add:'2026-11-02' },
+  { id:'tinkercad', n:'Tinkercad', d:'Simple 3D design for prints', u:'https://www.tinkercad.com/dashboard', k:'tool', b:['personal'], dom:'tinkercad.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'makerworld', n:'MakerWorld', d:"Gio's 3D print collections", u:'https://makerworld.com/en/@GioAzzarello/collections', k:'tool', b:['personal'], dom:'makerworld.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'printables', n:'Printables', d:'Free 3D print models', u:'https://www.printables.com/model', k:'tool', b:['personal'], dom:'printables.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  { id:'thingiverse', n:'Thingiverse', d:'More free 3D print models', u:'https://www.thingiverse.com', k:'tool', b:['personal'], dom:'thingiverse.com', c:'#ffffff', p:'free', add:'2026-11-02' }
 ];

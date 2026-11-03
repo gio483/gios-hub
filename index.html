@@ -264,7 +264,7 @@
     <div class="f"><label>Price</label><input name="amt" inputmode="decimal" placeholder="0.00"></div>
     <div class="f"><label>Billing</label><select name="per">
       <option value="mo">Monthly</option><option value="yr">Yearly</option><option value="life">Lifetime (paid once)</option>
-      <option value="free">Free</option><option value="usage">Pay as you go</option><option value="none">Don't know yet</option></select></div>
+      <option value="free">Free</option><option value="usage">Pay as you go</option><option value="incl">Included with another plan</option><option value="none">Don't know yet</option></select></div>
   </div>
   <div class="frow">
     <div class="f"><label>Emoji</label><input name="i" placeholder="optional"></div>
@@ -283,14 +283,15 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=2"></script>
+<script src="dock-data.js?v=3"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
 const BIZMAP = Object.fromEntries(BIZ.map(b=>[b.id,b]));
 const LS = 'gio-dock-v1', LS_UI = 'gio-dock-ui-v1', API = '/api/lifeos?ns=dock';
-// what "Most used" shows until the hub has learned from real opens
-const SEED = ['sdlr-hq','sdlr-lead-map','sdlr-this-week','claude','ghl','site-sdlr','sdlr-estimator','sdlr-bni','money-terminal','lifeos','magnific','gcal','meta-ads','kitchen','lantern','site-svm','svm-websites','gsc','freepik','sdlr-gallery'];
+// what "Most used" shows until the hub has learned from real opens:
+// ranked by Chrome visits in the gio@shiftvisionmedia.com profile (2026-11-02)
+const SEED = ['magnific','svm-highlevel','youtube','ghl','gdocs','gmail','github','ga4','chatgpt','gdrive','gcal','canva','sdlr-hq','stripe','instagram','site-bni','linkedin','claude','bni-connect','cloudflare'];
 const KINDS = { app:'Apps we built', site:'Websites', design:'Designs & decks', tool:'Tools & subscriptions', course:'Courses & learning' };
 const KIND_ORDER = ['app','site','design','tool','course'];
 
@@ -359,6 +360,7 @@ function priceLabel(it){
   if(Array.isArray(p)) return p[1]==='life' ? `<span class="price">LIFE · ${money(p[0])}</span>` : `<span class="price">${money(p[0])}/${p[1]}</span>`;
   if(p==='free') return `<span class="price free">FREE</span>`;
   if(p==='usage') return `<span class="price">USAGE</span>`;
+  if(p==='incl') return `<span class="price">INCLUDED</span>`;
   if(needsPrice(it)) return `<span class="price set" data-edit="${esc(it.id)}">SET PRICE</span>`;
   return '';
 }
@@ -534,6 +536,7 @@ function moneyView(all){
   const life    = sorted(i => Array.isArray(i.p) && i.p[1]==='life');
   const usage   = list.filter(i => i.p==='usage');
   const free    = list.filter(i => i.p==='free');
+  const incl    = list.filter(i => i.p==='incl');
   const unknown = list.filter(needsPrice);
   // with a business picked, a shared tool only counts its share
   const share = i => ui.biz ? 1 / Math.max(1,(i.b||[]).length) : 1;
@@ -556,7 +559,7 @@ function moneyView(all){
     <div class="kpi warn"><div class="t">Need a price</div><div class="v">${unknown.length}</div><div class="s">Fill these in below and the totals grow</div></div>
   </div></section>
   ${!ui.biz && perBiz.length ? `<section class="sec"><div class="sec-h"><h3>Monthly cost by business</h3></div><p class="sub">A tool two businesses share counts half to each.</p><div class="bars">${perBiz.map(x => `<div class="bar-row"><span class="bl"><i style="width:8px;height:8px;border-radius:50%;background:${x.b.c}"></i>${x.b.short}</span><span class="bt"><span style="width:${(x.v/maxB*100).toFixed(1)}%;background:${x.b.c}"></span></span><span class="bv">${money(x.v)}/mo</span></div>`).join('')}</div></section>` : ''}
-  ${table('Still need a price', unknown, it => mrow(it, `<form class="setp" data-setp="${esc(it.id)}"><input name="amt" inputmode="decimal" placeholder="$" aria-label="Price for ${esc(it.n)}"><select name="per" aria-label="Billing"><option value="mo">/mo</option><option value="yr">/yr</option><option value="life">once</option><option value="free">free</option><option value="usage">usage</option></select><button>Set</button></form>`),
+  ${table('Still need a price', unknown, it => mrow(it, `<form class="setp" data-setp="${esc(it.id)}"><input name="amt" inputmode="decimal" placeholder="$" aria-label="Price for ${esc(it.n)}"><select name="per" aria-label="Billing"><option value="mo">/mo</option><option value="yr">/yr</option><option value="life"${it.k==='course'?' selected':''}>once</option><option value="free">free</option><option value="usage">usage</option><option value="incl">included</option></select><button>Set</button></form>`),
       'Type what each one costs and tap Set. It saves to every device.')}
   <div class="two">
     ${table('Monthly', monthly, it => mrow(it, `<span class="mv">${money(it.p[0])}<small>${money(it.p[0]*12,0)}/yr</small></span>`))}
@@ -564,7 +567,10 @@ function moneyView(all){
     ${table('Lifetime', life, it => mrow(it, `<span class="mv">${money(it.p[0])}<small>paid once</small></span>`))}
     ${table('Pay as you go', usage, it => mrow(it, `<span class="typ">Usage</span>`))}
   </div>
-  ${table('Free', free, it => mrow(it, `<span class="typ" style="color:var(--good)">Free</span>`))}
+  <div class="two">
+    ${table('Included with another plan', incl, it => mrow(it, `<span class="typ">Included</span>`))}
+    ${table('Free', free, it => mrow(it, `<span class="typ" style="color:var(--good)">Free</span>`))}
+  </div>
   <p class="note">Starting prices come from Rocket Money (personal cards, through July 2026) and published list prices. Business-card charges were never in Rocket Money, so most business tools start out needing a price.</p>`;
 }
 
@@ -604,13 +610,13 @@ function openEditor(id){
   form.i.value = v.i||''; form.dom.value = v.dom||''; form.c.value = /^#[0-9a-f]{6}$/i.test(v.c||'') ? v.c : '#2a2d33';
   form.ours.value = v.ours ? '1' : ''; form.pin.checked = !!v.pin;
   form.amt.value = Array.isArray(v.p) ? v.p[0] : '';
-  form.per.value = Array.isArray(v.p) ? v.p[1] : (v.p==='free' || v.p==='usage' ? v.p : (v.ours ? 'free' : 'none'));
+  form.per.value = Array.isArray(v.p) ? v.p[1] : (v.p==='free' || v.p==='usage' || v.p==='incl' ? v.p : (v.ours ? 'free' : 'none'));
   form.querySelectorAll('input[name=b]').forEach(cb => cb.checked = (v.b||[]).includes(cb.value));
   dlg.showModal();
   if(!it) setTimeout(()=>form.n.focus(), 30);
 }
 function priceFrom(amt, per){
-  if(per==='free' || per==='usage') return per;
+  if(per==='free' || per==='usage' || per==='incl') return per;
   if(per==='none') return null;
   const a = parseFloat(String(amt).replace(/[$,\s]/g,''));
   return isFinite(a) && a > 0 ? [Math.round(a*100)/100, per] : null;
