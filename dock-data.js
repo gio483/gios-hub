@@ -35,6 +35,7 @@ window.DOCK_BIZ = [
 window.DOCK_ITEMS = [
   /* ---------------- SDLR · our apps ---------------- */
   { id:'sdlr-hq', n:'Command Center', d:'CRM, inbox, follow-ups, BidForge estimates. The GoHighLevel replacement', u:'https://sdlr-hq.vercel.app', k:'app', b:['sdlr'], i:'🏛️', c:'#2f3a22', ours:true, s:'live', add:'2026-09-28' },
+  { id:'tally', n:'Tally', d:'Snap receipts, AI reads them, file each to a project and see what every job costs', u:'https://tally.shiftvisionphotos.workers.dev', k:'app', b:['sdlr','svm'], i:'🧾', c:'#1f6f4f', ours:true, s:'live', add:'2026-11-02' },
   { id:'sdlr-lead-map', n:'Lead Map', d:'Every lead on a live map by area, value and source', u:'sdlr-lead-map.html', k:'app', b:['sdlr'], i:'🗺️', c:'#34442a', ours:true, add:'2026-09-09' },
   { id:'sdlr-this-week', n:"This Week's Posts", d:'Download the image, copy the caption, schedule it', u:'sdlr-this-week.html', k:'app', b:['sdlr'], i:'📲', c:'#3b4a2c', ours:true, add:'2026-06-25' },
   { id:'sdlr-estimator', n:'Estimator', d:'Price jobs and generate client estimates', u:'sdlr-estimator.html', k:'app', b:['sdlr'], i:'🧮', c:'#40502f', ours:true, add:'2026-06-01' },
