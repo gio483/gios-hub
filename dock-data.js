@@ -71,6 +71,7 @@ window.DOCK_ITEMS = [
   /* ---------------- SVM ---------------- */
   { id:'svm-websites', n:'Our Websites', d:'Every site we have built together', u:'websites.html', k:'app', b:['svm'], i:'🌐', c:'#06344a', ours:true, add:'2026-07-01' },
   { id:'svm-editor', n:'Website Editor', d:'Clients change the words on their own sites', u:'website-editor.html', k:'app', b:['svm'], i:'✏️', c:'#083d56', ours:true, add:'2026-07-01' },
+  { id:'mediavault', n:'MediaVault', d:'Keeps the drives straight: what is on each disk, which projects are finished, and moves them to the archive with a SHA-256 check before anything is deleted. Finds work even on an unplugged drive', u:'', k:'app', b:['svm','sdlr','personal'], i:'🗄️', c:'#1e2a33', ours:true, s:'local', p:'free', add:'2026-11-06', note:'Mac app in /Applications, plus the mvault CLI. Source ~/Projects/mediavault' },
   { id:'video-studio', n:'Video Studio', d:'Claude as editor: vs analyze, rough cuts, captions, Resolve timelines. Runs on the Mac', u:'', k:'app', b:['svm','sdlr'], i:'🎞️', c:'#1b1b22', ours:true, s:'local', add:'2026-10-24', note:'Local tool in ~/Projects/video-studio' },
 
   /* ---------------- Standby Pro ---------------- */
