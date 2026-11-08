@@ -152,6 +152,10 @@
     .ban ul{columns:1}
     .facts div{flex-direction:column;gap:3px}
     .facts dt{flex:none}
+    /* long filenames in code tags must wrap, not force the table wide */
+    table{table-layout:fixed;font-size:.82rem}
+    td code,th{white-space:normal;overflow-wrap:anywhere}
+    td,th{word-break:break-word}
   }
 
   @media print{
