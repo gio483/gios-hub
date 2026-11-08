@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<title>Color Pipeline — Gio's Hub</title>
+<style>
+  :root{--bg:#0b1220;--card:#151f33;--text:#f1f5f9;--muted:#94a3b8;--line:#26344f;--accent:#38bdf8;--warm:#e0a44c;--cyan:#5fc9c4}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 600px at 50% -10%, #16233e 0%, var(--bg) 55%) fixed;color:var(--text);min-height:100vh;padding:max(24px,env(safe-area-inset-top)) 18px calc(48px + env(safe-area-inset-bottom));line-height:1.5}
+  header,main{max-width:760px;margin:0 auto}
+  .back{display:inline-flex;align-items:center;gap:7px;color:var(--muted);font-size:.92rem;padding:6px 2px;font-weight:600;text-decoration:none}
+  .back:hover{color:var(--text)}
+  h1{font-size:1.5rem;margin:10px 0 0;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:.92rem;margin:6px 2px 0}
+  h2{font-size:1.02rem;margin:30px 0 11px;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  h2 .n{width:23px;height:23px;border-radius:7px;background:rgba(56,189,248,.14);color:var(--accent);font-size:.76rem;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:15px 16px;margin-bottom:11px}
+  .card h3{margin:0 0 3px;font-size:1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .tag{font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:999px;padding:2px 8px;color:var(--muted)}
+  .tag.log{color:#86efac;border-color:#2b5c3f}
+  .tag.flat{color:var(--warm);border-color:#5c492b}
+  dl{margin:9px 0 0;display:grid;grid-template-columns:auto 1fr;gap:5px 13px;font-size:.87rem}
+  dt{color:var(--muted);white-space:nowrap}
+  dd{margin:0}
+  b.k{color:var(--accent);font-weight:600}
+  .flow{display:flex;align-items:stretch;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .step{flex:1 1 150px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 13px}
+  .step .s{font-size:.7rem;font-weight:700;color:var(--accent);letter-spacing:.05em;text-transform:uppercase}
+  .step h4{margin:4px 0 3px;font-size:.95rem}
+  .step p{margin:0;font-size:.8rem;color:var(--muted);line-height:1.35}
+  .nodes{background:#0e1726;border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:.84rem}
+  .nodes div{display:flex;gap:11px;padding:5px 0;border-bottom:1px dashed #1e2a42}
+  .nodes div:last-child{border:0}
+  .nodes span.i{color:var(--accent);font-weight:700;width:16px;flex:none}
+  .nodes span.w{color:var(--muted);font-size:.78rem;margin-left:auto;text-align:right}
+  ul{margin:8px 0 0;padding-left:19px;font-size:.88rem}
+  li{margin-bottom:6px}
+  .swatches{display:flex;gap:7px;margin:11px 0 3px;flex-wrap:wrap}
+  .sw{flex:1 1 60px;height:42px;border-radius:9px;border:1px solid rgba(255,255,255,.08);display:flex;align-items:flex-end;justify-content:center;font-size:.62rem;color:rgba(255,255,255,.75);padding-bottom:3px;font-weight:600}
+  .warn{border-left:3px solid var(--warm)}
+  .note{font-size:.82rem;color:var(--muted);margin:9px 2px 0}
+  code{background:rgba(255,255,255,.07);border-radius:5px;padding:1px 6px;font-size:.84em}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg><span>Back</span></a>
+  <h1>Color Pipeline</h1>
+  <p class="sub">One grade, every camera. Set the camera right, normalise, then one LUT on top.</p>
+</header>
+<main>
+
+  <h2><span class="n">1</span>The three stages</h2>
+  <div class="flow">
+    <div class="step"><div class="s">Stage 1</div><h4>Normalise</h4><p>Each camera's own transform into Rec.709. The only part that differs per body.</p></div>
+    <div class="step"><div class="s">Stage 2</div><h4>Match</h4><p>Grey card at the head of every roll. Balance each camera to neutral.</p></div>
+    <div class="step"><div class="s">Stage 3</div><h4>Look</h4><p>The Mint LUT. Identical on every clip from every camera.</p></div>
+  </div>
+  <p class="note">A single LUT can't match six cameras on its own — they start from different colour science. Stage 1 is what makes stage 3 behave the same everywhere.</p>
+
+  <h2><span class="n">2</span>On the day — camera settings</h2>
+  <div class="card warn">
+    <h3>Do this on every camera</h3>
+    <dl>
+      <dt>White balance</dt><dd><b class="k">Manual 5600K</b> outdoors. Never auto — auto WB is why multicam never matches.</dd>
+      <dt>Sharpening</dt><dd><b class="k">Lowest setting.</b> Our reference is <i>less</i> sharpened than our own footage, not more.</dd>
+      <dt>Resolution</dt><dd><b class="k">4K</b>, even when delivering 1080. Downscaling gives real sharpness with no halos.</dd>
+    </dl>
+  </div>
+
+  <div class="card"><h3>Sony FX3 <span class="tag log">S-Log3</span></h3>
+    <dl><dt>Profile</dt><dd>S-Log3 / S-Gamut3.Cine, 10-bit 4:2:2</dd>
+    <dt>Base ISO</dt><dd>640 &middot; 12800</dd>
+    <dt>Detail</dt><dd>−7</dd>
+    <dt>Exposure</dt><dd>≈ +1.7 stops over, protect highlights</dd></dl></div>
+
+  <div class="card"><h3>Sony FX30 <span class="tag log">S-Log3</span></h3>
+    <dl><dt>Profile</dt><dd>S-Log3 / S-Gamut3.Cine</dd>
+    <dt>Base ISO</dt><dd>800 &middot; 2500</dd>
+    <dt>Detail</dt><dd>−7</dd>
+    <dt>Exposure</dt><dd>≈ +1.7 stops over</dd></dl></div>
+
+  <div class="card"><h3>Sony A7 IV <span class="tag log">S-Log3</span></h3>
+    <dl><dt>Profile</dt><dd>S-Log3 / S-Gamut3.Cine</dd>
+    <dt>Base ISO</dt><dd>640 &middot; 4000</dd>
+    <dt>Detail</dt><dd>−7</dd></dl></div>
+
+  <div class="card"><h3>Sony, run &amp; gun <span class="tag flat">S-Cinetone</span></h3>
+    <dl><dt>When</dt><dd>No time to grade properly</dd>
+    <dt>Why</dt><dd>Already close to 709 — skip the transform, go straight to the look with a lighter trim</dd></dl></div>
+
+  <div class="card"><h3>DJI Osmo Pocket 3 <span class="tag log">D-Log M</span></h3>
+    <dl><dt>Mode</dt><dd>Pro, D-Log M, 10-bit, 4K</dd>
+    <dt>Sharpness</dt><dd>−1 / lowest &middot; NR lowest</dd>
+    <dt>Watch</dt><dd>Default sharpening is very aggressive. This matters more here than on any other body.</dd></dl></div>
+
+  <div class="card"><h3>GoPro Hero 12 <span class="tag log">GP-Log</span></h3>
+    <dl><dt>Protune</dt><dd>ON &middot; GP-Log if your firmware has it, else Flat</dd>
+    <dt>WB</dt><dd>5500K manual</dd>
+    <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400 &middot; EV −0.5</dd></dl></div>
+
+  <div class="card"><h3>GoPro Hero 9 <span class="tag flat">Flat</span></h3>
+    <dl><dt>Protune</dt><dd>ON &middot; Color: Flat (no GP-Log on the 9)</dd>
+    <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400</dd>
+    <dt>Watch</dt><dd>Flat isn't log — it needs far less stretching. Over-stretching is what makes GoPro fall apart.</dd></dl></div>
+
+  <div class="card"><h3>iPhone 15 Pro Max <span class="tag log">Apple Log</span></h3>
+    <dl><dt>App</dt><dd>Final Cut Camera or Blackmagic Cam → Apple Log ProRes, 4K</dd>
+    <dt>Lock</dt><dd>Exposure <i>and</i> white balance</dd>
+    <dt>Note</dt><dd>Normal iPhone video is already 709 — treat it as 709, don't transform it</dd></dl></div>
+
+  <h2><span class="n">3</span>In Resolve</h2>
+  <div class="card">
+    <h3>Easiest: let Resolve normalise everything</h3>
+    <p class="note" style="margin-top:6px">Project Settings → Color Management → <b class="k">DaVinci YRGB Color Managed</b>, output Rec.709 Gamma 2.4. Then set each clip's <b class="k">Input Color Space</b> in the media pool. All six cameras land on one consistent base automatically — this is the whole reason colour management exists.</p>
+  </div>
+  <div class="nodes">
+    <div><span class="i">1</span><span>Transform to Rec.709</span><span class="w">skip under RCM</span></div>
+    <div><span class="i">2</span><span>Balance — grey card, offset, exposure</span><span class="w">per clip</span></div>
+    <div><span class="i">3</span><span>Mint Look LUT</span><span class="w">Sky Safe for SDLR</span></div>
+    <div><span class="i">4</span><span>Trim — contrast / sat to taste</span><span class="w">small</span></div>
+    <div><span class="i">5</span><span>Grain (optional)</span><span class="w">hides codec noise</span></div>
+  </div>
+  <p class="note">Fix a warm or dark clip in <b class="k">node 2</b>, not node 4. Trimming after the look fights the look.</p>
+  <p class="note">LUTs live in Resolve under <code>LUT / SVM /</code> — <b class="k">Mint Look Sky Safe</b> is the default; the faithful version rotates blue skies to cyan.</p>
+
+  <h2><span class="n">4</span>The look itself</h2>
+  <div class="card">
+    <div class="swatches">
+      <div class="sw" style="background:#101413">shadow</div>
+      <div class="sw" style="background:#2b3330">toe</div>
+      <div class="sw" style="background:#63543c">low mid</div>
+      <div class="sw" style="background:#9c8457">mid</div>
+      <div class="sw" style="background:#d8c79c">high</div>
+      <div class="sw" style="background:#eee5cd">white</div>
+    </div>
+    <dl style="margin-top:13px">
+      <dt>Shadows</dt><dd>Cyan — red pulled out of the toe</dd>
+      <dt>Mids &amp; highs</dt><dd>Gold — blue pulled down about 10%</dd>
+      <dt>Blacks</dt><dd>Land at ~12/255. Clean, never crushed, never milky</dd>
+      <dt>Whites</dt><dd>Shouldered around 234 — rolled off, never clipped</dd>
+      <dt>Saturation</dt><dd>0.29. Moderate — it is not a punchy look</dd>
+      <dt>Blue &amp; magenta</dt><dd>Rotated toward cyan and pulled down</dd>
+    </dl>
+  </div>
+
+  <h2><span class="n">5</span>The sharpness rules</h2>
+  <div class="card warn">
+    <p style="margin:0;font-size:.9rem">The look we're chasing is <b>not sharper than ours — it's cleaner.</b> Measured at matched pixel scale it has <b class="k">17%</b> edge-halo artifacts against <b class="k">41%</b> in our own reel. Sharpness here is subtractive.</p>
+    <ul>
+      <li>Sharpening <b>down or off</b> in every camera.</li>
+      <li>No sharpen / clarity / texture pass in post, ever.</li>
+      <li>Shoot 4K even for 1080 delivery.</li>
+      <li>Upload 4K to YouTube — the encode bitrate is far higher, so even 1080 viewers see a cleaner image.</li>
+      <li>Low ISO, correct exposure. Noise → NR → smearing → the urge to sharpen. That loop is what looks cheap.</li>
+    </ul>
+  </div>
+
+  <p class="note" style="margin-top:22px">Full write-up, measurements and the LUT generator live in <code>_video-studio/looks/</code>.</p>
+</main>
+</body>
+</html>

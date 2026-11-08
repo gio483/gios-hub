@@ -71,6 +71,7 @@ window.DOCK_ITEMS = [
   { id:'ksh-gallery', n:'KSH Design Gallery', d:'Flipbooks and visual deliverables', u:'designs.html?c=ksh', k:'design', b:['ksh'], i:'🎨', c:'#31475e', ours:true, add:'2026-05-19' },
 
   /* ---------------- SVM ---------------- */
+  { id:'color-pipeline', n:'Color Pipeline', d:'One grade across every camera: what to set on the FX3, FX30, A7 IV, Pocket 3, GoPro and iPhone, how to normalise each one, and the LUT that goes on top', u:'color-pipeline.html', k:'app', b:['svm','sdlr'], i:'🎨', c:'#1d3340', ours:true, s:'live', p:'free', add:'2026-11-07' },
   { id:'svm-websites', n:'Our Websites', d:'Every site we have built together', u:'websites.html', k:'app', b:['svm'], i:'🌐', c:'#06344a', ours:true, add:'2026-07-01' },
   { id:'svm-editor', n:'Website Editor', d:'Clients change the words on their own sites', u:'website-editor.html', k:'app', b:['svm'], i:'✏️', c:'#083d56', ours:true, add:'2026-07-01' },
   { id:'mediavault', n:'MediaVault', d:'Keeps the drives straight: what is on each disk, which projects are finished, and moves them to the archive with a SHA-256 check before anything is deleted. Finds work even on an unplugged drive', u:'', k:'app', b:['svm','sdlr','personal'], i:'🗄️', c:'#1e2a33', ours:true, s:'local', p:'free', add:'2026-11-06', note:'Mac app in /Applications, plus the mvault CLI. Source ~/Projects/mediavault' },
