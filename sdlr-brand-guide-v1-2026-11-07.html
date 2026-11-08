@@ -309,19 +309,25 @@
     </div>
 
     <h3>Which file to use</h3>
+    <p>All five vector files below were corrected on <strong>2026-11-07</strong> — canonical palette, wordmark outlined to paths. Use these.</p>
     <table>
       <tr><th style="width:42%">File</th><th>Use for</th></tr>
-      <tr><td><code>SDLR.svg</code></td><td>Vector master. Any print, large format, or vehicle application. Always start here.</td></tr>
-      <tr><td><code>SDLR Logo Gold on Green.png</code></td><td>Primary dark lockup, raster use.</td></tr>
-      <tr><td><code>SDLR Logo Green on Cream.png</code></td><td>Primary light lockup, raster use.</td></tr>
-      <tr><td><code>SDLR Cream (Transparent BG).png</code></td><td>Over photography and video. One-color, maximum legibility.</td></tr>
-      <tr><td><code>SDLR Gold Logo (Transparent BG).png</code></td><td>Over dark photography where gold has enough contrast. Check it.</td></tr>
-      <tr><td><code>SDLR White Long.png</code></td><td>Horizontal variant for wide, short spaces (web header, video lower third).</td></tr>
+      <tr><td><code>SDLR.svg</code></td><td>Master sheet — all four lockups on one canvas. Open this to see the whole system.</td></tr>
+      <tr><td><code>SDLR-gold-on-sage.svg</code></td><td><strong>Primary.</strong> Dark backgrounds, signage, apparel, video end cards.</td></tr>
+      <tr><td><code>SDLR-sage-on-cream.svg</code></td><td><strong>Primary light.</strong> Documents, proposals, letterhead, light web.</td></tr>
+      <tr><td><code>SDLR-sage-on-gold.svg</code></td><td>Sage on gold. Low contrast — use sparingly and check legibility at size.</td></tr>
+      <tr><td><code>SDLR-black-on-cream.svg</code></td><td>Single-color and fallback use.</td></tr>
     </table>
 
     <div class="flag">
-      <h4>Known issue — fix before any new print run</h4>
-      <p>The vector file <code>SDLR.svg</code> carries <strong>older color values</strong> — sage <code>#556B5D</code> and gold <code>#C9A96A</code> — which do not match the current brand palette (<code>#4E5D4A</code> / <code>#BDA572</code>). The hex values in §4 of this guide are canonical; they are what the website and the approved 2026 yard signs use. If you open the SVG, recolor it to the §4 values before output, and send the corrected file back to Gio so the master can be replaced.</p>
+      <h4>Don't use the PNG logos yet</h4>
+      <p>Every raster logo in <code>assets/logos/</code> was exported <em>before</em> the palette was finalized and still carries the old values — sage <code>#556B5D</code>, gold <code>#C9A96A</code>, cream <code>#E4E5DD</code>. They are visibly cooler and more saturated than the brand. <strong>Use the SVGs above for anything new</strong>, and ask Gio before using a raster logo. The PNG set is queued for re-export from the corrected vectors.</p>
+    </div>
+
+    <div class="flag">
+      <h4>Why the vectors needed fixing — worth knowing</h4>
+      <p>Until 2026-11-07 the logo SVG had three defects. The palette was the old one. The <code>viewBox</code> was cropped so that opening the file showed only one of the four lockups. And the wordmark was <strong>live text set in Montserrat rather than outlined paths</strong> — meaning any machine without Montserrat installed, which is most print shops and most browsers, silently rendered "SAN DIEGO / LANDSCAPE REMODELING" in a fallback serif. All three are fixed. The originals are kept in <code>assets/logos/_archive-pre-2026-11-07/</code>.</p>
+      <p>The practical lesson for anyone producing artwork: <strong>always outline type in a logo file before sending it out.</strong></p>
     </div>
 
     <h3>Clear space and minimum size</h3>
@@ -899,7 +905,9 @@
     <table>
       <tr><th style="width:30%">Item</th><th>Status</th></tr>
       <tr><td><strong>Final tagline</strong></td><td>Not settled. Current recommendation on the table: <em>"Built slowly. Built once. Built to be lived in."</em> Until it's confirmed, don't lock a tagline into permanent artwork — signage, vehicle wraps, embroidery.</td></tr>
-      <tr><td><strong>Logo vector colors</strong></td><td>⚠ <code>SDLR.svg</code> carries outdated hex values. Recolor to §4 before output and return the corrected master.</td></tr>
+      <tr><td><strong>Logo vectors</strong></td><td>✅ <strong>Fixed 2026-11-07.</strong> Palette corrected, wordmark outlined, each lockup given its own correctly-cropped file.</td></tr>
+      <tr><td><strong>PNG logo set</strong></td><td>⚠ All raster logos still carry the old palette. Needs re-export from the corrected vectors — including the transparent-background and horizontal "Long" variants.</td></tr>
+      <tr><td><strong><code>SDLR LOGOS.svg</code></strong></td><td>❓ An older alternate mark with different letterforms, left untouched. Gio to confirm whether it should be archived.</td></tr>
       <tr><td><strong>Pantone equivalents</strong></td><td>Not assigned. Match to proof on every print run until they are.</td></tr>
       <tr><td><strong>Signature program names</strong></td><td>"The 10-Month Walk-Through" is the working title; "The Tenth-Month Return" is under consideration. Confirm before putting a program name in permanent collateral.</td></tr>
       <tr><td><strong>Founder photography</strong></td><td>Editorial headshots of Gio and Mike, a two-shot, and a crew-on-site wide are all still needed. The About page has placeholders where they belong.</td></tr>
