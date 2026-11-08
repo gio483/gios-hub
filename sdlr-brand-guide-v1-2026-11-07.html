@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SDLR Brand Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sage:#4E5D4A; --sage-700:#3E4A3A; --sage-800:#2E382B; --sage-200:#BAC0AF; --sage-50:#F1F2EE;
+    --gold:#BDA572; --gold-400:#C4AD75; --gold-200:#E4D3A8; --gold-50:#FAF6EC;
+    --paper:#F5F1E8; --paper-warm:#EFE9DB; --paper-deep:#E5DECA;
+    --ink:#1F1F1F; --ink-muted:#5A5A55; --ink-soft:#8A8A84;
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Inter',system-ui,-apple-system,sans-serif;
+    --nav-w:264px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+
+  /* ---------- nav ---------- */
+  nav{position:fixed;top:0;left:0;width:var(--nav-w);height:100vh;background:var(--sage-800);color:var(--paper);overflow-y:auto;padding:28px 0 40px;z-index:50}
+  .nav-brand{padding:0 24px 20px;border-bottom:1px solid rgba(245,241,232,.14);margin-bottom:14px}
+  .nav-brand .mk{font-family:var(--serif);font-size:1.9rem;letter-spacing:.06em;color:var(--gold);line-height:1}
+  .nav-brand .sub{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sage-200);margin-top:7px}
+  nav a{display:block;padding:7px 24px;color:var(--paper);text-decoration:none;font-size:.82rem;opacity:.75;border-left:2px solid transparent;transition:.15s}
+  nav a:hover,nav a.on{opacity:1;border-left-color:var(--gold);background:rgba(189,165,114,.1)}
+  nav .grp{padding:16px 24px 5px;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-400);opacity:.85}
+  .navtoggle{display:none}
+
+  /* ---------- layout ---------- */
+  main{margin-left:var(--nav-w);max-width:none}
+  .wrap{max-width:860px;margin:0 auto;padding:0 40px}
+  section{padding:70px 0;border-bottom:1px solid var(--paper-deep)}
+  section:last-of-type{border-bottom:0}
+
+  /* ---------- hero ---------- */
+  .hero{background:var(--sage);color:var(--paper);padding:92px 0 80px;border-bottom:0}
+  .hero .eyebrow{color:var(--gold-200)}
+  .hero h1{color:var(--paper);margin:14px 0 0;font-size:clamp(2.6rem,5.4vw,4.4rem)}
+  .hero .lede{color:#E8E4D8;font-size:1.12rem;max-width:40rem;margin-top:22px}
+  .hero .meta{margin-top:34px;padding-top:22px;border-top:1px solid rgba(245,241,232,.22);display:flex;flex-wrap:wrap;gap:34px;font-size:.78rem;color:var(--sage-200)}
+  .hero .meta b{display:block;color:var(--paper);font-weight:500;letter-spacing:.04em;margin-bottom:3px}
+
+  /* ---------- type ---------- */
+  h2{font-family:var(--serif);font-weight:500;font-size:clamp(1.9rem,3.4vw,2.7rem);line-height:1.1;letter-spacing:-.01em;margin:0 0 6px}
+  h3{font-family:var(--serif);font-weight:600;font-size:1.42rem;line-height:1.25;margin:38px 0 10px}
+  h4{font-family:var(--sans);font-weight:600;font-size:.82rem;letter-spacing:.13em;text-transform:uppercase;color:var(--sage-700);margin:28px 0 9px}
+  .eyebrow{display:block;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--sage-700);font-weight:500}
+  .rule{width:58px;height:1px;background:var(--gold);margin:18px 0 26px}
+  p{margin:0 0 15px}
+  .lede{font-size:1.06rem;color:var(--ink-muted)}
+  a{color:var(--sage-700)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;background:var(--paper-warm);padding:2px 6px;border-radius:3px;border:1px solid var(--paper-deep)}
+  strong{font-weight:600}
+
+  ul,ol{margin:0 0 15px;padding-left:20px}
+  li{margin-bottom:7px}
+  li::marker{color:var(--gold)}
+
+  /* ---------- components ---------- */
+  .pull{font-family:var(--serif);font-size:1.6rem;line-height:1.35;color:var(--sage-700);border-left:2px solid var(--gold);padding:4px 0 4px 24px;margin:30px 0}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+
+  .card{background:#fff;border:1px solid var(--paper-deep);padding:22px 24px}
+  .card h4{margin-top:0}
+
+  /* do / don't */
+  .dd{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:24px 0}
+  .do,.dont{padding:20px 22px;border:1px solid;font-size:.92rem}
+  .do{background:var(--sage-50);border-color:var(--sage-200)}
+  .dont{background:#FBF1EE;border-color:#E2C4BA}
+  .do h4{color:var(--sage-700);margin-top:0}
+  .dont h4{color:#9C4A2F;margin-top:0}
+  .do ul,.dont ul{margin-bottom:0;padding-left:18px}
+
+  /* swatches */
+  .swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:26px 0}
+  .sw{border:1px solid var(--paper-deep);background:#fff}
+  .sw .chip{height:108px}
+  .sw .info{padding:12px 14px;font-size:.76rem;line-height:1.5}
+  .sw .nm{font-weight:600;font-size:.85rem;display:block;margin-bottom:4px}
+  .sw .hex{font-family:ui-monospace,Menlo,monospace;color:var(--ink-muted)}
+  .sw .use{color:var(--ink-soft);margin-top:6px;display:block;font-size:.72rem}
+
+  .tints{display:flex;margin:10px 0 26px;border:1px solid var(--paper-deep)}
+  .tints div{flex:1;height:52px;position:relative}
+  .tints span{position:absolute;bottom:-21px;left:0;right:0;text-align:center;font-size:.6rem;font-family:ui-monospace,Menlo,monospace;color:var(--ink-soft)}
+  .tintwrap{margin-bottom:34px}
+
+  /* logo plates */
+  .plates{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:24px 0}
+  .plate{border:1px solid var(--paper-deep)}
+  .plate .img{display:flex;align-items:center;justify-content:center;padding:28px;min-height:190px}
+  .plate img{max-width:78%;height:auto;display:block}
+  .plate .cap{padding:11px 16px;font-size:.76rem;color:var(--ink-muted);border-top:1px solid var(--paper-deep);background:#fff}
+  .plate .cap b{color:var(--ink);font-weight:600}
+
+  /* table */
+  table{width:100%;border-collapse:collapse;margin:20px 0;font-size:.88rem}
+  th{text-align:left;font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;color:var(--sage-700);border-bottom:1.5px solid var(--sage-200);padding:0 12px 9px 0;font-weight:600}
+  td{padding:11px 12px 11px 0;border-bottom:1px solid var(--paper-deep);vertical-align:top}
+  td code{white-space:nowrap}
+
+  /* flags */
+  .flag{background:var(--gold-50);border:1px solid var(--gold-200);border-left:3px solid var(--gold);padding:18px 22px;margin:24px 0;font-size:.92rem}
+  .flag h4{margin-top:0;color:#8A6D30}
+  .flag p:last-child{margin-bottom:0}
+
+  .ban{background:#FBF1EE;border:1px solid #E2C4BA;padding:20px 22px;margin:22px 0}
+  .ban h4{margin-top:0;color:#9C4A2F}
+  .ban ul{columns:2;column-gap:28px;margin-bottom:0;font-size:.9rem}
+  .ban li{break-inside:avoid}
+
+  .checklist{background:var(--sage-800);color:var(--paper);padding:34px 38px;margin:26px 0}
+  .checklist h3{color:var(--gold);margin-top:0}
+  .checklist ol{padding-left:20px}
+  .checklist li{margin-bottom:11px;color:#E8E4D8}
+  .checklist li::marker{color:var(--gold)}
+  .checklist strong{color:var(--paper)}
+
+  .facts{background:#fff;border:1px solid var(--paper-deep);padding:0}
+  .facts div{display:flex;gap:18px;padding:13px 22px;border-bottom:1px solid var(--paper-warm);font-size:.9rem}
+  .facts div:last-child{border-bottom:0}
+  .facts dt{flex:0 0 118px;font-size:.68rem;letter-spacing:.11em;text-transform:uppercase;color:var(--sage-700);font-weight:600;padding-top:3px}
+  .facts dd{margin:0;flex:1}
+
+  .typespec{background:#fff;border:1px solid var(--paper-deep);padding:26px 28px;margin:20px 0}
+  .typespec .sample{margin-bottom:10px;color:var(--ink)}
+  .typespec .meta{font-size:.72rem;color:var(--ink-soft);font-family:ui-monospace,Menlo,monospace;border-top:1px solid var(--paper-warm);padding-top:11px}
+
+  footer{background:var(--sage-800);color:var(--sage-200);padding:48px 0;font-size:.82rem}
+  footer .wrap{max-width:860px}
+  footer b{color:var(--paper);font-weight:500}
+  footer a{color:var(--gold-400)}
+
+  @media (max-width:1000px){
+    :root{--nav-w:0px}
+    nav{transform:translateX(-100%);transition:transform .22s ease;width:264px}
+    body.nav-open nav{transform:translateX(0)}
+    main{margin-left:0}
+    .navtoggle{display:flex;align-items:center;gap:9px;position:fixed;top:14px;left:14px;z-index:60;background:var(--sage-800);color:var(--paper);border:0;border-radius:8px;padding:10px 14px;font-family:var(--sans);font-size:.78rem;font-weight:600;cursor:pointer;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+    .hero{padding-top:104px}
+    .wrap{padding:0 22px}
+    .swatches{grid-template-columns:1fr 1fr}
+    .grid2,.grid3,.dd,.plates{grid-template-columns:1fr}
+    .ban ul{columns:1}
+    .facts div{flex-direction:column;gap:3px}
+    .facts dt{flex:none}
+  }
+
+  @media print{
+    nav,.navtoggle{display:none}
+    main{margin-left:0}
+    body{background:#fff;font-size:11pt}
+    section{page-break-inside:avoid;padding:28px 0}
+    .hero{background:var(--sage)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .chip,.tints div,.plate .img,.checklist,.sw,.do,.dont,.flag,.ban{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    a{text-decoration:none}
+  }
+</style>
+</head>
+<body>
+
+<button class="navtoggle" id="navtoggle">☰ Contents</button>
+
+<nav id="nav">
+  <div class="nav-brand">
+    <div class="mk">SDLR</div>
+    <div class="sub">Brand Guide · v1</div>
+  </div>
+  <div class="grp">Start</div>
+  <a href="#start">How to use this</a>
+  <a href="#company">The company</a>
+  <div class="grp">Identity</div>
+  <a href="#logo">Logo</a>
+  <a href="#color">Color</a>
+  <a href="#type">Typography</a>
+  <a href="#layout">Layout &amp; elements</a>
+  <div class="grp">Content</div>
+  <a href="#photo">Photography &amp; imagery</a>
+  <a href="#video">Video &amp; motion</a>
+  <a href="#voice">Voice &amp; copy</a>
+  <div class="grp">Reference</div>
+  <a href="#facts">The facts block</a>
+  <a href="#specs">Deliverable specs</a>
+  <a href="#check">Pre-flight checklist</a>
+  <a href="#open">Open items</a>
+</nav>
+
+<main>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow">San Diego Landscape Remodeling</span>
+    <h1>Brand Guide</h1>
+    <p class="lede">Everything you need to make something that looks, sounds, and feels like SDLR — without having to ask. Built for designers, editors, printers, photographers, and anyone else producing work in this brand's name.</p>
+    <div class="meta">
+      <div><b>Version 1.0</b>November 7, 2026</div>
+      <div><b>Owner</b>Gio Azzarello</div>
+      <div><b>Status</b>Active — supersedes the April 2026 PDF</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ START ============ -->
+<section id="start">
+  <div class="wrap">
+    <span class="eyebrow">01</span>
+    <h2>How to use this</h2>
+    <div class="rule"></div>
+    <p class="lede">Read sections 2 through 4 once. Keep sections 5 through 12 open while you work. If something isn't covered here, ask — don't guess, and don't borrow from a competitor.</p>
+
+    <h3>The one-minute version</h3>
+    <p>SDLR is a <strong>design-build firm for outdoor living</strong> serving high-end San Diego homes. It is not a landscaping company, and nothing you make should suggest it is. The visual register is <em>Architectural Digest</em>, not a contractor flyer. The reference brands are Rolls-Royce and private yacht charter — luxury with real, warm humans behind it.</p>
+
+    <div class="pull">"Sell the experience, not the product."</div>
+
+    <p>Three rules carry most of the weight. If you remember nothing else:</p>
+    <ol>
+      <li><strong>Restraint reads as money.</strong> Cream space, one accent, one idea per piece. Crowding, gradients, drop shadows, and starbursts destroy the positioning faster than anything else.</li>
+      <li><strong>Never show people's faces in SDLR imagery.</strong> No people, no figures, no pets — in stills. (Video is the exception; see §7.)</li>
+      <li><strong>Never put a price floor in public copy.</strong> Per-service investment bands in a table are fine. A "starting at" number is not.</li>
+    </ol>
+
+    <div class="flag">
+      <h4>Where the master files live</h4>
+      <p>Logos, print-ready artwork, the image library, and templates are in the client folder under <code>02 Clients/san-diego-landscape-remodeling/assets/</code>. Ask Gio for access. The live website — the most reliable reference for the brand in practice — is <strong>sandiegolandscaperemodeling.com</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMPANY ============ -->
+<section id="company">
+  <div class="wrap">
+    <span class="eyebrow">02</span>
+    <h2>The company</h2>
+    <div class="rule"></div>
+    <p class="lede">You can't design for a brand you can't describe. Here is the whole thing in one page.</p>
+
+    <h3>What SDLR is</h3>
+    <p>A boutique outdoor-living design-build firm covering San Diego County. SDLR designs and builds complete outdoor environments — hardscape, outdoor kitchens, fire features, pergolas, pools, lighting, drainage — as one coordinated project, under one Class B general contractor license, with one crew and one schedule.</p>
+
+    <h3>What SDLR is not</h3>
+    <p>Not a landscaper. Not a lawn or maintenance service. Not a tree company. Not an emergency contractor. SDLR does not do same-day work, does not price-match, and does not take small-scope jobs. Any design or copy that makes SDLR look like a general-purpose yard service is off-brand, regardless of how well it's executed.</p>
+
+    <div class="pull">"By design, not by dispatch."</div>
+    <p>This is the governing positioning line. Projects are planned months ahead and executed deliberately. <strong>Scarcity and intention are the product.</strong> Nothing you make should signal speed, availability, or urgency.</p>
+
+    <h3>Who it's for</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>The buyer</h4>
+        <p style="margin-bottom:0">Grandparents and young families. Household income $600K+, home value $8M+. Professionals, owners, investors. They are quality-shopping, not price-shopping. They want it done right, once.</p>
+      </div>
+      <div class="card">
+        <h4>What they're actually buying</h4>
+        <p style="margin-bottom:0">Pride when family comes over. A space they genuinely use. In Gio's words — <em>"a subtle wealth statement that makes a big statement when people come over."</em> Not Instagram content. Lived experience.</p>
+      </div>
+    </div>
+
+    <h3>Their fears (what good work quietly answers)</h3>
+    <ol>
+      <li>The contractor blows the budget</li>
+      <li>It takes far longer than promised</li>
+      <li>It never gets finished</li>
+      <li>The workmanship looks bad in two years</li>
+      <li>Nobody communicates</li>
+    </ol>
+    <p>Calm, precise, well-made collateral is itself the answer to all five. Sloppy work signals a sloppy build.</p>
+
+    <h3>The four signature programs</h3>
+    <table>
+      <tr><th style="width:34%">Program</th><th>What it is</th></tr>
+      <tr><td><strong>The 10-Month Walk-Through</strong></td><td>SDLR returns ten months after completion for a fine-toothed inspection. No charge. Part of every project.</td></tr>
+      <tr><td><strong>Design-to-Reality Visualization</strong></td><td>The client's actual property rendered photorealistically before a paver is laid.</td></tr>
+      <tr><td><strong>Direct-Founder Access</strong></td><td>Gio and Mike personally on every project. No account managers.</td></tr>
+      <tr><td><strong>Ongoing Outdoor Maintenance</strong></td><td>Optional post-project care that keeps the space at day-one condition.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ LOGO ============ -->
+<section id="logo">
+  <div class="wrap">
+    <span class="eyebrow">03</span>
+    <h2>Logo</h2>
+    <div class="rule"></div>
+    <p class="lede">A stacked monogram — <strong>SDLR</strong> in a high-contrast display serif — over a two-line spaced sans wordmark reading SAN DIEGO / LANDSCAPE REMODELING.</p>
+
+    <div class="plates">
+      <div class="plate">
+        <div class="img" style="background:#4E5D4A"><img src="sdlr-bg-logo-gold.png" alt="SDLR logo in gold on sage green"></div>
+        <div class="cap"><b>Gold on sage</b> — the primary lockup. Default for dark backgrounds, signage, apparel, video end cards.</div>
+      </div>
+      <div class="plate">
+        <div class="img" style="background:#F5F1E8"><img src="sdlr-bg-logo-green.png" alt="SDLR logo in sage green on cream"></div>
+        <div class="cap"><b>Sage on cream</b> — the primary light lockup. Default for documents, proposals, letterhead, light web.</div>
+      </div>
+    </div>
+
+    <h3>Which file to use</h3>
+    <table>
+      <tr><th style="width:42%">File</th><th>Use for</th></tr>
+      <tr><td><code>SDLR.svg</code></td><td>Vector master. Any print, large format, or vehicle application. Always start here.</td></tr>
+      <tr><td><code>SDLR Logo Gold on Green.png</code></td><td>Primary dark lockup, raster use.</td></tr>
+      <tr><td><code>SDLR Logo Green on Cream.png</code></td><td>Primary light lockup, raster use.</td></tr>
+      <tr><td><code>SDLR Cream (Transparent BG).png</code></td><td>Over photography and video. One-color, maximum legibility.</td></tr>
+      <tr><td><code>SDLR Gold Logo (Transparent BG).png</code></td><td>Over dark photography where gold has enough contrast. Check it.</td></tr>
+      <tr><td><code>SDLR White Long.png</code></td><td>Horizontal variant for wide, short spaces (web header, video lower third).</td></tr>
+    </table>
+
+    <div class="flag">
+      <h4>Known issue — fix before any new print run</h4>
+      <p>The vector file <code>SDLR.svg</code> carries <strong>older color values</strong> — sage <code>#556B5D</code> and gold <code>#C9A96A</code> — which do not match the current brand palette (<code>#4E5D4A</code> / <code>#BDA572</code>). The hex values in §4 of this guide are canonical; they are what the website and the approved 2026 yard signs use. If you open the SVG, recolor it to the §4 values before output, and send the corrected file back to Gio so the master can be replaced.</p>
+    </div>
+
+    <h3>Clear space and minimum size</h3>
+    <ul>
+      <li><strong>Clear space:</strong> on all four sides, leave at least the height of the "S" in the SDLR monogram. Nothing enters that zone — no type, no rules, no photo edges, no page trim.</li>
+      <li><strong>Minimum width:</strong> 110&nbsp;px on screen, 1&nbsp;inch in print, for the stacked lockup. Below that the two-line wordmark fills in and stops being legible — use the monogram alone instead.</li>
+      <li><strong>Monogram alone</strong> (SDLR, no wordmark) is permitted for favicons, social avatars, embroidery, and any application under the minimum. It is never the primary mark on a first impression.</li>
+    </ul>
+
+    <div class="dd">
+      <div class="do">
+        <h4>Do</h4>
+        <ul>
+          <li>Scale proportionally, always</li>
+          <li>Use one solid brand color per lockup</li>
+          <li>Place it on calm, uncluttered areas of a photo</li>
+          <li>Let it sit small and confident — it does not need to be big</li>
+        </ul>
+      </div>
+      <div class="dont">
+        <h4>Don't</h4>
+        <ul>
+          <li>Stretch, skew, rotate, or arch it</li>
+          <li>Add drop shadows, outer glows, bevels, or gradients</li>
+          <li>Recolor it outside the palette, or use a metallic gradient "gold"</li>
+          <li>Put it on a busy photo without a scrim</li>
+          <li>Rebuild the wordmark in a different typeface</li>
+          <li>Enclose it in a box or badge that isn't in this guide</li>
+          <li>Pair it with a second logo inside the clear-space zone</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COLOR ============ -->
+<section id="color">
+  <div class="wrap">
+    <span class="eyebrow">04</span>
+    <h2>Color</h2>
+    <div class="rule"></div>
+    <p class="lede">Four colors. That's the whole brand. The discipline is the point — a fifth color is how this starts looking like everyone else.</p>
+
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#4E5D4A"></div><div class="info"><span class="nm">Sage</span><span class="hex">#4E5D4A</span><span class="use">Primary. Structure, dark bands, buttons, the logo field.</span></div></div>
+      <div class="sw"><div class="chip" style="background:#BDA572"></div><div class="info"><span class="nm">Gold</span><span class="hex">#BDA572</span><span class="use">Accent only. Rules, eyebrows on dark, the logo letterform.</span></div></div>
+      <div class="sw"><div class="chip" style="background:#F5F1E8;border-bottom:1px solid #E5DECA"></div><div class="info"><span class="nm">Paper</span><span class="hex">#F5F1E8</span><span class="use">The default background. Not white. Everything sits on this.</span></div></div>
+      <div class="sw"><div class="chip" style="background:#1F1F1F"></div><div class="info"><span class="nm">Ink</span><span class="hex">#1F1F1F</span><span class="use">Body text. Soft black, never pure #000.</span></div></div>
+    </div>
+
+    <h3>Print values</h3>
+    <table>
+      <tr><th>Color</th><th>HEX</th><th>RGB</th><th>CMYK (approx.)</th></tr>
+      <tr><td><strong>Sage</strong></td><td><code>#4E5D4A</code></td><td>78 · 93 · 74</td><td>16 · 0 · 20 · 64</td></tr>
+      <tr><td><strong>Gold</strong></td><td><code>#BDA572</code></td><td>189 · 165 · 114</td><td>0 · 13 · 40 · 26</td></tr>
+      <tr><td><strong>Paper</strong></td><td><code>#F5F1E8</code></td><td>245 · 241 · 232</td><td>0 · 2 · 5 · 4</td></tr>
+      <tr><td><strong>Ink</strong></td><td><code>#1F1F1F</code></td><td>31 · 31 · 31</td><td>0 · 0 · 0 · 88 <span style="color:var(--ink-soft)">(rich black: 60·40·40·100)</span></td></tr>
+    </table>
+
+    <div class="flag">
+      <h4>Printers, read this</h4>
+      <p>These CMYK values are straight conversions, not press-proofed builds. <strong>Pantone equivalents have not been assigned yet.</strong> On any new print run, pull a physical proof and match to the on-screen sage and gold — both are easy to push muddy or orange on uncoated stock. Sage shifting cool/grey and gold shifting brassy are the two failure modes to watch. Flag the proof to Gio before the full run.</p>
+    </div>
+
+    <h3>Supporting tints</h3>
+    <p>Use these only where you genuinely need a step — a hover state, a quiet band, a table stripe. They are not decorative colors.</p>
+
+    <div class="tintwrap">
+      <h4>Sage</h4>
+      <div class="tints">
+        <div style="background:#F1F2EE"><span>F1F2EE</span></div>
+        <div style="background:#BAC0AF"><span>BAC0AF</span></div>
+        <div style="background:#72805F"><span>72805F</span></div>
+        <div style="background:#4E5D4A"><span>4E5D4A</span></div>
+        <div style="background:#3E4A3A"><span>3E4A3A</span></div>
+        <div style="background:#2E382B"><span>2E382B</span></div>
+      </div>
+    </div>
+
+    <div class="tintwrap">
+      <h4>Gold</h4>
+      <div class="tints">
+        <div style="background:#FAF6EC"><span>FAF6EC</span></div>
+        <div style="background:#E4D3A8"><span>E4D3A8</span></div>
+        <div style="background:#D2BB84"><span>D2BB84</span></div>
+        <div style="background:#BDA572"><span>BDA572</span></div>
+        <div style="background:#A48A58"><span>A48A58</span></div>
+        <div style="background:#826D45"><span>826D45</span></div>
+      </div>
+    </div>
+
+    <div class="tintwrap">
+      <h4>Paper &amp; ink</h4>
+      <div class="tints">
+        <div style="background:#F5F1E8"><span>F5F1E8</span></div>
+        <div style="background:#EFE9DB"><span>EFE9DB</span></div>
+        <div style="background:#E5DECA"><span>E5DECA</span></div>
+        <div style="background:#8A8A84"><span>8A8A84</span></div>
+        <div style="background:#5A5A55"><span>5A5A55</span></div>
+        <div style="background:#1F1F1F"><span>1F1F1F</span></div>
+      </div>
+    </div>
+
+    <h3>How to mix them</h3>
+    <ul>
+      <li><strong>Roughly 70 / 20 / 8 / 2</strong> — paper, sage, ink, gold. Gold is a seasoning, not an ingredient.</li>
+      <li><strong>Gold never carries body text.</strong> It fails contrast on cream and looks cheap at small sizes. Gold is for hairline rules, uppercase eyebrows on a dark field, and the logo.</li>
+      <li><strong>Dark bands are sage-800</strong> (<code>#2E382B</code>) or sage (<code>#4E5D4A</code>) with paper text. Never black-on-white blocks.</li>
+      <li><strong>Pure white is not in the palette.</strong> If you need a lift above paper, use white only as a card surface inside a paper field — never as the page background.</li>
+    </ul>
+
+    <h4>Accessibility floors</h4>
+    <ul>
+      <li>Ink on paper — <strong>15.1:1</strong>. Use freely.</li>
+      <li>Paper on sage — <strong>7.2:1</strong>. Use freely.</li>
+      <li>Sage-700 on paper — <strong>8.6:1</strong>. Safe for small text.</li>
+      <li>Gold on paper — <strong>2.1:1</strong>. <strong>Fails.</strong> Rules and large display only, never body copy or small UI text.</li>
+      <li>Gold on sage-800 — <strong>5.4:1</strong>. Passes for text at 14px+. This is the correct way to use gold type.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ TYPE ============ -->
+<section id="type">
+  <div class="wrap">
+    <span class="eyebrow">05</span>
+    <h2>Typography</h2>
+    <div class="rule"></div>
+    <p class="lede">Two typefaces, both free from Google Fonts. A high-contrast serif for everything expressive, a neutral sans for everything functional.</p>
+
+    <div class="typespec">
+      <div class="sample" style="font-family:var(--serif);font-size:3.1rem;line-height:1.05;font-weight:500;letter-spacing:-.01em">Built with intention.</div>
+      <div class="meta">CORMORANT GARAMOND · 400 / 500 / 600 + 400 italic · Display &amp; headlines</div>
+    </div>
+
+    <div class="typespec">
+      <div class="sample" style="font-family:var(--sans);font-size:1.02rem;line-height:1.65">A backyard should feel like a room you actually want to be in. Hardscape, fire feature, pergola — designed as one cohesive space.</div>
+      <div class="meta">INTER · 400 / 500 / 600 · Body, UI, captions, labels</div>
+    </div>
+
+    <h3>The scale</h3>
+    <table>
+      <tr><th style="width:24%">Role</th><th style="width:28%">Face &amp; weight</th><th>Size &amp; treatment</th></tr>
+      <tr><td><strong>Display XL</strong></td><td>Cormorant 500</td><td>48–88px · line-height 1.02 · tracking −0.01em</td></tr>
+      <tr><td><strong>Display L</strong></td><td>Cormorant 500</td><td>36–68px · line-height 1.05 · tracking −0.01em</td></tr>
+      <tr><td><strong>Display M</strong></td><td>Cormorant 500/600</td><td>30–48px · line-height 1.1</td></tr>
+      <tr><td><strong>Display S</strong></td><td>Cormorant 600</td><td>24–36px · line-height 1.15</td></tr>
+      <tr><td><strong>Body</strong></td><td>Inter 400</td><td>16–17px · line-height 1.65 · max 38rem measure</td></tr>
+      <tr><td><strong>Eyebrow</strong></td><td>Inter 500</td><td>11–12px · UPPERCASE · <strong>tracking 0.18em</strong> · sage-700 on light, gold on dark</td></tr>
+      <tr><td><strong>Button / CTA</strong></td><td>Inter 500</td><td>14px · UPPERCASE · tracking 0.18em</td></tr>
+      <tr><td><strong>Caption</strong></td><td>Inter 400</td><td>13–14px · ink-muted <code>#5A5A55</code></td></tr>
+    </table>
+
+    <div class="flag">
+      <h4>Montserrat — logo only</h4>
+      <p>The wordmark under the monogram is set in <strong>Montserrat</strong>. That is a historical artifact of the logo artwork, not a brand typeface. <strong>Never set new type in Montserrat.</strong> If you need the wordmark at a new size, scale the vector — don't retype it.</p>
+    </div>
+
+    <h3>Rules</h3>
+    <ul>
+      <li><strong>Headlines are serif. Everything else is sans.</strong> No exceptions, and never the reverse.</li>
+      <li><strong>Sentence case for headlines</strong>, not Title Case. Uppercase is reserved for eyebrows and buttons, where the 0.18em tracking does the work.</li>
+      <li><strong>The eyebrow is the signature move.</strong> A tiny tracked-out uppercase label above a serif headline, often with a 58px gold hairline between them. It appears on nearly every SDLR surface. Use it.</li>
+      <li><strong>One measure, always.</strong> Body copy caps at about 38rem (roughly 70 characters). Long full-width lines break the editorial feel instantly.</li>
+      <li><strong>No italics for emphasis in body copy.</strong> Cormorant italic is for a pull quote or a single considered word. Inter italic, essentially never.</li>
+      <li><strong>Never justify text.</strong> Ragged right, always.</li>
+      <li><strong>Real punctuation.</strong> Em dashes, curly quotes, proper ellipses. This is a detail buyers at this level register without naming it.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ LAYOUT ============ -->
+<section id="layout">
+  <div class="wrap">
+    <span class="eyebrow">06</span>
+    <h2>Layout &amp; graphic elements</h2>
+    <div class="rule"></div>
+    <p class="lede">The SDLR layout language is a short list. There are no other decorative elements — if it isn't here, it isn't in the brand.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h4>The gold hairline</h4>
+        <div style="width:58px;height:1px;background:#BDA572;margin:14px 0"></div>
+        <p style="margin-bottom:0;font-size:.92rem">A 1px gold rule, 58–64px wide, sitting between an eyebrow and a headline, or centered under a section title. The single most recognizable SDLR graphic element.</p>
+      </div>
+      <div class="card">
+        <h4>The eyebrow stack</h4>
+        <span class="eyebrow" style="margin:14px 0 0">Outdoor Living</span>
+        <div style="width:58px;height:1px;background:#BDA572;margin:10px 0"></div>
+        <div style="font-family:var(--serif);font-size:1.5rem;line-height:1.15">A space that feels complete</div>
+        <p style="margin:12px 0 0;font-size:.92rem">Label, rule, serif headline. The default way to open any section, page, slide, or print panel.</p>
+      </div>
+    </div>
+
+    <h3>Spacing and structure</h3>
+    <ul>
+      <li><strong>Generous vertical rhythm.</strong> Sections breathe at 80–128px on desktop. Crowding is the fastest way to lose the register.</li>
+      <li><strong>Three container widths:</strong> narrow (38rem, for reading), wide (52rem, for mixed content), editorial (72rem, for full layouts).</li>
+      <li><strong>Alternating bands</strong> carry the rhythm: paper → dark sage → paper → warm paper. Dark bands are for philosophy, process, and quotes — the moments that aren't selling.</li>
+      <li><strong>Squared corners.</strong> Buttons, cards, and image frames have no border radius. Rounded corners read consumer-app, not architectural.</li>
+      <li><strong>Hairline borders only</strong> — 1px, in <code>#E5DECA</code> on light or <code>rgba(245,241,232,.2)</code> on dark. No heavy strokes, no boxes-within-boxes.</li>
+    </ul>
+
+    <h3>Buttons</h3>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin:18px 0 10px">
+      <span style="display:inline-block;background:#4E5D4A;color:#F5F1E8;padding:15px 28px;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500">Book a Consultation</span>
+      <span style="display:inline-block;border:1px solid #4E5D4A;color:#3E4A3A;padding:14px 27px;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500">View the Work</span>
+    </div>
+    <p>Solid sage primary, outlined secondary. Square, uppercase, tracked 0.18em, generous padding. On dark backgrounds use the ghost variant — paper outline, transparent fill.</p>
+
+    <div class="flag">
+      <h4>The CTA language is fixed</h4>
+      <p>The primary call to action is <strong>"Book a Consultation."</strong> Never <em>"Get a Free Estimate," "Free Quote," "Call Today,"</em> or anything with an exclamation point. For a $20–75K decision, positioning beats friction-reduction — "free" cheapens the thing being offered.</p>
+    </div>
+
+    <div class="dd">
+      <div class="do">
+        <h4>Do</h4>
+        <ul>
+          <li>Let one idea own a page or a frame</li>
+          <li>Use cream negative space as a deliberate element</li>
+          <li>Align to a visible grid; keep edges honest</li>
+          <li>Let photography be the loudest thing present</li>
+        </ul>
+      </div>
+      <div class="dont">
+        <h4>Don't</h4>
+        <ul>
+          <li>Gradients, glows, bevels, or drop shadows</li>
+          <li>Rounded corners or pill shapes</li>
+          <li>Icon sets, badges, starbursts, or ribbons</li>
+          <li>Stock "luxury" flourishes — laurels, crowns, script accents</li>
+          <li>Text over the busy part of a photo without a scrim</li>
+          <li>More than one accent color on a surface</li>
+          <li>Centered body copy (centered headlines are fine)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PHOTO ============ -->
+<section id="photo">
+  <div class="wrap">
+    <span class="eyebrow">07</span>
+    <h2>Photography &amp; imagery</h2>
+    <div class="rule"></div>
+    <p class="lede">The imagery <em>is</em> the product. Everything else in this guide supports it. The standard is architectural editorial — <em>Architectural Digest</em>, <em>Dwell</em>, an Aman resort's website.</p>
+
+    <h3>Rule one: a real photo beats a render, every time</h3>
+    <p>Anything that has actually been built gets a <strong>real photograph</strong>. A phone in good side light beats any generated image. Capturing 15–20 real frames is part of every job closeout.</p>
+    <p>Generated imagery is reserved for what doesn't exist yet: concepts, unbuilt designs, a client's before-and-after vision, and gaps in the library. <strong>Never place a raw render next to a real photo in the same grid, carousel, or spread</strong> — the real one exposes the fake one instantly.</p>
+
+    <div class="flag">
+      <h4>The website portfolio is stricter than social</h4>
+      <p>The site's portfolio and "our work" sections use <strong>genuine project photography only</strong> — never generated images presented as a catalog of completed builds. Six real projects beat fifty renderings. The social feed is treated as a styled showroom; the website portfolio is a verified record.</p>
+    </div>
+
+    <h3>The look</h3>
+    <ul>
+      <li><strong>One dominant light direction</strong> with real falloff — sun raking across travertine, dappled pergola shadows. Never softly lit from everywhere.</li>
+      <li><strong>Real dynamic range.</strong> Let skies and speculars roll off to white; let shadows go genuinely dark. "Evenly visible everywhere" is the tell that something is fake.</li>
+      <li><strong>Warm-neutral, restrained color.</strong> Magazine warmth. No teal push, no orange push, no heavy saturation.</li>
+      <li><strong>A real focal plane.</strong> Shallow depth — a styled counter sharp, the background soft.</li>
+      <li><strong>Styled and lived in</strong> — real firewood, ceramics, a throw left slightly undone. Not empty and pristine.</li>
+      <li><strong>Architectural framing</strong> — straight level verticals, no keystone, eye-level or slightly elevated, 24mm or 35mm.</li>
+    </ul>
+
+    <h3>Hard rules — these are not preferences</h3>
+    <ol>
+      <li><strong>No people, no faces, ever.</strong> No figures, no body parts, no pets. The spaces are shot like an architectural feature before the owners arrive.</li>
+      <li><strong>Show the neighbors.</strong> Ninety-nine percent of SDLR jobs sit on a normal San Diego lot. Every image shows neighboring rooflines, second stories, or walls over the back fence. A beautiful house alone in empty hills is rejected on sight.</li>
+      <li><strong>Vary the house every single time.</strong> Rotate architecture (Spanish, modern, ranch, craftsman, coastal contemporary, farmhouse) and materials. The same white-stucco house repeating is the biggest giveaway there is.</li>
+      <li><strong>It must look like San Diego</strong> — SoCal architecture, California planting (olive, agave, succulents, citrus, palms, bougainvillea). No maples, oaks, or Midwest skies. And match the specific neighborhood named: no ocean behind an El Cajon home, no sprawling estate on a North Park lot.</li>
+      <li><strong>One photograph per image. No collages.</strong> No split screens, no grids, no three-in-one. Before/after is the only permitted two-frame format, and only when that's the explicit intent.</li>
+      <li><strong>No text, logos, or watermarks baked into the image.</strong> Overlays are a layout decision, made separately.</li>
+      <li><strong>Name real products.</strong> Every image is built around materials SDLR actually installs, so when someone asks "what pavers are those?" there's a real answer. See the list below.</li>
+    </ol>
+
+    <h3>Subject rotation</h3>
+    <p>Vary widely so the work speaks to every buyer: putting greens, sport courts, pools and spas, zen retreat yards, full entertainment yards, low-maintenance yards for retirees, family yards with turf and fire pits, small urban yards done beautifully — and <strong>driveways and front-yard curb appeal, which must recur</strong> and have historically been skipped. Occasional drone and aerial frames show scale nothing else can.</p>
+
+    <h3>Products to specify by name</h3>
+    <div class="grid2">
+      <div class="card" style="font-size:.88rem">
+        <h4>Hard materials</h4>
+        <p style="margin-bottom:6px"><strong>Pavers:</strong> Belgard (Urbana, Mega-Arbel, Dimensions), Techo-Bloc (Blu 60, Aberdeen, Industria), Acker-Stone</p>
+        <p style="margin-bottom:6px"><strong>Porcelain:</strong> Belgard Porcelain, Florim, Arterra</p>
+        <p style="margin-bottom:6px"><strong>Stone:</strong> Arizona Tile, Bedrosians (silver/ivory travertine)</p>
+        <p style="margin-bottom:0"><strong>Veneer:</strong> Eldorado Stone, Cultured Stone</p>
+      </div>
+      <div class="card" style="font-size:.88rem">
+        <h4>Features</h4>
+        <p style="margin-bottom:6px"><strong>Fire:</strong> Warming Trends (CrossFire), HPC Fire, Bobe, Firegear</p>
+        <p style="margin-bottom:6px"><strong>Kitchen:</strong> Lynx, DCS, Blaze, Bull; Danver / Brown Jordan cabinetry</p>
+        <p style="margin-bottom:6px"><strong>Shade:</strong> StruXure louvered pergola, Trex Pergola</p>
+        <p style="margin-bottom:6px"><strong>Turf &amp; courts:</strong> SYNLawn, ProGreen; VersaCourt, SnapSports</p>
+        <p style="margin-bottom:0"><strong>Lighting &amp; water:</strong> FX Luminaire, Kichler; Diamond Spas, Bobe water bowls</p>
+      </div>
+    </div>
+
+    <h3>Output specs</h3>
+    <ul>
+      <li><strong>4:5</strong> — Instagram and Facebook feed (default)</li>
+      <li><strong>9:16</strong> — Stories and Reels</li>
+      <li><strong>1:1</strong> — grid-only needs</li>
+      <li><strong>16:9 / 3:2</strong> — web heroes and print</li>
+      <li>Master at <strong>4K</strong> minimum. Deliver sRGB for screen, CMYK conversions proofed for print.</li>
+    </ul>
+
+    <div class="flag">
+      <h4>If you're generating imagery</h4>
+      <p>There's a detailed production standard — model, prompt modules, the realism post-process, and the gallery-consistency method — in <code>brand/image-style-guide.md</code>. Ask Gio for it before generating anything. Generated SDLR imagery is produced on one specific model and run through a realism pass before it ships; substituting another tool is not a neutral choice.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VIDEO ============ -->
+<section id="video">
+  <div class="wrap">
+    <span class="eyebrow">08</span>
+    <h2>Video &amp; motion</h2>
+    <div class="rule"></div>
+    <p class="lede">Premium comes from planning, light, and designed frames — not from captions, effects, or cutting speed.</p>
+
+    <h3>Two registers</h3>
+    <div class="grid2">
+      <div class="card">
+        <h4>Clean — anyone talking to camera</h4>
+        <p style="margin-bottom:0;font-size:.93rem">Locked-off or tightly controlled camera, properly lit (key + fill, or window + bounce), clean background, bright, almost perfect. As few cuts as possible — a lit single take with punch-ins beats a jump-cut chain. Polish comes from pre-planned graphic elements, not captions over everything. <strong>Mike at job sites is shot in this register.</strong></p>
+      </div>
+      <div class="card">
+        <h4>Warm — crews, process, materials</h4>
+        <p style="margin-bottom:0;font-size:.93rem">Cinematic and warmer. Handheld with intent, shallow depth, golden highlights, texture close-ups of hands, tools, and materials. Wide crew shot → tool close-up → hands detail, repeated. Music carries it; no VO, no captions.</p>
+      </div>
+    </div>
+
+    <h3>Rhythm</h3>
+    <ul>
+      <li><strong>Let it breathe.</strong> Brand films and interview pieces: b-roll holds 4–8s, a hero frame can hold 8–10s, with music-only air between thoughts. Fewer bites, each given room.</li>
+      <li><strong>Social montage:</strong> 3–5s per shot, occasional 1s accents and 6–8s holds. No sawtooth pacing; change pace only at a story turn.</li>
+      <li><strong>Never cut on the word.</strong> Every dialogue bite starts at least 0.3s before the first word and runs 0.6s past the last, to the natural breath. Joins get an audio crossfade.</li>
+      <li>Cut on action or on the beat. Never on dead air.</li>
+    </ul>
+
+    <h3>Captions</h3>
+    <ul>
+      <li><strong>Short-form 9:16 with someone talking: captions always on.</strong></li>
+      <li>Style: bold uppercase sans, word-by-word or 2–4 word cards, <strong>one color</strong>, lower third, inside safe zones (above the bottom 35%, inside the side 6%).</li>
+      <li><strong>No keyword color highlighting, no pill backgrounds, no emoji, no bounce.</strong> The September 2026 SDLR reels — gold-highlight, mixed-case, pill backgrounds — are the counter-example, not a reference.</li>
+      <li>Montage with no one speaking: no captions. Text only as a title card or designed label.</li>
+      <li>Long-form 16:9: no captions. Text only as title cards and inserts.</li>
+    </ul>
+
+    <h3>Image quality — non-negotiable</h3>
+    <ul>
+      <li>Every frame sharp and full-resolution. Soft, upscaled, over-compressed, or noisy low-light footage is <strong>disqualifying, not "fixable in post."</strong></li>
+      <li>Exposure, white balance, and contrast matched across every shot <em>before</em> any look is applied. A conversion LUT alone is not a grade. LUT strength ≤50% on balanced footage.</li>
+      <li>Pick the steadiest window of a take, not the first usable one. Stabilized clips must actually read as steady — otherwise replace the clip.</li>
+      <li>People are in frame on purpose or not at all. Nobody wandering through the back of a shot.</li>
+      <li>Grain or an aged look only as a deliberate, named choice — never as cover for soft footage.</li>
+    </ul>
+
+    <h3>Sound &amp; finishing</h3>
+    <ul>
+      <li><strong>Music first.</strong> Choose the track before the paper edit and cut to it. A cut built without its music is a shot list, not a rough cut.</li>
+      <li>Music ducked 6–12dB under voice, room tone under every gap. Deliver <strong>−14 LUFS / −1 dBTP</strong>.</li>
+      <li><strong>Straight cuts.</strong> Dip to black at section changes only. No transition packs, no speed ramps unless the source is ≥60fps and it serves the story, no particle or "cinematic" overlays.</li>
+      <li>Endings are deliberate: a held hero frame, a logo + tagline card, or a hard stop on the beat. No trailing talk.</li>
+      <li>Deliver 1080×1920 for 9:16 at high bitrate, mastered at the highest resolution available. Never a re-encode of a re-encode.</li>
+      <li>Naming: <code>sdlr-&lt;piece&gt;-&lt;ratio&gt;-v&lt;N&gt;-&lt;date&gt;.mp4</code>. Keep every version.</li>
+    </ul>
+
+    <div class="flag">
+      <h4>Planning is part of editing</h4>
+      <p>Every piece starts with a one-page plan <em>before shooting</em>: the formal idea, the hook frame, a shot list by register, the graphic elements, the music direction, and the ending. If the idea can't be named in five words, the piece isn't planned yet. The hook lands inside 1.5 seconds.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VOICE ============ -->
+<section id="voice">
+  <div class="wrap">
+    <span class="eyebrow">09</span>
+    <h2>Voice &amp; copy</h2>
+    <div class="rule"></div>
+    <p class="lede">Editorial-luxury with human warmth. Ultra-premium positioning, with real people clearly present behind it. Think an Aman resort's website, not a landscaping company's.</p>
+
+    <h3>Personality</h3>
+    <p><strong>Premium. Intentional. Confident. Grounded.</strong> The quiet confidence of a firm that does excellent work and knows it — without arrogance and without a pitch. Less contractor, more trusted expert who has done this a hundred times.</p>
+    <ul>
+      <li>Premium but never pretentious</li>
+      <li>Confident but never pushy</li>
+      <li>Educational but never condescending</li>
+      <li>Design-aware, but speaks like a builder — not an interior designer</li>
+    </ul>
+
+    <h3>Phrases to lean on</h3>
+    <div class="grid2">
+      <div class="card" style="font-size:.95rem">
+        <p style="margin-bottom:8px">"Built with intention. Not rushed."</p>
+        <p style="margin-bottom:8px">"A space that feels complete"</p>
+        <p style="margin-bottom:0">"Designed around how you actually live"</p>
+      </div>
+      <div class="card" style="font-size:.95rem">
+        <p style="margin-bottom:8px">"Structure before landscaping"</p>
+        <p style="margin-bottom:8px">"A natural extension of your home"</p>
+        <p style="margin-bottom:0">"Outdoor living, not just outdoor space"</p>
+      </div>
+    </div>
+
+    <h3>Craft</h3>
+    <ul>
+      <li><strong>Short, confident sentences.</strong> Let the work speak.</li>
+      <li><strong>Lead with the outcome or the feeling</strong>, not the service list.</li>
+      <li>Reach for: <em>intentional, cohesive, refined, structured, built, transformed, designed, realized.</em></li>
+      <li>Reference the San Diego lifestyle naturally — indoor/outdoor living, year-round use.</li>
+      <li>These clients are making a real investment. Write to them accordingly.</li>
+    </ul>
+
+    <div class="ban">
+      <h4>Banned — rewrite on sight</h4>
+      <ul>
+        <li>"dream backyard"</li>
+        <li>"transform your space"</li>
+        <li>"your vision, our expertise"</li>
+        <li>"free estimate" / "free quote"</li>
+        <li>"cheap" / "affordable" / "budget-friendly"</li>
+        <li>"best prices" / "price match"</li>
+        <li>"quality work" / "quality guaranteed"</li>
+        <li>"best in the business"</li>
+        <li>"we do it all"</li>
+        <li>"act now" / "limited spots" / "don't wait"</li>
+        <li>"same-day" / "immediate" / "we can be there tomorrow"</li>
+        <li>"call us today!"</li>
+        <li>"lawn care" / "gardening" / "maintenance"</li>
+        <li>"our studio" / "visit our showroom" / "drop by"</li>
+        <li>Real-estate-listing clichés</li>
+        <li>Any exclamation point in brand copy</li>
+      </ul>
+    </div>
+
+    <div class="flag">
+      <h4>The pricing rule — hard, and easy to break by accident</h4>
+      <p><strong>No price floor appears in any public prose.</strong> Not "projects from $20K," not "starting at," not "minimum investment of," not the figure written out in words. On editorial-luxury copy a concrete floor reads like a directory listing — and it <em>underprices</em> SDLR to exactly the buyer worth winning.</p>
+      <p><strong>What is allowed:</strong> per-service investment bands inside a services table (e.g. "Retaining &amp; Seating Walls · $20K–$100K"). Those are context for someone already serious.</p>
+      <p><strong>Use scope language instead of numbers</strong> to filter: "small-scope work," "full backyard remodels," "design-build at this scale." Or register cues: "boutique," "a committed investment," "one honest number."</p>
+    </div>
+
+    <h3>Naming rules — hard</h3>
+    <ul>
+      <li><strong>Never name Mike's other companies</strong> in public copy. If depth must be referenced: "a specialty materials background" — descriptive, never branded.</li>
+      <li><strong>Never name the Field Lead by full name</strong> publicly. Use "our Field Lead" or "our lead craftsman." His 25+ years and role can be cited; the name cannot.</li>
+      <li><strong>Gio and Mike's first names are fine</strong> in public copy.</li>
+      <li><strong>The La Mesa address is an office, not a studio.</strong> It appears in the NAP block only. Never "visit our studio."</li>
+    </ul>
+
+    <h3>Honesty guardrails — legal, not stylistic</h3>
+    <ul>
+      <li><strong>No testimonials</strong> until a real SDLR client consents in writing. The standing placeholder is "References available on request."</li>
+      <li><strong>No fabricated job claims.</strong> No invented client names, no "we just finished this for the ___ family," no fake before/afters tied to a real address. Confident, present-tense description of the design and build is fine; a manufactured delivered-project story is false advertising for a licensed contractor.</li>
+      <li><strong>All "licensed" claims cite Mike's Class B license number.</strong> Gio is not a licensed contractor — never imply otherwise.</li>
+      <li><strong>Never offer in-person visits to completed projects.</strong> Client privacy: their homes never become a showroom.</li>
+    </ul>
+
+    <h3>Reference copy — match this tone</h3>
+    <div class="card">
+      <h4>Instagram</h4>
+      <p style="margin-bottom:0;font-style:italic">"A backyard should feel like a room you actually want to be in. Hardscape, fire feature, pergola — all designed as one cohesive space. La Mesa. Built by SDLR."</p>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h4>Ad</h4>
+      <p style="margin-bottom:6px;font-style:italic">"Your backyard has more potential than you think."</p>
+      <p style="margin-bottom:0;font-style:italic">"Most San Diego backyards are underbuilt. Great house. Forgotten backyard. We design and build outdoor living spaces that match the home you've worked for — structured, cohesive, and built to last."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FACTS ============ -->
+<section id="facts">
+  <div class="wrap">
+    <span class="eyebrow">10</span>
+    <h2>The facts block</h2>
+    <div class="rule"></div>
+    <p class="lede">Use these <em>exactly</em> as written on every surface — website, print, social bios, directory listings. Consistency here is the foundation of local search ranking; any divergence costs real money.</p>
+
+    <div class="facts">
+      <div><dt>Name</dt><dd>San Diego Landscape Remodeling</dd></div>
+      <div><dt>Address</dt><dd>9019 Park Plaza Dr, Unit H, La Mesa, CA 91942</dd></div>
+      <div><dt>Phone</dt><dd>(619) 613-2511 &nbsp;·&nbsp; <code>tel:+16196132511</code></dd></div>
+      <div><dt>Email</dt><dd>office@sandiegolandscaperemodeling.com <span style="color:var(--ink-soft)">(always lowercase)</span></dd></div>
+      <div><dt>Website</dt><dd>sandiegolandscaperemodeling.com</dd></div>
+      <div><dt>Hours</dt><dd>Open 24 hours · Every day</dd></div>
+      <div><dt>License</dt><dd>CSLB #1139785 — Class B General Contractor</dd></div>
+      <div><dt>Service area</dt><dd>San Diego County</dd></div>
+    </div>
+
+    <h3>Services, in priority order</h3>
+    <p>Full backyard remodels (the hero offer) · outdoor kitchens and BBQ islands · patios and hardscape · fire pits and fireplaces · pergolas and shade structures · retaining and seating walls · artificial turf · landscape lighting · swimming pools, new and remodel · pool decks and poolside hardscape · drainage and grading.</p>
+    <p><strong>Not sold:</strong> landscape maintenance, lawn care, tree trimming, or any small-scope standalone work.</p>
+
+    <div class="flag">
+      <h4>Pools — get this right</h4>
+      <p><strong>SDLR builds pools.</strong> Older materials said the opposite; that was wrong and it cost work. SDLR is the general contractor on the pool under the Class B, with the shell carried by a licensed C-53 subcontractor — exactly like excavation, electrical, and masonry. Write it as: <em>"We build pools. The shell is a licensed subcontract, like every other trade on the job."</em> Never imply SDLR self-performs the shell; never hedge so far it reads as though they don't build pools.</p>
+    </div>
+
+    <div class="flag">
+      <h4>Two design tiers — never conflate them</h4>
+      <p><strong>Free concept visualization</strong> — a photoreal render of the client's own backyard, made from photos taken on the property walk. It is a <em>visualization, not an engineered plan.</em> No exact dimensions, no elevations. In client-facing copy this is a "concept render" — never "a design."</p>
+      <p><strong>Paid true design ($2,500–$6,000+)</strong> — exact dimensions, elevations, fully editable. The words <em>design, the plan, exact dimensions, elevations</em> belong to this tier only. Promising the paid tier for free over-promises the lead and cheapens the design.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SPECS ============ -->
+<section id="specs">
+  <div class="wrap">
+    <span class="eyebrow">11</span>
+    <h2>Deliverable specs</h2>
+    <div class="rule"></div>
+
+    <table>
+      <tr><th style="width:30%">Deliverable</th><th>Spec</th></tr>
+      <tr><td><strong>Instagram / Facebook feed</strong></td><td>1080×1350 (4:5), sRGB. Max <strong>five hashtags</strong> — hard cap. Every caption includes a "selections" block naming real products, and ends with a lead-gen CTA.</td></tr>
+      <tr><td><strong>Stories / Reels</strong></td><td>1080×1920 (9:16). Keep type above the bottom 35% and inside the side 6%.</td></tr>
+      <tr><td><strong>Web hero</strong></td><td>2400px wide minimum, WebP or optimized JPG, under 300KB after compression.</td></tr>
+      <tr><td><strong>Business cards</strong></td><td>3.5×2in + 0.125in bleed, 1/8in rounded corners, uncoated or soft-touch. Existing print-ready file in the brand system folder.</td></tr>
+      <tr><td><strong>Yard signs</strong></td><td>24×18in, two-sided — sage face and cream face. FINAL approved design dated 2026-10-23; print files with bleed exist. Don't redesign without asking.</td></tr>
+      <tr><td><strong>EDDM postcard</strong></td><td>9×6.25in jumbo, full bleed, USPS EDDM indicia requirements apply.</td></tr>
+      <tr><td><strong>Letterhead / proposals</strong></td><td>US Letter, editable templates in the brand system folder. Each proposal section starts on a fresh page.</td></tr>
+      <tr><td><strong>Apparel</strong></td><td>Sage, black, cream, and stone colorways exist with approved placements. Embroidery uses the monogram; screen print can carry the full lockup.</td></tr>
+      <tr><td><strong>Vehicle</strong></td><td>Decal pack exists for a sign shop. Vector only — never a raster logo at vehicle scale.</td></tr>
+    </table>
+
+    <h3>File naming</h3>
+    <p>Lowercase, hyphenated, dated, versioned: <code>sdlr-&lt;piece&gt;-v&lt;N&gt;-&lt;YYYY-MM-DD&gt;.&lt;ext&gt;</code>. Keep every version — nothing gets overwritten.</p>
+  </div>
+</section>
+
+<!-- ============ CHECKLIST ============ -->
+<section id="check">
+  <div class="wrap">
+    <span class="eyebrow">12</span>
+    <h2>Pre-flight checklist</h2>
+    <div class="rule"></div>
+    <p class="lede">Run this before anything ships. If a line fails, it isn't ready — regardless of deadline.</p>
+
+    <div class="checklist">
+      <h3>Before you send it</h3>
+      <ol>
+        <li><strong>Could this be mistaken for a landscaping company?</strong> If yes, start over.</li>
+        <li><strong>Palette check.</strong> Only sage, gold, paper, ink and their tints. No fifth color. No pure white background. No pure black.</li>
+        <li><strong>Type check.</strong> Serif headlines, sans everything else. Eyebrows tracked 0.18em. Nothing set in Montserrat.</li>
+        <li><strong>Gold check.</strong> Gold is carrying rules and accents only — not body text on cream.</li>
+        <li><strong>Imagery check.</strong> No faces. Neighbors visible. The house differs from the last piece. Reads as San Diego. No collage. No baked-in text.</li>
+        <li><strong>Mixing check.</strong> No raw render sitting beside a real photo in the same set.</li>
+        <li><strong>Copy check.</strong> No banned phrases. No price floor in prose. No exclamation points. CTA reads "Book a Consultation."</li>
+        <li><strong>Claims check.</strong> No testimonials without written consent. No invented project stories. License claims cite CSLB #1139785.</li>
+        <li><strong>Facts check.</strong> NAP matches §10 character for character.</li>
+        <li><strong>Craft check.</strong> Real punctuation, honest alignment, generous space, square corners, hairline borders.</li>
+        <li><strong>Print only:</strong> bleed set, proof pulled, sage and gold matched by eye to this guide.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ OPEN ============ -->
+<section id="open">
+  <div class="wrap">
+    <span class="eyebrow">13</span>
+    <h2>Open items</h2>
+    <div class="rule"></div>
+    <p class="lede">Honest gaps in the system as of November 2026. If your work runs into one of these, ask Gio rather than inventing an answer.</p>
+
+    <table>
+      <tr><th style="width:30%">Item</th><th>Status</th></tr>
+      <tr><td><strong>Final tagline</strong></td><td>Not settled. Current recommendation on the table: <em>"Built slowly. Built once. Built to be lived in."</em> Until it's confirmed, don't lock a tagline into permanent artwork — signage, vehicle wraps, embroidery.</td></tr>
+      <tr><td><strong>Logo vector colors</strong></td><td>⚠ <code>SDLR.svg</code> carries outdated hex values. Recolor to §4 before output and return the corrected master.</td></tr>
+      <tr><td><strong>Pantone equivalents</strong></td><td>Not assigned. Match to proof on every print run until they are.</td></tr>
+      <tr><td><strong>Signature program names</strong></td><td>"The 10-Month Walk-Through" is the working title; "The Tenth-Month Return" is under consideration. Confirm before putting a program name in permanent collateral.</td></tr>
+      <tr><td><strong>Founder photography</strong></td><td>Editorial headshots of Gio and Mike, a two-shot, and a crew-on-site wide are all still needed. The About page has placeholders where they belong.</td></tr>
+      <tr><td><strong>Project photography</strong></td><td>Real SDLR project photography is thin. This is the single biggest constraint on the brand — it is why the portfolio rules in §7 are strict.</td></tr>
+      <tr><td><strong>Insurance figures</strong></td><td>Carrier and limits not yet confirmed for marketing use. Don't publish specific coverage numbers.</td></tr>
+    </table>
+
+    <div class="flag">
+      <h4>When in doubt</h4>
+      <p>The three questions that resolve most judgment calls: <strong>Would this run in <em>Architectural Digest</em>?</strong> &nbsp;<strong>Does it sell the experience rather than the product?</strong> &nbsp;<strong>Would a buyer with an $8M home read this as "done right, once"?</strong> If any answer is no, it isn't SDLR yet.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>SDLR Brand Guide v1.0</b> — November 7, 2026. Supersedes the April 2026 brand guide PDF.</p>
+    <p>Questions, approvals, and master files: <b>Gio Azzarello</b> · office@sandiegolandscaperemodeling.com · (619) 613-2511</p>
+    <p style="margin-bottom:0;opacity:.72">San Diego Landscape Remodeling · CSLB #1139785 · San Diego County, California</p>
+  </div>
+</footer>
+
+</main>
+
+<script>
+  var t=document.getElementById('navtoggle'),n=document.getElementById('nav');
+  t.addEventListener('click',function(){document.body.classList.toggle('nav-open')});
+  n.addEventListener('click',function(e){if(e.target.tagName==='A')document.body.classList.remove('nav-open')});
+
+  var links=[].slice.call(document.querySelectorAll('nav a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))}).filter(Boolean);
+  function sync(){
+    var y=window.scrollY+140,cur=null;
+    secs.forEach(function(s,i){if(s.offsetTop<=y)cur=i});
+    links.forEach(function(a){a.classList.remove('on')});
+    if(cur!==null&&links[cur])links[cur].classList.add('on');
+  }
+  window.addEventListener('scroll',sync,{passive:true});sync();
+</script>
+</body>
+</html>

@@ -56,6 +56,7 @@ window.DOCK_ITEMS = [
   /* ---------------- SDLR · designs ---------------- */
   { id:'sdlr-deck', n:'1-to-1 Deck', d:'The story, the work and the $200K mortgage play, for networking meetings', u:'sdlr-deck.html', k:'design', b:['sdlr'], i:'🖼️', c:'#6b5a3a', ours:true, add:'2026-08-20' },
   { id:'sdlr-gallery', n:'SDLR Design Gallery', d:'Every SDLR design piece with its version history', u:'designs.html?c=sdlr', k:'design', b:['sdlr'], i:'🎨', c:'#706040', ours:true, add:'2026-07-08' },
+  { id:'sdlr-brand-guide', n:'SDLR Brand Guide', d:'The handover guide for designers, editors and printers — logo, color, type, photography, voice, specs', u:'sdlr-brand-guide.html', k:'design', b:['sdlr'], i:'📘', c:'#4E5D4A', ours:true, add:'2026-11-07' },
   { id:'sdlr-yard-signs', n:'Yard Signs', d:'Final two-sided yard sign, eleven rounds of versions', u:'sdlr-yard-signs.html', k:'design', b:['sdlr'], i:'🪧', c:'#2f4a2a', ours:true, add:'2026-10-23' },
   { id:'sdlr-ecard', n:'Digital E-Card', d:'Tap-to-save business card for SDLR', u:'sdlr-ecard.html', k:'design', b:['sdlr'], i:'💳', c:'#3d3524', ours:true, add:'2026-07-08' },
 
