@@ -101,10 +101,11 @@
     <dt>WB</dt><dd>5500K manual</dd>
     <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400 &middot; EV −0.5</dd></dl></div>
 
-  <div class="card"><h3>GoPro Hero 9 <span class="tag flat">Flat</span></h3>
-    <dl><dt>Protune</dt><dd>ON &middot; Color: Flat (no GP-Log on the 9)</dd>
-    <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400</dd>
-    <dt>Watch</dt><dd>Flat isn't log — it needs far less stretching. Over-stretching is what makes GoPro fall apart.</dd></dl></div>
+  <div class="card warn"><h3>GoPro Hero 9 <span class="tag flat">Flat</span></h3>
+    <dl><dt>Protune</dt><dd>ON &middot; Color: Flat (no GP-Log on the 9 — Flat is the ceiling)</dd>
+    <dt>Sharpness</dt><dd><b class="k">LOW</b> &middot; ISO cap 400 &middot; EV −0.5</dd>
+    <dt>Watch</dt><dd>Ships on Sharpness High. Measured <b class="k">68% edge halos</b> — the worst of any footage tested, and it bakes in permanently.</dd>
+    <dt>Also</dt><dd>Clips easily. Keep the sun behind you.</dd></dl></div>
 
   <div class="card"><h3>iPhone 15 Pro Max <span class="tag log">Apple Log</span></h3>
     <dl><dt>App</dt><dd>Final Cut Camera or Blackmagic Cam → Apple Log ProRes, 4K</dd>
@@ -124,7 +125,13 @@
     <div><span class="i">5</span><span>Grain (optional)</span><span class="w">hides codec noise</span></div>
   </div>
   <p class="note">Fix a warm or dark clip in <b class="k">node 2</b>, not node 4. Trimming after the look fights the look.</p>
-  <p class="note">LUTs live in Resolve under <code>LUT / SVM /</code> — <b class="k">Mint Look Sky Safe</b> is the default; the faithful version rotates blue skies to cyan.</p>
+  <p class="note">LUTs live in Resolve under <code>LUT / SVM /</code>. Pick by how it was shot:</p>
+  <div class="nodes" style="margin-top:8px">
+    <div><span class="i">▸</span><span><b class="k">Mint Look Sky Safe</b> — shot in log, normalised</span><span class="w">the default</span></div>
+    <div><span class="i">▸</span><span><b class="k">Mint Look Baked Profile</b> — standard profile, S-Cinetone, phone</span><span class="w">not log</span></div>
+    <div><span class="i">▸</span><span><b class="k">Mint Look</b> — faithful to the reference</span><span class="w">rotates skies to cyan</span></div>
+  </div>
+  <p class="note">Using the log version on non-log footage stacks two contrast curves — shadows block up and mids go olive. That's what Baked Profile is for.</p>
 
   <h2><span class="n">4</span>The look itself</h2>
   <div class="card">
