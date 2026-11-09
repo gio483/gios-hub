@@ -12,7 +12,7 @@
      n      name
      d      one-line description (plain English)
      u      link (relative = a page on the hub, http = outside)
-     k      kind: app | site | tool | course | design
+     k      kind: app | site | tool | util (free quick utility: downloaders, converters, generators) | course | design
      b      businesses: sdlr | svm | ksh | standby | mts | personal
      i      emoji icon (our own stuff)          dom  domain for a real logo (tools)
      c      card color
@@ -229,5 +229,25 @@ window.DOCK_ITEMS = [
   { id:'tinkercad', n:'Tinkercad', d:'Simple 3D design for prints', u:'https://www.tinkercad.com/dashboard', k:'tool', b:['personal'], dom:'tinkercad.com', c:'#ffffff', p:'free', add:'2026-11-02' },
   { id:'makerworld', n:'MakerWorld', d:"Gio's 3D print collections", u:'https://makerworld.com/en/@GioAzzarello/collections', k:'tool', b:['personal'], dom:'makerworld.com', c:'#ffffff', p:'free', add:'2026-11-02' },
   { id:'printables', n:'Printables', d:'Free 3D print models', u:'https://www.printables.com/model', k:'tool', b:['personal'], dom:'printables.com', c:'#ffffff', p:'free', add:'2026-11-02' },
-  { id:'thingiverse', n:'Thingiverse', d:'More free 3D print models', u:'https://www.thingiverse.com', k:'tool', b:['personal'], dom:'thingiverse.com', c:'#ffffff', p:'free', add:'2026-11-02' }
+  { id:'thingiverse', n:'Thingiverse', d:'More free 3D print models', u:'https://www.thingiverse.com', k:'tool', b:['personal'], dom:'thingiverse.com', c:'#ffffff', p:'free', add:'2026-11-02' },
+  /* ---------------- Quick utilities: downloaders, converters, generators (2026-11-09) ---------------- */
+  { id:'snapyt', n:'SnapYT', d:'YouTube video downloader. Paste a link, save the video', u:'https://www.snapyt.app/', k:'util', b:['svm','sdlr','personal'], i:'▶️', c:'#c4302b', p:'free', add:'2026-11-09' },
+  { id:'ssyoutube', n:'SSYouTube', d:'YouTube video downloader (backup)', u:'https://ssyoutube.com/', k:'util', b:['svm','personal'], i:'⬇️', c:'#a32622', p:'free', add:'2026-11-09' },
+  { id:'ytmp3', n:'YTMP3', d:'YouTube to MP3 downloader: grab just the audio', u:'https://ytmp3.cc/', k:'util', b:['svm','personal'], i:'🎵', c:'#7a1f1c', p:'free', add:'2026-11-09' },
+  { id:'yt1z', n:'YT1z', d:'YouTube video downloader (third option)', u:'https://yt1z.net/', k:'util', b:['svm','personal'], i:'📼', c:'#5e1a18', p:'free', add:'2026-11-09' },
+  { id:'snapsave', n:'SnapSave', d:'Facebook video downloader, HD, no watermark. Also does Instagram', u:'https://snapsave.app/', k:'util', b:['svm','sdlr','personal'], i:'📘', c:'#1b4fbf', p:'free', add:'2026-11-09' },
+  { id:'fdown', n:'FDown', d:'Facebook video downloader (backup)', u:'https://fdown.net/', k:'util', b:['svm','personal'], i:'⬇️', c:'#163f99', p:'free', add:'2026-11-09' },
+  { id:'saveclip', n:'SaveClip', d:'Instagram downloader: reels, videos, photos, stories', u:'https://saveclip.app/en8', k:'util', b:['svm','sdlr','personal'], i:'📸', c:'#b3266f', p:'free', add:'2026-11-09' },
+  { id:'snapinst', n:'SnapInsta', d:'Instagram downloader (backup)', u:'https://snapinst.app/', k:'util', b:['svm','ksh'], i:'📲', c:'#8a1f6a', p:'free', add:'2026-11-09' },
+  { id:'tiiny', n:'Tiiny Host', d:'Drop an HTML file, get a live link', u:'https://tiiny.host/host-html-file/', k:'util', b:['svm'], dom:'tiiny.host', c:'#ffffff', p:'free', add:'2026-11-09' },
+  { id:'qr-generator', n:'QR Code Generator', d:'Make and manage QR codes for signs, cards and flyers', u:'https://app.qr-code-generator.com/manage', k:'util', b:['svm','sdlr','ksh'], dom:'qr-code-generator.com', c:'#ffffff', p:null, add:'2026-11-09' },
+  { id:'coolors', n:'Coolors', d:'Color palette generator', u:'https://coolors.co/', k:'util', b:['svm'], dom:'coolors.co', c:'#ffffff', p:'free', add:'2026-11-09' },
+  { id:'1001fonts', n:'1001 Fonts', d:'Free fonts to download', u:'https://www.1001fonts.com/', k:'util', b:['svm'], dom:'1001fonts.com', c:'#ffffff', p:'free', add:'2026-11-09' },
+  { id:'suno', n:'Suno', d:'AI music: make a song or a bed for a video', u:'https://suno.com/create', k:'tool', b:['svm','personal'], dom:'suno.com', c:'#000000', p:null, add:'2026-11-09' },
+
+  /* ---------------- KSH profiles & pieces (from the media@kshconstruction.com Chrome profile) ---------------- */
+  { id:'ksh-houzz', n:'KSH on Houzz', d:'KSH Construction pro profile', u:'https://www.houzz.com/pro/kshconstruction', k:'tool', b:['ksh'], dom:'houzz.com', c:'#4dbc15', p:'free', add:'2026-11-09' },
+  { id:'ksh-pinterest', n:'KSH on Pinterest', d:'KSH Construction board', u:'https://www.pinterest.com/KSHConstructionsd/ksh-construction/', k:'tool', b:['ksh'], dom:'pinterest.com', c:'#e60023', p:'free', add:'2026-11-09' },
+  { id:'ksh-instagram', n:'KSH on Instagram', d:'@kshconstruction', u:'https://www.instagram.com/kshconstruction/', k:'tool', b:['ksh'], dom:'instagram.com', c:'#2b1530', p:'free', add:'2026-11-09' },
+  { id:'ksh-welcome-packet', n:'KSH Welcome Packet', d:'Client welcome packet flipbook on Flipsnack', u:'https://www.flipsnack.com/EF6D6977C6F/ksh-welcome-packet.html', k:'design', b:['ksh'], dom:'flipsnack.com', c:'#ffffff', ours:true, add:'2026-11-09' },
 ];

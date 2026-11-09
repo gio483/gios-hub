@@ -231,7 +231,7 @@
   <aside class="side" id="side">
     <div class="brand"><img src="icon-192.png?v=2" alt=""><div><b>DOCK</b><small id="brandCount"></small></div></div>
     <div id="nav"></div>
-    <div class="side-help">Type anywhere to search. <kbd>Alt</kbd>+<kbd>0</kbd>–<kbd>6</kbd> buckets · <kbd>Alt</kbd>+<kbd>O</kbd> ours · <kbd>T</kbd> tools · <kbd>W</kbd> sites · <kbd>M</kbd> money · <kbd>A</kbd> all · <kbd>N</kbd> add</div>
+    <div class="side-help">Type anywhere to search. <kbd>Alt</kbd>+<kbd>0</kbd>–<kbd>6</kbd> buckets · <kbd>Alt</kbd>+<kbd>O</kbd> ours · <kbd>T</kbd> tools · <kbd>U</kbd> utilities · <kbd>W</kbd> sites · <kbd>M</kbd> money · <kbd>A</kbd> all · <kbd>N</kbd> add</div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
@@ -256,7 +256,7 @@
   <div class="f"><label>What it does</label><textarea name="d"></textarea></div>
   <div class="frow">
     <div class="f"><label>Kind</label><select name="k">
-      <option value="app">App we built</option><option value="site">Website</option><option value="tool">Tool / subscription</option><option value="course">Course</option><option value="design">Design</option></select></div>
+      <option value="app">App we built</option><option value="site">Website</option><option value="tool">Tool / subscription</option><option value="util">Quick utility (downloader, converter…)</option><option value="course">Course</option><option value="design">Design</option></select></div>
     <div class="f"><label>Status</label><select name="s"><option value="">None</option><option value="live">Live</option><option value="preview">Preview</option><option value="building">Building</option><option value="local">Runs on the Mac</option></select></div>
   </div>
   <div class="f"><label>Businesses</label><div class="bizpick" id="bizPick"></div></div>
@@ -283,7 +283,7 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=8"></script>
+<script src="dock-data.js?v=9"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
@@ -292,8 +292,8 @@ const LS = 'gio-dock-v1', LS_UI = 'gio-dock-ui-v1', API = '/api/lifeos?ns=dock';
 // what "Most used" shows until the hub has learned from real opens:
 // ranked by Chrome visits in the gio@shiftvisionmedia.com profile (2026-11-02)
 const SEED = ['magnific','svm-highlevel','youtube','ghl','gdocs','gmail','github','ga4','chatgpt','gdrive','gcal','canva','sdlr-hq','stripe','instagram','site-bni','linkedin','claude','bni-connect','cloudflare'];
-const KINDS = { app:'Apps we built', site:'Websites', design:'Designs & decks', tool:'Tools & subscriptions', course:'Courses & learning' };
-const KIND_ORDER = ['app','site','design','tool','course'];
+const KINDS = { app:'Apps we built', site:'Websites', design:'Designs & decks', tool:'Tools & subscriptions', util:'Quick utilities', course:'Courses & learning' };
+const KIND_ORDER = ['app','site','design','tool','util','course'];
 
 let store = read(LS, {});           // synced: it:<id> = edits/additions, op:<id> = open counts
 let ui = Object.assign({ view:'used', layout:'grid', theme:'dark', closed:{ recent:true, added:true }, biz:'' }, read(LS_UI, {}));
@@ -414,7 +414,7 @@ function row(it){
     <span class="ri" style="--c:${esc(it.c||'#222')}">${art(it, true)}</span>
     <span style="min-width:0"><div class="rn">${esc(it.n)}</div><div class="rd">${esc(it.d)}</div></span>
     <span class="tags">${bizTags(it)}</span>
-    <span class="rk">${({app:'App',site:'Site',tool:'Tool',course:'Course',design:'Design'})[it.k]||''}</span>
+    <span class="rk">${({app:'App',site:'Site',tool:'Tool',util:'Utility',course:'Course',design:'Design'})[it.k]||''}</span>
     <span class="rp">${priceLabel(it) || (it.s ? `<span class="price">${STATUS[it.s]}</span>` : '')}</span>
     <button class="flat-edit" data-edit="${esc(it.id)}" aria-label="Edit ${esc(it.n)}">${PEN}</button>
   </a>`;
@@ -449,6 +449,7 @@ const NAV = [
   { id:'tool', k:'T', l:'Tools & subs' },
   { id:'site', k:'W', l:'Websites' },
   { id:'design', k:'D', l:'Designs' },
+  { id:'util', k:'U', l:'Utilities' },
   { id:'course', k:'C', l:'Courses' },
   { id:'all', k:'A', l:'All' },
   { id:'money', k:'$', l:'Money' },
@@ -684,7 +685,7 @@ document.addEventListener('submit', e => {
 /* ---- search + keyboard ---- */
 const qEl = document.getElementById('q');
 qEl.addEventListener('input', () => { q = qEl.value.trim(); render(); });
-const KEYMAP = { Digit0:'used', KeyO:'ours', KeyT:'tool', KeyW:'site', KeyD:'design', KeyC:'course', KeyA:'all', KeyM:'money', KeyN:'add' };
+const KEYMAP = { Digit0:'used', KeyO:'ours', KeyT:'tool', KeyW:'site', KeyD:'design', KeyC:'course', KeyU:'util', KeyA:'all', KeyM:'money', KeyN:'add' };
 BIZ.forEach(b => KEYMAP['Digit'+b.key] = b.id);
 document.addEventListener('keydown', e => {
   if(dlg.open) return;
