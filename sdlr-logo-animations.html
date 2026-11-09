@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SDLR Logo Animations</title>
+<style>
+  :root{
+    --bg:#11140f; --panel:#1a1f16; --line:#2b3326;
+    --text:#F5F1E8; --muted:#9aa390; --gold:#BDA572; --sage:#4E5D4A;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased}
+
+  header{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#0b0e09;
+         border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .back{color:var(--muted);text-decoration:none;font-size:.82rem;display:flex;align-items:center;gap:6px;
+        padding:7px 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel)}
+  .back:hover{color:var(--text);border-color:var(--gold)}
+  .htitle{font-size:.98rem;font-weight:700}
+  .hsub{font-size:.72rem;color:var(--muted)}
+  .pill{margin-left:auto;font-size:.7rem;color:var(--gold);background:rgba(189,165,114,.12);
+        border:1px solid rgba(189,165,114,.3);padding:5px 10px;border-radius:999px;white-space:nowrap}
+
+  main{max-width:1080px;margin:0 auto;padding:26px 16px 70px}
+  .lede{color:var(--muted);font-size:.95rem;line-height:1.65;margin:0 0 8px;max-width:72ch}
+  .lede b{color:var(--text);font-weight:600}
+  .howto{display:grid;gap:10px;margin:20px 0 34px;padding:16px 18px;background:var(--panel);
+         border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:12px}
+  .howto h2{margin:0;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .howto p{margin:0;color:var(--muted);font-size:.88rem;line-height:1.6}
+  .howto code{background:#0b0e09;border:1px solid var(--line);padding:1px 6px;border-radius:5px;
+              font-size:.82em;color:var(--text)}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:28px}
+  .cardhead{padding:18px 20px 14px;display:flex;flex-wrap:wrap;align-items:baseline;gap:10px}
+  .num{font-size:.72rem;color:var(--gold);letter-spacing:.2em;font-weight:700}
+  .cardhead h3{margin:0;font-size:1.35rem;font-weight:600;letter-spacing:.01em}
+  .tag{font-size:.78rem;color:var(--muted);margin-left:auto}
+  .desc{padding:0 20px 16px;color:var(--muted);font-size:.9rem;line-height:1.65;max-width:70ch;margin:0}
+  .desc b{color:var(--text);font-weight:600}
+
+  .stage{background:#000;display:flex;align-items:center;justify-content:center;min-height:200px}
+  .stage video{display:block;width:100%;height:auto;max-height:62vh;object-fit:contain;background:#000}
+  .stage.vert video{width:auto;max-width:100%;max-height:70vh}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 20px;border-top:1px solid var(--line)}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#0b0e09}
+  .seg button{background:transparent;border:0;color:var(--muted);padding:8px 14px;font-size:.82rem;
+              cursor:pointer;font-family:inherit;white-space:nowrap}
+  .seg button[aria-pressed="true"]{background:var(--gold);color:#1b1b1b;font-weight:600}
+  .replay{margin-left:auto;background:#0b0e09;border:1px solid var(--line);color:var(--muted);
+          padding:8px 14px;border-radius:9px;font-size:.82rem;cursor:pointer;font-family:inherit}
+  .replay:hover{color:var(--text);border-color:var(--gold)}
+
+  .dl{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 18px}
+  .dl a{font-size:.78rem;color:var(--text);text-decoration:none;background:#0b0e09;
+        border:1px solid var(--line);padding:8px 12px;border-radius:9px;display:flex;align-items:center;gap:7px}
+  .dl a:hover{border-color:var(--gold);color:var(--gold)}
+  .dl .k{color:var(--muted);font-size:.9em}
+
+  .specs{margin-top:34px;padding:18px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  .specs h2{margin:0 0 12px;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+  .specs table{width:100%;border-collapse:collapse;font-size:.86rem}
+  .specs td{padding:7px 0;border-bottom:1px solid var(--line);color:var(--muted);vertical-align:top}
+  .specs td:first-child{color:var(--text);width:40%;padding-right:14px}
+  .specs tr:last-child td{border-bottom:0}
+  .specs code{background:#0b0e09;border:1px solid var(--line);padding:1px 6px;border-radius:5px;
+              font-size:.86em;color:var(--text);word-break:break-all}
+  @media(max-width:640px){ .cardhead h3{font-size:1.15rem} .tag{margin-left:0;width:100%} }
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="designs.html?c=sdlr">← Design Gallery</a>
+  <div>
+    <div class="htitle">SDLR Logo Animations</div>
+    <div class="hsub">Three intro / outro stings</div>
+  </div>
+  <span class="pill">v1 · Nov 9, 2026</span>
+</header>
+
+<main>
+  <p class="lede">Three different animated versions of the SDLR logo, built from the real logo vectors — not a
+  picture of the logo being faded in. Every one comes as an <b>intro</b> (3 seconds, for the front of a video)
+  and an <b>outro</b> (4.2 seconds, with the website, phone and licence number), in both
+  <b>landscape and vertical</b>. Pick the one that fits the video.</p>
+
+  <div class="howto">
+    <h2>How to use these</h2>
+    <p><b>The MP4s</b> are ready to drop straight onto a timeline — they already have the brand background
+    behind them. Use these for anything posted as-is.</p>
+    <p><b>The ALPHA files</b> (<code>.mov</code>, ProRes 4444) have a real transparent background, so the logo
+    sits on top of your footage with nothing behind it. Use these when you want the mark to animate over a
+    backyard shot. They are drawn in <b>cream</b>, not gold — that is the brand guide's "over photography"
+    colour, and it stays readable over both bright sun and shade, where gold washes out. They are too large
+    for this page, so they live in the client folder — path at the bottom. A gold set can be made any time.</p>
+    <p>Every one ends on a <b>held final frame</b>, so you can freeze or extend the last frame as long as you
+    like, and fade out on your own terms. There is no sound on any of them.</p>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="specs">
+    <h2>Specs &amp; file locations</h2>
+    <table>
+      <tr><td>Format</td><td>1920×1080 and 1080×1920, 30fps</td></tr>
+      <tr><td>Intro length</td><td>3.0 seconds (90 frames)</td></tr>
+      <tr><td>Outro length</td><td>4.2 seconds (126 frames)</td></tr>
+      <tr><td>MP4</td><td>H.264, brand background baked in — social, quick drops</td></tr>
+      <tr><td>ALPHA .mov</td><td>ProRes 4444, true alpha channel, cream mark — opens in Premiere, Resolve and Final Cut</td></tr>
+      <tr><td>Colours</td><td>Sage #4E5D4A · Gold #BDA572 · Paper #F5F1E8 — straight off the brand guide</td></tr>
+      <tr><td>Outro end card</td><td>sandiegolandscaperemodeling.com · (619) 613-2511 · Lic. #1139785</td></tr>
+      <tr><td>All files</td><td><code>02 Clients/san-diego-landscape-remodeling/assets/design/logo-animations/2026-11-09/</code></td></tr>
+    </table>
+  </div>
+</main>
+
+<script>
+const BASE = 'sdlr-stings/';
+const CONCEPTS = [
+  { id:'Draft', num:'01', name:'Draft', tag:'Design-studio',
+    desc:'A drafting pen <b>traces the outline</b> of the SDLR monogram letter by letter on a faint grid, then the gold <b>floods in from the bottom</b> and the measurement lines pull away as the name settles underneath. This is the one that looks like the logo is being <b>designed in front of you</b> — it ties straight to the concept renders you sell.' },
+  { id:'Atelier', num:'02', name:'Atelier', tag:'Most premium',
+    desc:'The mark starts <b>sitting in the dark</b>, barely there. A wide band of gold light <b>rakes across it</b> and lights it up as it passes, the room brightens to full sage behind it, then a second, faster glint runs over the top. This is the <b>most expensive-looking</b> of the three — the luxury-car-advert read.' },
+  { id:'Horizon', num:'03', name:'Horizon', tag:'Warm / editorial',
+    desc:'A thin line is <b>drawn out from the centre</b>, and the monogram <b>rises up out of it</b> like a landform coming up out of the ground. The line then retracts and the name fades up underneath. This one is on <b>cream, not sage</b> — the softest and most magazine-like of the three, best in front of warm, human, homeowner-facing videos.' },
+];
+
+const state = {};
+document.getElementById('cards').innerHTML = CONCEPTS.map(c => {
+  state[c.id] = { mode:'Intro', ratio:'16x9' };
+  return `
+  <div class="card" data-c="${c.id}">
+    <div class="cardhead">
+      <span class="num">${c.num}</span>
+      <h3>${c.name}</h3>
+      <span class="tag">${c.tag}</span>
+    </div>
+    <p class="desc">${c.desc}</p>
+    <div class="stage" id="stage-${c.id}">
+      <video id="v-${c.id}" autoplay muted loop playsinline preload="metadata"></video>
+    </div>
+    <div class="controls">
+      <div class="seg" data-kind="mode">
+        <button data-v="Intro"  aria-pressed="true">Intro</button>
+        <button data-v="Outro"  aria-pressed="false">Outro</button>
+      </div>
+      <div class="seg" data-kind="ratio">
+        <button data-v="16x9" aria-pressed="true">Landscape</button>
+        <button data-v="9x16" aria-pressed="false">Vertical</button>
+      </div>
+      <button class="replay">↻ Replay</button>
+    </div>
+    <div class="dl">
+      <a href="${BASE}SDLR-${c.id}-Intro-16x9.mp4" download><span class="k">MP4</span> Intro · Landscape</a>
+      <a href="${BASE}SDLR-${c.id}-Intro-9x16.mp4" download><span class="k">MP4</span> Intro · Vertical</a>
+      <a href="${BASE}SDLR-${c.id}-Outro-16x9.mp4" download><span class="k">MP4</span> Outro · Landscape</a>
+      <a href="${BASE}SDLR-${c.id}-Outro-9x16.mp4" download><span class="k">MP4</span> Outro · Vertical</a>
+    </div>
+  </div>`;
+}).join('');
+
+function load(id){
+  const s = state[id];
+  const v = document.getElementById('v-'+id);
+  const stage = document.getElementById('stage-'+id);
+  stage.classList.toggle('vert', s.ratio === '9x16');
+  v.src = `${BASE}SDLR-${id}-${s.mode}-${s.ratio}.mp4`;
+  v.load(); v.play().catch(()=>{});
+}
+CONCEPTS.forEach(c => load(c.id));
+
+document.getElementById('cards').addEventListener('click', e => {
+  const card = e.target.closest('.card'); if (!card) return;
+  const id = card.dataset.c;
+  if (e.target.classList.contains('replay')) {
+    const v = document.getElementById('v-'+id); v.currentTime = 0; v.play().catch(()=>{}); return;
+  }
+  const btn = e.target.closest('.seg button'); if (!btn) return;
+  const kind = btn.parentElement.dataset.kind;
+  state[id][kind] = btn.dataset.v;
+  [...btn.parentElement.children].forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  load(id);
+});
+</script>
+</body>
+</html>
