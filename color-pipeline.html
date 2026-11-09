@@ -96,7 +96,7 @@
     <dt>Sharpness</dt><dd>−1 / lowest &middot; NR lowest</dd>
     <dt>Watch</dt><dd>Default sharpening is very aggressive. This matters more here than on any other body.</dd></dl></div>
 
-  <div class="card"><h3>GoPro Hero 12 <span class="tag log">GP-Log</span></h3>
+  <div class="card"><h3>GoPro Hero 12 <span class="tag log">GP-Log</span> <span class="tag" style="color:#86efac;border-color:#2b5c3f">use this one</span></h3>
     <dl><dt>Protune</dt><dd>ON &middot; GP-Log if your firmware has it, else Flat</dd>
     <dt>WB</dt><dd>5500K manual</dd>
     <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400 &middot; EV −0.5</dd></dl></div>
@@ -112,8 +112,25 @@
     <dt>Lock</dt><dd>Exposure <i>and</i> white balance</dd>
     <dt>Note</dt><dd>Normal iPhone video is already 709 — treat it as 709, don't transform it</dd></dl></div>
 
-  <h2><span class="n">3</span>Calibration shoot <span class="tag">one time</span></h2>
-  <p class="note" style="margin:0 2px 11px">Ten seconds of the same scene on every body, with a grey card in frame. This is what turns the per-camera trims from <i>estimated</i> into <i>measured</i> &mdash; the difference between close and cutting together invisibly.</p>
+  <h2><span class="n">3</span>Calibration shoot <span class="tag" style="color:#86efac;border-color:#2b5c3f">done 9 Nov</span></h2>
+  <div class="card">
+    <h3>Result &mdash; the three cameras now match</h3>
+    <p class="note" style="margin-top:4px">Shot on the SDLR polo in the backyard. Measured across the graded clips: blacks and whites land within <b class="k">2/255</b> of each other, saturation within <b class="k">0.017</b>. Each body has its own normalise LUT; they all share one look.</p>
+    <dl>
+      <dt>Sony FX3</dt><dd>S-Log3 &rarr; official Sony transform &rarr; Mint Sky Safe</dd>
+      <dt>GoPro Hero 12</dt><dd><b class="k">SVM Normalise &mdash; GoPro Hero12 Flat</b> &rarr; Mint Sky Safe</dd>
+      <dt>Osmo Pocket 3</dt><dd><b class="k">SVM Normalise &mdash; Osmo Pocket3 DLogM</b> &rarr; Mint Sky Safe</dd>
+    </dl>
+  </div>
+  <div class="card warn">
+    <h3>What capped the accuracy &mdash; fix on the next one</h3>
+    <dl>
+      <dt>Sun in frame</dt><dd>On both action cams. That makes veiling glare that <i>varies across the frame</i> &mdash; the GoPro reads the polo brighter than the fence while the FX3 reads it darker. No LUT undoes a spatial haze. <b class="k">Open shade or overcast.</b></dd>
+      <dt>No grey card</dt><dd>The match had to be built from surfaces found in frame instead.</dd>
+      <dt>Split timing</dt><dd>The Pocket 3 rolled 30 min after the others, so the sun had genuinely moved. Shoot every body back to back.</dd>
+    </dl>
+  </div>
+  <p class="note" style="margin:0 2px 11px">The protocol below still stands &mdash; a re-shoot in soft light with a card would tighten this further.</p>
 
   <div class="card warn">
     <h3>Change these two profiles first</h3>
@@ -183,6 +200,11 @@
     <div><span class="i">▸</span><span><b class="k">Mint Look Sky Safe</b> — shot in log, normalised</span><span class="w">the default</span></div>
     <div><span class="i">▸</span><span><b class="k">Mint Look Baked Profile</b> — standard profile, S-Cinetone, phone</span><span class="w">not log</span></div>
     <div><span class="i">▸</span><span><b class="k">Mint Look</b> — faithful to the reference</span><span class="w">rotates skies to cyan</span></div>
+  </div>
+  <p class="note">Normalise LUTs, measured from the 9 Nov shoot. Use these on those two bodies instead of a transform node:</p>
+  <div class="nodes" style="margin-top:8px">
+    <div><span class="i">▸</span><span><b class="k">SVM Normalise — GoPro Hero12 Flat to Rec709</b></span><span class="w">then Mint</span></div>
+    <div><span class="i">▸</span><span><b class="k">SVM Normalise — Osmo Pocket3 DLogM to Rec709</b></span><span class="w">then Mint</span></div>
   </div>
   <p class="note">Using the log version on non-log footage stacks two contrast curves — shadows block up and mids go olive. That's what Baked Profile is for.</p>
 
