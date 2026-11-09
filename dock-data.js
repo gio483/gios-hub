@@ -250,4 +250,7 @@ window.DOCK_ITEMS = [
   { id:'ksh-pinterest', n:'KSH on Pinterest', d:'KSH Construction board', u:'https://www.pinterest.com/KSHConstructionsd/ksh-construction/', k:'tool', b:['ksh'], dom:'pinterest.com', c:'#e60023', p:'free', add:'2026-11-09' },
   { id:'ksh-instagram', n:'KSH on Instagram', d:'@kshconstruction', u:'https://www.instagram.com/kshconstruction/', k:'tool', b:['ksh'], dom:'instagram.com', c:'#2b1530', p:'free', add:'2026-11-09' },
   { id:'ksh-welcome-packet', n:'KSH Welcome Packet', d:'Client welcome packet flipbook on Flipsnack', u:'https://www.flipsnack.com/EF6D6977C6F/ksh-welcome-packet.html', k:'design', b:['ksh'], dom:'flipsnack.com', c:'#ffffff', ours:true, add:'2026-11-09' },
+
+  /* ---------------- Personal finance logins ---------------- */
+  { id:'ally', n:'Ally', d:'Tesla loan and Ally account dashboard', u:'https://secure.ally.com/dashboard', k:'tool', b:['personal'], dom:'ally.com', c:'#650360', p:'free', note:'Login only; the loan payment is not counted as a subscription', add:'2026-11-09' },
 ];
