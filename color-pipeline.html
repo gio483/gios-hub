@@ -112,7 +112,60 @@
     <dt>Lock</dt><dd>Exposure <i>and</i> white balance</dd>
     <dt>Note</dt><dd>Normal iPhone video is already 709 — treat it as 709, don't transform it</dd></dl></div>
 
-  <h2><span class="n">3</span>In Resolve</h2>
+  <h2><span class="n">3</span>Calibration shoot <span class="tag">one time</span></h2>
+  <p class="note" style="margin:0 2px 11px">Ten seconds of the same scene on every body, with a grey card in frame. This is what turns the per-camera trims from <i>estimated</i> into <i>measured</i> &mdash; the difference between close and cutting together invisibly.</p>
+
+  <div class="card warn">
+    <h3>Change these two profiles first</h3>
+    <p class="note" style="margin-top:4px">Shoot before this and you are calibrating settings you are about to retire.</p>
+    <dl>
+      <dt>Pocket 3</dt><dd>Pro &rarr; <b class="k">D-Log M</b>, 10-bit, sharpness lowest</dd>
+      <dt>GoPro Hero 9</dt><dd>Protune ON &rarr; Color <b class="k">Flat</b>, Sharpness <b class="k">LOW</b></dd>
+      <dt>Sonys</dt><dd>Already right &mdash; S-Log3, nothing to change</dd>
+    </dl>
+  </div>
+
+  <div class="card">
+    <h3>Grey card, first 3 seconds, every take</h3>
+    <p class="note" style="margin-top:4px">An 18% grey card held in frame, lit by the same light as the scene. White foamcore works if that is what you have. This one thing is most of the value of the shoot &mdash; without it, neutral has to be estimated off concrete and paint lines.</p>
+  </div>
+
+  <div class="card">
+    <h3>Locked identical on every camera</h3>
+    <dl>
+      <dt>White balance</dt><dd><b class="k">A fixed Kelvin number</b> &mdash; 5600 daylight, 6500 shade. One camera left on auto and the match is only valid for that clip.</dd>
+      <dt>Frame rate</dt><dd>The same on all of them &mdash; 24 or 30</dd>
+      <dt>Shutter</dt><dd>1/48 at 24 &middot; 1/60 at 30</dd>
+      <dt>Sony ISO</dt><dd>800 &mdash; S-Log3 base on all three bodies</dd>
+      <dt>Exposure</dt><dd>Grey card landing in the same place on every camera</dd>
+    </dl>
+  </div>
+
+  <div class="card warn">
+    <h3>Open shade or overcast &mdash; not hard sun</h3>
+    <p class="note" style="margin-top:4px">The GoPro and Pocket 3 have fixed apertures and no internal ND. In bright sun they sit pinned overexposed and cannot be matched to the Sonys at base ISO &mdash; no amount of post fixes it. Soft light keeps all of them in range. Bring the Pocket 3 magnetic NDs if you have them.</p>
+  </div>
+
+  <div class="card">
+    <h3>One frame, everything in it</h3>
+    <ul>
+      <li><b>A person.</b> Skin is the hardest match and the one that actually matters.</li>
+      <li>Deep shadow <i>and</i> a bright sky or white wall in the same frame &mdash; that is what shows how each camera's toe and shoulder behave.</li>
+      <li>Green plants plus grey concrete or stucco.</li>
+      <li>Same framing, same spot, every body back to back inside a few minutes so the sun does not drift.</li>
+    </ul>
+  </div>
+
+  <p class="note">Ten seconds each, whichever bodies you have on you that day:</p>
+  <div class="nodes" style="margin-top:8px">
+    <div><span class="i">&#9656;</span><span>Sony FX3 / FX30 / A7 IV</span><span class="w">S-Log3, ISO 800</span></div>
+    <div><span class="i">&#9656;</span><span>DJI Osmo Pocket 3</span><span class="w">D-Log M</span></div>
+    <div><span class="i">&#9656;</span><span>GoPro Hero 9 / 12</span><span class="w">Flat / GP-Log</span></div>
+    <div><span class="i">&#9656;</span><span>iPhone 15 Pro Max</span><span class="w">Apple Log &mdash; closes the last gap</span></div>
+  </div>
+  <p class="note">The iPhone path is the one part of this system still specified but never tested. It is a ten-second add while you are already standing there.</p>
+
+  <h2><span class="n">4</span>In Resolve</h2>
   <div class="card">
     <h3>Easiest: let Resolve normalise everything</h3>
     <p class="note" style="margin-top:6px">Project Settings → Color Management → <b class="k">DaVinci YRGB Color Managed</b>, output Rec.709 Gamma 2.4. Then set each clip's <b class="k">Input Color Space</b> in the media pool. All six cameras land on one consistent base automatically — this is the whole reason colour management exists.</p>
@@ -133,7 +186,7 @@
   </div>
   <p class="note">Using the log version on non-log footage stacks two contrast curves — shadows block up and mids go olive. That's what Baked Profile is for.</p>
 
-  <h2><span class="n">4</span>The look itself</h2>
+  <h2><span class="n">5</span>The look itself</h2>
   <div class="card">
     <div class="swatches">
       <div class="sw" style="background:#101413">shadow</div>
@@ -153,7 +206,7 @@
     </dl>
   </div>
 
-  <h2><span class="n">5</span>The sharpness rules</h2>
+  <h2><span class="n">6</span>The sharpness rules</h2>
   <div class="card warn">
     <p style="margin:0;font-size:.9rem">The look we're chasing is <b>not sharper than ours — it's cleaner.</b> Measured at matched pixel scale it has <b class="k">17%</b> edge-halo artifacts against <b class="k">41%</b> in our own reel. Sharpness here is subtractive.</p>
     <ul>
