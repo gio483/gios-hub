@@ -268,6 +268,27 @@ textarea.input{min-height:110px;resize:vertical}
 }
 @media (max-width:380px){ details.sec .body{grid-template-columns:1fr} .hero h1{font-size:30px} }
 
+/* hamburger menu (phones) */
+.burger,.cur-page{display:none}
+.burger{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);flex-direction:column;justify-content:center;align-items:center;gap:5px;flex:0 0 44px;margin-left:auto}
+.burger span{display:block;width:20px;height:2px;border-radius:2px;background:var(--gold);transition:transform .2s,opacity .2s}
+.side.open .burger span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.side.open .burger span:nth-child(2){opacity:0}
+.side.open .burger span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media (max-width:820px){
+  .side{overflow:visible;justify-content:space-between}
+  .brand{flex:1;min-width:0;padding:0}
+  .brand > div:last-child{display:block;min-width:0}
+  .brand-title{font-size:15px;white-space:nowrap}
+  .cur-page{display:block;color:var(--gold);font-size:12px;font-weight:700;margin-top:3px}
+  .burger{display:flex}
+  .nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;overflow:visible;mask-image:none;-webkit-mask-image:none;background:var(--navy-2);border-bottom:1px solid var(--line);padding:8px 12px 16px;gap:2px;box-shadow:0 24px 50px rgba(0,0,0,.55)}
+  .side.open .nav{display:flex;animation:drop .18s ease}
+  .nav button{padding:14px;font-size:16px;white-space:normal}
+  .nav .ico{display:inline-block}
+  .nav button.active{box-shadow:inset 3px 0 0 var(--gold)}
+}
+@keyframes drop{from{transform:translateY(-6px)}to{transform:none}}
 #top10{overflow-x:auto;-webkit-overflow-scrolling:touch}
 #top10 .recipe{min-width:560px}
 @media (max-width:820px){.entry-photo{min-height:200px;background-position:center 18%}}
@@ -287,7 +308,9 @@ textarea.input{min-height:110px;resize:vertical}
       <div>
         <div class="brand-title">Triton Pitching Lab</div>
         <div class="brand-sub">Brandon Jackel · RHP</div>
+        <div class="cur-page" id="cur-page">Dashboard</div>
       </div>
+      <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
     </div>
     <nav class="nav" id="nav">
       <button data-view="dash" class="active"><span class="ico">◆</span>Dashboard</button>
@@ -708,12 +731,17 @@ function go(view, opts={}) {
   S.view = view;
   $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   const ab = $(`#nav button[data-view="${view}"]`);
-  if (ab && window.innerWidth <= 820) ab.scrollIntoView({ inline: 'center', block: 'nearest' });
+  if (ab) $('#cur-page').textContent = ab.lastChild.textContent.trim();
+  setMenu(false);
   $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + view));
   if (opts.date) S.entryDate = opts.date;
   RENDER[view]();
   window.scrollTo({ top: 0 });
   try { history.replaceState(null, '', '#' + view); } catch (e) {}
+}
+function setMenu(open) {
+  $('.side').classList.toggle('open', open);
+  const b = $('#burger'); if (b) { b.setAttribute('aria-expanded', open); b.setAttribute('aria-label', open ? 'Close menu' : 'Open menu'); }
 }
 function sideStats() {
   const rows = Store.rows;
@@ -1357,6 +1385,9 @@ function importCSV(file) {
 Store.load();
 sideStats();
 $$('#nav button').forEach(b => b.onclick = () => go(b.dataset.view));
+$('#burger').onclick = e => { e.stopPropagation(); setMenu(!$('.side').classList.contains('open')); };
+document.addEventListener('click', e => { if (!e.target.closest('.side')) setMenu(false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
 const start = (location.hash || '').slice(1);
 go(RENDER[start] ? start : 'dash');
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (RENDER[v] && v !== S.view) go(v); });
