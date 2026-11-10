@@ -1,0 +1,1314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Triton Pitching Lab</title>
+<meta name="description" content="Brandon Jackel pitching performance, recovery and arm-care dashboard">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#182B49; --navy-2:#0F1E36; --navy-3:#0A1528; --ink:#081120;
+  --gold:#FFCD00; --gold-2:#C69214; --blue:#00629B; --sky:#4FA3E3; --teal:#00C6D7;
+  --stitch:#E0544B; --green:#3DDC97; --amber:#FFB547; --red:#FF6B6B;
+  --text:#EAF0F8; --muted:#8FA3BF; --line:rgba(143,163,191,.16); --card:#12233F; --card-2:#162A4A;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--ink);color:var(--text);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.brand-title,.kpi-val,.big{font-family:"Barlow Condensed",Inter,sans-serif;letter-spacing:.02em}
+h1{font-size:34px;margin:0;font-weight:800;text-transform:uppercase}
+h2{font-size:22px;margin:0 0 4px;font-weight:700;text-transform:uppercase}
+h3{font-size:17px;margin:0;font-weight:700;text-transform:uppercase;color:var(--gold)}
+a{color:var(--gold)}
+.muted{color:var(--muted)} .small{font-size:12px}
+button,input,select,textarea{font:inherit;color:inherit}
+
+.app{display:flex;min-height:100vh}
+.side{width:236px;flex:0 0 236px;background:linear-gradient(180deg,var(--navy) 0%,var(--navy-3) 100%);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh}
+.brand{display:flex;gap:10px;align-items:center;padding:0 6px}
+.brand-mark{width:44px;height:44px;border-radius:12px;background:var(--gold);color:var(--navy);display:grid;place-items:center;box-shadow:0 6px 20px rgba(255,205,0,.25)}
+.brand-mark svg{width:30px;height:30px}
+.brand-title{font-size:20px;font-weight:800;text-transform:uppercase;line-height:1}
+.brand-sub{color:var(--gold);font-size:12px;font-weight:600;margin-top:3px}
+.nav{display:flex;flex-direction:column;gap:3px}
+.nav button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);font-weight:600}
+.nav button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.nav button.active{background:rgba(255,205,0,.12);color:var(--gold);box-shadow:inset 3px 0 0 var(--gold)}
+.nav .ico{width:18px;text-align:center}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px;padding:0 6px}
+#side-stats{font-size:12px;color:var(--text)}
+
+.main{flex:1;min-width:0;padding:24px 28px 60px}
+.view{display:none}
+.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1}}
+
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.page-head p{margin:4px 0 0;color:var(--muted)}
+
+/* hero */
+.hero{position:relative;border-radius:20px;overflow:hidden;min-height:250px;background:var(--navy) 60% 22%/cover no-repeat;display:flex;align-items:flex-end;margin-bottom:18px;border:1px solid var(--line)}
+.hero::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,17,32,.95) 0%,rgba(8,17,32,.7) 45%,rgba(8,17,32,.15) 100%)}
+.hero-inner{position:relative;padding:26px 28px;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;width:100%;flex-wrap:wrap}
+.eyebrow{color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+.hero h1{font-size:46px;line-height:1;margin:6px 0}
+.hero-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.tag{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.tag.gold{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.hero-stats{display:flex;gap:22px}
+.hero-stat .big{font-size:40px;font-weight:800;color:var(--gold);line-height:1}
+.hero-stat .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+
+/* cards */
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(170px,1fr));margin-bottom:14px}
+.card{background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.kpi .kpi-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600}
+.kpi .kpi-val{font-size:34px;font-weight:800;line-height:1.05;margin-top:6px}
+.kpi .kpi-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.up{color:var(--green)} .down{color:var(--red)} .flat{color:var(--muted)}
+.charts{grid-template-columns:repeat(12,1fr)}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}
+.chart-box{position:relative;height:260px}
+.chart-box.tall{height:320px}
+
+/* readiness ring */
+.ring{display:flex;align-items:center;gap:14px}
+.ring svg{width:76px;height:76px;flex:0 0 76px}
+
+/* segmented */
+.seg{display:inline-flex;background:var(--navy-3);border:1px solid var(--line);border-radius:10px;padding:3px}
+.seg button{all:unset;cursor:pointer;padding:6px 12px;border-radius:8px;font-weight:600;font-size:12px;color:var(--muted)}
+.seg button.on{background:var(--gold);color:var(--navy)}
+
+/* inputs */
+.input,select.input,textarea.input{background:var(--navy-3);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0;width:100%;outline:none}
+.input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,205,0,.15)}
+select.input{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 16px) 50%,calc(100% - 11px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:30px}
+.btn{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;font-weight:700;background:var(--gold);color:var(--navy);white-space:nowrap}
+.btn:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}
+.btn.danger{background:transparent;color:var(--red);border:1px solid rgba(255,107,107,.4)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.toolbar .input{width:auto}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{all:unset;cursor:pointer;padding:5px 11px;border-radius:999px;border:1px solid var(--line);font-size:12px;font-weight:600;color:var(--muted)}
+.chip.on{border-color:var(--gold);color:var(--gold);background:rgba(255,205,0,.08)}
+label.chk{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer}
+label.chk input{accent-color:var(--gold)}
+
+/* table */
+.table-wrap{overflow:auto;max-height:calc(100vh - 230px);border:1px solid var(--line);border-radius:var(--radius);background:var(--card)}
+table.data{border-collapse:separate;border-spacing:0;font-size:12.5px;min-width:100%}
+table.data th,table.data td{padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:right}
+table.data th{position:sticky;top:0;background:var(--navy);z-index:2;cursor:pointer;user-select:none;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:11px;letter-spacing:.04em}
+table.data th.grp{top:0;color:var(--gold);text-align:left;cursor:default;border-bottom:none}
+table.data thead tr:nth-child(2) th{top:31px}
+table.data th:hover{color:var(--text)}
+table.data th.sorted{color:var(--gold)}
+table.data td.txt,table.data th.txt{text-align:left}
+table.data td.wrap{white-space:normal;min-width:180px;max-width:280px}
+table.data .sticky{position:sticky;left:0;background:var(--navy-2);z-index:1;text-align:left}
+table.data th.sticky{z-index:3;background:var(--navy)}
+table.data tbody tr{cursor:pointer}
+table.data tbody tr:hover td{background:rgba(255,205,0,.05)}
+.p-top{background:rgba(255,205,0,.22)!important;color:#fff;font-weight:700}
+.p-hi{background:rgba(61,220,151,.13)}
+.p-lo{background:rgba(255,107,107,.12)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.dot.blue{background:var(--sky)}
+
+/* bests */
+.bests-grid{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.best{display:flex;flex-direction:column;gap:6px}
+.best .name{font-weight:700}
+.best .big{font-size:30px;font-weight:800;color:var(--gold);line-height:1}
+.best .row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.bar{height:6px;border-radius:6px;background:var(--navy-3);overflow:hidden}
+.bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--gold))}
+.spark{width:100%;height:34px}
+.group-title{margin:22px 0 10px;display:flex;align-items:center;gap:10px}
+.group-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+/* insights */
+.r-badge{font-family:"Barlow Condensed";font-size:40px;font-weight:800;line-height:1}
+.drivers{display:flex;flex-direction:column;gap:6px}
+.driver{display:grid;grid-template-columns:minmax(120px,1.3fr) 2fr 54px 40px;align-items:center;gap:10px;font-size:12.5px;cursor:pointer;padding:3px 4px;border-radius:6px}
+.driver:hover{background:rgba(255,255,255,.04)}
+.driver .track{height:10px;background:var(--navy-3);border-radius:6px;position:relative}
+.driver .track i{position:absolute;top:0;bottom:0;border-radius:6px}
+.driver .track::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:var(--line)}
+.recipe{width:100%;border-collapse:collapse;font-size:13px}
+.recipe td,.recipe th{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right}
+.recipe th{color:var(--muted);font-size:11px;text-transform:uppercase;text-align:right}
+.recipe td:first-child,.recipe th:first-child{text-align:left}
+.callout{background:rgba(0,198,215,.08);border:1px solid rgba(0,198,215,.25);border-radius:12px;padding:12px 14px;font-size:13px}
+
+/* form */
+.entry-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
+details.sec{background:linear-gradient(180deg,var(--card-2),var(--card));border:1px solid var(--line);border-radius:var(--radius);margin-bottom:12px}
+details.sec summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
+details.sec summary::-webkit-details-marker{display:none}
+details.sec summary::after{content:"+";font-size:20px;color:var(--gold)}
+details.sec[open] summary::after{content:"–"}
+details.sec .body{padding:0 16px 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field > span{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.field.wide{grid-column:1/-1}
+.field .unit{font-size:10px;color:var(--gold-2);margin-left:4px}
+.toggle{display:flex;gap:6px}
+.toggle button{all:unset;cursor:pointer;flex:1;text-align:center;padding:8px;border-radius:10px;border:1px solid var(--line);font-weight:700;font-size:12px;color:var(--muted)}
+.toggle button.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.scale{display:flex;gap:4px}
+.scale button{all:unset;cursor:pointer;flex:1;text-align:center;padding:7px 0;border-radius:8px;background:var(--navy-3);border:1px solid var(--line);font-weight:700;font-size:12px;color:var(--muted)}
+.scale button.on{background:var(--gold);color:var(--navy)}
+textarea.input{min-height:110px;resize:vertical}
+.sticky-panel{position:sticky;top:20px;display:flex;flex-direction:column;gap:12px}
+
+/* journal */
+.j-card{display:flex;flex-direction:column;gap:8px}
+.j-date{font-family:"Barlow Condensed";font-size:20px;font-weight:700;text-transform:uppercase}
+.j-text{white-space:pre-wrap}
+.mini{display:inline-flex;gap:4px;align-items:center;background:var(--navy-3);border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:11.5px;font-weight:600}
+.mini b{color:var(--gold)}
+
+/* timeline */
+.timeline{display:flex;flex-direction:column;gap:0;max-height:320px;overflow:auto;padding-right:6px}
+.tl{display:grid;grid-template-columns:70px 14px 1fr;gap:10px;align-items:start;padding:6px 0}
+.tl .d{color:var(--muted);font-size:12px;text-align:right}
+.tl .pin{width:10px;height:10px;border-radius:50%;background:var(--gold);margin-top:4px;box-shadow:0 0 0 3px rgba(255,205,0,.15)}
+.tl .pin.alt{background:var(--sky);box-shadow:0 0 0 3px rgba(79,163,227,.15)}
+
+/* heatmap */
+.heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:6px}
+.heat .col{display:flex;flex-direction:column;gap:3px}
+.heat .c{width:13px;height:13px;border-radius:3px;background:var(--navy-3);position:relative}
+.heat .c.lift::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--sky)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11.5px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+.dropzone{border:2px dashed rgba(255,205,0,.35);border-radius:var(--radius);padding:30px;text-align:center;cursor:pointer;transition:.2s}
+.dropzone.over,.dropzone:hover{background:rgba(255,205,0,.06);border-color:var(--gold)}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--gold);color:var(--navy);font-weight:700;padding:11px 18px;border-radius:12px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+@media (max-width:1100px){
+  .span-8,.span-7,.span-6,.span-5,.span-4{grid-column:span 12}
+  .entry-layout{grid-template-columns:1fr}
+  .sticky-panel{position:static}
+}
+@media (max-width:820px){
+  .app{flex-direction:column}
+  .side{position:sticky;top:0;z-index:20;width:100%;flex:none;height:auto;flex-direction:row;align-items:center;padding:10px 16px;gap:12px;overflow:hidden}
+  .brand-sub,.side-foot{display:none}
+  .brand-title{font-size:16px}
+  .brand-mark{width:34px;height:34px}.brand-mark svg{width:22px;height:22px}
+  .nav{flex-direction:row;overflow-x:auto;flex:1}
+  .nav button{padding:8px 10px;white-space:nowrap;font-size:13px}
+  .nav button.active{box-shadow:inset 0 -2px 0 var(--gold)}
+  .nav .ico{display:none}
+  .brand > div:last-child{display:none}
+  .main{padding:16px 16px 60px}
+  .hero h1{font-size:34px}
+  .hero-stat .big{font-size:30px}
+  .driver{grid-template-columns:1fr 1.2fr 46px}
+  .driver .n{display:none}
+  .table-wrap{max-height:none}
+}
+
+</style>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23182B49'/%3E%3Cpath d='M32 4l5 10h-3v14c6-1 9-6 9-14h-3l5-10 5 10h-3c0 12-6 19-13 20v26h-4V34c-7-1-13-8-13-20h-3l5-10 5 10h-3c0 8 3 13 9 14V14h-3z' fill='%23FFCD00'/%3E%3C/svg%3E">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="trident" viewBox="0 0 64 64"><path d="M32 4l5 10h-3v14c6-1 9-6 9-14h-3l5-10 5 10h-3c0 12-6 19-13 20v26h-4V34c-7-1-13-8-13-20h-3l5-10 5 10h-3c0 8 3 13 9 14V14h-3z" fill="currentColor"/></symbol>
+</svg>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="brand-mark"><svg><use href="#trident"/></svg></div>
+      <div>
+        <div class="brand-title">Triton Pitching Lab</div>
+        <div class="brand-sub">Brandon Jackel · RHP</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      <button data-view="dash" class="active"><span class="ico">◆</span>Dashboard</button>
+      <button data-view="log"><span class="ico">▤</span>Data Log</button>
+      <button data-view="bests"><span class="ico">★</span>Personal Bests</button>
+      <button data-view="insights"><span class="ico">⟋</span>Insights</button>
+      <button data-view="entry"><span class="ico">＋</span>Daily Entry</button>
+      <button data-view="journal"><span class="ico">✎</span>Journal</button>
+      <button data-view="data"><span class="ico">⇅</span>Import / Export</button>
+    </nav>
+    <div class="side-foot">
+      <div id="side-stats"></div>
+      <div class="muted small">Entries save in this browser. Use Import / Export to back up or move devices.</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section class="view active" id="v-dash"></section>
+    <section class="view" id="v-log"></section>
+    <section class="view" id="v-bests"></section>
+    <section class="view" id="v-insights"></section>
+    <section class="view" id="v-entry"></section>
+    <section class="view" id="v-journal"></section>
+    <section class="view" id="v-data"></section>
+  </main>
+</div>
+<div id="toast" class="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+// Seed data imported from "Data - 2026.csv" (3/24/26 - 11/9/26)
+window.SEED_CSV = "Date,Day of Week,notes ,Throw,throw location,Throwing ,Pitches,Sleep ,Time in bed,Time out of bed,REM,Deep ,Total Restorative,Bodyweight,HRV,Recovery Score,Strain,RHR,Calories,Protein,Carbs,Fats,Warmup Routine,Lift ,total throws,high effort throws,workload,averge torque,arm speed max,arm speed average,CP Velo Spread,CP Velo AVG,CP Velo Max,Pen Velo Spread,Pen Velo AVG,Pen Velo Max,Live velo spread,Live velo avg,live velo max,Live pitches,strikes,fb strikes rate,off strike rate,ABs,PPA,FPS,1-1 counts,1-1 wins,whiffs,swings,strike %,Arm Score,Total Strength Fresh,IR ,IR %,ER ,ER %,Scaption ,Scaption %,Grip two finger ,Grip %,Shoulder Balance,Primer ,Primer Accel,Primer Decel,Ratio,Post exam total,cmj camera,pull up m/s max,pull up m/s avg,Cmj force plates,CMJ/BW,CMJ Peak Force,RSI,RSI/ BW,Grip,Grip %,ISO 30 Left,ISO 30 Right,ISO Combined,ISO Combo/ weight,Noardboard ecc,Noard ecc/ weight,Hip Abd L,Hip Abd R,Hip Add L,Hip Add R\n3/24/26,Tuesday,first tj throws (45ft),TRUE,UCSD,51 (3x12@45),,8:10,,,1:11,1:51,3:02,199.2,174,92,,,,,,,\"UC Prime, PL Hurdles, arm care with crossover\",FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,82.48%,164.3,48.4,24.30%,44.2,22.19%,34.5,17.32%,37.2,18.67%,0.9132231405,68.4,38.5,29.9,77.66%,,,,,,,,,,,,,,,,,,,,,\n3/25/26,Wednesday,,FALSE,,,,6:02,,,0:57,1:57,2:54,200.4,181,90,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n3/26/26,Thursday,,TRUE,Monte Vista Football,51 (3x12@45),,7:35,,,1:13,1:51,3:04,200.4,158,62,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n3/27/26,Friday,,FALSE,,,,7:45,,,0:59,2:12,3:11,199.4,149,58,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n3/28/26,Saturday,,TRUE,Monte Vista JV,51 (3x12@45),,8:18,,,1:08,1:45,2:53,199,157,71,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n3/29/26,Sunday,,FALSE,,,,7:55,,,1:16,1:49,3:05,200,147,59,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n3/30/26,Monday,60ft,TRUE,UCSD,56 (3x12 @60),,7:58,,,0:46,2:02,2:48,200.2,148,61,,,,,,,Loma hurdle+ arm care,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,82.27%,164.7,46.3,23.13%,48,23.98%,35.9,17.93%,34.5,17.23%,1.036717063,72.4,42.2,30.2,71.56%,101%,,,,,,,,,,,,,,,,,,,,\n3/31/26,Tuesday,,FALSE,,,,6:43,,,0:51,1:53,2:44,199.8,186,88,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/1/26,Wednesday,,TRUE,Ucsd,56 (3x12 @60),,7:53,,,1:43,1:23,3:06,200,123,41,,,,,,,UCSD Prime + Arm Care,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,64.6,39.3,25.3,64.38%,,,,,47.7,0.2385,,0.81,0.41%,,,,,,,,,,,,\n4/2/26,Thursday,,FALSE,,,,6:33,,,0:47,1:34,2:21,200.6,140,54,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/3/26,Friday,,TRUE,Ucsd,56 (3x12 @ 60),,6:37,,,0:52,2:10,3:02,200.4,170,80,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,68.3,40.3,28,69.48%,,,,,,,,,,,,,,,,,,,,,\n4/4/26,Saturday,,FALSE,,,,7:26,,,1:12,1:55,3:07,201.6,128,45,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/5/26,Sunday,,FALSE,,,,7:05,,,1:01,2:01,3:02,201.6,153,67,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/6/26,Monday,75 ft,TRUE,Ucsd,56 (3x12 @75),,7:45,,,1:17,2:13,3:30,199.8,120,43,,,,,,,ARM CARE+ Hurdle +Prime,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,83.63%,167.1,45.7,22.87%,45.9,22.97%,38.2,19.12%,37.3,18.67%,1.004376368,64.1,37.7,26.4,70.03%,93%,,,,,,,,,,,,,,,,,,,,\n4/7/26,Tuesday,,FALSE,,,,7:31,,7:45,1:27,1:32,2:59,200.8,149,70,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/8/26,Wednesday,,TRUE,ucsd,56 (3x12 @75),,7:52,,,1:31,1:51,3:22,200.6,136,54,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.8,0.2432701894,,0.73,0.36%,,,530,620,575,2.87,,,,,,\n4/9/26,Thursday,,FALSE,,,,7:17,,,1:07,1:45,2:52,200.8,196,87,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/10/26,Friday,,TRUE,ucsd,56 (3x12 @75),,8:14,,,1:14,1:49,3:03,201.6,144,56,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/11/26,Saturday,,FALSE,,,,8:29,,,1:35,1:56,3:31,200.6,187,86,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/12/26,Sunday,90ft,TRUE,steele baseball ,56 (3x12 @90),,7:46,,,0:54,1:56,2:50,200.8,137,54,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,81.23%,163.1,45.9,22.86%,48.7,24.25%,34.1,16.98%,34.4,17.13%,1.061002179,,,,,99%,,,,,,,,,,,,,,,,,,,,\n4/13/26,Monday,,FALSE,,,,7:33,10:15,8:15,1:36,1:59,3:35,200.6,148,65,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/14/26,Tuesday,,TRUE,SDSU,56 (3x12@90),,8:10,9:28,7:45,1:50,1:49,3:39,202.4,161,75,,,,,,,Prime and arm care,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/15/26,Wednesday,,FALSE,,,,7:25,11:35,8:15,1:27,1:38,3:05,200.8,136,55,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.3,0.2405378486,,0.75,0.37%,133.6,66.53%,523,633,578,2.88,,,,,,\n4/16/26,Thursday,,TRUE,UCSD,56 (3x12@90),,7:31,10:15,7:45,1:25,1:48,3:13,201.8,136,54,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/17/26,Friday,,FALSE,,,,8:39,9:12,7:50,1:50,1:52,3:42,200.8,137,58,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.6,0.2370517928,,0.81,0.40%,137.2,68.33%,,,,,,,,,,\n4/18/26,Saturday,105ft,TRUE,UCSD,56 (3x12@105),,7:02,11:45,7:50,1:03,1:48,2:51,201.4,172,80,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,86.35%,173.9,51.2,25.42%,50.4,25.02%,34.1,16.93%,38.2,18.97%,0.984375,,,,,95%,,,,,,,,,139.2,69.12%,,,,,,,,,,\n4/19/26,Sunday,,FALSE,,,,7:17,10:30,7:30,1:08,2:37,3:45,201.4,149,67,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,45.5,0.22591857,,0.73,0.36%,,,,,,,,,,,,\n4/20/26,Monday,,TRUE,UCSD,56 (3x12 @ 105),,8:55,10:00,8:00,2:08,1:56,4:04,202.6,152,61,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,140.4,69.30%,,,,,,,,,,\n4/21/26,Tuesday,,FALSE,,,,7:38,9:30,7:30,1:03,1:55,2:58,204,169,85,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/22/26,Wednesday,,TRUE,ucsd,56 (3x12 @105),,7:17,12:01,8:45,1:24,1:49,3:13,201.8,152,64,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.5,0.2353815659,,0.78,0.39%,142.4,70.56%,550,580,565,2.80,,,,,,\n4/23/26,Thursday,,FALSE,,,,8:16,10:00,8:30,1:16,1:49,3:05,200.8,131,45,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/24/26,Friday,120ft,TRUE,ucsd,56 (3x12 @120),,7:29,10:00,7:45,1:00,1:46,2:46,201.8,132,46,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,82.36%,166.2,48.5,24.03%,46.6,23.09%,35.4,17.54%,35.7,17.69%,0.9608247423,,,,,104%,,,,,,,,,145.2,71.95%,,,,,,,,,,\n4/25/26,Saturday,,FALSE,,,,6:37,11:30,7:45,0:47,2:00,2:47,202.4,195,86,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.9,0.2366600791,,0.79,0.39%,,,,,,,,,,,,\n4/26/26,Sunday,,TRUE,ucsd,56 (3x12 @120),,7:01,11:00,7:45,1:12,2:17,3:29,201.8,160,62,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,69.7,40.5,29.2,72.10%,,,,,,,,,,,,,,,,,,,,,\n4/27/26,Monday,,FALSE,,,,7:51,,,1:05,2:05,3:10,200.8,179,81,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n4/28/26,Tuesday,,TRUE,ucsd,56 (3x12 @120),,7:56,10:00,7:45,1:32,1:53,3:25,200.2,166,72,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,152.8,76.32%,,,,,,,,,,\n4/29/26,Wednesday,,FALSE,,,,7:55,11:00,8:45,1:44,1:54,3:38,201.8,178,72,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,562,602,582,2.88,,,,,,\n4/30/26,Thursday,start of 2 on 1 off,TRUE,ucsd,56 (3x12 @60),,7:37,10:30,8:45,1:25,1:30,2:55,202.2,168,68,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,38,,,,,,,,,,,,,,,,,,,,,,,\n5/1/26,Friday,,TRUE,,44 (2x12 @150),,8:23,,,1:52,1:34,3:26,201,153,59,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,93.03%,187,49.3,24.53%,52.9,26.32%,38.2,19.00%,46.6,23.18%,1.073022312,,,,,96%,,,,,,,,,148.2,73.73%,,,,,,,,,,\n5/2/26,Saturday,,FALSE,,,,8:02,,,0:47,1:56,2:43,200.4,177,83,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/3/26,Sunday,,TRUE,vdo ll,56 (3x12 @60),,7:55,11:15,9:30,1:07,1:54,3:01,199.2,176,79,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/4/26,Monday,,TRUE,ucsd,44 (2x12 @150),,7:34,10:00,7:45,0:51,1:48,2:39,200,131,41,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,136.2,68.10%,,,,,,,,,,\n5/5/26,Tuesday,,FALSE,,,,8:37,10:00,9:00,1:47,2:08,3:55,202.2,167,72,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/6/26,Wednesday,,TRUE,ucsd,56 (3x12 @60),,7:21,11:15,8:30,1:12,2:14,3:26,202.8,194,88,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.7,0.2352071006,,0.76,0.37%,,,558,585,571.5,2.82,,,,,,\n5/7/26,Thursday,,TRUE,steele,44 (2x12 @150),,7:14,10:00,7:20,1:33,1:39,3:12,201.8,177,77,,,,,,,,FALSE,,,,,,,68-73,69.7,73,,,,,,,,,,,,,,,,,,,86.27%,174.1,55.7,27.60%,51.7,25.62%,34,16.85%,32.7,16.20%,0.9281867145,,,,,99%,,,,,,,,,,,,,,,,,,,,\n5/8/26,Friday,,FALSE,,,,8:39,10:00,9:00,1:04,1:37,2:41,202,167,64,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/9/26,Saturday,,TRUE,Steele,56 (3x12 @60),,8:19,11:00,9:00,1:39,1:58,3:37,202.2,196,86,,,,,,,,FALSE,,,,,,,60-63,61.4,66,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/10/26,Sunday,,TRUE,Steele,44 (2x12 @150),,7:17,1:00,9:00,1:21,2:16,3:37,202.4,180,73,,,,,,,,FALSE,,,,,,,68-71,68.8,71,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/11/26,Monday,start new training block,FALSE,,,,7:19,11:00,8:30,0:40,2:05,2:45,202.4,142,44,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/12/26,Tuesday,,TRUE,ucsd,56 (3x12 @60),,8:25,10:30,8:45,1:26,2:03,3:29,202.4,183,82,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/13/26,Wednesday,,TRUE,ucsd,44 (2x12 @180),,7:16,,,1:03,1:30,2:33,200.8,160,58,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,84.46%,169.6,53.1,26.44%,46.6,23.21%,31.9,15.89%,38,18.92%,0.8775894539,,,,,,,,,46,0.2290836653,,0.73,0.36%,134.2,66.83%,,,,,,,,,,\n5/14/26,Thursday,,FALSE,,,,8:13,10:30,9:00,1:36,1:47,3:23,202.8,175,71,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/15/26,Friday,,TRUE,ucsd,56 (3x12 @60),,7:44,11:30,8:45,1:14,1:43,2:57,205,160,57,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/16/26,Saturday,,TRUE,ucsd,44 (2x12 @180),,7:39,,,0:54,1:52,2:46,204.2,165,63,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,80.85%,165.1,49.2,24.09%,48.3,23.65%,32.7,16.01%,34.9,17.09%,0.9817073171,,,,,,,,,,,,,,,,,,,,,,,,,\n5/17/26,Sunday,,FALSE,,,,8:20,11:00,9:00,1:54,1:53,3:47,202.4,174,79,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/18/26,Monday,,TRUE,ucsd,56 (3x12 @60),,8:34,,,1:12,1:49,3:01,203.4,141,48,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/19/26,Tuesday,,TRUE,ucsd,44 (2x12 @180),,8:20,10:30,8:45,1:24,1:40,3:04,202.4,182,80,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/20/26,Wednesday,conference tourney,FALSE,,,,6:09,,,0:49,1:43,2:32,,204,94,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/21/26,Thursday,,TRUE,UC irvine,56 (3x12 @60),,7:04,,,1:04,2:02,3:06,,158,56,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/22/26,Friday,,TRUE,uc irvine,44 (2x12 @180),,7:41,,,1:31,2:18,3:49,,166,67,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/23/26,Saturday,,TRUE,uc irvine,32 (1x12@ 60),,6:40,,,1:05,2:11,3:16,,184,79,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/24/26,Sunday,last night conference ,FALSE,,,,6:57,,,1:15,2:16,3:31,,148,48,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/25/26,Monday,,TRUE,,56 (3x12 @60),,7:10,,,0:53,1:45,2:38,200.6,140,45,,,,,,,,TRUE,,,,,,,61-65,,66,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/26/26,Tuesday,,TRUE,,44 (2x12 @180),,6:45,,,1:20,1:34,2:54,202.4,143,49,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/27/26,Wednesday,,TRUE,,32 (1x12@ 60),,8:24,,,1:21,1:47,3:08,201.6,89,16,,,,,,,,TRUE,,,,,,,77-80,,80,,,,,,,,,,,,,,,,,,,90.33%,182.1,52.2,25.89%,53.2,26.39%,37.2,18.45%,39.5,19.59%,1.019157088,,,,,,,,,,,,,,151.6,75.20%,,,,,,,,,,\n5/28/26,Thursday,,FALSE,,,,8:10,,,1:16,1:46,3:02,203.4,189,88,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/29/26,Friday,,TRUE,,56 (3x12 @60),,7:20,,,1:17,1:58,3:15,201.6,170,70,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/30/26,Saturday,,TRUE,,44 (2x12 @180),,8:38,,,1:43,2:03,3:46,202.2,153,64,,,,,,,,FALSE,,,,,,,70-74,72.1,76,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n5/31/26,Sunday,,TRUE,,32 (1x12@ 60),,7:24,,,0:47,1:49,2:36,201.6,142,54,,,,,,,,FALSE,,,,,,,77-78,77.6,78,,,,,,,,,,,,,,,,,,,86.61%,174.6,52.3,25.94%,51.5,25.55%,35.5,17.61%,35.3,17.51%,0.9847036329,,,,,,,,,,,,,,143.4,71.13%,,,,,,,,,,\n6/1/26,Monday,,FALSE,,,,7:50,,,1:48,1:36,3:24,201.4,143,57,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/2/26,Tuesday,,TRUE,,56 (3x12 @60),,7:38,,,0:53,1:44,2:37,202,145,55,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/3/26,Wednesday,,TRUE,,44 (2x12 @180),,8:03,,,1:30,2:32,4:02,201.6,152,64,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/4/26,Thursday,,TRUE,,32 (1x12@ 60),,8:01,,,1:11,2:13,3:24,202.2,153,58,,,,,,,,FALSE,,,,,,,77-80,78.8,80,,,,,,,,,,,,,,,,,,,87.98%,177.9,54.3,26.85%,50.4,24.93%,35.8,17.71%,37.4,18.50%,0.9281767956,,,,,,,,,,,,,,148.4,73.39%,,,,,,,,,,\n6/5/26,Friday,,FALSE,,,,8:28,,,0:53,2:06,2:59,201.6,84,19,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/6/26,Saturday,,TRUE,,56 (3x12 @60),,8:05,,,1:25,1:42,3:07,203.6,140,55,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/7/26,Sunday,,TRUE,,44 (2x12 @180),,7:36,,,1:49,1:49,3:38,202.2,142,60,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/8/26,Monday,,TRUE,,32 (1x12@ 60),,6:00,,,0:58,2:22,3:20,201,162,72,,,,,,,,TRUE,,,,,,,81-84,81.4,84,,,,,,,,,,,,,,,,,,,88.51%,177.9,50.4,25.07%,54.2,26.97%,35.6,17.71%,37.7,18.76%,1.075396825,,,,,,,,,49.1,0.244278607,,0.65,0.32%,129.4,64.38%,,,,,,,,,,\n6/9/26,Tuesday,,FALSE,,,,7:52,,,1:01,1:58,2:59,204.2,163,77,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/10/26,Wednesday,,TRUE,,56 (3x12 @60),,7:42,,,1:30,1:29,2:59,203.2,128,48,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/11/26,Thursday,,TRUE,,44 (2x12 @180),,7:43,,,1:03,1:47,2:50,203,158,71,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/12/26,Friday,,TRUE,,32 (1x12@ 60),,7:07,,,0:52,1:40,2:32,202,146,61,,,,,,,,TRUE,,,,,,,81-83,81.9,83,,,,,,,,,,,,,,,,,,,87.67%,177.1,53.5,26.49%,51.8,25.64%,37.1,18.37%,34.7,17.18%,0.9682242991,,,,,,,,,,,,,,130,64.36%,,,,,,,,,,\n6/13/26,Saturday,,FALSE,,,,7:09,,,1:07,1:48,2:55,203.4,170,84,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/14/26,Sunday,,TRUE,,56 (3x12 @60),,7:45,,,1:35,1:22,2:57,201.6,137,48,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/15/26,Monday,,TRUE,,44 (2x12 @180),,6:52,,,1:01,1:54,2:55,202.2,136,47,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/16/26,Tuesday,Last day throwing ,TRUE,,32 (1x12@ 60),,6:45,,,0:52,1:42,2:34,203,150,66,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,85.27%,173.1,53.5,26.35%,50.4,24.83%,35.3,17.39%,33.9,16.70%,0.9420560748,,,,,,,,,,,,,,,,,,,,,,,,,\n6/17/26,Wednesday,,FALSE,,,,7:54,,,1:15,1:36,2:51,202.8,159,76,,,3250,240,365,90,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/18/26,Thursday,,FALSE,,,,7:57,,,0:59,1:22,2:21,202.8,128,40,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/19/26,Friday,,FALSE,,,,6:42,,,1:17,1:31,2:48,198.4,179,81,,,3150,205,360,90,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/20/26,Saturday,,FALSE,,,,8:41,,,1:11,1:49,3:00,202,145,64,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/21/26,Sunday,,FALSE,,,,7:29,,,1:06,1:43,2:49,203.8,171,78,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/22/26,Monday,,FALSE,,,,7:58,,,1:44,1:48,3:32,203.2,147,64,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/23/26,Tuesday,,FALSE,,,,6:54,,,1:04,1:55,2:59,,157,75,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/24/26,Wednesday,,FALSE,,,,8:00,,,1:19,1:26,2:45,203,134,50,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/25/26,Thursday,,FALSE,,,,7:24,,,1:00,1:46,2:46,203,150,70,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/26/26,Friday,,FALSE,,,,7:29,,,1:25,1:39,3:04,203.4,155,74,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/27/26,Saturday,,FALSE,,,,8:30,,,1:53,2:08,4:01,203.2,176,87,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/28/26,Sunday,,FALSE,,,,7:43,,,1:18,1:53,3:11,201.8,159,75,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/29/26,Monday,,FALSE,,,,8:30,,,1:43,1:34,3:17,201.2,89,26,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n6/30/26,Tuesday,,FALSE,,,,7:16,,,1:21,2:00,3:21,202.4,143,62,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/1/26,Wednesday,,FALSE,,,,7:45,,,1:33,1:44,3:17,200.8,153,73,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/2/26,Thursday,,FALSE,,,,8:54,,,2:14,2:02,4:16,201,130,55,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/3/26,Friday,,FALSE,,,,6:09,,,1:02,1:49,2:51,200.8,139,59,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/4/26,Saturday,,FALSE,,,,6:45,,,0:46,1:57,2:43,199.2,184,82,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/5/26,Sunday,,FALSE,,,,7:28,,,1:37,2:33,4:10,200.4,138,57,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/6/26,Monday,,FALSE,,,,7:26,,,1:34,2:12,3:46,203.2,118,43,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/7/26,Tuesday,,FALSE,,,,7:29,,,1:05,2:05,3:10,203.2,141,63,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/8/26,Wednesday,,FALSE,,,,7:46,,,1:13,1:53,3:06,199.2,101,29,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/9/26,Thursday,,FALSE,,,,8:22,,,1:09,2:08,3:17,199.2,116,44,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/10/26,Friday,,FALSE,,,,8:38,,,1:09,1:48,2:57,199,78,22,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/11/26,Saturday,,FALSE,,,,4:49,,,0:18,1:39,1:57,,150,58,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/12/26,Sunday,,FALSE,,,,8:12,,,0:40,2:16,2:56,200.2,111,48,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/13/26,Monday,,TRUE,,,,8:35,,,1:16,1:40,2:56,199,90,20,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/14/26,Tuesday,,TRUE,,,,7:44,,,1:06,2:04,3:10,199.4,137,62,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,90.27%,180,56.6,28.39%,53.7,26.93%,35.8,17.95%,33.9,17.00%,0.9487632509,,,,,,,,,,,,,,,,,,,,,,,,,\n7/15/26,Wednesday,,FALSE,,,,7:36,,,1:07,2:11,3:18,201.6,134,66,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/16/26,Thursday,vacation flight to seattle,TRUE,,,,3:08,,,0:29,1:32,2:01,,140,22,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/17/26,Friday,first day on boat,TRUE,,,,7:25,,,1:35,2:19,3:54,,139,63,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/18/26,Saturday,sea day,FALSE,,,,5:45,,,0:39,2:11,2:50,,132,44,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/19/26,Sunday,juneau,TRUE,,,,5:06,,,0:45,1:38,2:23,,113,24,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/20/26,Monday,skagway,TRUE,,,,4:46,,,0:53,1:56,2:49,,137,29,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/21/26,Tuesday,glacier,FALSE,,,,4:31,,,0:27,1:45,2:12,,140,29,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/22/26,Wednesday,sitka,TRUE,,,,4:57,,,0:18,1:47,2:05,,176,51,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/23/26,Thursday,icy strait,TRUE,,,,6:29,,,1:10,1:22,2:32,,96,28,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/24/26,Friday,ketchikan,FALSE,,,,5:05,,,0:32,1:30,2:02,,147,34,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/25/26,Saturday,sea day,FALSE,,,,5:31,,,0:26,1:33,1:59,,160,63,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/26/26,Sunday,victoria,TRUE,,,,6:53,,,0:58,1:43,2:41,,91,26,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/27/26,Monday,flight home from seattle,FALSE,,,,3:39,,,0:15,1:54,2:09,,118,16,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/28/26,Tuesday,,TRUE,,,,7:27,,,1:11,1:52,3:03,199,98,35,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/29/26,Wednesday,,TRUE,,,,8:05,,,1:12,1:58,3:10,198.6,58,16,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,90.28%,179.3,59.4,29.91%,51.5,25.93%,34.1,17.17%,34.3,17.27%,0.867003367,,,,,,,,,,,,,,128.6,64.75%,,,,,,,,,,\n7/30/26,Thursday,,FALSE,,,,8:28,,,1:38,1:25,3:03,199.2,88,41,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n7/31/26,Friday,,TRUE,,60,,8:31,,,1:05,1:50,2:55,199.6,108,57,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,49.8,0.249498998,,0.72,0.36%,,,,,,,,,,,,\n8/1/26,Saturday,,TRUE,,150,,8:50,,,1:50,1:57,3:47,199.4,130,75,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/2/26,Sunday,,FALSE,,,,7:52,,,1:08,1:35,2:43,200.6,89,45,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/3/26,Monday,,TRUE,ucsd,60,,7:12,,,1:20,1:47,3:07,199.6,115,66,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,49.2,0.246492986,,0.71,0.36%,,,,,,,,,,,,\n8/4/26,Tuesday,,TRUE,ucsd,nelly,,7:52,,,1:07,2:13,3:20,199.4,125,76,,,,,,,,FALSE,,,,,,,80-84,82.3,84,,,,,,,,,,,,,,,,,,,88.16%,175.8,59.5,29.84%,49.9,25.03%,33.9,17.00%,32.5,16.30%,0.8386554622,,,,,,,,,,,,,,,,,,,,,,,,,\n8/5/26,Wednesday,,FALSE,,,,8:18,,,1:30,1:27,2:57,199.4,89,39,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/6/26,Thursday,,TRUE,ucsd spanos,60,,7:31,,,1:42,1:53,3:35,199.4,88,34,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/7/26,Friday,,TRUE,ucsd spanos,150,,7:57,,,1:34,1:56,3:30,200.8,118,66,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,125.4,62.45%,,,,,,,,,,\n8/8/26,Saturday,,FALSE,,,,6:08,,,0:33,1:49,2:22,201.6,130,70,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/9/26,Sunday,,TRUE,ucsd,light ,,5:29,,,0:37,1:56,2:33,,128,61,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/10/26,Monday,,TRUE,ucsd,nelly,,8:37,,,1:31,2:12,3:43,201.8,104,48,,,,,,,,TRUE,,,,,,,,,,82-86,,86,,,,,,,,,,,,,,,,88.60%,178.8,57.6,28.54%,51.6,25.57%,36,17.84%,33.6,16.65%,0.8958333333,,,,,,,,,,,,,,,,,,,,,,,,,\n8/11/26,Tuesday,,FALSE,,,,8:02,,,0:59,2:19,3:18,202.8,140,84,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/12/26,Wednesday,,TRUE,spanos,light,,7:54,,,1:25,1:35,3:00,199.8,125,69,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/13/26,Thursday,,TRUE,spanos,long toss,,7:16,,,1:19,2:01,3:20,200.4,123,63,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/14/26,Friday,,FALSE,,,,7:26,,,0:42,1:43,2:25,199,87,30,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/15/26,Saturday,,TRUE,steele,light,,7:17,,,0:54,1:30,2:24,,113,49,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/16/26,Sunday,,TRUE,bullpen @ucsd,bullpen,25,7:31,,,1:11,2:01,3:12,201,114,52,,,,,,,,FALSE,,,,,,,,,,82-85,,85,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/17/26,Monday,,FALSE,,,,6:51,,,1:25,2:06,3:31,200.6,122,69,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,51.7,0.2577268195,,0.7,0.35%,,,,,,,,,,,,\n8/18/26,Tuesday,,TRUE,spanos,light,,8:12,,,1:14,1:59,3:13,199.6,126,69,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/19/26,Wednesday,,TRUE,spanos,light,,7:19,,,1:18,1:50,3:08,197.6,109,50,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/20/26,Thursday,,TRUE,bullpen @ucsd,bullpen,25,8:03,,,1:14,1:45,2:59,199.8,121,71,,,,,,,,FALSE,,,,,,,,,,84-86,85.07,86,,,,,,,,,,,,,,,,89.24%,178.3,54.8,27.43%,52.7,26.38%,35.5,17.77%,35.3,17.67%,0.9616788321,,,,,,,,,,,,,,,,,,,,,,,,,\n8/21/26,Friday,,FALSE,,,,6:39,,,1:14,1:42,2:56,201,119,66,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/22/26,Saturday,,TRUE,,,,7:50,,,1:02,1:37,2:39,201.2,119,66,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/23/26,Sunday,,TRUE,,,,7:02,,,1:12,1:41,2:53,200.2,158,94,,,,,,,,FALSE,,,,,,,75-80,77.4,80,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/24/26,Monday,,FALSE,,,,7:22,,,0:59,1:58,2:57,200.6,110,55,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,47.4,0.2362911266,,0.75,0.37%,,,,,,,,,,,,\n8/25/26,Tuesday,,TRUE,,,,7:28,,,1:19,1:38,2:57,199.6,139,83,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/26/26,Wednesday,bullpen,TRUE,garretts,bullpen,,6:37,,,1:16,1:36,2:52,,114,61,,,,,,,,TRUE,,,,,,,,,,85-86,85.4,86,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/27/26,Thursday,,FALSE,,,,8:39,,,1:47,1:52,3:39,199.6,144,86,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/28/26,Friday,,TRUE,spanos,,,7:19,,,0:40,1:27,2:07,201.4,101,46,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/29/26,Saturday,,TRUE,steele,LT/flat ground,,7:38,,,1:17,1:45,3:02,201.6,119,67,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/30/26,Sunday,,FALSE,,,,8:21,,,1:54,2:02,3:56,203.2,122,65,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n8/31/26,Monday,,TRUE,,,,7:46,,,1:10,1:34,2:44,202.2,117,67,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,48.8,0.2413452028,,0.71,0.35%,,,560,590,575,2.84,,,,,,\n9/1/26,Tuesday,,FALSE,,,,7:34,,,1:12,1:35,2:47,199.8,116,65,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/2/26,Wednesday,bullpen,TRUE,ucsd bullpen,FB only pen,16,7:23,,,0:56,2:05,3:01,200.2,111,59,,,,,,,,TRUE,,,,,,,,,,88-90,89,90,,,,,,,,,,,,,,,,89.81%,179.8,58.1,29.02%,53.4,26.67%,32.6,16.28%,35.7,17.83%,0.9191049914,,,,,,,,,,,,,,,,,,,,,,,,,\n9/3/26,Thursday,cookie day,FALSE,,,,6:57,,,1:09,1:56,3:05,200.4,141,84,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/4/26,Friday,silverstrand,TRUE,spanos field,,,6:47,,,1:20,1:29,2:49,198.6,134,78,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/5/26,Saturday,,TRUE,garrett's,,,5:48,,,0:18,2:00,2:18,198.4,109,47,,,,,,,,FALSE,,,,,,,81-82,81,85,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/6/26,Sunday,,FALSE,,,,6:53,,,0:32,1:39,2:11,199.8,106,46,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/7/26,Monday,deload week,TRUE,ucsd ,,,5:58,,,0:41,1:50,2:31,201.4,127,69,,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/8/26,Tuesday,,FALSE,,,,8:31,,,1:38,2:05,3:43,200,134,86,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/9/26,Wednesday,bullpen,TRUE,ucsd game mound,bullpen,24,6:45,,,1:09,1:31,2:40,202.2,141,89,18.1,,,,,,,TRUE,,,,,,,,,,88-89,88.5,89,,,,,,,,,,,,,,,,88.38%,178.7,56,27.70%,54.1,26.76%,36.5,18.05%,32.1,15.88%,0.9660714286,,,,,,,,,,,,,,,,,,,,,,,,,\n9/10/26,Thursday,,FALSE,,,,8:02,,,0:56,1:51,2:47,201.2,170,94,10.6,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/11/26,Friday,,TRUE,spanos field,,,6:49,,,0:49,2:02,2:51,200.4,138,77,14.8,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/12/26,Saturday,,TRUE,Garretts,Lt/ mound cp,,8:50,,,1:36,1:45,3:21,200.8,141,80,9.8,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/13/26,Sunday,,FALSE,,,,6:28,,,0:59,1:52,2:51,200.6,110,45,9.1,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/14/26,Monday,,TRUE,Ucsd,Light,,7:24,,,0:59,1:42,2:41,201.6,112,47,12.4,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/15/26,Tuesday,,TRUE,Ucsd game mound,Bullpen,24,6:51,,,0:32,1:47,2:19,203.2,107,41,14.3,,,,,,,FALSE,,,,,,,,,,89-91,90.3,91,,,,,,,,,,,,,,,,95.23%,193.5,55.4,27.26%,60.4,29.72%,38.9,19.14%,38.8,19.09%,1.090252708,,,,,,,,,,,,,,,,,,,,,,,,,\n9/16/26,Wednesday,,FALSE,,,,7:46,,,1:40,1:47,3:27,204.2,121,53,16.9,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,51,,,,,,,,,,,,,,,,,,,\n9/17/26,Thursday,,TRUE,,180 light w flat,,7:14,,,1:25,1:44,3:09,202.4,160,88,15.7,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/18/26,Friday,,TRUE,ucsd,touch n feel,18,7:50,,,1:50,2:03,3:53,202.2,123,58,13.3,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,90.26%,182.5,59.5,29.43%,54,26.71%,34.1,16.86%,34.9,17.26%,0.9075630252,,,,,,52.5,,,,,,,,,,,,,,,,,,,\n9/19/26,Saturday,,FALSE,,,,5:42,,,1:17,1:54,3:11,204.4,153,72,15.3,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/20/26,Sunday,,FALSE,,,,6:34,,,1:00,2:24,3:24,202.2,144,68,9.2,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/21/26,Monday,,TRUE,ucsd,touch n feel,18,6:30,,,0:47,1:50,2:37,201.2,137,66,18.1,,,,,,,TRUE,,,,,,,,,,81-84,,84,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.2,,,,,,,,,,,,,,,,,,,\n9/22/26,Tuesday,,FALSE,,,,7:19,,,1:13,1:18,2:31,,140,65,7.5,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/23/26,Wednesday,,TRUE,ucsd,180 with flat,,5:47,,,1:19,2:05,3:24,203,131,56,17.8,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.8,,,,,,,,,,,,,,,,,,,\n9/24/26,Thursday,first live abs 10am,TRUE,ucsd,live abs,20,7:15,,,1:27,2:13,3:40,204,146,77,15.1,,,,,,,FALSE,,,,,,,,,,,,,89-92,90.63,92,19,12,,,,,,,,,,63.16%,91.13%,185.9,59.3,29.07%,56.2,27.55%,33.3,16.32%,37.1,18.19%,0.9477234401,,,,,,,,,,,,,,,,,,,,,,,,,\n9/25/26,Friday,,FALSE,,,,8:27,,,1:26,2:10,3:36,204.4,142,67,18.4,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52.4,,,,,,,,,,,,,,,,,,,\n9/26/26,Saturday,,TRUE,,,,7:14,,,1:12,1:33,2:45,202.2,159,88,7.7,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/27/26,Sunday,,FALSE,,,,5:56,,,1:05,1:30,2:35,203.6,96,28,6.4,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/28/26,Monday,lift before throw,TRUE,ucsd bullpen ,touch n feel,12,6:47,,,0:37,1:46,2:23,203.4,137,63,17.6,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,84.56%,172,46.6,22.91%,54.9,26.99%,35,17.21%,35.5,17.45%,1.178111588,,,,,,50,,,,,,,,,,,,,,,,,,,\n9/29/26,Tuesday,,FALSE,,,,8:00,,,1:10,1:42,2:52,203.6,131,58,4.7,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n9/30/26,Wednesday,2nd lives 4pm,TRUE,ucsd,live abs,,6:38,,,1:08,1:25,2:33,204,137,65,15,,,,,,,FALSE,,,,,,,,,,,,,90-92,91,92,16,10,,,,,,,,,,62.50%,88.77%,181.1,53.7,26.32%,56,27.45%,37.2,18.24%,34.2,16.76%,1.04283054,,,,,98,,,,,,,,,,,,,,,,,,,,\n10/1/26,Thursday,,FALSE,,,,6:43,,,1:31,1:50,3:21,204.4,166,87,16.2,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52.3,,,,,,,,,,,,,,,,,,,\n10/2/26,Friday,,TRUE,ucsd,light toss,,7:27,,,0:53,2:11,3:04,204.6,126,51,17.8,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.2,,,,,,,,,,,,,,,,,,,\n10/3/26,Saturday,,TRUE,garretts,medium intent,,7:10,,,1:26,1:28,2:54,204.2,131,60,8.2,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/4/26,Sunday,,FALSE,,,,7:08,,,1:17,1:59,3:16,203.2,120,50,7.1,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/5/26,Monday,,TRUE,ucsd,120 air under,,6:38,,,1:17,1:46,3:03,203.2,111,41,16.9,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/6/26,Tuesday,,TRUE,ucsd,bullpen,20,5:46,,,0:19,1:34,1:53,203.6,127,48,14.8,,,,,,,FALSE,,,,,,,,,,81-86,83,86,,,,,,,,,,,,,,,,97.89%,199.3,54.9,26.96%,65.1,31.97%,41,20.14%,38.3,18.81%,1.18579235,,,,,,,,,,,,,,,,,,,,,,,,,\n10/7/26,Wednesday,,FALSE,,,,6:15,,,0:25,1:40,2:05,205,131,57,18.8,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/8/26,Thursday,,TRUE,ucsd,60 lighr,,7:16,,,1:08,2:06,3:14,205,143,76,8.7,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/9/26,Friday,,TRUE,ucsd,scrimmage,13,7:06,,,1:00,2:15,3:15,203.4,97,30,18,,,,,,,FALSE,,,,,,,,,,,,,90-92,91,91.6,13,9,7/8,2/5,3,4.333333333,3,,,,,69.23%,91.74%,186.6,60.3,29.65%,57.4,28.22%,35.7,17.55%,33.2,16.32%,0.951907131,,,,,98,,,,,,,,,,,,,,,,,,,,\n10/10/26,Saturday,,FALSE,,,,5:05,,,0:33,1:26,1:59,203.8,163,60,13.3,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,49.5,,,,,,,,,,,,,,,,,,,\n10/11/26,Sunday,,FALSE,,,,6:27,,,0:55,1:51,2:46,203.8,123,55,5.7,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/12/26,Monday,,TRUE,Ucsd,Light 60,,7:14,10:00,7:30,1:16,1:48,3:04,,133,69,19.5,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52.5,0.53,0.51,,,,,,,,,,,,,,,,,\n10/13/26,Tuesday,,TRUE,ucsd ,bullpen,20,6:37,10:00,7:30,1:26,1:53,3:19,205,140,67,16.6,,,,,,,TRUE,,,,,,,,,,84-86,85.17,86.3,,,,,,,,,,,,,,,,88.15%,180.7,51.6,25.17%,56.8,27.71%,35.3,17.22%,37,18.05%,1.100775194,,,,,,53.6,0.47,0.43,,,,,,,,,,,,,,,,,\n10/14/26,Wednesday,,FALSE,,,,7:40,10:00,7:30,1:25,2:09,3:34,205,113,44,15,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,53.8,0.54,0.51,,,,,,,,,,,,,,,,,\n10/15/26,Thursday,,TRUE,ucsd,light 60,,7:52,,,1:29,2:02,3:31,205.4,119,47,7.9,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/16/26,Friday,,TRUE,ucsd,lives,23,7:05,,,1:34,2:09,3:43,204.2,129,63,18.3,,,,,,,FALSE,,,,,,,,,,,,,88-92,90.18,91.7,23,12,8/17,4/6,5,4.6,3,,,,,52.17%,99.17%,202.5,64.7,31.68%,69.4,33.99%,36.1,17.68%,32.3,15.82%,1.072642968,,,,,,52.4,0.49,0.48,,,,,,,,,,,,,,,,,\n10/17/26,Saturday,,FALSE,,,,6:47,,,1:10,1:48,2:58,204.8,147,76,14.1,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/18/26,Sunday,,FALSE,,,,7:50,,,1:27,1:55,3:22,206.2,110,42,4.9,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/19/26,Monday,,TRUE,ucsd,light 60,,6:34,,,1:22,1:39,3:01,206,102,37,18.4,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/20/26,Tuesday,,TRUE,ucsd,bullpen,25,6:31,,,1:04,1:18,2:22,206.4,145,79,13.6,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/21/26,Wednesday,,FALSE,,,,7:10,,,1:55,2:07,4:02,206.2,123,62,15.7,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54,0.53,0.53,,,,,,,,,,,,,,588.00,575.00,510.00,537.00\n10/22/26,Thursday,,TRUE,ucsd,light 60,,8:19,,,1:30,1:51,3:21,204.8,141,79,8,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/23/26,Friday,2 innings first time,TRUE,ucsd,lives,37,7:49,,,1:36,1:56,3:32,204.8,118,53,18.5,,,,,,,FALSE,,,,,,,,,,,,,88-92,90.01,91.9,37,23,11/14,12/23,9,4.111111111,3,5,3,3,14,62.16%,91.31%,187,63.9,31.20%,57.3,27.98%,33.5,16.36%,32.3,15.77%,0.896713615,,,,,,,,,,,,,,,,,,,,,,,,,\n10/24/26,Saturday,,FALSE,,,,5:20,,,0:47,1:41,2:28,205,160,72,13.9,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52.2,,,48,0.2341463415,,0.62,0.30%,,,,,,,,,,,,\n10/25/26,Sunday,whoop died,FALSE,,,,,,,,,0:00,205.4,163,,5.4,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/26/26,Monday,,TRUE,ucsd,light 60,,7:24,,,1:23,1:55,3:18,205.4,110,54,17.6,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,54.2,0.63,0.5,,,,,,,,580,606,593,2.89,,,,,,\n10/27/26,Tuesday,,TRUE,ucsd,bullpen,23,5:44,,,1:00,2:17,3:17,206.2,143,68,14.6,,,,,,,TRUE,,,,,,,,,,83-85,84,85,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,51,0.48,0.45,,,,,,,,,,,,,,,,,\n10/28/26,Wednesday,,FALSE,,,,7:55,,,1:32,1:56,3:28,205.4,134,72,18.4,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/29/26,Thursday,,TRUE,ucsd,light 60,,7:31,,,1:43,1:32,3:15,205.2,105,48,7.1,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/30/26,Friday,arm care app not work,TRUE,ucsd,lives,21,7:39,,,1:08,2:28,3:36,206,89,36,16.9,,,,,,,FALSE,,,,,,,,,,,,,90-92,90.475,92,21,13,,,,,,,,,,61.90%,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n10/31/26,Saturday,,FALSE,,,,6:28,,,0:53,1:51,2:44,206,154,84,14.7,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52,0.6,0.53,,,,,,,,,,,,,,,,,\n11/1/26,Sunday,,FALSE,,,,6:17,,,1:03,1:13,2:16,204.4,143,76,5.4,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n11/2/26,Monday,,TRUE,ucsd,pitch design pen,18,6:54,,,0:54,1:57,2:51,206.6,148,81,18.6,,,,,,,TRUE,,,,,,,,,,85,,85.3,,,,,,,,,,,,,,,,96.90%,200.2,61.1,29.57%,62.6,30.30%,39.1,18.93%,37.4,18.10%,1.024549918,,,,,,,,,,,,,,,,,,,,,,,,,\n11/3/26,Tuesday,,FALSE,,,,8:17,,,1:07,2:13,3:20,206.2,170,90,10,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,535.00,3,,,,\n11/4/26,Wednesday,,TRUE,ucsd,execution pen,,7:20,,,1:16,1:38,2:54,208,141,71,15.4,,,,,,,TRUE,,,,,,,,,,85-87,,86.6,,,,,,,,,,,,,,,,90.96%,189.2,60.2,28.94%,57.6,27.69%,40,19.23%,31.4,15.10%,0.9568106312,,,,,,53.02,0.56,0.53,,,,,,,,,,,,,,,,,\n11/5/26,Thursday,,TRUE,ucsd,light 60,,7:46,,,1:10,1:31,2:41,207.2,139,69,9.8,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n11/6/26,Friday,,TRUE,ucsd,lives,25,7:44,,,1:10,1:54,3:04,206.6,136,65,16.8,,,,,,,FALSE,,,,,,,,,,,,,88-92,90.32,92.2,25,15,4/5,11/20,7,3.571428571,3,4,4,6,11,60.00%,92.55%,191.2,62.1,30.06%,58.5,28.32%,36.9,17.86%,33.7,16.31%,0.9420289855,,,,,,,,,,,,,,,,,,,,,,,,,\n11/7/26,Saturday,,FALSE,,,,6:00,,,0:48,2:07,2:55,206,145,67,13.6,,,,,,,TRUE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,52,0.6,0.53,47.7,0.2315533981,,0.67,0.33%,,,,,,,,,,,,\n11/8/26,Sunday,,FALSE,,,,5:51,,,1:03,1:56,2:59,206.2,135,51,5.5,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n11/9/26,Monday,,FALSE,,,,6:48,,,1:10,1:52,3:02,204.6,109,36,,,,,,,,FALSE,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,\n";
+</script>
+<script>
+/* Triton Pitching Lab — Brandon Jackel
+   Single-page app: seed data (seed-data.js) + browser-saved entries (localStorage). */
+'use strict';
+
+/* ---------------- field schema ----------------
+   [key, label, group, type, unit, dir, csvHeader]
+   type: date text long bool num dur pct frac range scale
+   dir: 1 higher is better, -1 lower is better, 0 neutral, 'T1' closest to 1.0 is best */
+const GROUPS = {
+  well:  'Wellness & Journal',
+  day:   'Day & Throwing',
+  sleep: 'Sleep & Recovery',
+  body:  'Body & Nutrition',
+  load:  'Throwing Load',
+  velo:  'Velocity',
+  live:  'Live ABs & Command',
+  arm:   'Arm Care',
+  power: 'Power & Strength',
+};
+const FIELD_ROWS = [
+  ['date','Date','day','date','',0,'Date'],
+  ['notes','Notes','day','text','',0,'notes'],
+  ['throw','Threw','day','bool','',0,'Throw'],
+  ['location','Throw Location','day','text','',0,'throw location'],
+  ['throwing','Throwing Program','day','text','',0,'Throwing'],
+  ['pitches','Pitches','day','num','',0,'Pitches'],
+  ['warmup','Warmup Routine','day','text','',0,'Warmup Routine'],
+  ['lift','Lifted','day','bool','',0,'Lift'],
+
+  ['sleep','Sleep','sleep','dur','h',1,'Sleep'],
+  ['bedIn','Time in Bed','sleep','text','',0,'Time in bed'],
+  ['bedOut','Time out of Bed','sleep','text','',0,'Time out of bed'],
+  ['rem','REM','sleep','dur','h',1,'REM'],
+  ['deep','Deep','sleep','dur','h',1,'Deep'],
+  ['restor','Total Restorative','sleep','dur','h',1,'Total Restorative'],
+  ['hrv','HRV','sleep','num','ms',1,'HRV'],
+  ['recovery','Recovery Score','sleep','num','%',1,'Recovery Score'],
+  ['strain','Strain','sleep','num','',0,'Strain'],
+  ['rhr','Resting HR','sleep','num','bpm',-1,'RHR'],
+
+  ['bw','Bodyweight','body','num','lb',0,'Bodyweight'],
+  ['cal','Calories','body','num','kcal',0,'Calories'],
+  ['protein','Protein','body','num','g',1,'Protein'],
+  ['carbs','Carbs','body','num','g',0,'Carbs'],
+  ['fats','Fats','body','num','g',0,'Fats'],
+
+  ['totalThrows','Total Throws','load','num','',0,'total throws'],
+  ['highEffort','High-Effort Throws','load','num','',0,'high effort throws'],
+  ['workload','Workload','load','num','',0,'workload'],
+  ['torque','Avg Torque','load','num','Nm',0,'averge torque'],
+  ['armSpeedMax','Arm Speed Max','load','num','',1,'arm speed max'],
+  ['armSpeedAvg','Arm Speed Avg','load','num','',1,'arm speed average'],
+
+  ['cpSpread','CP Velo Range','velo','range','mph',0,'CP Velo Spread'],
+  ['cpAvg','CP Velo Avg','velo','num','mph',1,'CP Velo AVG'],
+  ['cpMax','CP Velo Max','velo','num','mph',1,'CP Velo Max'],
+  ['penSpread','Pen Velo Range','velo','range','mph',0,'Pen Velo Spread'],
+  ['penAvg','Pen Velo Avg','velo','num','mph',1,'Pen Velo AVG'],
+  ['penMax','Pen Velo Max','velo','num','mph',1,'Pen Velo Max'],
+  ['liveSpread','Live Velo Range','velo','range','mph',0,'Live velo spread'],
+  ['liveAvg','Live Velo Avg','velo','num','mph',1,'Live velo avg'],
+  ['liveMax','Live Velo Max','velo','num','mph',1,'live velo max'],
+
+  ['livePitches','Live Pitches','live','num','',0,'Live pitches'],
+  ['strikes','Strikes','live','num','',1,'strikes'],
+  ['fbStrike','FB Strike Rate','live','frac','',1,'fb strikes rate'],
+  ['offStrike','Offspeed Strike Rate','live','frac','',1,'off strike rate'],
+  ['abs','ABs','live','num','',0,'ABs'],
+  ['ppa','Pitches / AB','live','num','',-1,'PPA'],
+  ['fps','First-Pitch Strikes','live','num','',1,'FPS'],
+  ['oneOne','1-1 Counts','live','num','',0,'1-1 counts'],
+  ['oneOneWins','1-1 Wins','live','num','',1,'1-1 wins'],
+  ['whiffs','Whiffs','live','num','',1,'whiffs'],
+  ['swings','Swings','live','num','',0,'swings'],
+  ['strikePct','Strike %','live','pct','%',1,'strike %'],
+
+  ['armScore','Arm Score','arm','pct','%',1,'Arm Score'],
+  ['totalStrength','Total Strength (Fresh)','arm','num','lb',1,'Total Strength Fresh'],
+  ['ir','IR','arm','num','lb',1,'IR'],
+  ['irPct','IR %','arm','pct','%',1,'IR %'],
+  ['er','ER','arm','num','lb',1,'ER'],
+  ['erPct','ER %','arm','pct','%',1,'ER %'],
+  ['scap','Scaption','arm','num','lb',1,'Scaption'],
+  ['scapPct','Scaption %','arm','pct','%',1,'Scaption %'],
+  ['grip2','Grip (2-finger)','arm','num','lb',1,'Grip two finger'],
+  ['grip2Pct','Grip 2-finger %','arm','pct','%',1,'Grip %'],
+  ['shoulderBal','Shoulder Balance','arm','num','',  'T1','Shoulder Balance'],
+  ['primer','Primer','arm','num','',1,'Primer'],
+  ['primerAccel','Primer Accel','arm','num','',1,'Primer Accel'],
+  ['primerDecel','Primer Decel','arm','num','',1,'Primer Decel'],
+  ['ratio','Decel/Accel Ratio','arm','pct','%',1,'Ratio'],
+  ['postExam','Post-Exam Total','arm','pct','%',1,'Post exam total'],
+
+  ['cmjCam','CMJ (camera)','power','num','cm',1,'cmj camera'],
+  ['pullMax','Pull-up Max','power','num','m/s',1,'pull up m/s max'],
+  ['pullAvg','Pull-up Avg','power','num','m/s',1,'pull up m/s avg'],
+  ['cmjFP','CMJ (force plates)','power','num','cm',1,'Cmj force plates'],
+  ['cmjBW','CMJ / BW','power','num','',1,'CMJ/BW'],
+  ['cmjPeak','CMJ Peak Force','power','num','N',1,'CMJ Peak Force'],
+  ['rsi','RSI','power','num','',1,'RSI'],
+  ['rsiBW','RSI / BW','power','pct','%',1,'RSI/ BW'],
+  ['grip','Grip','power','num','lb',1,'Grip'],
+  ['gripPct','Grip % BW','power','pct','%',1,'Grip %'],
+  ['isoL','ISO 30 Left','power','num','',1,'ISO 30 Left'],
+  ['isoR','ISO 30 Right','power','num','',1,'ISO 30 Right'],
+  ['isoCombo','ISO Combined','power','num','',1,'ISO Combined'],
+  ['isoComboBW','ISO Combo / BW','power','num','',1,'ISO Combo/ weight'],
+  ['nordEcc','Nordboard Ecc','power','num','',1,'Noardboard ecc'],
+  ['nordEccBW','Nordboard Ecc / BW','power','num','',1,'Noard ecc/ weight'],
+  ['hipAbdL','Hip Abd L','power','num','',1,'Hip Abd L'],
+  ['hipAbdR','Hip Abd R','power','num','',1,'Hip Abd R'],
+  ['hipAddL','Hip Add L','power','num','',1,'Hip Add L'],
+  ['hipAddR','Hip Add R','power','num','',1,'Hip Add R'],
+
+  ['feel','Overall Feel','well','scale','/10',1,'Feel'],
+  ['armFeel','Arm Feel','well','scale','/10',1,'Arm Feel'],
+  ['energy','Energy','well','scale','/10',1,'Energy'],
+  ['soreness','Soreness','well','scale','/10',-1,'Soreness'],
+  ['journal','How are you feeling?','well','long','',0,'Journal'],
+];
+const FIELDS = FIELD_ROWS.map(([k,label,g,t,u,dir,csv]) => ({k,label,g,t,u,dir,csv}));
+const FK = Object.fromEntries(FIELDS.map(f => [f.k, f]));
+const NUMERIC_T = new Set(['num','dur','pct','frac','scale']);
+const NUM_FIELDS = FIELDS.filter(f => NUMERIC_T.has(f.t));
+
+/* ---------------- utils ---------------- */
+const $ = (s, el=document) => el.querySelector(s);
+const $$ = (s, el=document) => [...el.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DOW = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const fromIso = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (s, n) => { const d = fromIso(s); d.setDate(d.getDate()+n); return iso(d); };
+const short = s => { const d = fromIso(s); return `${MON[d.getMonth()]} ${d.getDate()}`; };
+const longDate = s => { const d = fromIso(s); return `${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`; };
+const todayIso = () => iso(new Date());
+const mean = a => a.length ? a.reduce((s,x)=>s+x,0)/a.length : null;
+const sd = a => { if (a.length < 2) return null; const m = mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1)); };
+const clamp = (x,a,b) => Math.max(a, Math.min(b, x));
+const round = (v, d=1) => v == null || isNaN(v) ? null : Math.round(v * 10**d) / 10**d;
+
+function parseDate(s) {
+  s = String(s || '').trim();
+  if (!s) return null;
+  let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return iso(new Date(+m[1], +m[2]-1, +m[3]));
+  m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; return iso(new Date(y, +m[1]-1, +m[2])); }
+  const d = new Date(s); return isNaN(d) ? null : iso(d);
+}
+function parseVal(f, raw) {
+  if (raw == null) return undefined;
+  if (typeof raw === 'boolean' || typeof raw === 'number') return raw;
+  const s = String(raw).trim();
+  if (!s) return undefined;
+  switch (f.t) {
+    case 'bool': return /^(true|yes|y|1|x|✓)$/i.test(s) ? true : /^(false|no|n|0)$/i.test(s) ? false : undefined;
+    case 'num': case 'pct': case 'scale': { const n = parseFloat(s.replace(/[,%\s]/g,'')); return isNaN(n) ? undefined : n; }
+    case 'dur': {
+      let n;
+      const m = s.match(/^(\d+):(\d{1,2})/);
+      if (m) n = +m[1] + +m[2]/60; else n = parseFloat(s);
+      return !n || isNaN(n) ? undefined : Math.round(n*1000)/1000;
+    }
+    case 'frac': return /^\s*\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?\s*$/.test(s) ? s.replace(/\s/g,'') : (isNaN(parseFloat(s)) ? undefined : s);
+    default: return s;
+  }
+}
+/* numeric value of a field for charts/stats */
+function nv(r, f) {
+  if (!r) return null;
+  const v = r[f.k];
+  if (v == null || v === '') return null;
+  if (f.t === 'bool') return v ? 1 : 0;
+  if (f.t === 'frac') {
+    const m = String(v).match(/^([\d.]+)\/([\d.]+)$/);
+    if (m) return +m[2] ? (+m[1] / +m[2]) * 100 : null;
+    const n = parseFloat(v); return isNaN(n) ? null : n;
+  }
+  return typeof v === 'number' ? v : null;
+}
+function fmtDur(h) { if (h == null) return '—'; const hh = Math.floor(h), mm = Math.round((h-hh)*60); return mm === 60 ? `${hh+1}h 0m` : `${hh}h ${mm}m`; }
+function fmtNum(v) {
+  if (v == null || isNaN(v)) return '—';
+  const a = Math.abs(v);
+  const d = a >= 100 ? 1 : a >= 10 ? 1 : a >= 1 ? 2 : 3;
+  return String(round(v, d));
+}
+function fmt(f, v, opts={}) {
+  if (v == null || v === '') return opts.blank ?? '—';
+  switch (f.t) {
+    case 'dur': return fmtDur(v);
+    case 'pct': return fmtNum(v) + '%';
+    case 'bool': return v ? '✓' : '—';
+    case 'frac': {
+      const n = nv({[f.k]: v}, f);
+      return opts.pct && n != null ? `${round(n,0)}%` : String(v);
+    }
+    case 'num': case 'scale': return fmtNum(v) + (opts.unit && f.u && f.u !== '%' ? ` ${f.u}` : '');
+    default: return String(v);
+  }
+}
+function fmtStat(f, v) { // for aggregate numbers (frac shown as %)
+  if (v == null || isNaN(v)) return '—';
+  if (f.t === 'dur') return fmtDur(v);
+  if (f.t === 'pct' || f.t === 'frac') return fmtNum(v) + '%';
+  return fmtNum(v);
+}
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2400); }
+
+/* ---------------- CSV ---------------- */
+function parseCSV(text) {
+  const rows = []; let row = [], cur = '', q = false;
+  text = text.replace(/^﻿/, '');
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else q = false; }
+      else cur += c;
+    } else if (c === '"') q = true;
+    else if (c === ',') { row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i+1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+const normH = h => String(h).toLowerCase().replace(/\s+/g,' ').trim();
+/* header key with occurrence index, so duplicate headers ("Grip %") map correctly */
+function headerKeys(headers) {
+  const seen = {};
+  return headers.map(h => { const n = normH(h); seen[n] = (seen[n] || 0) + 1; return n + '#' + seen[n]; });
+}
+const FIELD_BY_HKEY = (() => {
+  const seen = {}, m = {};
+  FIELDS.forEach(f => { const n = normH(f.csv); seen[n] = (seen[n] || 0) + 1; m[n + '#' + seen[n]] = f; });
+  return m;
+})();
+function csvToRecords(text) {
+  const rows = parseCSV(text).filter(r => r.some(c => String(c).trim()));
+  if (!rows.length) return { records: {}, unmatched: [] };
+  const keys = headerKeys(rows[0]);
+  const unmatched = rows[0].filter((h, i) => !FIELD_BY_HKEY[keys[i]] && normH(h) !== 'day of week' && normH(h));
+  const records = {};
+  for (const r of rows.slice(1)) {
+    const rec = {};
+    keys.forEach((k, i) => {
+      const f = FIELD_BY_HKEY[k]; if (!f) return;
+      if (f.k === 'date') { rec.date = parseDate(r[i]); return; }
+      const v = parseVal(f, r[i]); if (v !== undefined) rec[f.k] = v;
+    });
+    if (!rec.date) continue;
+    // ignore spreadsheet template rows that only carry default FALSE flags
+    const meaningful = Object.keys(rec).some(k => k !== 'date' && !(FK[k].t === 'bool' && rec[k] === false));
+    if (!meaningful && !(rec.throw || rec.lift)) continue;
+    records[rec.date] = Object.assign(records[rec.date] || {}, rec);
+  }
+  return { records, unmatched };
+}
+function recordsToCSV(recs) {
+  const head = ['Date','Day of Week', ...FIELDS.filter(f => f.k !== 'date').map(f => f.csv)];
+  const q = v => { const s = String(v ?? ''); return /[",\n]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
+  const lines = [head.map(q).join(',')];
+  for (const r of recs) {
+    const d = fromIso(r.date);
+    const cells = [`${d.getMonth()+1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`, DOW[d.getDay()]];
+    FIELDS.forEach(f => {
+      if (f.k === 'date') return;
+      const v = r[f.k];
+      if (v == null) cells.push('');
+      else if (f.t === 'bool') cells.push(v ? 'TRUE' : 'FALSE');
+      else if (f.t === 'dur') { const hh = Math.floor(v), mm = Math.round((v-hh)*60); cells.push(`${hh}:${String(mm).padStart(2,'0')}`); }
+      else if (f.t === 'pct') cells.push(v + '%');
+      else cells.push(v);
+    });
+    lines.push(cells.map(q).join(','));
+  }
+  return lines.join('\n');
+}
+function download(name, text, type='text/csv') {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ---------------- store ---------------- */
+const LS_KEY = 'triton-pitching-lab.v1';
+const Store = {
+  seed: {}, local: {}, deleted: {},
+  load() {
+    this.seed = csvToRecords(window.SEED_CSV || '').records;
+    try {
+      const s = JSON.parse(localStorage.getItem(LS_KEY) || '{}');
+      this.local = s.local || {}; this.deleted = s.deleted || {};
+    } catch (e) { this.local = {}; this.deleted = {}; }
+    this.rebuild();
+  },
+  save() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ local: this.local, deleted: this.deleted })); }
+    catch (e) { toast('Could not save in this browser — export a backup!'); }
+    this.rebuild();
+  },
+  rebuild() {
+    const dates = new Set([...Object.keys(this.seed), ...Object.keys(this.local)]);
+    const all = [];
+    for (const d of dates) {
+      if (this.deleted[d]) continue;
+      const r = Object.assign({}, this.seed[d] || {}, this.local[d] || {}, { date: d });
+      for (const k of Object.keys(r)) if (r[k] === null) delete r[k];
+      all.push(r);
+    }
+    all.sort((a, b) => a.date < b.date ? -1 : 1);
+    this.rows = all;
+    this.byDate = Object.fromEntries(all.map(r => [r.date, r]));
+    this.computeStats();
+  },
+  computeStats() {
+    this.stats = {};
+    for (const f of NUM_FIELDS) {
+      const pts = this.rows.map(r => [r.date, nv(r, f)]).filter(p => p[1] != null);
+      const vals = pts.map(p => p[1]);
+      const score = v => f.dir === 'T1' ? -Math.abs(v - 1) : f.dir === -1 ? -v : v;
+      const sorted = vals.map(score).sort((a, b) => a - b);
+      let best = null;
+      if (f.dir) for (const p of pts) if (!best || score(p[1]) > score(best[1])) best = p;
+      this.stats[f.k] = { n: vals.length, pts, mean: mean(vals), sd: sd(vals), min: vals.length ? Math.min(...vals) : null, max: vals.length ? Math.max(...vals) : null, best, sorted, score, latest: pts[pts.length-1] || null };
+    }
+  },
+  /* percentile (0..1, 1 = best) of a value against history */
+  pctile(f, v) {
+    const s = this.stats[f.k]; if (!s || s.n < 5 || !f.dir) return null;
+    const x = s.score(v); let lo = 0;
+    for (const y of s.sorted) if (y < x) lo++;
+    return lo / (s.n - 1 || 1);
+  },
+  put(rec) {
+    this.local[rec.date] = Object.assign({}, rec, { _updated: new Date().toISOString() });
+    delete this.deleted[rec.date];
+    this.save();
+  },
+};
+
+/* ---------------- charts ---------------- */
+const C = { gold:'#FFCD00', gold2:'#C69214', sky:'#4FA3E3', blue:'#00629B', teal:'#00C6D7', stitch:'#E0544B', green:'#3DDC97', white:'#EAF0F8', muted:'#8FA3BF', grid:'rgba(143,163,191,.12)' };
+const charts = {};
+function chart(id, cfg) {
+  if (charts[id]) charts[id].destroy();
+  const el = document.getElementById(id); if (!el || !window.Chart) return;
+  charts[id] = new Chart(el, cfg);
+}
+if (window.Chart) {
+  Chart.defaults.color = C.muted;
+  Chart.defaults.font.family = 'Inter, system-ui, sans-serif';
+  Chart.defaults.font.size = 11;
+  Chart.defaults.borderColor = C.grid;
+  Chart.defaults.plugins.legend.labels.boxWidth = 10;
+  Chart.defaults.plugins.legend.labels.boxHeight = 10;
+  Chart.defaults.plugins.legend.labels.usePointStyle = true;
+  Chart.defaults.plugins.tooltip.backgroundColor = '#0A1528';
+  Chart.defaults.plugins.tooltip.borderColor = 'rgba(255,205,0,.4)';
+  Chart.defaults.plugins.tooltip.borderWidth = 1;
+  Chart.defaults.plugins.tooltip.padding = 10;
+  Chart.defaults.maintainAspectRatio = false;
+  Chart.defaults.elements.line.tension = .3;
+  Chart.defaults.elements.point.radius = 0;
+  Chart.defaults.elements.point.hoverRadius = 5;
+}
+const lineDs = (label, data, color, extra={}) => ({ label, data, borderColor: color, backgroundColor: color + '22', borderWidth: 2, spanGaps: true, ...extra });
+function sparkSVG(vals, color = C.gold) {
+  const v = vals.filter(x => x != null);
+  if (v.length < 2) return '<svg class="spark"></svg>';
+  const min = Math.min(...v), max = Math.max(...v), w = 240, h = 34;
+  const pts = v.map((x, i) => `${(i/(v.length-1))*w},${h - 3 - ((x-min)/((max-min)||1))*(h-6)}`).join(' ');
+  return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2" vector-effect="non-scaling-stroke"/></svg>`;
+}
+
+/* ---------------- app state & router ---------------- */
+const S = { view: 'dash', range: 90, log: { q:'', from:'', to:'', groups: new Set(['day','sleep','velo','arm']), throwOnly:false, liftOnly:false, sort:'date', dir:-1 }, bestsGroup:'all', ins: { x:'sleep', y:'armScore', lag:0, target:'armScore', same:false }, entryDate: null, jq:'' };
+const RENDER = {};
+function go(view, opts={}) {
+  S.view = view;
+  $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+  $$('.view').forEach(v => v.classList.toggle('active', v.id === 'v-' + view));
+  if (opts.date) S.entryDate = opts.date;
+  RENDER[view]();
+  window.scrollTo({ top: 0 });
+  try { history.replaceState(null, '', '#' + view); } catch (e) {}
+}
+function sideStats() {
+  const rows = Store.rows;
+  const n = Object.keys(Store.local).length;
+  $('#side-stats').innerHTML = `<b>${rows.length}</b> days logged<br><span class="muted">${rows.length ? short(rows[0].date) + ' – ' + short(rows[rows.length-1].date) : ''}${n ? ` · ${n} edited here` : ''}</span>`;
+}
+
+/* ---------------- readiness ---------------- */
+function readiness(date) {
+  const r = Store.byDate[date]; if (!r) return null;
+  const parts = [];
+  if (r.recovery != null) parts.push(['Recovery', clamp(r.recovery, 0, 100), .4]);
+  if (r.hrv != null) {
+    const base = Store.rows.filter(x => x.date < date && x.date >= addDays(date, -30) && x.hrv != null).map(x => x.hrv);
+    if (base.length >= 5) parts.push(['HRV vs 30-day', clamp(((r.hrv / mean(base)) - .7) / .5 * 100, 0, 100), .3]);
+  }
+  if (r.sleep != null) parts.push(['Sleep', clamp(r.sleep / 8 * 100, 0, 100), .2]);
+  if (r.feel != null) parts.push(['How you feel', r.feel * 10, .2]);
+  if (r.armFeel != null) parts.push(['Arm feel', r.armFeel * 10, .2]);
+  if (!parts.length) return null;
+  const w = parts.reduce((s, p) => s + p[2], 0);
+  return { score: Math.round(parts.reduce((s, p) => s + p[1]*p[2], 0) / w), parts };
+}
+function readinessColor(s) { return s >= 67 ? C.green : s >= 45 ? C.gold : C.stitch; }
+function ringSVG(score, color) {
+  const r = 32, c = 2*Math.PI*r, off = c * (1 - score/100);
+  return `<svg viewBox="0 0 76 76"><circle cx="38" cy="38" r="${r}" fill="none" stroke="rgba(143,163,191,.15)" stroke-width="7"/><circle cx="38" cy="38" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 38 38)"/><text x="38" y="44" text-anchor="middle" font-family="Barlow Condensed" font-weight="800" font-size="22" fill="#EAF0F8">${score}</text></svg>`;
+}
+
+/* ================= DASHBOARD ================= */
+RENDER.dash = function () {
+  const rows = Store.rows;
+  const el = $('#v-dash');
+  if (!rows.length) { el.innerHTML = '<div class="empty">No data yet — add a daily entry or import a CSV.</div>'; return; }
+  const last = rows[rows.length - 1].date;
+  const first = rows[0].date;
+  const since = Math.round((fromIso(last) - fromIso(first)) / 864e5) + 1;
+  const throwDays = rows.filter(r => r.throw).length;
+  const liftDays = rows.filter(r => r.lift).length;
+  const st = Store.stats;
+  const latestWith = k => { const p = st[k]?.latest; return p ? { date: p[0], v: p[1] } : null; };
+  const avgLast = (k, days, end = last) => { const v = rows.filter(r => r.date > addDays(end, -days) && r.date <= end).map(r => nv(r, FK[k])).filter(x => x != null); return v.length ? mean(v) : null; };
+  const lastNote = [...rows].reverse().find(r => r.notes && /ft|live|pen|bullpen|inning|first|start/i.test(r.notes));
+  const rd = readiness(last) || readiness(addDays(last, -1));
+
+  const trend = (now, prev, good = 1, unitFmt = fmtNum) => {
+    if (now == null || prev == null) return '<span class="flat">no comparison yet</span>';
+    const d = now - prev; const cls = (Math.abs(d) < 1e-9 || !good) ? 'flat' : (d * good > 0 ? 'up' : 'down');
+    return `<span class="${cls}">${d > 0 ? '▲' : d < 0 ? '▼' : '•'} ${unitFmt(Math.abs(d))}</span>`;
+  };
+  const hrv7 = avgLast('hrv', 7), hrv30 = avgLast('hrv', 30);
+  const rec7 = avgLast('recovery', 7), rec30 = avgLast('recovery', 30);
+  const sl7 = avgLast('sleep', 7), sl30 = avgLast('sleep', 30);
+  const bw = latestWith('bw'); const bw30 = (() => { const v = rows.filter(r => r.bw != null && r.date <= addDays(last, -30)); return v.length ? v[v.length-1].bw : null; })();
+  const arm = latestWith('armScore'); const armBest = st.armScore.best;
+  const velo = st.liveMax.best || st.penMax.best;
+  const liveAvgLatest = latestWith('liveAvg');
+  const sp = latestWith('strikePct');
+  const heroImg = 'bj-hero.jpg';
+
+  el.innerHTML = `
+  <div class="hero" style="background-image:url('${heroImg}')">
+    <div class="hero-inner">
+      <div>
+        <div class="eyebrow">UC San Diego Tritons · Right-handed pitcher</div>
+        <h1>Brandon Jackel</h1>
+        <div class="muted">The road back — from the first 45-ft toss to live ABs. Data through ${longDate(last)}.</div>
+        <div class="hero-tags">
+          <span class="tag gold">Day ${since} of the comeback</span>
+          ${lastNote ? `<span class="tag">Latest milestone: ${esc(lastNote.notes)} · ${short(lastNote.date)}</span>` : ''}
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="big">${throwDays}</div><div class="lbl">Throw days</div></div>
+        <div class="hero-stat"><div class="big">${liftDays}</div><div class="lbl">Lift days</div></div>
+        <div class="hero-stat"><div class="big">${velo ? fmtNum(velo[1]) : '—'}</div><div class="lbl">Top velo (mph)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-head">
+    <div><h2>Summary</h2><p>7-day averages compared with the 30-day baseline. Green is moving the right way.</p></div>
+    <div class="seg" id="range-seg">
+      ${[[30,'30 days'],[90,'90 days'],[9999,'All time']].map(([v,l]) => `<button data-r="${v}" class="${S.range==v?'on':''}">${l}</button>`).join('')}
+    </div>
+  </div>
+
+  <div class="grid kpis">
+    <div class="card kpi">
+      <div class="kpi-lbl">Readiness · ${rd ? short(Store.byDate[last] && readiness(last) ? last : addDays(last,-1)) : ''}</div>
+      ${rd ? `<div class="ring" style="margin-top:6px">${ringSVG(rd.score, readinessColor(rd.score))}<div class="kpi-sub" style="margin:0">${rd.parts.map(p => `${p[0]}: <b style="color:var(--text)">${Math.round(p[1])}</b>`).join('<br>')}</div></div>` : '<div class="kpi-val">—</div><div class="kpi-sub">Log sleep / HRV / recovery to score</div>'}
+    </div>
+    <div class="card kpi"><div class="kpi-lbl">HRV · 7-day avg</div><div class="kpi-val">${fmtNum(hrv7)}<small class="muted" style="font-size:16px"> ms</small></div><div class="kpi-sub">${trend(hrv7, hrv30)} vs 30-day ${fmtNum(hrv30)}</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Recovery · 7-day avg</div><div class="kpi-val">${fmtNum(rec7)}<small class="muted" style="font-size:16px">%</small></div><div class="kpi-sub">${trend(rec7, rec30)} vs 30-day ${fmtNum(rec30)}%</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Sleep · 7-day avg</div><div class="kpi-val">${fmtDur(sl7)}</div><div class="kpi-sub">${trend(sl7, sl30, 1, v => fmtDur(v))} vs 30-day ${fmtDur(sl30)}</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Bodyweight</div><div class="kpi-val">${bw ? fmtNum(bw.v) : '—'}<small class="muted" style="font-size:16px"> lb</small></div><div class="kpi-sub">${trend(bw?.v, bw30, 0)} over 30 days${bw ? ' · ' + short(bw.date) : ''}</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Arm Score</div><div class="kpi-val">${arm ? fmtNum(arm.v) + '%' : '—'}</div><div class="kpi-sub">${armBest ? `Best ${fmtNum(armBest[1])}% · ${short(armBest[0])}` : ''}</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Live Velo Avg</div><div class="kpi-val">${liveAvgLatest ? fmtNum(liveAvgLatest.v) : '—'}<small class="muted" style="font-size:16px"> mph</small></div><div class="kpi-sub">${liveAvgLatest ? 'Last live · ' + short(liveAvgLatest.date) : ''}${st.liveMax.max ? ` · max ${fmtNum(st.liveMax.max)}` : ''}</div></div>
+    <div class="card kpi"><div class="kpi-lbl">Strike % (live)</div><div class="kpi-val">${sp ? fmtNum(sp.v) + '%' : '—'}</div><div class="kpi-sub">${sp ? `Avg ${fmtNum(st.strikePct.mean)}% over ${st.strikePct.n} lives` : ''}</div></div>
+  </div>
+
+  <div class="grid charts">
+    <div class="card span-8"><div class="card-head"><h3>Velocity progression</h3><span class="muted small">Catch play → bullpen → live ABs (all sessions)</span></div><div class="chart-box tall"><canvas id="ch-velo"></canvas></div></div>
+    <div class="card span-4"><div class="card-head"><h3>Rehab milestones</h3><span class="muted small">From the notes column</span></div><div class="timeline" id="timeline"></div></div>
+
+    <div class="card span-7"><div class="card-head"><h3>HRV & recovery</h3><span class="muted small">Daily, with 7-day HRV trend</span></div><div class="chart-box"><canvas id="ch-hrv"></canvas></div></div>
+    <div class="card span-5"><div class="card-head"><h3>Sleep breakdown</h3><span class="muted small">Deep · REM · light</span></div><div class="chart-box"><canvas id="ch-sleep"></canvas></div></div>
+
+    <div class="card span-6"><div class="card-head"><h3>Arm care</h3><span class="muted small">Arm Score & total fresh strength</span></div><div class="chart-box"><canvas id="ch-arm"></canvas></div></div>
+    <div class="card span-6"><div class="card-head"><h3>Bodyweight</h3><span class="muted small">With 7-day average</span></div><div class="chart-box"><canvas id="ch-bw"></canvas></div></div>
+
+    <div class="card span-6"><div class="card-head"><h3>Live ABs — command</h3><span class="muted small">Strike % and pitches per live session</span></div><div class="chart-box"><canvas id="ch-live"></canvas></div></div>
+    <div class="card span-6"><div class="card-head"><h3>Power</h3><span class="muted small">CMJ (force plates & camera) and RSI</span></div><div class="chart-box"><canvas id="ch-power"></canvas></div></div>
+
+    <div class="card span-12"><div class="card-head"><h3>Training calendar</h3><span class="muted small">Every day since the first throw</span></div><div class="heat" id="heat"></div>
+      <div class="legend"><span><i style="background:var(--navy-3)"></i>Rest / no throw</span><span><i style="background:rgba(255,205,0,.45)"></i>Throw day</span><span><i style="background:var(--gold)"></i>Bullpen / live / game</span><span><i style="background:var(--navy-3);box-shadow:inset 0 0 0 4px var(--navy-3);position:relative"></i><span class="dot blue" style="margin-left:-14px;margin-right:6px;width:5px;height:5px"></span>Lift day</span></div>
+    </div>
+  </div>`;
+
+  $$('#range-seg button').forEach(b => b.onclick = () => { S.range = +b.dataset.r; RENDER.dash(); });
+
+  const inRange = rows.filter(r => r.date > addDays(last, -S.range));
+
+  // velocity (all-time: sparse sessions)
+  const vRows = rows.filter(r => ['cpMax','penMax','liveAvg','liveMax','cpAvg','penAvg'].some(k => r[k] != null));
+  chart('ch-velo', { type: 'line', data: { labels: vRows.map(r => short(r.date)), datasets: [
+    lineDs('Catch play max', vRows.map(r => r.cpMax ?? null), C.sky, { pointRadius: 3 }),
+    lineDs('Bullpen max', vRows.map(r => r.penMax ?? null), C.teal, { pointRadius: 3 }),
+    lineDs('Live avg', vRows.map(r => r.liveAvg ?? null), C.gold2, { pointRadius: 3, borderDash: [5,4] }),
+    lineDs('Live max', vRows.map(r => r.liveMax ?? null), C.gold, { pointRadius: 4, borderWidth: 3 }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'mph' } } } } });
+
+  // timeline
+  const notes = rows.filter(r => r.notes).reverse();
+  $('#timeline').innerHTML = notes.map(r => `<div class="tl"><div class="d">${short(r.date)}</div><div class="pin ${/ft|live|pen|bullpen|inning|first|throw|scrimmage/i.test(r.notes) ? '' : 'alt'}"></div><div>${esc(r.notes)}${r.throwing ? `<div class="muted small">${esc(r.throwing)}${r.location ? ' · ' + esc(r.location) : ''}</div>` : ''}</div></div>`).join('') || '<div class="muted">No notes yet.</div>';
+
+  // HRV / recovery
+  const hr = inRange;
+  const roll = (arr, n) => arr.map((_, i) => { const w = arr.slice(Math.max(0, i-n+1), i+1).filter(x => x != null); return w.length ? mean(w) : null; });
+  const hrvVals = hr.map(r => r.hrv ?? null);
+  chart('ch-hrv', { type: 'line', data: { labels: hr.map(r => short(r.date)), datasets: [
+    lineDs('Recovery %', hr.map(r => r.recovery ?? null), C.teal, { yAxisID: 'y1', fill: true, backgroundColor: 'rgba(0,198,215,.08)', borderWidth: 1.5 }),
+    lineDs('HRV', hrvVals, 'rgba(255,205,0,.45)', { borderWidth: 1 }),
+    lineDs('HRV 7-day', roll(hrvVals, 7), C.gold, { borderWidth: 3 }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'HRV (ms)' } }, y1: { position: 'right', min: 0, max: 100, grid: { display: false }, title: { display: true, text: 'Recovery %' } }, x: { ticks: { maxTicksLimit: 10 } } } } });
+
+  // sleep
+  const sl = inRange.filter(r => r.sleep != null).slice(-Math.min(S.range, 60));
+  chart('ch-sleep', { type: 'bar', data: { labels: sl.map(r => short(r.date)), datasets: [
+    { label: 'Deep', data: sl.map(r => r.deep ?? 0), backgroundColor: C.blue, stack: 's' },
+    { label: 'REM', data: sl.map(r => r.rem ?? 0), backgroundColor: C.teal, stack: 's' },
+    { label: 'Light', data: sl.map(r => Math.max(0, (r.sleep || 0) - (r.deep || 0) - (r.rem || 0))), backgroundColor: 'rgba(143,163,191,.35)', stack: 's' },
+  ]}, options: { plugins: { tooltip: { callbacks: { label: c => `${c.dataset.label}: ${fmtDur(c.raw)}`, footer: items => 'Total: ' + fmtDur(sl[items[0].dataIndex].sleep) } } }, scales: { x: { stacked: true, ticks: { maxTicksLimit: 8 } }, y: { stacked: true, title: { display: true, text: 'hours' } } } } });
+
+  // arm care
+  const ar = rows.filter(r => r.armScore != null || r.totalStrength != null);
+  chart('ch-arm', { type: 'line', data: { labels: ar.map(r => short(r.date)), datasets: [
+    lineDs('Arm Score %', ar.map(r => r.armScore ?? null), C.gold, { pointRadius: 3, borderWidth: 3 }),
+    lineDs('Total strength (lb)', ar.map(r => r.totalStrength ?? null), C.sky, { yAxisID: 'y1', pointRadius: 2 }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'Arm Score %' } }, y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'lb' } } } } });
+
+  // bodyweight
+  const bwr = inRange.filter(r => r.bw != null);
+  const bwv = bwr.map(r => r.bw);
+  chart('ch-bw', { type: 'line', data: { labels: bwr.map(r => short(r.date)), datasets: [
+    lineDs('Bodyweight', bwv, 'rgba(79,163,227,.5)', { borderWidth: 1, pointRadius: 2 }),
+    lineDs('7-day avg', roll(bwv, 7), C.gold, { borderWidth: 3 }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'lb' } }, x: { ticks: { maxTicksLimit: 8 } } } } });
+
+  // live
+  const lv = rows.filter(r => r.strikePct != null || r.livePitches != null);
+  chart('ch-live', { data: { labels: lv.map(r => short(r.date)), datasets: [
+    { type: 'bar', label: 'Live pitches', data: lv.map(r => r.livePitches ?? null), backgroundColor: 'rgba(0,98,155,.7)', borderRadius: 6, yAxisID: 'y1' },
+    { type: 'line', label: 'Strike %', data: lv.map(r => r.strikePct ?? null), borderColor: C.gold, backgroundColor: C.gold, borderWidth: 3, pointRadius: 4, spanGaps: true },
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { min: 0, max: 100, title: { display: true, text: 'Strike %' } }, y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'pitches' } } } } });
+
+  // power
+  const pw = rows.filter(r => r.cmjFP != null || r.cmjCam != null || r.rsi != null);
+  chart('ch-power', { type: 'line', data: { labels: pw.map(r => short(r.date)), datasets: [
+    lineDs('CMJ force plates', pw.map(r => r.cmjFP ?? null), C.gold, { pointRadius: 3, borderWidth: 3 }),
+    lineDs('CMJ camera', pw.map(r => r.cmjCam ?? null), C.sky, { pointRadius: 3 }),
+    lineDs('RSI', pw.map(r => r.rsi ?? null), C.stitch, { pointRadius: 3, yAxisID: 'y1' }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'CMJ' } }, y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'RSI' } } } } });
+
+  // heatmap
+  const start = fromIso(first); start.setDate(start.getDate() - start.getDay());
+  const end = fromIso(last);
+  let html = '', d = new Date(start);
+  while (d <= end) {
+    html += '<div class="col">';
+    for (let i = 0; i < 7; i++) {
+      const k = iso(d), r = Store.byDate[k];
+      let bg = 'var(--navy-3)', cls = 'c';
+      if (k < first || d > end) bg = 'transparent';
+      else if (r?.throw) bg = (/pen|live|scrim|game|inning/i.test((r.throwing || '') + ' ' + (r.notes || '')) || r.pitches) ? C.gold : 'rgba(255,205,0,.45)';
+      if (r?.lift) cls += ' lift';
+      const tip = r ? `${longDate(k)}${r.throw ? ' · threw' + (r.throwing ? ': ' + r.throwing : '') : ''}${r.lift ? ' · lifted' : ''}${r.notes ? ' · ' + r.notes : ''}` : longDate(k);
+      html += `<div class="${cls}" style="background:${bg}" title="${esc(tip)}"></div>`;
+      d.setDate(d.getDate() + 1);
+    }
+    html += '</div>';
+  }
+  $('#heat').innerHTML = html;
+};
+
+/* ================= DATA LOG ================= */
+RENDER.log = function () {
+  const L = S.log;
+  const el = $('#v-log');
+  el.innerHTML = `
+  <div class="page-head"><div><h2>Data Log</h2><p>Every day, every metric. Click a column to sort, click a row to edit that day. <span class="p-top" style="padding:1px 6px;border-radius:4px">Gold</span> = top 10% of his history, <span class="p-hi" style="padding:1px 6px;border-radius:4px">green</span> = top third, <span class="p-lo" style="padding:1px 6px;border-radius:4px">red</span> = bottom third.</p></div>
+  <button class="btn ghost" id="log-export">⇩ Export view as CSV</button></div>
+  <div class="toolbar">
+    <input class="input" id="log-q" placeholder="Search notes, location, program…" value="${esc(L.q)}" style="min-width:220px;flex:1">
+    <input class="input" type="date" id="log-from" value="${L.from}" title="From">
+    <input class="input" type="date" id="log-to" value="${L.to}" title="To">
+    <label class="chk"><input type="checkbox" id="log-throw" ${L.throwOnly ? 'checked' : ''}> Throw days</label>
+    <label class="chk"><input type="checkbox" id="log-lift" ${L.liftOnly ? 'checked' : ''}> Lift days</label>
+  </div>
+  <div class="toolbar"><span class="muted small" style="font-weight:600">COLUMNS</span><div class="chips" id="log-groups">${Object.entries(GROUPS).map(([g, l]) => `<button class="chip ${L.groups.has(g) ? 'on' : ''}" data-g="${g}">${l}</button>`).join('')}<button class="chip" data-g="__all">All</button></div></div>
+  <div class="table-wrap" id="log-table"></div>
+  <div class="muted small" id="log-count" style="margin-top:8px"></div>`;
+
+  const upd = () => drawLogTable();
+  $('#log-q').oninput = e => { L.q = e.target.value; upd(); };
+  $('#log-from').onchange = e => { L.from = e.target.value; upd(); };
+  $('#log-to').onchange = e => { L.to = e.target.value; upd(); };
+  $('#log-throw').onchange = e => { L.throwOnly = e.target.checked; upd(); };
+  $('#log-lift').onchange = e => { L.liftOnly = e.target.checked; upd(); };
+  $$('#log-groups .chip').forEach(c => c.onclick = () => {
+    const g = c.dataset.g;
+    if (g === '__all') { const allOn = L.groups.size === Object.keys(GROUPS).length; L.groups = new Set(allOn ? ['day'] : Object.keys(GROUPS)); }
+    else L.groups.has(g) ? L.groups.delete(g) : L.groups.add(g);
+    RENDER.log();
+  });
+  $('#log-export').onclick = () => { download(`brandon-jackel-log-${todayIso()}.csv`, recordsToCSV(logRows())); toast('Exported ' + logRows().length + ' rows'); };
+  drawLogTable();
+};
+function logCols() {
+  return FIELDS.filter(f => f.k !== 'date' && S.log.groups.has(f.g) && (f.t === 'long' || f.t === 'text' || f.t === 'range' || f.t === 'frac' || f.t === 'bool' || (Store.stats[f.k]?.n || 0) > 0 || Object.keys(Store.local).length));
+}
+function logRows() {
+  const L = S.log; const q = L.q.toLowerCase();
+  let rows = Store.rows.filter(r =>
+    (!L.from || r.date >= L.from) && (!L.to || r.date <= L.to) &&
+    (!L.throwOnly || r.throw) && (!L.liftOnly || r.lift) &&
+    (!q || [r.notes, r.location, r.throwing, r.warmup, r.journal].join(' ').toLowerCase().includes(q)));
+  const f = FK[L.sort];
+  rows = rows.slice().sort((a, b) => {
+    if (L.sort === 'date') return (a.date < b.date ? -1 : 1) * L.dir;
+    const va = NUMERIC_T.has(f.t) || f.t === 'bool' ? nv(a, f) : a[f.k], vb = NUMERIC_T.has(f.t) || f.t === 'bool' ? nv(b, f) : b[f.k];
+    if (va == null && vb == null) return 0; if (va == null) return 1; if (vb == null) return -1;
+    return (va < vb ? -1 : va > vb ? 1 : 0) * L.dir;
+  });
+  return rows;
+}
+function drawLogTable() {
+  const cols = logCols().filter(f => {
+    // hide numeric columns with no data at all, unless they're in a small group
+    if (NUMERIC_T.has(f.t)) return (Store.stats[f.k]?.n || 0) > 0;
+    return Store.rows.some(r => r[f.k] != null && r[f.k] !== '');
+  });
+  const rows = logRows(); const L = S.log;
+  const groupsInOrder = [];
+  cols.forEach(f => { const last = groupsInOrder[groupsInOrder.length-1]; if (last && last.g === f.g) last.n++; else groupsInOrder.push({ g: f.g, n: 1 }); });
+  const arrow = k => L.sort === k ? (L.dir > 0 ? ' ▲' : ' ▼') : '';
+  let h = `<table class="data"><thead><tr><th class="grp sticky"></th>${groupsInOrder.map(g => `<th class="grp" colspan="${g.n}">${GROUPS[g.g]}</th>`).join('')}</tr>`;
+  h += `<tr><th class="sticky txt ${L.sort === 'date' ? 'sorted' : ''}" data-k="date">Date${arrow('date')}</th>${cols.map(f => `<th data-k="${f.k}" class="${L.sort === f.k ? 'sorted' : ''} ${['text','long','range'].includes(f.t) ? 'txt' : ''}" title="${esc(f.label)}">${esc(f.label)}${f.u && f.t !== 'pct' ? ` <span style="text-transform:none;opacity:.6">${f.u}</span>` : ''}${arrow(f.k)}</th>`).join('')}</tr></thead><tbody>`;
+  for (const r of rows) {
+    h += `<tr data-d="${r.date}"><td class="sticky txt"><b>${short(r.date)}</b> <span class="muted small">${DOW[fromIso(r.date).getDay()].slice(0,3)} '${r.date.slice(2,4)}</span>${Store.local[r.date] ? ' <span class="dot" title="Edited in app"></span>' : ''}</td>`;
+    for (const f of cols) {
+      const v = r[f.k];
+      let cls = '';
+      if (NUMERIC_T.has(f.t) && v != null) { const p = Store.pctile(f, nv(r, f)); if (p != null) cls = p >= .9 ? 'p-top' : p >= .667 ? 'p-hi' : p <= .333 ? 'p-lo' : ''; }
+      if (['text','range'].includes(f.t)) cls += ' txt';
+      if (f.t === 'long' || f.k === 'notes' || f.k === 'warmup') cls += ' txt wrap';
+      h += `<td class="${cls}">${v == null || v === '' ? '<span class="muted">·</span>' : esc(fmt(f, v))}</td>`;
+    }
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  $('#log-table').innerHTML = rows.length ? h : '<div class="empty">No days match these filters.</div>';
+  $('#log-count').textContent = `${rows.length} of ${Store.rows.length} days · ${cols.length} columns`;
+  $$('#log-table th[data-k]').forEach(th => th.onclick = () => { const k = th.dataset.k; if (L.sort === k) L.dir *= -1; else { L.sort = k; L.dir = k === 'date' ? -1 : -1; } drawLogTable(); });
+  $$('#log-table tbody tr').forEach(tr => tr.onclick = () => go('entry', { date: tr.dataset.d }));
+}
+
+/* ================= PERSONAL BESTS ================= */
+RENDER.bests = function () {
+  const el = $('#v-bests');
+  const g = S.bestsGroup;
+  const fields = NUM_FIELDS.filter(f => f.dir && (Store.stats[f.k]?.n || 0) >= 1 && (g === 'all' || f.g === g));
+  const byGroup = {};
+  fields.forEach(f => (byGroup[f.g] = byGroup[f.g] || []).push(f));
+  el.innerHTML = `
+  <div class="page-head"><div><h2>Personal Bests</h2><p>Best mark ever recorded for every metric, where he is now, and how close the latest number is to that best.</p></div></div>
+  <div class="toolbar"><div class="chips" id="bests-chips"><button class="chip ${g === 'all' ? 'on' : ''}" data-g="all">All</button>${Object.entries(GROUPS).filter(([k]) => NUM_FIELDS.some(f => f.g === k && f.dir && Store.stats[f.k]?.n)).map(([k, l]) => `<button class="chip ${g === k ? 'on' : ''}" data-g="${k}">${l}</button>`).join('')}</div></div>
+  ${Object.entries(byGroup).map(([gk, fs]) => `
+    <div class="group-title"><h3>${GROUPS[gk]}</h3></div>
+    <div class="grid bests-grid">${fs.map(bestCard).join('')}</div>`).join('') || '<div class="empty">No data yet.</div>'}
+  <div class="card" style="margin-top:20px">
+    <div class="card-head"><h3>Top 10 days</h3><select class="input" id="top-metric" style="width:auto">${NUM_FIELDS.filter(f => f.dir && Store.stats[f.k]?.n).map(f => `<option value="${f.k}">${esc(f.label)}</option>`).join('')}</select></div>
+    <div id="top10"></div>
+  </div>`;
+  $$('#bests-chips .chip').forEach(c => c.onclick = () => { S.bestsGroup = c.dataset.g; RENDER.bests(); });
+  $$('#v-bests .best').forEach(c => c.onclick = () => { $('#top-metric').value = c.dataset.k; drawTop10(); $('#top10').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+  $('#top-metric').value = S.topMetric || 'armScore';
+  $('#top-metric').onchange = drawTop10;
+  drawTop10();
+};
+function bestCard(f) {
+  const s = Store.stats[f.k];
+  const best = s.best, latest = s.latest;
+  let pctOf = null;
+  if (best && latest) {
+    if (f.dir === 'T1') pctOf = 100 - Math.abs(latest[1] - 1) * 100;
+    else if (f.dir === -1) pctOf = latest[1] ? best[1] / latest[1] * 100 : null;
+    else pctOf = best[1] ? latest[1] / best[1] * 100 : null;
+  }
+  const isPB = best && latest && best[0] === latest[0];
+  return `<div class="card best" data-k="${f.k}" style="cursor:pointer">
+    <div class="row"><span class="name" style="color:var(--text)">${esc(f.label)}</span><span>${s.n} logged</span></div>
+    <div class="big">${fmtStat(f, best?.[1])}${f.u && !['%','h'].includes(f.u) && f.t !== 'pct' ? `<small style="font-size:14px;color:var(--muted)"> ${f.u}</small>` : ''}</div>
+    <div class="row"><span>Best · ${best ? short(best[0]) + " '" + best[0].slice(2,4) : '—'}${f.dir === -1 ? ' (lower is better)' : f.dir === 'T1' ? ' (closest to 1.0)' : ''}</span>${isPB ? '<span style="color:var(--gold);font-weight:700">★ Current PB</span>' : ''}</div>
+    ${sparkSVG(s.pts.slice(-40).map(p => p[1]))}
+    <div class="row"><span>Latest <b style="color:var(--text)">${fmtStat(f, latest?.[1])}</b> · ${latest ? short(latest[0]) : ''}</span><span>Avg ${fmtStat(f, s.mean)}</span></div>
+    <div class="bar"><i style="width:${clamp(pctOf || 0, 0, 100)}%"></i></div>
+    <div class="row"><span>${pctOf != null ? Math.round(pctOf) + '% of best' : ''}</span></div>
+  </div>`;
+}
+function drawTop10() {
+  const k = $('#top-metric').value; S.topMetric = k; const f = FK[k]; const s = Store.stats[k];
+  const top = s.pts.slice().sort((a, b) => s.score(b[1]) - s.score(a[1])).slice(0, 10);
+  $('#top10').innerHTML = `<table class="recipe"><thead><tr><th>#</th><th style="text-align:left">Date</th><th>${esc(f.label)}</th><th>Sleep</th><th>HRV</th><th>Recovery</th><th>Bodyweight</th><th style="text-align:left">Notes</th></tr></thead><tbody>${top.map((p, i) => { const r = Store.byDate[p[0]]; return `<tr><td style="text-align:left">${i+1}</td><td style="text-align:left">${short(p[0])} '${p[0].slice(2,4)}</td><td style="color:var(--gold);font-weight:700">${fmtStat(f, p[1])}</td><td>${fmt(FK.sleep, r.sleep)}</td><td>${fmt(FK.hrv, r.hrv)}</td><td>${fmt(FK.recovery, r.recovery)}</td><td>${fmt(FK.bw, r.bw)}</td><td style="text-align:left" class="muted">${esc(r.notes || r.throwing || '')}</td></tr>`; }).join('')}</tbody></table>`;
+}
+
+/* ================= INSIGHTS ================= */
+function xValue(f, date, lag) {
+  if (lag === 0) return nv(Store.byDate[date], f);
+  if (lag === 1) return nv(Store.byDate[addDays(date, -1)], f);
+  if (lag === 3) { const v = [1,2,3].map(i => nv(Store.byDate[addDays(date, -i)], f)).filter(x => x != null); return v.length ? mean(v) : null; }
+  return null;
+}
+function pairs(fx, fy, lag) {
+  const out = [];
+  for (const r of Store.rows) {
+    const y = nv(r, fy); if (y == null) continue;
+    const x = xValue(fx, r.date, lag); if (x == null) continue;
+    out.push({ x, y, d: r.date });
+  }
+  return out;
+}
+function pearson(p) {
+  const n = p.length; if (n < 3) return null;
+  const mx = mean(p.map(a => a.x)), my = mean(p.map(a => a.y));
+  let sxy = 0, sxx = 0, syy = 0;
+  for (const a of p) { sxy += (a.x-mx)*(a.y-my); sxx += (a.x-mx)**2; syy += (a.y-my)**2; }
+  if (!sxx || !syy) return null;
+  return { r: sxy / Math.sqrt(sxx*syy), slope: sxy / sxx, icpt: my - (sxy/sxx)*mx };
+}
+const strength = r => { const a = Math.abs(r); return a >= .7 ? 'very strong' : a >= .5 ? 'strong' : a >= .3 ? 'moderate' : a >= .15 ? 'weak' : 'little to no'; };
+const lagLabel = l => l === 0 ? 'same day' : l === 1 ? 'the day before' : 'the 3 days before (avg)';
+function metricOptions(sel, minN = 3) {
+  const grouped = {};
+  FIELDS.filter(f => (NUMERIC_T.has(f.t) || f.t === 'bool') && (f.t === 'bool' ? Store.rows.some(r => r[f.k] != null) : (Store.stats[f.k]?.n || 0) >= minN)).forEach(f => (grouped[f.g] = grouped[f.g] || []).push(f));
+  return Object.entries(grouped).map(([g, fs]) => `<optgroup label="${GROUPS[g]}">${fs.map(f => `<option value="${f.k}" ${f.k === sel ? 'selected' : ''}>${esc(f.label)}${f.t === 'bool' ? ' (yes/no)' : ''}</option>`).join('')}</optgroup>`).join('');
+}
+RENDER.insights = function () {
+  const I = S.ins;
+  $('#v-insights').innerHTML = `
+  <div class="page-head"><div><h2>Insights</h2><p>Match any stat against any other. Find out what his best days have in common — and what to aim for.</p></div></div>
+  <div class="grid charts">
+    <div class="card span-7">
+      <div class="card-head"><h3>Compare two stats</h3></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <label class="field"><span>Input (X)</span><select class="input" id="ins-x">${metricOptions(I.x)}</select></label>
+        <label class="field"><span>Outcome (Y)</span><select class="input" id="ins-y">${metricOptions(I.y)}</select></label>
+        <label class="field"><span>X measured</span><select class="input" id="ins-lag"><option value="0">Same day</option><option value="1">Day before</option><option value="3">Avg of prior 3 days</option></select></label>
+      </div>
+      <div class="chart-box tall"><canvas id="ch-scatter"></canvas></div>
+    </div>
+    <div class="card span-5">
+      <div class="card-head"><h3>What it means</h3></div>
+      <div id="ins-read"></div>
+    </div>
+
+    <div class="card span-6">
+      <div class="card-head"><h3>What moves <span id="drv-name"></span>?</h3><select class="input" id="ins-target" style="width:auto">${metricOptions(I.target, 5)}</select></div>
+      <label class="chk" style="margin-bottom:8px"><input type="checkbox" id="ins-same" ${I.same ? 'checked' : ''}> Include stats from the same category (e.g. IR/ER inside Arm Score)</label>
+      <p class="muted small" style="margin-top:0">Every other stat ranked by how closely it tracks this one (input measured <span id="drv-lag"></span>). Gold bar = moves together, blue bar = moves opposite. Click a row to plot it.</p>
+      <div class="drivers" id="drivers"></div>
+    </div>
+    <div class="card span-6">
+      <div class="card-head"><h3>Optimal zone</h3><span class="muted small">Best 25% of days vs the rest</span></div>
+      <div id="recipe"></div>
+    </div>
+  </div>`;
+  $('#ins-lag').value = String(I.lag);
+  $('#ins-x').onchange = e => { I.x = e.target.value; drawScatter(); };
+  $('#ins-y').onchange = e => { I.y = e.target.value; drawScatter(); };
+  $('#ins-lag').onchange = e => { I.lag = +e.target.value; drawScatter(); drawDrivers(); drawRecipe(); };
+  $('#ins-target').onchange = e => { I.target = e.target.value; drawDrivers(); drawRecipe(); };
+  $('#ins-same').onchange = e => { I.same = e.target.checked; drawDrivers(); drawRecipe(); };
+  drawScatter(); drawDrivers(); drawRecipe();
+};
+function drawScatter() {
+  const I = S.ins, fx = FK[I.x], fy = FK[I.y];
+  const p = pairs(fx, fy, I.lag), pr = pearson(p);
+  const xs = p.map(a => a.x);
+  const line = pr ? [{ x: Math.min(...xs), y: pr.icpt + pr.slope * Math.min(...xs) }, { x: Math.max(...xs), y: pr.icpt + pr.slope * Math.max(...xs) }] : [];
+  chart('ch-scatter', { type: 'scatter', data: { datasets: [
+    { label: 'Days', data: p, backgroundColor: 'rgba(255,205,0,.75)', borderColor: C.gold, pointRadius: 5, pointHoverRadius: 7 },
+    { type: 'line', label: 'Trend', data: line, borderColor: C.teal, borderWidth: 2, borderDash: [6,4], pointRadius: 0 },
+  ]}, options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.d ? `${short(c.raw.d)}: ${fx.label} ${fmtStat(fx, c.raw.x)} → ${fy.label} ${fmtStat(fy, c.raw.y)}` : 'Trend' } } },
+    scales: { x: { title: { display: true, text: `${fx.label} (${lagLabel(I.lag)})` }, ticks: { callback: v => fx.t === 'dur' ? fmtDur(v) : v } }, y: { title: { display: true, text: fy.label }, ticks: { callback: v => fy.t === 'dur' ? fmtDur(v) : v } } } } });
+  const el = $('#ins-read');
+  if (!pr) { el.innerHTML = `<div class="callout">Only <b>${p.length}</b> day(s) have both <b>${esc(fx.label)}</b> and <b>${esc(fy.label)}</b>. Need at least 3 to compare — keep logging both.</div>`; return; }
+  const col = pr.r > 0 ? C.gold : C.sky;
+  const dirWord = pr.r > 0 ? 'higher' : 'lower';
+  const per = fx.t === 'dur' ? 'per extra hour' : fx.t === 'bool' ? 'on "yes" days' : `per +1 ${fx.u || 'unit'}`;
+  el.innerHTML = `
+    <div style="display:flex;align-items:baseline;gap:12px"><div class="r-badge" style="color:${col}">${pr.r > 0 ? '+' : ''}${pr.r.toFixed(2)}</div><div class="muted">correlation (r) · ${p.length} days</div></div>
+    <p><b>${strength(pr.r)[0].toUpperCase() + strength(pr.r).slice(1)}</b> relationship. When <b>${esc(fx.label)}</b> (${lagLabel(I.lag)}) is higher, <b>${esc(fy.label)}</b> tends to be <b style="color:${col}">${dirWord}</b>.</p>
+    <p class="muted">Trend line: about <b style="color:var(--text)">${pr.slope > 0 ? '+' : ''}${fmtNum(pr.slope)}</b> ${esc(fy.u || '')} of ${esc(fy.label)} ${per}.</p>
+    ${p.length < 10 ? `<div class="callout">Small sample (${p.length} days) — treat this as a hint, not a rule. It gets more reliable with every entry.</div>` : ''}
+    <p class="muted small">Correlation shows what moves together, not what causes what. Use it to pick what to test next.</p>`;
+}
+function drawDrivers() {
+  const I = S.ins, ft = FK[I.target];
+  $('#drv-name').textContent = ft.label; $('#drv-lag').textContent = lagLabel(I.lag);
+  const res = [];
+  for (const f of FIELDS) {
+    if (f.k === ft.k || !(NUMERIC_T.has(f.t) || f.t === 'bool')) continue;
+    if (!I.same && f.g === ft.g) continue;
+    const p = pairs(f, ft, I.lag); if (p.length < 6) continue;
+    const pr = pearson(p); if (!pr) continue;
+    res.push({ f, r: pr.r, n: p.length });
+  }
+  res.sort((a, b) => Math.abs(b.r) - Math.abs(a.r));
+  $('#drivers').innerHTML = res.slice(0, 16).map(x => `<div class="driver" data-k="${x.f.k}"><span>${esc(x.f.label)}</span><div class="track"><i style="${x.r >= 0 ? `left:50%;width:${Math.abs(x.r)*50}%;background:${C.gold}` : `right:50%;width:${Math.abs(x.r)*50}%;background:${C.sky}`}"></i></div><b style="text-align:right;color:${x.r >= 0 ? C.gold : C.sky}">${x.r > 0 ? '+' : ''}${x.r.toFixed(2)}</b><span class="n muted small">n${x.n}</span></div>`).join('') || '<div class="muted">Not enough overlapping days yet (need 6+).</div>';
+  $$('#drivers .driver').forEach(d => d.onclick = () => { S.ins.x = d.dataset.k; S.ins.y = I.target; $('#ins-x').value = S.ins.x; $('#ins-y').value = S.ins.y; drawScatter(); $('#ch-scatter').scrollIntoView({ behavior: 'smooth', block: 'center' }); });
+}
+function drawRecipe() {
+  const I = S.ins, ft = FK[I.target], s = Store.stats[ft.k];
+  const el = $('#recipe');
+  if (!s || s.n < 8 || !ft.dir) { el.innerHTML = `<div class="callout">Pick an outcome with a clear "better" direction and at least 8 logged days. <b>${esc(ft.label)}</b> has ${s?.n || 0}.</div>`; return; }
+  const scored = s.pts.map(p => ({ d: p[0], v: p[1], sc: s.score(p[1]) })).sort((a, b) => b.sc - a.sc);
+  const cut = Math.max(2, Math.round(scored.length / 4));
+  const best = new Set(scored.slice(0, cut).map(x => x.d));
+  const rows = [];
+  for (const f of FIELDS) {
+    if (f.k === ft.k || !(NUMERIC_T.has(f.t))) continue;
+    if (!I.same && f.g === ft.g) continue;
+    const b = [], o = [];
+    for (const p of scored) { const x = xValue(f, p.d, I.lag); if (x == null) continue; (best.has(p.d) ? b : o).push(x); }
+    if (b.length < 3 || o.length < 3) continue;
+    const all = b.concat(o), sdev = sd(all); if (!sdev) continue;
+    const eff = (mean(b) - mean(o)) / sdev;
+    rows.push({ f, mb: mean(b), mo: mean(o), eff, nb: b.length });
+  }
+  rows.sort((a, b) => Math.abs(b.eff) - Math.abs(a.eff));
+  const top = rows.slice(0, 10);
+  const threshold = scored[cut - 1].v;
+  el.innerHTML = `
+    <p class="muted small" style="margin-top:0">Best days = top ${cut} of ${scored.length} for <b style="color:var(--text)">${esc(ft.label)}</b> (${ft.dir === -1 ? '≤' : '≥'} ${fmtStat(ft, threshold)}). Inputs measured ${lagLabel(I.lag)}.</p>
+    ${top.length ? `<table class="recipe"><thead><tr><th>Stat</th><th>Best days</th><th>Other days</th><th>Gap</th></tr></thead><tbody>
+    ${top.map(x => `<tr><td>${esc(x.f.label)}</td><td style="color:var(--gold);font-weight:700">${fmtStat(x.f, x.mb)}</td><td class="muted">${fmtStat(x.f, x.mo)}</td><td style="color:${x.eff >= 0 ? C.gold : C.sky}">${x.eff >= 0 ? '▲' : '▼'} ${Math.abs(x.eff).toFixed(1)}σ</td></tr>`).join('')}
+    </tbody></table>
+    <div class="callout" style="margin-top:12px"><b>Aim for:</b> ${top.slice(0, 3).map(x => `${esc(x.f.label)} around <b>${fmtStat(x.f, x.mb)}</b>`).join(', ')} — that's what his best ${esc(ft.label)} days looked like.</div>` : '<div class="muted">Not enough overlapping data yet.</div>'}`;
+}
+
+/* ================= DAILY ENTRY ================= */
+const ENTRY_ORDER = ['well','day','sleep','body','velo','live','arm','power','load'];
+const OPEN_BY_DEFAULT = new Set(['well','day','sleep','body']);
+RENDER.entry = function () {
+  const date = S.entryDate || todayIso();
+  S.entryDate = date;
+  const r = Store.byDate[date] || { date };
+  const exists = !!Store.byDate[date];
+  const input = f => {
+    const v = r[f.k];
+    const id = 'f-' + f.k;
+    const lbl = `<span>${esc(f.label)}${f.u && f.t !== 'scale' ? `<em class="unit">${f.u}</em>` : ''}</span>`;
+    switch (f.t) {
+      case 'bool': return `<div class="field">${lbl}<div class="toggle" data-k="${f.k}" data-v="${v === true ? 'y' : v === false ? 'n' : ''}"><button type="button" data-v="y" class="${v === true ? 'on' : ''}">Yes</button><button type="button" data-v="n" class="${v === false ? 'on' : ''}">No</button></div></div>`;
+      case 'scale': return `<div class="field">${lbl}<div class="scale" data-k="${f.k}" data-v="${v ?? ''}">${Array.from({ length: 10 }, (_, i) => `<button type="button" data-v="${i+1}" class="${v == i+1 ? 'on' : ''}">${i+1}</button>`).join('')}</div></div>`;
+      case 'long': return `<label class="field wide">${lbl}<textarea class="input" id="${id}" placeholder="How's the body? How's the arm? Anything on your mind — sleep, school, stress, what felt good in the bullpen…">${esc(v || '')}</textarea></label>`;
+      case 'dur': return `<label class="field">${lbl}<input class="input" id="${id}" placeholder="h:mm e.g. 7:45" value="${v != null ? (Math.floor(v) + ':' + String(Math.round((v - Math.floor(v))*60)).padStart(2,'0')) : ''}"></label>`;
+      case 'frac': return `<label class="field">${lbl}<input class="input" id="${id}" placeholder="e.g. 8/12" value="${esc(v ?? '')}"></label>`;
+      case 'range': return `<label class="field">${lbl}<input class="input" id="${id}" placeholder="e.g. 88-92" value="${esc(v ?? '')}"></label>`;
+      case 'text': return `<label class="field ${f.k === 'notes' || f.k === 'warmup' ? 'wide' : ''}">${lbl}<input class="input" id="${id}" value="${esc(v ?? '')}" ${f.k === 'bedIn' || f.k === 'bedOut' ? 'placeholder="e.g. 10:30"' : ''}></label>`;
+      default: return `<label class="field">${lbl}<input class="input" id="${id}" type="number" step="any" inputmode="decimal" value="${v ?? ''}"></label>`;
+    }
+  };
+  const sections = ENTRY_ORDER.map(g => {
+    const fs = FIELDS.filter(f => f.g === g && f.k !== 'date');
+    const filled = fs.filter(f => r[f.k] != null && r[f.k] !== '').length;
+    return `<details class="sec" ${OPEN_BY_DEFAULT.has(g) || (filled && g !== 'load') ? 'open' : ''}><summary><h3>${GROUPS[g]}</h3><span class="muted small">${filled ? filled + ' filled' : ''}</span></summary><div class="body">${fs.map(input).join('')}</div></details>`;
+  }).join('');
+  const prev = Store.rows.filter(x => x.date < date).slice(-1)[0];
+  $('#v-entry').innerHTML = `
+  <div class="page-head"><div><h2>Daily Entry</h2><p>${exists ? 'Editing' : 'New entry for'} <b style="color:var(--text)">${longDate(date)}</b>. Fill in whatever you have — every field is optional.</p></div>
+    <div class="toolbar" style="margin:0"><button class="btn ghost" id="e-prev">‹</button><input class="input" type="date" id="e-date" value="${date}" style="width:auto"><button class="btn ghost" id="e-next">›</button><button class="btn ghost" id="e-today">Today</button></div></div>
+  <div class="entry-layout">
+    <form id="entry-form" onsubmit="return false">${sections}</form>
+    <div class="sticky-panel">
+      <div class="card" style="background:url('bj-mound.jpg') center/cover;min-height:120px;position:relative;overflow:hidden;padding:0"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,17,32,.92),rgba(8,17,32,.2));"></div><div style="position:relative;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;height:100%;min-height:120px"><div class="eyebrow">${DOW[fromIso(date).getDay()]}</div><div style="font-family:'Barlow Condensed';font-size:28px;font-weight:800;text-transform:uppercase;line-height:1">${short(date)}, ${date.slice(0,4)}</div></div></div>
+      <button class="btn" id="e-save" style="justify-content:center;padding:13px">Save entry</button>
+      ${Store.local[date] ? `<button class="btn ghost" id="e-revert" style="justify-content:center">${Store.seed[date] ? 'Revert to spreadsheet values' : 'Delete this entry'}</button>` : ''}
+      <div class="card"><div class="kpi-lbl" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Previous day · ${prev ? short(prev.date) : '—'}</div>
+        ${prev ? `<div class="small" style="margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:4px 10px">${['sleep','hrv','recovery','bw','armScore','feel','armFeel'].filter(k => prev[k] != null).map(k => `<span class="muted">${FK[k].label}</span><b>${fmt(FK[k], prev[k])}</b>`).join('')}</div>${prev.journal ? `<div class="small muted" style="margin-top:8px;font-style:italic">“${esc(prev.journal.slice(0, 160))}${prev.journal.length > 160 ? '…' : ''}”</div>` : ''}` : '<div class="muted small">No earlier entries.</div>'}
+      </div>
+      <div class="muted small">Saved entries live in this browser and show everywhere in the app straight away. Export a backup from Import / Export now and then.</div>
+    </div>
+  </div>`;
+
+  const setDate = d => { S.entryDate = d; RENDER.entry(); };
+  $('#e-date').onchange = e => e.target.value && setDate(e.target.value);
+  $('#e-prev').onclick = () => setDate(addDays(date, -1));
+  $('#e-next').onclick = () => setDate(addDays(date, 1));
+  $('#e-today').onclick = () => setDate(todayIso());
+  $$('#entry-form .toggle, #entry-form .scale').forEach(w => w.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const same = w.dataset.v === b.dataset.v;
+    w.dataset.v = same ? '' : b.dataset.v;
+    $$('button', w).forEach(x => x.classList.toggle('on', !same && x === b));
+  });
+  $('#e-save').onclick = () => {
+    const rec = { date };
+    for (const f of FIELDS) {
+      if (f.k === 'date') continue;
+      let v;
+      if (f.t === 'bool') { const w = $(`.toggle[data-k="${f.k}"]`); v = w.dataset.v === 'y' ? true : w.dataset.v === 'n' ? false : undefined; }
+      else if (f.t === 'scale') { const w = $(`.scale[data-k="${f.k}"]`); v = w.dataset.v ? +w.dataset.v : undefined; }
+      else { const inp = $('#f-' + f.k); v = parseVal(f, inp.value); if (inp.value.trim() && v === undefined) { toast(`Check "${f.label}" — couldn't read "${inp.value}"`); inp.focus(); return; } }
+      // null marks a field that was cleared so it overrides the spreadsheet value
+      rec[f.k] = v === undefined ? (Store.seed[date] && Store.seed[date][f.k] != null ? null : undefined) : v;
+      if (rec[f.k] === undefined) delete rec[f.k];
+    }
+    Store.put(rec); sideStats();
+    toast('Saved ' + longDate(date));
+    RENDER.entry();
+  };
+  const rv = $('#e-revert');
+  if (rv) rv.onclick = () => {
+    if (!confirm(Store.seed[date] ? 'Discard the edits made in the app for this day and go back to the spreadsheet values?' : 'Delete this entry?')) return;
+    delete Store.local[date]; Store.save(); sideStats(); toast('Done'); RENDER.entry();
+  };
+};
+
+/* ================= JOURNAL ================= */
+RENDER.journal = function () {
+  const q = S.jq.toLowerCase();
+  const items = Store.rows.filter(r => r.journal || r.notes || r.feel != null || r.armFeel != null).filter(r => !q || [r.journal, r.notes, r.throwing, r.location].join(' ').toLowerCase().includes(q)).reverse();
+  const withFeel = Store.rows.filter(r => r.feel != null || r.armFeel != null).slice(-60);
+  $('#v-journal').innerHTML = `
+  <div class="page-head"><div><h2>Journal</h2><p>How he's feeling, in his own words — next to the numbers from the same day.</p></div><button class="btn" id="j-new">＋ Write today's entry</button></div>
+  ${withFeel.length >= 2 ? `<div class="card" style="margin-bottom:14px"><div class="card-head"><h3>How he's felt</h3></div><div class="chart-box" style="height:200px"><canvas id="ch-feel"></canvas></div></div>` : ''}
+  <div class="toolbar"><input class="input" id="j-q" placeholder="Search the journal…" value="${esc(S.jq)}"></div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))">
+  ${items.map(r => `<div class="card j-card" data-d="${r.date}" style="cursor:pointer">
+     <div style="display:flex;justify-content:space-between;align-items:baseline"><span class="j-date">${short(r.date)} '${r.date.slice(2,4)}</span><span class="muted small">${DOW[fromIso(r.date).getDay()]}</span></div>
+     <div style="display:flex;gap:6px;flex-wrap:wrap">${['feel','armFeel','energy','soreness'].filter(k => r[k] != null).map(k => `<span class="mini">${FK[k].label} <b>${r[k]}</b></span>`).join('')}${r.throw ? '<span class="mini">Threw</span>' : ''}${r.lift ? '<span class="mini">Lifted</span>' : ''}${r.recovery != null ? `<span class="mini">Recovery <b>${r.recovery}%</b></span>` : ''}</div>
+     ${r.journal ? `<div class="j-text">${esc(r.journal)}</div>` : ''}
+     ${r.notes ? `<div class="muted">📝 ${esc(r.notes)}</div>` : ''}
+     ${r.throwing ? `<div class="muted small">${esc(r.throwing)}${r.location ? ' · ' + esc(r.location) : ''}</div>` : ''}
+   </div>`).join('') || '<div class="empty">No journal entries yet. Use “Write today’s entry” to add how he’s feeling.</div>'}
+  </div>`;
+  $('#j-q').oninput = e => { S.jq = e.target.value; const pos = e.target.selectionStart; RENDER.journal(); const i = $('#j-q'); i.focus(); i.setSelectionRange(pos, pos); };
+  $('#j-new').onclick = () => go('entry', { date: todayIso() });
+  $$('#v-journal .j-card').forEach(c => c.onclick = () => go('entry', { date: c.dataset.d }));
+  if (withFeel.length >= 2) chart('ch-feel', { type: 'line', data: { labels: withFeel.map(r => short(r.date)), datasets: [
+    lineDs('Overall', withFeel.map(r => r.feel ?? null), C.gold, { pointRadius: 3, borderWidth: 3 }),
+    lineDs('Arm', withFeel.map(r => r.armFeel ?? null), C.teal, { pointRadius: 3 }),
+    lineDs('Energy', withFeel.map(r => r.energy ?? null), C.sky, { pointRadius: 2 }),
+    lineDs('Soreness', withFeel.map(r => r.soreness ?? null), C.stitch, { pointRadius: 2, borderDash: [4,4] }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { y: { min: 0, max: 10 } } } });
+};
+
+/* ================= IMPORT / EXPORT ================= */
+RENDER.data = function () {
+  const n = Object.keys(Store.local).length;
+  $('#v-data').innerHTML = `
+  <div class="page-head"><div><h2>Import / Export</h2><p>Upload new spreadsheet exports, back everything up, or move the data to another device.</p></div></div>
+  <div class="grid charts">
+    <div class="card span-6">
+      <div class="card-head"><h3>Upload a spreadsheet (CSV)</h3></div>
+      <p class="muted" style="margin-top:0">Same columns as the “Data - 2026” sheet (File → Download → CSV in Google Sheets). Matching dates are updated, new dates are added, blank cells never wipe existing numbers.</p>
+      <div class="dropzone" id="drop"><div style="font-size:28px">⇪</div><b>Drop a CSV here</b><div class="muted small">or click to choose a file</div><input type="file" id="file" accept=".csv,text/csv" hidden></div>
+      <div id="import-result" style="margin-top:12px"></div>
+    </div>
+    <div class="card span-6">
+      <div class="card-head"><h3>Export & back up</h3></div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="btn" id="x-csv">⇩ Download full data as CSV</button>
+        <span class="muted small">Every day with every metric plus the wellness scores and journal — opens in Google Sheets / Excel and can be re-uploaded here.</span>
+        <button class="btn ghost" id="x-json">⇩ Download app backup (.json)</button>
+        <label class="btn ghost" style="justify-content:flex-start">⇧ Restore app backup<input type="file" id="x-restore" accept=".json,application/json" hidden></label>
+        <span class="muted small">${n} day(s) edited or added in this browser.</span>
+        ${n ? '<button class="btn danger" id="x-reset">Clear all in-app edits</button>' : ''}
+      </div>
+    </div>
+    <div class="card span-12">
+      <div class="card-head"><h3>What's tracked</h3><span class="muted small">${FIELDS.length} fields across ${Object.keys(GROUPS).length} categories</span></div>
+      <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">${Object.entries(GROUPS).map(([g, l]) => `<div><div style="color:var(--gold);font-weight:700;margin-bottom:4px">${l}</div><div class="muted small">${FIELDS.filter(f => f.g === g && f.k !== 'date').map(f => `${esc(f.label)}${Store.stats[f.k] ? ` <span style="opacity:.6">(${Store.stats[f.k].n})</span>` : ''}`).join(' · ')}</div></div>`).join('')}</div>
+    </div>
+  </div>`;
+  const drop = $('#drop'), file = $('#file');
+  drop.onclick = () => file.click();
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+  drop.ondragleave = () => drop.classList.remove('over');
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) importCSV(e.dataTransfer.files[0]); };
+  file.onchange = () => file.files[0] && importCSV(file.files[0]);
+  $('#x-csv').onclick = () => { download(`brandon-jackel-pitching-${todayIso()}.csv`, recordsToCSV(Store.rows)); toast('CSV downloaded'); };
+  $('#x-json').onclick = () => { download(`triton-pitching-lab-backup-${todayIso()}.json`, JSON.stringify({ app: 'triton-pitching-lab', version: 1, exported: new Date().toISOString(), local: Store.local, deleted: Store.deleted }, null, 1), 'application/json'); toast('Backup downloaded'); };
+  $('#x-restore').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    f.text().then(t => { const j = JSON.parse(t); if (!j.local) throw 0; Store.local = j.local; Store.deleted = j.deleted || {}; Store.save(); sideStats(); toast('Backup restored'); RENDER.data(); }).catch(() => toast('That file is not a Triton Pitching Lab backup'));
+  };
+  const rs = $('#x-reset');
+  if (rs) rs.onclick = () => { if (confirm('Remove every edit and entry made in this browser? Spreadsheet data stays. Download a backup first if unsure.')) { Store.local = {}; Store.deleted = {}; Store.save(); sideStats(); toast('Cleared'); RENDER.data(); } };
+};
+function importCSV(file) {
+  file.text().then(text => {
+    const { records, unmatched } = csvToRecords(text);
+    const dates = Object.keys(records).sort();
+    if (!dates.length) { $('#import-result').innerHTML = '<div class="callout">No dated rows found. Make sure the first column is “Date”.</div>'; return; }
+    let added = 0, updated = 0;
+    for (const d of dates) {
+      const had = !!Store.byDate[d];
+      Store.local[d] = Object.assign({}, Store.local[d] || {}, records[d], { _updated: new Date().toISOString(), _src: file.name });
+      delete Store.deleted[d];
+      had ? updated++ : added++;
+    }
+    Store.save(); sideStats();
+    $('#import-result').innerHTML = `<div class="callout">Imported <b>${dates.length}</b> days from <b>${esc(file.name)}</b> (${short(dates[0])} – ${short(dates[dates.length-1])}): ${added} new, ${updated} updated.${unmatched.length ? `<br><span class="muted small">Columns not recognised (skipped): ${unmatched.map(esc).join(', ')}</span>` : ''}</div>`;
+    toast('Import complete');
+  });
+}
+
+/* ---------------- boot ---------------- */
+Store.load();
+sideStats();
+$$('#nav button').forEach(b => b.onclick = () => go(b.dataset.view));
+const start = (location.hash || '').slice(1);
+go(RENDER[start] ? start : 'dash');
+
+</script>
+</body>
+</html>
