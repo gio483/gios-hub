@@ -1,7 +1,7 @@
 {
   "name": "Triton Pitching Lab",
   "short_name": "Triton Lab",
-  "description": "Brandon Jackel pitching, recovery and arm-care dashboard",
+  "description": "Branden Jackel pitching, recovery and arm-care dashboard",
   "start_url": "/triton-pitching-lab.html",
   "scope": "/triton-pitching-lab.html",
   "display": "standalone",

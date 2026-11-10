@@ -2,7 +2,7 @@ import { put, list } from '@vercel/blob';
 import momHandler, { isMomCron } from './_mom.mjs';
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
-const PATHS = { lifeos: 'lifeos/data.json', bni: 'sdlr-bni/outreach.json', dock: 'dock/data.json', triton: 'triton-lab/entries.json' };
+const PATHS = { lifeos: 'lifeos/data.json', bni: 'sdlr-bni/outreach.json', dock: 'dock/data.json' };
 function nsOf(req) {
   try { return new URL(req.url, 'http://x').searchParams.get('ns') || 'lifeos'; }
   catch (e) { return 'lifeos'; }
@@ -51,7 +51,7 @@ try { body = JSON.parse(Buffer.concat(chunks).toString() || '{}'); } catch { bod
 }
 try {
 let payload = body && body.data !== undefined ? body.data : (body || {});
-if (NS === 'bni' || NS === 'dock' || NS === 'triton') {
+if (NS === 'bni' || NS === 'dock') {
   const current = await readBlob(PATH);
   const merged = { ...current };
   for (const [k, v] of Object.entries(payload || {})) {
