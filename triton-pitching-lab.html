@@ -268,6 +268,28 @@ textarea.input{min-height:110px;resize:vertical}
 }
 @media (max-width:380px){ details.sec .body{grid-template-columns:1fr} .hero h1{font-size:30px} }
 
+/* lifting log */
+.lift-ex{margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.lift-head{display:flex;gap:8px;align-items:center}
+.lift-name{font-weight:700;font-size:15px;flex:1;min-width:0}
+.lift-last{font-size:12px;color:var(--muted);background:rgba(0,198,215,.07);border:1px solid rgba(0,198,215,.2);border-radius:8px;padding:6px 10px}
+.lift-last b{color:var(--teal);font-weight:700}
+.icon-btn{all:unset;box-sizing:border-box;cursor:pointer;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);flex:0 0 40px;font-size:13px}
+.icon-btn:hover{color:var(--red);border-color:rgba(255,107,107,.45)}
+.set-grid{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) 40px;gap:8px;align-items:center}
+.set-grid > span{font-size:10.5px;color:var(--muted);text-transform:uppercase;font-weight:700;letter-spacing:.05em}
+.set-grid > b{text-align:center;color:var(--gold);font-family:"Barlow Condensed";font-size:19px}
+.set-grid .input{text-align:center;font-weight:600}
+.lift-foot{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.small-btn{padding:8px 13px;font-size:13px}
+.lift-note{font-size:13px}
+.lift-add{margin-bottom:12px}
+.lift-add-row{display:flex;gap:8px}
+.lift-add-row .input{flex:1;min-width:0}
+.lift-recent{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:baseline;padding:8px 6px;border-bottom:1px solid var(--line);cursor:pointer;border-radius:6px}
+.lift-recent:hover,.lift-recent.on{background:rgba(255,205,0,.06)}
+.lift-recent .muted{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
 /* cloud sync status */
 .sync{font-size:11px;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:5px;color:var(--muted);white-space:nowrap}
 .sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex:0 0 7px}
@@ -328,6 +350,7 @@ textarea.input{min-height:110px;resize:vertical}
       <button data-view="bests"><span class="ico">★</span>Personal Bests</button>
       <button data-view="insights"><span class="ico">⟋</span>Insights</button>
       <button data-view="entry"><span class="ico">＋</span>Daily Entry</button>
+      <button data-view="lifts"><span class="ico">▲</span>Lifting Log</button>
       <button data-view="journal"><span class="ico">✎</span>Journal</button>
       <button data-view="data"><span class="ico">⇅</span>Import / Export</button>
     </nav>
@@ -343,6 +366,7 @@ textarea.input{min-height:110px;resize:vertical}
     <section class="view" id="v-bests"></section>
     <section class="view" id="v-insights"></section>
     <section class="view" id="v-entry"></section>
+    <section class="view" id="v-lifts"></section>
     <section class="view" id="v-journal"></section>
     <section class="view" id="v-data"></section>
   </main>
@@ -474,8 +498,13 @@ const FIELD_ROWS = [
   ['energy','Energy','well','scale','/10',1,'Energy'],
   ['soreness','Soreness','well','scale','/10',-1,'Soreness'],
   ['journal','How are you feeling?','well','long','',0,'Journal'],
+
+  // filled in automatically from the Lifting Log page (not typed in the daily form)
+  ['liftVol','Lift Volume','power','num','lb',1,'Lift Volume'],
+  ['liftsText','Lifting Log','power','text','',0,'Lifting Log'],
 ];
-const FIELDS = FIELD_ROWS.map(([k,label,g,t,u,dir,csv]) => ({k,label,g,t,u,dir,csv}));
+const DERIVED = new Set(['liftVol','liftsText']);
+const FIELDS = FIELD_ROWS.map(([k,label,g,t,u,dir,csv]) => ({k,label,g,t,u,dir,csv,derived:DERIVED.has(k)}));
 const FK = Object.fromEntries(FIELDS.map(f => [f.k, f]));
 const NUMERIC_T = new Set(['num','dur','pct','frac','scale']);
 const NUM_FIELDS = FIELDS.filter(f => NUMERIC_T.has(f.t));
@@ -667,6 +696,7 @@ const Store = {
       if (!this.seed[d] && !this.edited(d)) continue;
       const r = Object.assign({}, this.seed[d] || {}, loc, { date: d });
       for (const k of Object.keys(r)) if (k[0] === '_') delete r[k];
+      if (Array.isArray(r.lifts) && r.lifts.length) { r.liftVol = Math.round(liftVolume(r.lifts)); r.liftsText = liftSummary(r.lifts); }
       for (const k of Object.keys(r)) if (r[k] === null) delete r[k];
       all.push(r);
     }
@@ -779,7 +809,7 @@ const Sync = {
       if (changed) {
         Store.save(); sideStats();
         // never redraw the entry form under someone who is typing
-        if (rerender && S.view !== 'entry') RENDER[S.view]();
+        if (rerender && S.view !== 'entry' && S.view !== 'lifts') RENDER[S.view]();
       }
       this.status = 'synced'; this.lastAt = Date.now();
       await this.push();
@@ -841,6 +871,8 @@ function sparkSVG(vals, color = C.gold) {
 const S = { view: 'dash', range: 90, log: { q:'', from:'', to:'', groups: new Set(['day','sleep','velo','arm']), throwOnly:false, liftOnly:false, sort:'date', dir:-1 }, bestsGroup:'all', ins: { x:'sleep', y:'armScore', lag:0, target:'armScore', same:false }, entryDate: null, jq:'' };
 const RENDER = {};
 function go(view, opts={}) {
+  flushLifts();
+  if (view === 'lifts') { S.liftDraft = null; if (opts.date) S.liftDate = opts.date; }
   S.view = view;
   $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
   const ab = $(`#nav button[data-view="${view}"]`);
@@ -1129,7 +1161,7 @@ function drawLogTable() {
       let cls = '';
       if (NUMERIC_T.has(f.t) && v != null) { const p = Store.pctile(f, nv(r, f)); if (p != null) cls = p >= .9 ? 'p-top' : p >= .667 ? 'p-hi' : p <= .333 ? 'p-lo' : ''; }
       if (['text','range'].includes(f.t)) cls += ' txt';
-      if (f.t === 'long' || f.k === 'notes' || f.k === 'warmup') cls += ' txt wrap';
+      if (f.t === 'long' || f.k === 'notes' || f.k === 'warmup' || f.k === 'liftsText') cls += ' txt wrap';
       h += `<td class="${cls}">${v == null || v === '' ? '<span class="muted">·</span>' : esc(fmt(f, v))}</td>`;
     }
     h += '</tr>';
@@ -1349,7 +1381,7 @@ RENDER.entry = function () {
     }
   };
   const sections = ENTRY_ORDER.map(g => {
-    const fs = FIELDS.filter(f => f.g === g && f.k !== 'date');
+    const fs = FIELDS.filter(f => f.g === g && f.k !== 'date' && !f.derived);
     const filled = fs.filter(f => r[f.k] != null && r[f.k] !== '').length;
     return `<details class="sec" ${OPEN_BY_DEFAULT.has(g) || (filled && g !== 'load') ? 'open' : ''}><summary><h3>${GROUPS[g]}</h3><span class="muted small">${filled ? filled + ' filled' : ''}</span></summary><div class="body">${fs.map(input).join('')}</div></details>`;
   }).join('');
@@ -1383,8 +1415,10 @@ RENDER.entry = function () {
   });
   $('#e-save').onclick = () => {
     const rec = { date };
+    // keep the day's lifting log (edited on its own page)
+    if (Store.byDate[date] && Store.byDate[date].lifts) rec.lifts = Store.byDate[date].lifts;
     for (const f of FIELDS) {
-      if (f.k === 'date') continue;
+      if (f.k === 'date' || f.derived) continue;
       let v;
       if (f.t === 'bool') { const w = $(`.toggle[data-k="${f.k}"]`); v = w.dataset.v === 'y' ? true : w.dataset.v === 'n' ? false : undefined; }
       else if (f.t === 'scale') { const w = $(`.scale[data-k="${f.k}"]`); v = w.dataset.v ? +w.dataset.v : undefined; }
@@ -1403,6 +1437,202 @@ RENDER.entry = function () {
     Store.remove(date); sideStats(); toast('Done'); RENDER.entry();
   };
 };
+
+/* ================= LIFTING LOG =================
+   A day's lifts live on its record as  lifts: [{ n: name, note, sets: [{ w: lb, r: reps }] }]
+   so they save and sync exactly like every other daily entry. w = 0 means bodyweight. */
+const DEFAULT_EXERCISES = ['Trap Bar Deadlift','Back Squat','Front Squat','RDL','Split Squat','Reverse Lunge','Hip Thrust','Bench Press','DB Bench Press','Incline DB Press','Landmine Press','Pull-up','Chin-up','DB Row','Cable Row','Face Pull','Cable External Rotation','Nordic Curl','Copenhagen Plank','Med Ball Rotational Throw','Box Jump','Farmer Carry'];
+const e1rm = (w, r) => (w > 0 && r > 0 && r <= 12) ? w * (1 + r / 30) : null;   // Epley estimate
+function liftVolume(lifts) { return (lifts || []).reduce((s, x) => s + (x.sets || []).reduce((a, t) => a + (+t.w || 0) * (+t.r || 0), 0), 0); }
+function fmtSets(sets) {
+  // "3×5 @ 225, 1×3 @ 245" — groups identical consecutive sets
+  const out = []; let i = 0;
+  const live = (sets || []).filter(t => +t.r > 0);
+  while (i < live.length) {
+    let j = i; while (j + 1 < live.length && +live[j+1].w === +live[i].w && +live[j+1].r === +live[i].r) j++;
+    const n = j - i + 1, w = +live[i].w;
+    out.push(`${n > 1 ? n + '×' : ''}${live[i].r}${w ? ' @ ' + w : ' BW'}`);
+    i = j + 1;
+  }
+  return out.join(', ');
+}
+function liftSummary(lifts) { return (lifts || []).filter(x => x.n).map(x => `${x.n} ${fmtSets(x.sets)}`.trim()).join('; '); }
+function allExerciseNames() {
+  const m = new Map();
+  for (let i = Store.rows.length - 1; i >= 0; i--) for (const x of Store.rows[i].lifts || []) if (x.n && !m.has(x.n.trim().toLowerCase())) m.set(x.n.trim().toLowerCase(), x.n.trim());
+  for (const n of DEFAULT_EXERCISES) if (!m.has(n.toLowerCase())) m.set(n.toLowerCase(), n);
+  return [...m.values()];   // most recently used first, then the defaults
+}
+function exerciseHistory(name) {
+  const k = (name || '').trim().toLowerCase(), out = [];
+  if (!k) return out;
+  for (const r of Store.rows) for (const x of r.lifts || []) {
+    if ((x.n || '').trim().toLowerCase() !== k) continue;
+    const sets = (x.sets || []).filter(t => +t.r > 0); if (!sets.length) continue;
+    const best = Math.max(0, ...sets.map(t => e1rm(+t.w, +t.r) || 0));
+    out.push({ date: r.date, sets, top: Math.max(...sets.map(t => +t.w || 0)), e1rm: best || null, vol: sets.reduce((a, t) => a + (+t.w || 0) * (+t.r), 0), reps: sets.reduce((a, t) => a + +t.r, 0) });
+  }
+  return out;
+}
+const lastTime = (name, before) => { const h = exerciseHistory(name).filter(x => x.date < before); return h[h.length - 1] || null; };
+
+function flushLifts() { if (S.liftTimer) { clearTimeout(S.liftTimer); S.liftTimer = null; saveLifts(); } }
+function queueLiftSave() {
+  clearTimeout(S.liftTimer);
+  const el = $('#l-saved'); if (el) el.textContent = 'Saving…';
+  S.liftTimer = setTimeout(() => { S.liftTimer = null; saveLifts(); }, 700);
+}
+function saveLifts() {
+  const D = S.liftDraft; if (!D) return;
+  const clean = D.lifts.map(x => {
+    const sets = (x.sets || []).filter(t => (t.w !== '' && t.w != null) || (t.r !== '' && t.r != null)).map(t => ({ w: +t.w || 0, r: +t.r || 0 }));
+    const o = { n: (x.n || '').trim(), sets };
+    if ((x.note || '').trim()) o.note = x.note.trim();
+    return o;
+  }).filter(x => x.n && (x.sets.length || x.note));
+  const had = (Store.byDate[D.date] || {}).lifts || [];
+  if (!clean.length && !had.length) return;
+  const base = Store.edited(D.date) ? Object.assign({}, Store.local[D.date]) : { date: D.date };
+  for (const k of Object.keys(base)) if (k[0] === '_') delete base[k];
+  base.date = D.date;
+  base.lifts = clean.length ? clean : null;
+  if (clean.length) base.lift = true;
+  Store.put(base); sideStats();
+  const el = $('#l-saved'); if (el) el.textContent = '✓ Saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (Sync.enabled ? ' · syncing to cloud' : '');
+  if (S.view === 'lifts' && $('#ch-lift')) drawLiftProgress();
+}
+
+function exerciseCard(x, i, date) {
+  const last = x.n ? lastTime(x.n, date) : null;
+  const vol = (x.sets || []).reduce((a, t) => a + (+t.w || 0) * (+t.r || 0), 0);
+  const ph = (j, f, d) => last && last.sets[j] ? (f === 'w' ? (+last.sets[j].w || 'BW') : last.sets[j].r) : d;
+  return `<div class="card lift-ex">
+    <div class="lift-head">
+      <input class="input lift-name" data-i="${i}" data-f="n" list="ex-names" value="${esc(x.n || '')}" placeholder="Exercise name" autocomplete="off">
+      <button class="icon-btn" data-del-ex="${i}" title="Remove exercise" aria-label="Remove exercise">✕</button>
+    </div>
+    ${last ? `<div class="lift-last">Last time · ${short(last.date)}: <b>${esc(fmtSets(last.sets))}</b>${last.e1rm ? ` · est. max ${Math.round(last.e1rm)}` : ''}</div>` : ''}
+    <div class="set-grid">
+      <span>Set</span><span>Weight (lb)</span><span>Reps</span><span></span>
+      ${(x.sets || []).map((t, j) => `<b>${j + 1}</b><input class="input" type="text" inputmode="decimal" data-i="${i}" data-j="${j}" data-f="w" value="${t.w ?? ''}" placeholder="${ph(j, 'w', 'lb or BW')}"><input class="input" type="text" inputmode="numeric" data-i="${i}" data-j="${j}" data-f="r" value="${t.r ?? ''}" placeholder="${ph(j, 'r', 'reps')}"><button class="icon-btn" data-del-set="${i}:${j}" title="Remove set" aria-label="Remove set ${j + 1}">✕</button>`).join('')}
+    </div>
+    <div class="lift-foot"><button class="btn ghost small-btn" data-add-set="${i}">＋ Add set</button><span class="muted small" data-vol="${i}">${vol ? 'Volume ' + Math.round(vol).toLocaleString() + ' lb' : ''}</span></div>
+    <input class="input lift-note" data-i="${i}" data-f="note" value="${esc(x.note || '')}" placeholder="Note: tempo, how it felt, any pain…">
+  </div>`;
+}
+
+RENDER.lifts = function () {
+  const date = S.liftDate || todayIso(); S.liftDate = date;
+  if (!S.liftDraft || S.liftDraft.date !== date) {
+    const src = (Store.byDate[date] || {}).lifts || [];
+    S.liftDraft = { date, lifts: src.map(x => ({ n: x.n, note: x.note || '', sets: (x.sets || []).map(t => ({ w: +t.w ? t.w : (t.r ? 'BW' : ''), r: t.r || '' })) })) };
+  }
+  const L = S.liftDraft.lifts;
+  const names = allExerciseNames();
+  const prevDay = [...Store.rows].reverse().find(r => r.date < date && r.lifts && r.lifts.length);
+  const histNames = names.filter(n => exerciseHistory(n).length);
+  if (!S.liftHist || !histNames.includes(S.liftHist)) S.liftHist = (L.find(x => histNames.includes(x.n)) || {}).n || histNames[0] || '';
+  const recent = Store.rows.filter(r => r.lifts && r.lifts.length).slice(-8).reverse();
+
+  $('#v-lifts').innerHTML = `
+  <div class="page-head"><div><h2>Lifting Log</h2><p><b style="color:var(--text)">${longDate(date)}</b>. Add exercises, then weight and reps for each set. Saves automatically. Leave weight blank or type BW for bodyweight.</p></div>
+    <div class="toolbar" style="margin:0"><button class="btn ghost" id="l-prev" aria-label="Previous day">‹</button><input class="input" type="date" id="l-date" value="${date}" style="width:auto"><button class="btn ghost" id="l-next" aria-label="Next day">›</button><button class="btn ghost" id="l-today">Today</button></div></div>
+  <div class="entry-layout">
+    <div>
+      <div id="lift-list">${L.map((x, i) => exerciseCard(x, i, date)).join('')}</div>
+      <div class="card lift-add">
+        <div class="lift-add-row"><input class="input" id="l-new" list="ex-names" placeholder="${L.length ? 'Add another exercise' : 'Add an exercise, e.g. Trap Bar Deadlift'}" autocomplete="off"><button class="btn" id="l-add">＋ Add</button></div>
+        <div class="chips" style="margin-top:10px">${names.slice(0, 10).map(n => `<button class="chip" data-add="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+        ${prevDay && !L.length ? `<button class="btn ghost" id="l-repeat" style="margin-top:12px;white-space:normal">↻ Repeat last workout: ${short(prevDay.date)} · ${prevDay.lifts.length} exercise${prevDay.lifts.length > 1 ? 's' : ''}</button>` : ''}
+      </div>
+      <datalist id="ex-names">${names.map(n => `<option value="${esc(n)}"></option>`).join('')}</datalist>
+    </div>
+    <div class="sticky-panel">
+      <div class="card kpi"><div class="kpi-lbl">Workout volume · ${short(date)}</div><div class="kpi-val" id="l-vol">—</div><div class="kpi-sub" id="l-sum"></div><div class="kpi-sub" id="l-saved" style="color:var(--green)"></div></div>
+      <div class="card">
+        <div class="card-head"><h3>Progress</h3>${histNames.length ? `<select class="input" id="l-hist" style="width:auto;max-width:65%">${histNames.map(n => `<option ${n === S.liftHist ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>` : ''}</div>
+        ${histNames.length ? `<div class="chart-box" style="height:190px"><canvas id="ch-lift"></canvas></div><div id="l-prs" style="margin-top:10px"></div>` : '<div class="muted small">Log a few sessions and his strength trend and personal records show up here.</div>'}
+      </div>
+      <div class="card"><div class="card-head"><h3>Recent workouts</h3></div>
+        ${recent.length ? recent.map(r => `<div class="lift-recent ${r.date === date ? 'on' : ''}" data-d="${r.date}"><b>${short(r.date)}</b><span class="muted small">${esc(r.lifts.map(x => x.n).join(', '))}</span><span class="small">${r.liftVol ? Math.round(r.liftVol).toLocaleString() + ' lb' : ''}</span></div>`).join('') : '<div class="muted small">No workouts logged yet.</div>'}
+      </div>
+    </div>
+  </div>`;
+
+  const v = $('#v-lifts');
+  const setDate = d => { flushLifts(); S.liftDate = d; S.liftDraft = null; RENDER.lifts(); };
+  $('#l-date').onchange = e => e.target.value && setDate(e.target.value);
+  $('#l-prev').onclick = () => setDate(addDays(date, -1));
+  $('#l-next').onclick = () => setDate(addDays(date, 1));
+  $('#l-today').onclick = () => setDate(todayIso());
+  const addExercise = name => {
+    name = (name || '').trim(); if (!name) return;
+    const last = lastTime(name, date);
+    const n = last ? last.sets.length : 3;
+    L.push({ n: name, note: '', sets: Array.from({ length: Math.max(1, Math.min(n, 8)) }, () => ({ w: '', r: '' })) });
+    RENDER.lifts();
+    const inp = $(`#v-lifts [data-i="${L.length - 1}"][data-j="0"][data-f="w"]`); if (inp) inp.focus();
+  };
+  $('#l-add').onclick = () => addExercise($('#l-new').value);
+  $('#l-new').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); addExercise(e.target.value); } };
+  $$('[data-add]', v).forEach(b => b.onclick = () => addExercise(b.dataset.add));
+  const rep = $('#l-repeat');
+  if (rep) rep.onclick = () => { prevDay.lifts.forEach(x => L.push({ n: x.n, note: '', sets: (x.sets || []).map(() => ({ w: '', r: '' })) })); RENDER.lifts(); };
+  v.oninput = e => {
+    const t = e.target, i = t.dataset.i; if (i == null) return;
+    const x = L[+i]; if (!x) return;
+    if (t.dataset.j != null) x.sets[+t.dataset.j][t.dataset.f] = t.value.trim();
+    else x[t.dataset.f] = t.value;
+    updateLiftTotals(); queueLiftSave();
+  };
+  v.onchange = e => { if (e.target.classList.contains('lift-name')) { flushLifts(); RENDER.lifts(); } };
+  v.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.addSet != null) {
+      const x = L[+b.dataset.addSet], prev = [...x.sets].reverse().find(t => t.w !== '' || t.r !== '') || { w: '', r: '' };
+      x.sets.push({ w: prev.w, r: prev.r }); queueLiftSave(); RENDER.lifts();
+      const inp = $(`#v-lifts [data-i="${b.dataset.addSet}"][data-j="${x.sets.length - 1}"][data-f="r"]`); if (inp) inp.focus();
+    } else if (b.dataset.delSet != null) {
+      const [i, j] = b.dataset.delSet.split(':').map(Number); L[i].sets.splice(j, 1); queueLiftSave(); RENDER.lifts();
+    } else if (b.dataset.delEx != null) {
+      const x = L[+b.dataset.delEx];
+      if (x.sets.some(t => t.r || t.w) && !confirm(`Remove ${x.n || 'this exercise'} and its sets?`)) return;
+      L.splice(+b.dataset.delEx, 1); queueLiftSave(); RENDER.lifts();
+    }
+  };
+  $$('.lift-recent', v).forEach(el => el.onclick = () => setDate(el.dataset.d));
+  const hs = $('#l-hist'); if (hs) hs.onchange = e => { S.liftHist = e.target.value; drawLiftProgress(); };
+  updateLiftTotals();
+  if (histNames.length) drawLiftProgress();
+};
+function updateLiftTotals() {
+  const L = S.liftDraft.lifts;
+  const num = t => ({ w: /^bw$/i.test(String(t.w)) ? 0 : +t.w || 0, r: +t.r || 0 });
+  const vol = L.reduce((s, x) => s + x.sets.reduce((a, t) => { const n = num(t); return a + n.w * n.r; }, 0), 0);
+  const sets = L.reduce((s, x) => s + x.sets.filter(t => +t.r > 0).length, 0);
+  $('#l-vol').innerHTML = vol ? `${Math.round(vol).toLocaleString()}<small class="muted" style="font-size:16px"> lb</small>` : '—';
+  $('#l-sum').textContent = L.length ? `${L.length} exercise${L.length > 1 ? 's' : ''} · ${sets} working set${sets === 1 ? '' : 's'}` : 'No exercises yet';
+  L.forEach((x, i) => { const el = $(`#v-lifts [data-vol="${i}"]`); if (!el) return; const v = x.sets.reduce((a, t) => { const n = num(t); return a + n.w * n.r; }, 0); el.textContent = v ? 'Volume ' + Math.round(v).toLocaleString() + ' lb' : ''; });
+}
+function drawLiftProgress() {
+  const h = exerciseHistory(S.liftHist);
+  chart('ch-lift', { type: 'line', data: { labels: h.map(x => short(x.date)), datasets: [
+    lineDs('Top set (lb)', h.map(x => x.top || null), C.gold, { pointRadius: 4, borderWidth: 3 }),
+    lineDs('Est. max (lb)', h.map(x => x.e1rm ? Math.round(x.e1rm) : null), C.teal, { pointRadius: 3, borderDash: [5, 4] }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, plugins: { tooltip: { callbacks: { afterBody: items => fmtSets(h[items[0].dataIndex].sets) } } } } });
+  if (!h.length) { $('#l-prs').innerHTML = ''; return; }
+  const heavy = h.reduce((a, b) => b.top > a.top ? b : a);
+  const heavySet = heavy.sets.reduce((a, b) => (+b.w > +a.w || (+b.w === +a.w && +b.r > +a.r)) ? b : a);
+  const best = h.filter(x => x.e1rm).reduce((a, b) => (!a || b.e1rm > a.e1rm) ? b : a, null);
+  const vol = h.reduce((a, b) => b.vol > a.vol ? b : a);
+  const reps = h.reduce((a, b) => b.reps > a.reps ? b : a);
+  $('#l-prs').innerHTML = `<table class="recipe"><tbody>
+    ${heavy.top ? `<tr><td>Heaviest set</td><td style="color:var(--gold);font-weight:700">${heavySet.w} × ${heavySet.r}</td><td class="muted">${short(heavy.date)}</td></tr>` : ''}
+    ${best ? `<tr><td>Best est. max</td><td style="color:var(--gold);font-weight:700">${Math.round(best.e1rm)} lb</td><td class="muted">${short(best.date)}</td></tr>` : ''}
+    ${vol.vol ? `<tr><td>Most volume</td><td style="color:var(--gold);font-weight:700">${Math.round(vol.vol).toLocaleString()} lb</td><td class="muted">${short(vol.date)}</td></tr>` : `<tr><td>Most reps</td><td style="color:var(--gold);font-weight:700">${reps.reps}</td><td class="muted">${short(reps.date)}</td></tr>`}
+    <tr><td>Sessions logged</td><td style="font-weight:700">${h.length}</td><td></td></tr>
+  </tbody></table>`;
+}
 
 /* ================= JOURNAL ================= */
 RENDER.journal = function () {
