@@ -268,6 +268,15 @@ textarea.input{min-height:110px;resize:vertical}
 }
 @media (max-width:380px){ details.sec .body{grid-template-columns:1fr} .hero h1{font-size:30px} }
 
+/* cloud sync status */
+.sync{font-size:11px;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:5px;color:var(--muted);white-space:nowrap}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex:0 0 7px}
+.sync.ok::before{background:var(--green)}
+.sync.busy::before{background:var(--gold);animation:pulse 1s infinite}
+.sync.warn::before{background:var(--amber)}
+@keyframes pulse{50%{opacity:.3}}
+@media (max-width:820px){.sync{margin-top:2px;font-size:10.5px}}
+
 /* hamburger menu (phones) */
 .burger,.cur-page{display:none}
 .burger{all:unset;box-sizing:border-box;cursor:pointer;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.04);flex-direction:column;justify-content:center;align-items:center;gap:5px;flex:0 0 44px;margin-left:auto;display:none}
@@ -309,6 +318,7 @@ textarea.input{min-height:110px;resize:vertical}
         <div class="brand-title">Triton Pitching Lab</div>
         <div class="brand-sub">Brandon Jackel · RHP</div>
         <div class="cur-page" id="cur-page">Dashboard</div>
+        <div class="sync" id="sync"></div>
       </div>
       <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav"><span></span><span></span><span></span></button>
     </div>
@@ -323,7 +333,7 @@ textarea.input{min-height:110px;resize:vertical}
     </nav>
     <div class="side-foot">
       <div id="side-stats"></div>
-      <div class="muted small">Entries save in this browser. Use Import / Export to back up or move devices.</div>
+      <div class="muted small">New entries sync to the cloud, so every phone and computer sees the same data.</div>
     </div>
   </aside>
 
@@ -653,7 +663,10 @@ const Store = {
     const all = [];
     for (const d of dates) {
       if (this.deleted[d]) continue;
-      const r = Object.assign({}, this.seed[d] || {}, this.local[d] || {}, { date: d });
+      const loc = this.edited(d) ? this.local[d] : {};
+      if (!this.seed[d] && !this.edited(d)) continue;
+      const r = Object.assign({}, this.seed[d] || {}, loc, { date: d });
+      for (const k of Object.keys(r)) if (k[0] === '_') delete r[k];
       for (const k of Object.keys(r)) if (r[k] === null) delete r[k];
       all.push(r);
     }
@@ -681,10 +694,110 @@ const Store = {
     for (const y of s.sorted) if (y < x) lo++;
     return lo / (s.n - 1 || 1);
   },
+  /* a day has in-app edits (not a "removed" marker) */
+  edited(d) { const l = this.local[d]; return !!l && !l._gone; },
+  editedCount() { return Object.keys(this.local).filter(d => this.edited(d)).length; },
   put(rec) {
-    this.local[rec.date] = Object.assign({}, rec, { _updated: new Date().toISOString() });
+    const now = Date.now();
+    this.local[rec.date] = Object.assign({}, rec, { _updated: new Date(now).toISOString(), _u: now });
     delete this.deleted[rec.date];
     this.save();
+    Sync.queue([rec.date]);
+  },
+  /* drop in-app edits for a day (spreadsheet values come back); synced as a marker */
+  remove(d) {
+    this.local[d] = { _u: Date.now(), _gone: true };
+    this.save();
+    Sync.queue([d]);
+  },
+};
+const uOf = l => (l && (l._u || Date.parse(l._updated || ''))) || 0;
+
+/* ---------------- cloud sync ----------------
+   Every day's in-app entry is stored on the hub (/api/lifeos?ns=triton) as
+   { "<date>": { u: <ms timestamp>, rec: {...} | null } }. The server keeps the
+   newest u per day, so two devices editing different days never clash. */
+const Sync = {
+  url: '/api/lifeos?ns=triton',
+  enabled: /^https?:$/.test(location.protocol) && !/^(localhost|127\.|\[::1\])/.test(location.hostname),
+  pending: new Set(), status: 'local', lastAt: 0, busy: false, again: false,
+  init() {
+    try { this.pending = new Set(JSON.parse(localStorage.getItem(LS_KEY + '.pending') || '[]')); } catch (e) {}
+    this.status = this.enabled ? 'syncing' : 'local';
+    this.show();
+  },
+  savePending() { try { localStorage.setItem(LS_KEY + '.pending', JSON.stringify([...this.pending])); } catch (e) {} },
+  queue(dates) {
+    dates.forEach(d => this.pending.add(d)); this.savePending();
+    clearTimeout(this.t); this.t = setTimeout(() => this.push(), 300);
+    this.show();
+  },
+  async pull() {
+    const r = await fetch(this.url, { cache: 'no-store' });
+    if (!r.ok) throw new Error('pull ' + r.status);
+    const data = (await r.json()).data || {};
+    let changed = false;
+    for (const [d, v] of Object.entries(data)) {
+      if (!v || typeof v !== 'object' || !/^\d{4}-\d{2}-\d{2}$/.test(d)) continue;
+      const cu = Number(v.u || 0), lu = uOf(Store.local[d]);
+      if (cu > lu) {
+        Store.local[d] = v.rec ? Object.assign({}, v.rec, { date: d, _u: cu, _updated: new Date(cu).toISOString() }) : { _u: cu, _gone: true };
+        this.pending.delete(d); changed = true;
+      } else if (cu < lu) this.pending.add(d);
+    }
+    for (const d of Object.keys(Store.local)) if (!data[d]) this.pending.add(d);
+    this.savePending();
+    return changed;
+  },
+  async push() {
+    if (!this.enabled) { this.show(); return; }
+    if (!this.pending.size) { this.status = 'synced'; this.show(); return; }
+    if (this.busy) { this.again = true; return; }
+    this.busy = true; this.status = 'syncing'; this.show();
+    const sent = [...this.pending], payload = {};
+    for (const d of sent) {
+      const l = Store.local[d]; if (!l) continue;
+      const rec = {};
+      for (const [k, v] of Object.entries(l)) if (k[0] !== '_') rec[k] = v;
+      payload[d] = { u: uOf(l) || Date.now(), rec: l._gone ? null : rec };
+    }
+    try {
+      const r = await fetch(this.url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: payload }) });
+      if (!r.ok) throw new Error('push ' + r.status);
+      sent.forEach(d => this.pending.delete(d)); this.savePending();
+      this.status = 'synced'; this.lastAt = Date.now();
+    } catch (e) { this.status = 'offline'; }
+    this.busy = false; this.show();
+    if (this.again) { this.again = false; this.push(); }
+  },
+  async sync(rerender) {
+    if (!this.enabled) { this.status = 'local'; this.show(); return; }
+    if (this.busy) return;
+    this.status = 'syncing'; this.show();
+    try {
+      const changed = await this.pull();
+      if (changed) {
+        Store.save(); sideStats();
+        // never redraw the entry form under someone who is typing
+        if (rerender && S.view !== 'entry') RENDER[S.view]();
+      }
+      this.status = 'synced'; this.lastAt = Date.now();
+      await this.push();
+    } catch (e) { this.status = 'offline'; }
+    this.show();
+  },
+  show() {
+    const el = document.getElementById('sync'); if (!el) return;
+    const n = this.pending.size;
+    const map = {
+      synced: ['ok', 'Synced to cloud'],
+      syncing: ['busy', 'Syncing…'],
+      offline: ['warn', `Offline${n ? ` · ${n} waiting` : ''} · will retry`],
+      local: ['warn', 'Saved on this device only'],
+    };
+    const [cls, txt] = map[this.status] || map.local;
+    el.className = 'sync ' + cls; el.textContent = txt;
+    el.title = this.lastAt ? 'Last synced ' + new Date(this.lastAt).toLocaleTimeString() : '';
   },
 };
 
@@ -745,8 +858,8 @@ function setMenu(open) {
 }
 function sideStats() {
   const rows = Store.rows;
-  const n = Object.keys(Store.local).length;
-  $('#side-stats').innerHTML = `<b>${rows.length}</b> days logged<br><span class="muted">${rows.length ? short(rows[0].date) + ' – ' + short(rows[rows.length-1].date) : ''}${n ? ` · ${n} edited here` : ''}</span>`;
+  const n = Store.editedCount();
+  $('#side-stats').innerHTML = `<b>${rows.length}</b> days logged<br><span class="muted">${rows.length ? short(rows[0].date) + ' – ' + short(rows[rows.length-1].date) : ''}${n ? ` · ${n} added in app` : ''}</span>`;
 }
 
 /* ---------------- readiness ---------------- */
@@ -1010,7 +1123,7 @@ function drawLogTable() {
   let h = `<table class="data"><thead><tr><th class="grp sticky"></th>${groupsInOrder.map(g => `<th class="grp" colspan="${g.n}">${GROUPS[g.g]}</th>`).join('')}</tr>`;
   h += `<tr><th class="sticky txt ${L.sort === 'date' ? 'sorted' : ''}" data-k="date">Date${arrow('date')}</th>${cols.map(f => `<th data-k="${f.k}" class="${L.sort === f.k ? 'sorted' : ''} ${['text','long','range'].includes(f.t) ? 'txt' : ''}" title="${esc(f.label)}">${esc(f.label)}${f.u && f.t !== 'pct' ? ` <span style="text-transform:none;opacity:.6">${f.u}</span>` : ''}${arrow(f.k)}</th>`).join('')}</tr></thead><tbody>`;
   for (const r of rows) {
-    h += `<tr data-d="${r.date}"><td class="sticky txt"><b>${short(r.date)}</b> <span class="muted small">${DOW[fromIso(r.date).getDay()].slice(0,3)} '${r.date.slice(2,4)}</span>${Store.local[r.date] ? ' <span class="dot" title="Edited in app"></span>' : ''}</td>`;
+    h += `<tr data-d="${r.date}"><td class="sticky txt"><b>${short(r.date)}</b> <span class="muted small">${DOW[fromIso(r.date).getDay()].slice(0,3)} '${r.date.slice(2,4)}</span>${Store.edited(r.date) ? ' <span class="dot" title="Edited in app"></span>' : ''}</td>`;
     for (const f of cols) {
       const v = r[f.k];
       let cls = '';
@@ -1249,7 +1362,7 @@ RENDER.entry = function () {
     <div class="sticky-panel">
       <div class="card entry-photo"><div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(8,17,32,.95) 0%,rgba(8,17,32,.55) 28%,rgba(8,17,32,0) 55%);"></div><div style="position:relative;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;min-height:inherit"><div class="eyebrow">${DOW[fromIso(date).getDay()]}</div><div style="font-family:'Barlow Condensed';font-size:28px;font-weight:800;text-transform:uppercase;line-height:1">${short(date)}, ${date.slice(0,4)}</div></div></div>
       <div class="save-bar"><button class="btn" id="e-save" style="justify-content:center;padding:13px;width:100%">Save entry</button></div>
-      ${Store.local[date] ? `<button class="btn ghost" id="e-revert" style="justify-content:center">${Store.seed[date] ? 'Revert to spreadsheet values' : 'Delete this entry'}</button>` : ''}
+      ${Store.edited(date) ? `<button class="btn ghost" id="e-revert" style="justify-content:center">${Store.seed[date] ? 'Revert to spreadsheet values' : 'Delete this entry'}</button>` : ''}
       <div class="card"><div class="kpi-lbl" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Previous day · ${prev ? short(prev.date) : '—'}</div>
         ${prev ? `<div class="small" style="margin-top:8px;display:grid;grid-template-columns:1fr auto;gap:4px 10px">${['sleep','hrv','recovery','bw','armScore','feel','armFeel'].filter(k => prev[k] != null).map(k => `<span class="muted">${FK[k].label}</span><b>${fmt(FK[k], prev[k])}</b>`).join('')}</div>${prev.journal ? `<div class="small muted" style="margin-top:8px;font-style:italic">“${esc(prev.journal.slice(0, 160))}${prev.journal.length > 160 ? '…' : ''}”</div>` : ''}` : '<div class="muted small">No earlier entries.</div>'}
       </div>
@@ -1281,13 +1394,13 @@ RENDER.entry = function () {
       if (rec[f.k] === undefined) delete rec[f.k];
     }
     Store.put(rec); sideStats();
-    toast('Saved ' + longDate(date));
+    toast('Saved ' + longDate(date) + (Sync.enabled ? ' · syncing' : ''));
     RENDER.entry();
   };
   const rv = $('#e-revert');
   if (rv) rv.onclick = () => {
     if (!confirm(Store.seed[date] ? 'Discard the edits made in the app for this day and go back to the spreadsheet values?' : 'Delete this entry?')) return;
-    delete Store.local[date]; Store.save(); sideStats(); toast('Done'); RENDER.entry();
+    Store.remove(date); sideStats(); toast('Done'); RENDER.entry();
   };
 };
 
@@ -1322,9 +1435,9 @@ RENDER.journal = function () {
 
 /* ================= IMPORT / EXPORT ================= */
 RENDER.data = function () {
-  const n = Object.keys(Store.local).length;
+  const n = Store.editedCount();
   $('#v-data').innerHTML = `
-  <div class="page-head"><div><h2>Import / Export</h2><p>Upload new spreadsheet exports, back everything up, or move the data to another device.</p></div></div>
+  <div class="page-head"><div><h2>Import / Export</h2><p>Upload new spreadsheet exports or download everything. ${Sync.enabled ? 'Entries and imports sync to the cloud automatically, so every phone and computer sees the same data.' : 'Cloud sync is off in this local preview; entries save on this device.'}</p></div></div>
   <div class="grid charts">
     <div class="card span-6">
       <div class="card-head"><h3>Upload a spreadsheet (CSV)</h3></div>
@@ -1339,8 +1452,8 @@ RENDER.data = function () {
         <span class="muted small">Every day with every metric plus the wellness scores and journal — opens in Google Sheets / Excel and can be re-uploaded here.</span>
         <button class="btn ghost" id="x-json">⇩ Download app backup (.json)</button>
         <label class="btn ghost" style="justify-content:flex-start">⇧ Restore app backup<input type="file" id="x-restore" accept=".json,application/json" hidden></label>
-        <span class="muted small">${n} day(s) edited or added in this browser.</span>
-        ${n ? '<button class="btn danger" id="x-reset">Clear all in-app edits</button>' : ''}
+        <span class="muted small">${n} day(s) added or edited in the app (on top of the original spreadsheet).</span>
+        ${n ? `<button class="btn danger" id="x-reset">Clear all in-app edits${Sync.enabled ? ' (every device)' : ''}</button>` : ''}
       </div>
     </div>
     <div class="card span-12">
@@ -1358,10 +1471,21 @@ RENDER.data = function () {
   $('#x-json').onclick = () => { download(`triton-pitching-lab-backup-${todayIso()}.json`, JSON.stringify({ app: 'triton-pitching-lab', version: 1, exported: new Date().toISOString(), local: Store.local, deleted: Store.deleted }, null, 1), 'application/json'); toast('Backup downloaded'); };
   $('#x-restore').onchange = e => {
     const f = e.target.files[0]; if (!f) return;
-    f.text().then(t => { const j = JSON.parse(t); if (!j.local) throw 0; Store.local = j.local; Store.deleted = j.deleted || {}; Store.save(); sideStats(); toast('Backup restored'); RENDER.data(); }).catch(() => toast('That file is not a Triton Pitching Lab backup'));
+    f.text().then(t => {
+      const j = JSON.parse(t); if (!j.local) throw 0;
+      const now = Date.now();
+      for (const [d, l] of Object.entries(j.local)) Store.local[d] = Object.assign({}, l, { _u: now });
+      Store.deleted = j.deleted || {}; Store.save(); Sync.queue(Object.keys(j.local));
+      sideStats(); toast('Backup restored'); RENDER.data();
+    }).catch(() => toast('That file is not a Triton Pitching Lab backup'));
   };
   const rs = $('#x-reset');
-  if (rs) rs.onclick = () => { if (confirm('Remove every edit and entry made in this browser? Spreadsheet data stays. Download a backup first if unsure.')) { Store.local = {}; Store.deleted = {}; Store.save(); sideStats(); toast('Cleared'); RENDER.data(); } };
+  if (rs) rs.onclick = () => {
+    if (!confirm('Remove every entry and edit made in the app' + (Sync.enabled ? ', on every device' : '') + '? The original spreadsheet data stays. Download a backup first if unsure.')) return;
+    const now = Date.now(), ds = Object.keys(Store.local);
+    ds.forEach(d => { Store.local[d] = { _u: now, _gone: true }; });
+    Store.deleted = {}; Store.save(); Sync.queue(ds); sideStats(); toast('Cleared'); RENDER.data();
+  };
 };
 function importCSV(file) {
   file.text().then(text => {
@@ -1369,13 +1493,15 @@ function importCSV(file) {
     const dates = Object.keys(records).sort();
     if (!dates.length) { $('#import-result').innerHTML = '<div class="callout">No dated rows found. Make sure the first column is “Date”.</div>'; return; }
     let added = 0, updated = 0;
+    const now = Date.now();
     for (const d of dates) {
       const had = !!Store.byDate[d];
-      Store.local[d] = Object.assign({}, Store.local[d] || {}, records[d], { _updated: new Date().toISOString(), _src: file.name });
+      const base = Store.edited(d) ? Store.local[d] : {};
+      Store.local[d] = Object.assign({}, base, records[d], { _updated: new Date(now).toISOString(), _u: now, _src: file.name });
       delete Store.deleted[d];
       had ? updated++ : added++;
     }
-    Store.save(); sideStats();
+    Store.save(); Sync.queue(dates); sideStats();
     $('#import-result').innerHTML = `<div class="callout">Imported <b>${dates.length}</b> days from <b>${esc(file.name)}</b> (${short(dates[0])} – ${short(dates[dates.length-1])}): ${added} new, ${updated} updated.${unmatched.length ? `<br><span class="muted small">Columns not recognised (skipped): ${unmatched.map(esc).join(', ')}</span>` : ''}</div>`;
     toast('Import complete');
   });
@@ -1383,6 +1509,7 @@ function importCSV(file) {
 
 /* ---------------- boot ---------------- */
 Store.load();
+Sync.init();
 sideStats();
 $$('#nav button').forEach(b => b.onclick = () => go(b.dataset.view));
 $('#burger').onclick = e => { e.stopPropagation(); setMenu(!$('.side').classList.contains('open')); };
@@ -1391,6 +1518,11 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(fals
 const start = (location.hash || '').slice(1);
 go(RENDER[start] ? start : 'dash');
 window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (RENDER[v] && v !== S.view) go(v); });
+// pull other devices' entries on open, when the app comes back to the front, when back online, and every minute
+Sync.sync(true);
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') Sync.sync(true); });
+window.addEventListener('online', () => Sync.sync(true));
+setInterval(() => { if (document.visibilityState === 'visible') Sync.sync(true); }, 60000);
 
 </script>
 </body>
