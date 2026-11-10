@@ -1,5 +1,6 @@
 import { put, list } from '@vercel/blob';
 import momHandler, { isMomCron } from './_mom.mjs';
+import tritonHandler from './_triton.mjs';
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const PATHS = { lifeos: 'lifeos/data.json', bni: 'sdlr-bni/outreach.json', dock: 'dock/data.json' };
@@ -18,6 +19,7 @@ async function readBlob(p) {
 export default async function handler(req, res) {
   const NS = nsOf(req);
   if (NS === 'mom' || isMomCron(req)) return momHandler(req, res);
+  if (NS === 'triton') return tritonHandler(req, res); // Triton Pitching Lab sync (see _triton.mjs)
   const PATH = PATHS[NS] || PATHS.lifeos;
 const host = req.headers.host || '';
 const ref = req.headers.referer || req.headers.origin || '';

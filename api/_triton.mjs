@@ -1,4 +1,6 @@
 // Cloud sync for Triton Pitching Lab (triton-pitching-lab.html).
+// Served through /api/lifeos?ns=triton (underscore file = not its own function,
+// which keeps the hub under the Hobby plan's 12-function limit).
 //
 // Data: { "<YYYY-MM-DD>": { u: <ms timestamp>, rec: {...} | null } }
 // Newest `u` wins per day, so devices editing different days never clash.

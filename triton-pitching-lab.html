@@ -714,11 +714,11 @@ const Store = {
 const uOf = l => (l && (l._u || Date.parse(l._updated || ''))) || 0;
 
 /* ---------------- cloud sync ----------------
-   Every day's in-app entry is stored on the hub (/api/triton) as
+   Every day's in-app entry is stored on the hub (/api/lifeos?ns=triton → api/_triton.mjs) as
    { "<date>": { u: <ms timestamp>, rec: {...} | null } }. The server keeps the
    newest u per day, so two devices editing different days never clash. */
 const Sync = {
-  url: '/api/triton',
+  url: '/api/lifeos?ns=triton',
   enabled: /^https?:$/.test(location.protocol) && !/^(localhost|127\.|\[::1\])/.test(location.hostname),
   pending: new Set(), status: 'local', lastAt: 0, busy: false, again: false,
   init() {
