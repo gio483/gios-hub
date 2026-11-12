@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SDLR Ads Live</title>
+<link rel="icon" href="favicon.svg?v=2" type="image/svg+xml">
+<style>
+  :root {
+    --bg: #f5f1e8; --card: #fffdf8; --ink: #1f2419; --muted: #6b6f63; --line: #e4ddcd;
+    --sage: #556b5d; --deep: #2f3a22; --gold: #b8925a; --good: #3f7a3a; --warn: #a8680a; --bad: #a33a2d;
+    --bar: #8fa37f; --bar2: #c9a86a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141712; --card: #1d211a; --ink: #eef0e8; --muted: #a2a796; --line: #2e3429;
+      --sage: #9fb56a; --deep: #cfe0a6; --gold: #d8b77a; --good: #8fcf7f; --warn: #e3a34a; --bad: #ef7d6c;
+      --bar: #6f8a5c; --bar2: #c9a86a; }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Arial, sans-serif; line-height: 1.45;
+    padding: max(16px, env(safe-area-inset-top)) 16px 48px; }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; font-size: 28px; margin: 0; letter-spacing: -0.01em; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .btn { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 14px;
+    font-size: 13px; cursor: pointer; }
+  .btn:hover { border-color: var(--sage); }
+  .back { color: var(--muted); text-decoration: none; font-size: 13px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 18px; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 8px 12px; font-size: 13px; }
+  .chip b { font-weight: 600; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+  .seg { display: inline-flex; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 3px; margin-bottom: 14px; flex-wrap: wrap; }
+  .seg button { border: 0; background: transparent; color: var(--muted); padding: 6px 12px; border-radius: 999px; font-size: 13px; cursor: pointer; }
+  .seg button.on { background: var(--sage); color: #fff; }
+  @media (prefers-color-scheme: dark) { .seg button.on { color: #141712; } }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .kpi .l { font-size: 12px; color: var(--muted); }
+  .kpi .v { font-size: 26px; font-weight: 600; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .kpi .s { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .plain { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--gold); border-radius: 12px;
+    padding: 12px 16px; margin: 12px 0 24px; font-size: 15px; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin: 26px 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .camp h3 { margin: 0 0 2px; font-size: 16px; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .row:last-child { border-bottom: 0; }
+  .row span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+  .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+  td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr:last-child td { border-bottom: 0; }
+  .tag { font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); white-space: nowrap; }
+  .tag.blocked { color: var(--bad); border-color: currentColor; }
+  .tablewrap { overflow-x: auto; }
+  svg text { fill: var(--muted); font-size: 10px; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+  .gate { max-width: 360px; margin: 12vh auto 0; text-align: center; }
+  .gate input { width: 100%; padding: 12px 14px; font-size: 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); margin: 14px 0 10px; }
+  .gate .err { color: var(--bad); font-size: 13px; min-height: 18px; }
+  .empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+  @media (max-width: 720px) {
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    h1 { font-size: 24px; }
+    .kpi .v { font-size: 22px; }
+    .hide-sm { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function () {
+  var API = '/api/lifeos?ns=sdlrads';
+  var KEY_STORE = 'sdlrAdsKey';
+  var app = document.getElementById('app');
+  var state = { data: null, period: 'month' };
+  try { state.period = localStorage.getItem('sdlrAdsPeriod') || 'month'; } catch (e) {}
+
+  function key() { try { return localStorage.getItem(KEY_STORE) || ''; } catch (e) { return ''; } }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function money(n) { n = Number(n || 0); return '$' + (n >= 100 ? Math.round(n).toLocaleString('en-US') : (Number.isInteger(n) ? String(n) : n.toFixed(2))); }
+  function num(n) { return Math.round(Number(n || 0)).toLocaleString('en-US'); }
+  function pct(n) { return (n == null || isNaN(n)) ? '—' : Math.round(n * 100) + '%'; }
+  function ago(iso) {
+    var s = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (s < 90) return 'just now';
+    if (s < 3600) return Math.round(s / 60) + ' min ago';
+    if (s < 86400) return Math.round(s / 3600) + ' hr ago';
+    return Math.round(s / 86400) + ' days ago';
+  }
+
+  var PERIODS = [['today', 'Today'], ['week', 'This week'], ['month', 'This month'], ['last30', 'Last 30 days']];
+  var STATUS = {
+    ELIGIBLE: ['Running', 'var(--good)'], LIMITED: ['Running, limited', 'var(--warn)'], LEARNING: ['Running, still learning', 'var(--good)'],
+    PENDING: ["Waiting on Google's ad review", 'var(--warn)'], PAUSED: ['Paused', 'var(--muted)'], NOT_ELIGIBLE: ['Not running', 'var(--bad)'],
+    MISCONFIGURED: ['Not running: setup issue', 'var(--bad)'], ENDED: ['Ended', 'var(--muted)'], REMOVED: ['Removed', 'var(--muted)']
+  };
+  var REASONS = {
+    HAS_ADS_DISAPPROVED: 'an ad was rejected', HAS_ADS_LIMITED_BY_POLICY: 'an ad is limited by policy', BUDGET_CONSTRAINED: 'the daily budget runs out',
+    BIDDING_STRATEGY_LEARNING: 'Google is still learning', SEARCH_VOLUME_LIMITED: 'not many people search these words here',
+    HAS_NO_KEYWORDS_WITH_SEARCH_VOLUME: 'not many people search these words here', CAMPAIGN_PENDING: 'ads under review',
+    BIDDING_STRATEGY_LIMITED: 'the max-per-click cap is limiting it', HAS_ADS_PENDING_REVIEW: 'ads under review',
+    CAMPAIGN_PAUSED: 'paused', AD_GROUPS_PAUSED: 'ad groups paused'
+  };
+  var ACTION_NAMES = { 'Website lead form (thank-you page)': 'Form fills', 'Calls from ads': 'Calls from the ad (60+ sec)', 'Website phone tap': 'Phone taps on the site' };
+
+  function gate(msg) {
+    app.innerHTML = '<div class="gate"><h1>SDLR Ads Live</h1><div class="sub">Live Google Ads numbers for San Diego Landscape Remodeling</div>' +
+      '<input id="pw" type="password" placeholder="Passcode" autocomplete="current-password">' +
+      '<div class="err">' + esc(msg || '') + '</div><button class="btn" id="go">Open dashboard</button>' +
+      '<p class="note"><a class="back" href="./">← Back to the Dock</a></p></div>';
+    var go = function () {
+      var v = document.getElementById('pw').value.trim(); if (!v) return;
+      try { localStorage.setItem(KEY_STORE, v); } catch (e) {}
+      load();
+    };
+    document.getElementById('go').onclick = go;
+    document.getElementById('pw').onkeydown = function (e) { if (e.key === 'Enter') go(); };
+    document.getElementById('pw').focus();
+  }
+
+  function load() {
+    if (!key()) return gate();
+    fetch(API + '&t=' + Date.now(), { headers: { 'x-key': key() }, cache: 'no-store' })
+      .then(function (r) {
+        if (r.status === 401) { try { localStorage.removeItem(KEY_STORE); } catch (e) {} gate('That passcode did not work.'); return null; }
+        return r.json();
+      })
+      .then(function (j) { if (!j) return; state.data = j.data || {}; render(); })
+      .catch(function () { if (!state.data) app.innerHTML = '<div class="empty">Could not reach the hub. Check your connection and refresh.</div>'; });
+  }
+
+  function statusChip(c) {
+    var s = STATUS[c.primaryStatus] || (c.status === 'PAUSED' ? STATUS.PAUSED : [c.primaryStatus || c.status || 'Unknown', 'var(--muted)']);
+    var reasons = (c.reasons || []).map(function (r) { return REASONS[r]; }).filter(Boolean);
+    reasons = reasons.filter(function (r, i) { return reasons.indexOf(r) === i; });
+    return '<div class="chip"><span class="dot" style="background:' + s[1] + '"></span><b>' + esc(c.name.replace('Search - NC - ', '')) + '</b> · ' +
+      money(c.budget) + '/day · ' + esc(s[0]) + (reasons.length ? ' <span class="sub">(' + esc(reasons.join(', ')) + ')</span>' : '') + '</div>';
+  }
+
+  function plainSentence(t, label) {
+    if (!t || (!t.impressions && !t.clicks)) return label + ', no one has seen the ads yet. That is normal right after launch; Google reports run a few hours behind.';
+    var s = label + ', your ads were shown ' + num(t.impressions) + ' times and ' + num(t.clicks) + ' people clicked, for ' + money(t.cost) + ' total';
+    if (t.clicks) s += ' (about ' + money(t.cost / t.clicks) + ' per click)';
+    s += '. ';
+    if (t.leads >= 0.5) s += 'That turned into ' + num(t.leads) + ' lead' + (Math.round(t.leads) === 1 ? '' : 's') + ', or ' + money(t.cost / t.leads) + ' per lead.';
+    else s += 'No leads counted yet. Leads can take up to a day to show up here.';
+    return s;
+  }
+
+  function chart(daily) {
+    if (!daily || !daily.length) return '';
+    var W = 900, H = 170, pad = 24, n = daily.length, bw = (W - pad * 2) / n;
+    var maxC = Math.max.apply(null, daily.map(function (d) { return d.cost; }).concat([1]));
+    var bars = daily.map(function (d, i) {
+      var h = (d.cost / maxC) * (H - 40), x = pad + i * bw + 2, y = H - 20 - h;
+      var lead = d.leads >= 0.5 ? '<circle cx="' + (x + (bw - 4) / 2) + '" cy="' + (y - 7) + '" r="4" fill="var(--bar2)"><title>' + num(d.leads) + ' lead(s)</title></circle>' : '';
+      return '<rect x="' + x + '" y="' + y + '" width="' + Math.max(1, bw - 4) + '" height="' + Math.max(0, h) + '" rx="2" fill="var(--bar)"><title>' +
+        d.date + ': ' + money(d.cost) + ', ' + d.clicks + ' clicks</title></rect>' + lead;
+    }).join('');
+    var lbl = [0, Math.floor(n / 2), n - 1].map(function (i) {
+      return '<text x="' + (pad + i * bw + bw / 2) + '" y="' + (H - 4) + '" text-anchor="middle">' + daily[i].date.slice(5) + '</text>';
+    }).join('');
+    return '<div class="card"><svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Daily spend, last 30 days">' +
+      '<text x="' + pad + '" y="12">' + money(maxC) + '</text>' + bars + lbl + '</svg>' +
+      '<div class="legend"><span><span class="sw" style="background:var(--bar)"></span>Spent per day</span><span><span class="sw" style="background:var(--bar2);border-radius:50%"></span>Day with a lead</span></div></div>';
+  }
+
+  function render() {
+    var d = state.data;
+    if (!d || !d.updatedAt) {
+      app.innerHTML = header(null) + '<div class="card empty">No data yet. The Google Ads script sends fresh numbers every hour once it is installed.</div>';
+      bind(); return;
+    }
+    var p = state.period, t = (d.totals || {})[p] || {}, label = { today: 'Today', week: 'This week', month: 'This month', last30: 'In the last 30 days' }[p];
+    var h = header(d);
+    h += '<div class="chips">' + (d.campaigns || []).filter(function (c) { return c.status !== 'REMOVED'; }).map(statusChip).join('') + '</div>';
+    h += '<div class="seg" id="seg">' + PERIODS.map(function (x) { return '<button data-p="' + x[0] + '" class="' + (x[0] === p ? 'on' : '') + '">' + x[1] + '</button>'; }).join('') + '</div>';
+    h += '<div class="kpis">' +
+      kpi('Spent', money(t.cost), 'Budget ' + money(sumBudget(d)) + '/day') +
+      kpi('Clicks', num(t.clicks), t.clicks ? money(t.cost / t.clicks) + ' per click' : 'People who clicked an ad') +
+      kpi('Leads', num(t.leads), 'Forms + calls') +
+      kpi('Cost per lead', t.leads >= 0.5 ? money(t.cost / t.leads) : '—', 'Goal: about $200 or less') +
+      '</div>';
+    h += '<div class="plain">' + esc(plainSentence(t, label)) + '</div>';
+
+    h += '<h2>Spend, last 30 days</h2>' + chart(d.daily);
+
+    h += '<h2>By campaign, this month</h2><div class="grid2">' + (d.campaigns || []).filter(function (c) { return c.status === 'ENABLED'; }).map(function (c) {
+      var m = (c.periods || {}).month || {};
+      return '<div class="card camp"><h3>' + esc(c.name.replace('Search - NC - ', '')) + '</h3><div class="sub">' + money(c.budget) + '/day budget</div>' +
+        row('Spent', money(m.cost)) + row('People who saw it', num(m.impressions)) + row('Clicks', num(m.clicks)) +
+        row('Leads', num(m.leads)) + row('Cost per lead', m.leads >= 0.5 ? money(m.cost / m.leads) : '—') +
+        row('Share of searches we showed up for (7 days)', pct(c.impressionShare)) +
+        (c.lostToBudget > 0.1 ? '<div class="note">Missed ' + pct(c.lostToBudget) + ' of searches because the daily budget ran out.</div>' : '') +
+        (c.lostToRank > 0.4 ? '<div class="note">Missed ' + pct(c.lostToRank) + ' of searches because other ads outbid us or ranked higher.</div>' : '') +
+        '</div>';
+    }).join('') + '</div>';
+
+    var lt = d.leadsByType || {}, ltKeys = Object.keys(lt).filter(function (k) { return lt[k] >= 0.5; });
+    h += '<h2>Where this month\'s leads came from</h2><div class="card">' + (ltKeys.length ? ltKeys.map(function (k) { return row(ACTION_NAMES[k] || k, num(lt[k])); }).join('') :
+      '<div class="sub">No leads counted yet this month.</div>') +
+      '<div class="note">A form fill counts when someone reaches the thank-you page after an ad click. A call counts when someone taps the call button on the ad and talks 60+ seconds. Both can take up to a day to appear.</div></div>';
+
+    var ag = (d.adGroups || []).slice().sort(function (a, b) { return b.stats.cost - a.stats.cost; });
+    h += '<h2>Ad groups, last 30 days</h2><div class="card tablewrap"><table><tr><th>Ad group</th><th class="hide-sm">Campaign</th><th class="n">Clicks</th><th class="n">Spent</th><th class="n">Leads</th></tr>' +
+      (ag.length ? ag.map(function (a) {
+        return '<tr><td>' + esc(a.name) + '</td><td class="hide-sm">' + esc(a.campaign.replace('Search - NC - ', '')) + '</td><td class="n">' + num(a.stats.clicks) + '</td><td class="n">' + money(a.stats.cost) + '</td><td class="n">' + num(a.stats.leads) + '</td></tr>';
+      }).join('') : '<tr><td colspan="5" class="sub">No active ad groups.</td></tr>') + '</table></div>';
+
+    var st = d.searchTerms || [];
+    h += '<h2>What people searched, last 14 days</h2><div class="card tablewrap"><table><tr><th>They typed</th><th class="n">Saw</th><th class="n">Clicks</th><th class="n">Spent</th><th class="n hide-sm">Leads</th></tr>' +
+      (st.length ? st.slice(0, 25).map(function (s) {
+        var blocked = s.status === 'EXCLUDED' ? ' <span class="tag blocked">blocked</span>' : '';
+        return '<tr><td>' + esc(s.term) + blocked + '<div class="sub">' + esc(s.adGroup) + '</div></td><td class="n">' + num(s.impressions) + '</td><td class="n">' + num(s.clicks) + '</td><td class="n">' + money(s.cost) + '</td><td class="n hide-sm">' + num(s.leads) + '</td></tr>';
+      }).join('') : '<tr><td colspan="5" class="sub">No searches yet. These appear once people start seeing the ads.</td></tr>') + '</table>' +
+      '<div class="note">Claude checks this list every Monday and Thursday and blocks searches that are not customers (DIY, jobs, store shopping, lawn care).</div></div>';
+
+    var ads = d.ads || [];
+    var notOk = ads.filter(function (a) { return a.approval !== 'APPROVED'; });
+    h += '<h2>Ad approvals</h2><div class="card">' + (ads.length ? ads.map(function (a) {
+      var ok = a.approval === 'APPROVED', lim = a.approval === 'APPROVED_LIMITED', rev = a.review === 'REVIEW_IN_PROGRESS';
+      var txt = ok ? 'Approved' : lim ? 'Approved, limited' : rev ? 'Being reviewed by Google' : a.approval === 'DISAPPROVED' ? 'Rejected: needs a fix' : String(a.approval || a.review || 'Unknown').toLowerCase().replace(/_/g, ' ');
+      var col = ok ? 'var(--good)' : a.approval === 'DISAPPROVED' ? 'var(--bad)' : 'var(--warn)';
+      return row('<span class="dot" style="background:' + col + '"></span>' + esc(a.adGroup), esc(txt));
+    }).join('') : '<div class="sub">No active ads.</div>') +
+      (notOk.length ? '' : '<div class="note">Every active ad is approved.</div>') + '</div>';
+
+    h += '<p class="note" style="margin-top:28px">Numbers come straight from Google Ads every hour, through a read-only script inside the SDLR ads account. It never changes anything there. Google\'s own numbers can lag a few hours, and leads up to a day. A weekly summary email goes to Gio every Monday at 7 AM.</p>';
+    app.innerHTML = h;
+    bind();
+  }
+
+  function sumBudget(d) { return (d.campaigns || []).filter(function (c) { return c.status === 'ENABLED'; }).reduce(function (s, c) { return s + (c.budget || 0); }, 0); }
+  function kpi(l, v, s) { return '<div class="kpi"><div class="l">' + l + '</div><div class="v">' + v + '</div><div class="s">' + esc(s) + '</div></div>'; }
+  function row(a, b) { return '<div class="row"><span>' + a + '</span><span>' + b + '</span></div>'; }
+  function header(d) {
+    return '<header><div><a class="back" href="./">← Dock</a><h1>SDLR Ads Live</h1><div class="sub">' +
+      (d ? 'Updated ' + ago(d.updatedAt) + ' · Google Ads, North County' : 'Google Ads, North County') + '</div></div>' +
+      '<div><button class="btn" id="refresh">Refresh</button> <button class="btn" id="lock" title="Forget the passcode on this device">Lock</button></div></header>';
+  }
+  function bind() {
+    var r = document.getElementById('refresh'); if (r) r.onclick = load;
+    var l = document.getElementById('lock'); if (l) l.onclick = function () { try { localStorage.removeItem(KEY_STORE); } catch (e) {} gate(); };
+    var seg = document.getElementById('seg');
+    if (seg) seg.onclick = function (e) {
+      var p = e.target && e.target.getAttribute('data-p'); if (!p) return;
+      state.period = p; try { localStorage.setItem('sdlrAdsPeriod', p); } catch (err) {}
+      render();
+    };
+  }
+
+  load();
+  setInterval(function () { if (document.visibilityState === 'visible' && key()) load(); }, 5 * 60 * 1000);
+  document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && key() && state.data) load(); });
+})();
+</script>
+</body>
+</html>
