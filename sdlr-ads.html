@@ -145,6 +145,8 @@
     var s = STATUS[c.primaryStatus] || (c.status === 'PAUSED' ? STATUS.PAUSED : [c.primaryStatus || c.status || 'Unknown', 'var(--muted)']);
     var reasons = (c.reasons || []).map(function (r) { return REASONS[r]; }).filter(Boolean);
     reasons = reasons.filter(function (r, i) { return reasons.indexOf(r) === i; });
+    // "Running, still learning" already says it; don't repeat it in brackets.
+    if (c.primaryStatus === 'LEARNING') reasons = reasons.filter(function (r) { return r !== REASONS.BIDDING_STRATEGY_LEARNING; });
     return '<div class="chip"><span class="dot" style="background:' + s[1] + '"></span><b>' + esc(c.name.replace('Search - NC - ', '')) + '</b> · ' +
       money(c.budget) + '/day · ' + esc(s[0]) + (reasons.length ? ' <span class="sub">(' + esc(reasons.join(', ')) + ')</span>' : '') + '</div>';
   }
