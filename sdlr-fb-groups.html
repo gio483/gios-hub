@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDLR Facebook Groups</title>
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{--g:#425443;--gd:#2f3d30;--gold:#B08D57;--cream:#f6f1e7;--ink:#1f2620;--mut:#6b7268;--line:#e3dccd}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+header{background:var(--g);color:#fff;padding:18px 18px 0}
+header h1{font:600 22px/1.2 Georgia,serif;margin:0 0 2px}
+header p{margin:0 0 12px;color:#d9dccf;font-size:13px}
+nav{display:flex;gap:6px;overflow-x:auto}
+nav button{background:none;border:0;color:#d9dccf;font:600 14px/1 inherit;padding:12px 12px;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+nav button.on{color:#fff;border-color:var(--gold)}
+main{max-width:720px;margin:0 auto;padding:16px}
+.day{margin:6px 0 22px}
+.day h2{font:600 17px/1.2 Georgia,serif;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.pill{font:700 11px/1 inherit;letter-spacing:.04em;text-transform:uppercase;padding:5px 8px;border-radius:99px;background:var(--gold);color:#fff}
+.pill.grey{background:#c9c2b2}
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.card.done{opacity:.55}
+.card .top{padding:12px 14px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .grp{font-weight:700}
+.card .rule{font-size:13px;color:var(--mut)}
+.warn{background:#fbecd6;color:#7a4a10;font-size:13px;font-weight:600;padding:8px 14px;border-top:1px solid #f0d9b5}
+.card img{display:block;width:100%;max-height:520px;object-fit:contain;background:#ece6d9}
+.cap{white-space:pre-wrap;padding:12px 14px;font-size:14px;border-top:1px solid var(--line);max-height:180px;overflow:auto}
+.cap.open{max-height:none}
+.more{background:none;border:0;color:var(--g);font-weight:600;padding:0 14px 10px;cursor:pointer}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+.btns button{border:0;border-radius:10px;padding:13px 8px;font:700 14px/1 inherit;cursor:pointer}
+.b-save{background:var(--gold);color:#fff}
+.b-copy{background:var(--g);color:#fff}
+.b-copy.copied,.b-save.copied{background:#2c7a4b}
+.posted{display:flex;align-items:center;gap:8px;padding:0 14px 14px;font-size:14px;font-weight:600;color:var(--g)}
+.posted input{width:22px;height:22px;accent-color:var(--g)}
+.empty{background:#fff;border:1px dashed #cfc6b3;border-radius:14px;padding:14px;margin-bottom:14px}
+.empty .grp{font-weight:700}
+.empty p{margin:4px 0 0;font-size:13px;color:var(--mut)}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+td,th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+th{background:var(--g);color:#fff;font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.note{font-size:13px;color:var(--mut);margin:14px 2px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;transition:.25s;z-index:9}
+.toast.show{transform:translateX(-50%) translateY(0)}
+a.back{color:#d9dccf;font-size:13px;text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="./">&#8592; Hub</a>
+  <h1>Facebook Groups</h1>
+  <p>San Diego Landscape Remodeling. Save the photo, copy the caption, post, check it off.</p>
+  <nav><button data-v="up" class="on">Up next</button><button data-v="sched">Schedule</button><button data-v="groups">Group rules</button></nav>
+</header>
+<main id="app"></main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ EDIT HERE ============
+   GROUPS: one line per Facebook group. days = 'MO','TU','WE','TH','FR','SA','SU' or '3TH' (third Thursday of the month).
+   links:false = no website or links allowed in the caption.
+   POSTS: one line per scheduled post. date = YYYY-MM-DD, g = group id, img = file on the hub, cap = caption.
+   ================================== */
+const GROUPS = [
+  { id:'eastlake',  n:'Eastlake Chula Vista Residents',        town:'Eastlake',   days:['MO'],  rule:'Mondays only.', links:true },
+  { id:'sanmarcos', n:'San Marcos California Community',       town:'San Marcos', days:['MO'],  rule:'Mondays only. Same post as Eastlake, posted a few hours apart.', links:true },
+  { id:'lakeside',  n:'Lakeside Media Group',                  town:'Lakeside',   days:['TU'],  rule:'Any time. Never repeat a post.', links:true },
+  { id:'escondido', n:'All Things Escondido',                  town:'Escondido',  days:['WE'],  rule:'Any time, but no spam and no repeat posts.', links:true },
+  { id:'santee',    n:'All Things Happening in Santee',        town:'Santee',     days:['TH'],  rule:'Any time. Run by Suzanne Coleman.', links:true },
+  { id:'lamesa',    n:'La Mesa Happenings',                    town:'La Mesa',    days:['3TH'], rule:'Third Thursday of the month only. Photo only: NO website link and NO links of any kind.', links:false },
+];
+
+const SIGN = '\n\nSan Diego Landscape Remodeling\n619.613.2511\nsandiegolandscaperemodeling.com';
+const POOL = ', yes, a pool can fit in your backyard. \u{1F4A6}\n\nYou don’t need a huge lot. A compact pool with a little spa spilling into it, a clean paver deck, and planting full of color all the way around. Bougainvillea on the walls, kangaroo paw and lavender in the beds, and tall greenery so it feels like your own private retreat.\n\nSwim in the summer, soak in the spa on cool winter nights, and enjoy the view from the kitchen window all year.\n\nIf you have ever wondered whether a pool would work in your yard, we would love to come take a look and talk it through with you. Give us a call or visit our website to get started.' + SIGN;
+
+const POSTS = [
+  { date:'2026-11-16', g:'eastlake',  img:'fbg-pool.jpg', title:'Compact pool and spa', cap:'Eastlake neighbors' + POOL },
+  { date:'2026-11-16', g:'sanmarcos', img:'fbg-pool.jpg', title:'Compact pool and spa', cap:'San Marcos neighbors' + POOL },
+  { date:'2026-11-17', g:'lakeside',  img:'fbg-wall.jpg', title:'Retaining wall and terraced slope', cap:
+'Lakeside neighbors, with the rain coming, let’s talk about that slope out back. \u{1F327}️\n\nA lot of Lakeside homes sit on hillside lots, and an unfinished slope can turn into a real headache. Soil washing down after every storm, water pooling against the house, and a hill you can’t actually use.\n\nA properly built retaining wall changes all of that. Terrace the slope, add a few steps, and give the water somewhere to go with real drainage behind and below the wall. Suddenly you have two usable levels instead of one hill, with room for a patio, a fire pit or a little turf for the dog.\n\nThe part most people never see matters most: the base, the drain rock and the drain pipe. That is where a wall either lasts for decades or starts leaning in a few years, and it is the part we never cut corners on.\n\nIf your yard has a slope or a drainage problem you have been putting off, give us a call or visit our website. We would be glad to come take a look.' + SIGN },
+  { date:'2026-11-18', g:'escondido', img:'fbg-courtyard.jpg', title:'Courtyard, pergola and outdoor kitchen', cap:
+'Escondido neighbors, this is what a backyard built for the holidays looks like. \u{1F37D}️\n\nWarm travertine underfoot, a wood beam pergola with vines climbing the posts, a stone outdoor kitchen with a built in grill, and a long table with room for the whole family. Lavender, rosemary and olive trees along the fence line tie it all together.\n\nOur Escondido weather was made for this. Dinner outside in November, and a space you use all year long.\n\nIf you have been thinking about an outdoor kitchen, a pergola or a full backyard remodel, we would love to help bring it to life. Give us a call or visit our website and let’s talk about your yard.' + SIGN },
+  { date:'2026-11-19', g:'santee', img:'fbg-garden.jpg', title:'Garden, flagstone and fire pit', cap:
+'Santee neighbors, a little color goes a long way. \u{1F33A}\n\nBougainvillea on the wall, kangaroo paw and lavender spilling over the beds, a flagstone path winding through it all, and a fire pit circle right in the middle for these cool fall evenings. Tall greenery along the fence so it feels like your own private garden.\n\nIt doesn’t take a huge yard or a huge budget to make your backyard the place everyone wants to be.\n\nIf you have been thinking about new planting, a flagstone patio or a fire pit area, we would love to help. Give us a call or visit our website and let’s talk about your space.' + SIGN },
+  { date:'2026-11-19', g:'lamesa', img:'fbg-frontnight.jpg', title:'Front yard, paver driveway and lighting', cap:
+'La Mesa neighbors, what does your home say when you pull up at night? \u{1F3E1}✨\n\nA paver driveway in place of plain gray concrete, with small lights set right into the pavers. A low stone courtyard wall and gate at the front door. Drought tolerant planting and boulders instead of patchy grass. And low voltage lighting that washes the walls, lights the walkway and makes the trees glow every evening.\n\nIt is the first thing you see when you come home, and the first thing everyone else sees too.\n\nWe are San Diego Landscape Remodeling, and our office is right here in La Mesa on Park Plaza Drive. If you have been thinking about a front yard refresh, a new driveway or landscape lighting, give us a call.\n\nSan Diego Landscape Remodeling\n619.613.2511' },
+];
+/* Spare finished images not yet used in a group: fbg-pavers.jpg (pavers, gas fire pit, turf) */
+
+/* ============ app ============ */
+const $=s=>document.querySelector(s);
+const G=Object.fromEntries(GROUPS.map(g=>[g.id,g]));
+const DOW=['SU','MO','TU','WE','TH','FR','SA'];
+const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const pretty=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});};
+const today=new Date();today.setHours(0,0,0,0);const TODAY=iso(today);
+function store(){try{return JSON.parse(localStorage.getItem('sdlr-fbg-posted')||'{}')}catch(e){return{}}}
+function save(o){try{localStorage.setItem('sdlr-fbg-posted',JSON.stringify(o))}catch(e){}}
+let POSTED=store();
+const key=(date,g)=>date+'|'+g;
+
+function groupsOn(d){
+  const code=DOW[d.getDay()];
+  const third=d.getDay()===4 && Math.ceil(d.getDate()/7)===3;
+  return GROUPS.filter(g=>g.days.includes(code)||(third&&g.days.includes('3TH')));
+}
+function slots(days){
+  const out=[];
+  for(let i=0;i<days;i++){const d=new Date(today);d.setDate(d.getDate()+i);
+    for(const g of groupsOn(d)){const ds=iso(d);out.push({date:ds,g:g.id,post:POSTS.find(p=>p.date===ds&&p.g===g.id)});}}
+  /* posts loaded for past days that are not checked off yet */
+  const late=POSTS.filter(p=>p.date<TODAY&&!POSTED[key(p.date,p.g)]).map(p=>({date:p.date,g:p.g,post:p,late:true}));
+  return late.concat(out);
+}
+function esc(s){return s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function card(s){
+  const g=G[s.g],p=s.post,k=key(s.date,s.g),done=!!POSTED[k];
+  if(!p) return `<div class="empty"><div class="grp">${esc(g.n)}</div><p>No post loaded yet. ${esc(g.rule)} Ask Claude to load next week’s posts.</p></div>`;
+  return `<div class="card${done?' done':''}">
+    <div class="top"><div><div class="grp">${esc(g.n)}</div><div class="rule">${esc(g.rule)}</div></div>${s.late?'<span class="pill">Overdue</span>':''}</div>
+    ${g.links?'':'<div class="warn">No links allowed in this group. This caption has none, do not add the website.</div>'}
+    <img src="${p.img}" alt="${esc(p.title)}" loading="lazy">
+    <div class="cap" id="c-${k}">${esc(p.cap)}</div>
+    <button class="more" data-more="${k}">Show full caption</button>
+    <div class="btns"><button class="b-save" data-img="${p.img}" data-fn="SDLR-${s.g}-${s.date}.jpg">Save photo</button><button class="b-copy" data-k="${k}">Copy caption</button></div>
+    <label class="posted"><input type="checkbox" data-done="${k}" ${done?'checked':''}> Posted</label>
+  </div>`;
+}
+function renderUp(){
+  const all=slots(15);
+  const byDate={};all.forEach(s=>(byDate[s.date]=byDate[s.date]||[]).push(s));
+  const dates=Object.keys(byDate).sort();
+  let h='';
+  dates.forEach((d,i)=>{
+    const tag=d<TODAY?'<span class="pill">Missed</span>':d===TODAY?'<span class="pill">Today</span>':i===0||dates[i-1]<TODAY?'<span class="pill grey">Next</span>':'';
+    h+=`<section class="day"><h2>${pretty(d)} ${tag}</h2>${byDate[d].map(card).join('')}</section>`;
+  });
+  $('#app').innerHTML=h+'<p class="note">Check offs are saved on this device only.</p>';
+}
+function renderSched(){
+  const rows=slots(42).filter(s=>!s.late).map(s=>`<tr><td>${pretty(s.date)}</td><td>${esc(G[s.g].n)}</td><td>${s.post?(POSTED[key(s.date,s.g)]?'Posted':'Ready'):'<b>Needs a post</b>'}</td></tr>`).join('');
+  $('#app').innerHTML=`<table><tr><th>Day</th><th>Group</th><th>Status</th></tr>${rows}</table><p class="note">Next 6 weeks. The same days are on the SDLR Office calendar through November 2027, with a reminder the day before each La Mesa third Thursday.</p>`;
+}
+function renderGroups(){
+  const nm={MO:'Monday',TU:'Tuesday',WE:'Wednesday',TH:'Thursday',FR:'Friday','3TH':'3rd Thursday'};
+  $('#app').innerHTML=`<table><tr><th>Group</th><th>Day</th><th>Rule</th></tr>${GROUPS.map(g=>`<tr><td><b>${esc(g.n)}</b></td><td>${g.days.map(d=>nm[d]).join(', ')}</td><td>${esc(g.rule)}</td></tr>`).join('')}</table>
+  <p class="note">Every group gets its own image and caption matched to that town. No hashtags, no free concept offer. Close with the phone number and website (except La Mesa: phone only).</p>`;
+}
+let VIEW='up';
+function render(){({up:renderUp,sched:renderSched,groups:renderGroups})[VIEW]();}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');VIEW=b.dataset.v;render();scrollTo(0,0);});
+
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1800);}
+function flash(btn,txt){const o=btn.textContent;btn.textContent=txt;btn.classList.add('copied');setTimeout(()=>{btn.textContent=o;btn.classList.remove('copied');},1600);}
+async function copyText(txt,btn){
+  try{await navigator.clipboard.writeText(txt);}
+  catch(e){const ta=document.createElement('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity=0;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();}
+  flash(btn,'Copied ✓');toast('Caption copied. Paste it into Facebook.');
+}
+async function savePhoto(url,fn,btn){
+  const o=btn.textContent;btn.textContent='Preparing…';
+  try{
+    const b=await (await fetch(url,{cache:'no-store'})).blob();
+    const file=new File([b],fn,{type:'image/jpeg'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){
+      try{await navigator.share({files:[file]});btn.textContent=o;toast('Tap “Save Image” to put it in Photos');return;}
+      catch(err){if(err&&err.name==='AbortError'){btn.textContent=o;return;}}
+    }
+    const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);
+    btn.textContent=o;flash(btn,'Saved ✓');
+  }catch(e){btn.textContent=o;window.open(url,'_blank');toast('Press and hold the photo to save it');}
+}
+document.addEventListener('click',e=>{
+  const t=e.target;
+  if(t.dataset.img) savePhoto(t.dataset.img,t.dataset.fn,t);
+  else if(t.dataset.k){const [d,g]=t.dataset.k.split('|');copyText(POSTS.find(p=>p.date===d&&p.g===g).cap,t);}
+  else if(t.dataset.more){const c=document.getElementById('c-'+t.dataset.more);c.classList.toggle('open');t.textContent=c.classList.contains('open')?'Show less':'Show full caption';}
+});
+document.addEventListener('change',e=>{const k=e.target.dataset.done;if(!k)return;if(e.target.checked)POSTED[k]=Date.now();else delete POSTED[k];save(POSTED);render();});
+render();
+</script>
+</body>
+</html>
