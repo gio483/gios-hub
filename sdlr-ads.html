@@ -210,6 +210,30 @@
         '</div>';
     }).join('') + '</div>';
 
+    var ar = d.areas;
+    if (ar && ar.territories) {
+      var plabel = { today: 'today', week: 'this week', month: 'this month', last30: 'in the last 30 days' }[p];
+      h += '<h2>By area, ' + plabel + '</h2><div class="grid2">' + ar.territories.map(function (tr) {
+        var s = (tr.periods || {})[p] || {};
+        return '<div class="card camp"><h3>' + esc(tr.who) + '</h3><div class="sub">' + esc(tr.name) + '</div>' +
+          row('Spent', money(s.cost)) + row('People who saw it', num(s.impressions)) + row('Clicks', num(s.clicks)) +
+          row('Leads', num(s.leads)) + row('Cost per lead', s.leads >= 0.5 ? money(s.cost / s.leads) : '—') + '</div>';
+      }).join('') + '</div>';
+      var who = {}; ar.territories.forEach(function (tr) { who[tr.key] = tr.who; });
+      var allZ = ar.zips || [];
+      var zr = allZ.filter(function (z) { var s = (z.periods || {})[p]; return s && (s.impressions > 0 || s.cost > 0); })
+        .sort(function (a, b) { var x = a.periods[p], y = b.periods[p]; return (y.cost - x.cost) || (y.clicks - x.clicks) || (y.impressions - x.impressions); });
+      var quiet = allZ.filter(function (z) { return z.zip !== 'other'; }).length - zr.filter(function (z) { return z.zip !== 'other'; }).length;
+      h += '<div class="card tablewrap" style="margin-top:12px"><table><tr><th>Area</th><th class="n">Saw</th><th class="n">Clicks</th><th class="n">Spent</th><th class="n">Leads</th></tr>' +
+        (zr.length ? zr.map(function (z) {
+          var s = z.periods[p];
+          var sub = z.zip === 'other' ? 'Old targeting' : z.zip + ' · ' + (who[z.territory] || 'Unassigned');
+          return '<tr><td>' + esc(z.name) + '<div class="sub">' + esc(sub) + '</div></td><td class="n">' + num(s.impressions) + '</td><td class="n">' + num(s.clicks) + '</td><td class="n">' + money(s.cost) + '</td><td class="n">' + num(s.leads) + '</td></tr>';
+        }).join('') : '<tr><td colspan="5" class="sub">No views in any area ' + plabel + ' yet.</td></tr>') + '</table>' +
+        (quiet > 0 && zr.length ? '<div class="note">' + quiet + ' other area' + (quiet === 1 ? '' : 's') + ' had no views ' + plabel + '.</div>' : '') +
+        '<div class="note">Based on where the person was when they searched. Every lead also types their address into the form, so check that in GHL before handing a lead to the sales rep or to Gio &amp; Mike.</div></div>';
+    }
+
     var lt = d.leadsByType || {}, ltKeys = Object.keys(lt).filter(function (k) { return lt[k] >= 0.5; });
     h += '<h2>Where this month\'s leads came from</h2><div class="card">' + (ltKeys.length ? ltKeys.map(function (k) { return row(ACTION_NAMES[k] || k, num(lt[k])); }).join('') :
       '<div class="sub">No leads counted yet this month.</div>') +
@@ -249,7 +273,7 @@
   function row(a, b) { return '<div class="row"><span>' + a + '</span><span>' + b + '</span></div>'; }
   function header(d) {
     return '<header><div><a class="back" href="./">← Dock</a><h1>SDLR Ads Live</h1><div class="sub">' +
-      (d ? 'Updated ' + ago(d.updatedAt) + ' · Google Ads, North County' : 'Google Ads, North County') + '</div></div>' +
+      (d ? 'Updated ' + ago(d.updatedAt) + ' · Google Ads, San Diego' : 'Google Ads, San Diego') + '</div></div>' +
       '<div><button class="btn" id="refresh">Refresh</button> <button class="btn" id="lock" title="Forget the passcode on this device">Lock</button></div></header>';
   }
   function bind() {
