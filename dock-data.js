@@ -94,6 +94,7 @@ window.DOCK_ITEMS = [
   { id:'keylight', n:'Keylight', d:'Flash simulator for interior architecture: place lights, fire, get scored', u:'keylight/', k:'app', b:['personal','svm'], i:'💡', c:'#3d3416', ours:true, add:'2026-08-27' },
   { id:'trip-map', n:'Trip Map', d:'Where to go, what it costs and when you can actually leave', u:'trip-map.html', k:'app', b:['personal'], i:'🗺️', c:'#16323d', ours:true, add:'2026-08-16' },
   { id:'snacks', n:'Snack Board', d:'Low calorie snacks by store and shelf life, plus a list', u:'snacks.html', k:'app', b:['personal'], i:'🥫', c:'#3d2a14', ours:true, add:'2026-10-24' },
+  { id:'grid-down-manual', n:'Grid Down Field Manual', d:'Printable survival and self-reliance binder for San Diego County: water, fire, first aid, sickness, food, growing, tools, knots, power, vehicles, navigation. Military-style steps with drawings, quick cards, practice plan', u:'grid-down-manual.pdf', k:'design', b:['personal'], i:'\u{1F9ED}', c:'#36421c', ours:true, s:'live', p:'free', add:'2026-11-14', note:'437 pages. Print master (full-res) and source in 02 Clients/gio/grid-down-manual; rebuild with node build/build.mjs' },
   { id:'vibe', n:'Strong & Gentle', d:'Vibe board: marble, olive trees, fire and storm', u:'vibe/', k:'design', b:['personal'], i:'🏛️', c:'#2c2a26', ours:true, add:'2026-10-24' },
 
   /* ---------------- Courses & learning ---------------- */
