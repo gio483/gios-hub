@@ -297,7 +297,7 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=15"></script>
+<script src="dock-data.js?v=16"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
@@ -392,7 +392,8 @@ function vary(id){
   return `--h:${(h % 120) - 60}deg;--x:${15 + (h >>> 7) % 70}%`;
 }
 // the company an item belongs to (first business listed). Personal items stay on their emoji.
-const coOf = it => { const b = BIZMAP[(it.b||[])[0]]; return b && b.bg ? b : null; };
+const CLIENTMAP = Object.fromEntries((window.DOCK_CLIENTS||[]).map(c=>[c.id,c]));
+const coOf = it => { if(it.cl && CLIENTMAP[it.cl]) return CLIENTMAP[it.cl]; const b = BIZMAP[(it.b||[])[0]]; return b && b.bg ? b : null; };
 const branded = it => !!(coOf(it) && !(it.dom && !(it.ours && it.i)));   // our own stuff for a company (not a 3rd-party tool logo)
 const tileColor = it => branded(it) ? coOf(it).bg : (it.c||'#222');
 const coMark = b => b.mark ? `<img class="bm" src="${esc(b.mark)}" alt="${esc(b.short)}">` : `<span class="bw">${esc((b.word||b.short).split(' ')[0])}</span>`;

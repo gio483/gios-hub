@@ -14,6 +14,7 @@
      u      link (relative = a page on the hub, http = outside)
      k      kind: app | site | tool | util (free quick utility: downloaders, converters, generators) | course | design
      b      businesses: sdlr | svm | ksh | standby | mts | personal
+     cl     client brand (optional): shows that client's logo on the card, e.g. cl:'swo'
      i      emoji icon (our own stuff)          dom  domain for a real logo (tools)
      c      card color (company items show the company's logo + color instead; see DOCK_BIZ bg/logo/mark)
      p      price: [amount, 'mo'|'yr'|'life'] | 'free' | 'usage' | 'incl' (comes with another plan) | null (unknown, needs a price)
@@ -32,12 +33,17 @@ window.DOCK_BIZ = [
   { id:'personal', n:'Personal',            short:'Personal', c:'#ff8a3c', key:'6' }
 ];
 
+/* Client brands: an item with cl:'<id>' shows that client's logo instead of the business it's filed under */
+window.DOCK_CLIENTS = [
+  { id:'swo', n:'Starts With One Properties', short:'SWO', bg:'#000000', logo:'brand/swo-logo.png', mark:'brand/swo-mark.png' }
+];
+
 window.DOCK_ITEMS = [
   /* ---------------- SDLR · our apps ---------------- */
   { id:'sdlr-logo-animations', n:'Logo Animations', d:'Three animated SDLR logo stings for the front and end of videos \u2014 intro and outro, landscape and vertical, ready-to-drop MP4 plus transparent ProRes for laying over footage', u:'sdlr-logo-animations.html', k:'design', b:['sdlr'], i:'\u{1F3AC}', c:'#3a4a2e', ours:true, s:'live', p:'free', add:'2026-11-09' },
   { id:'sdlr-ads-live', n:'Ads Live', d:'Live Google Ads numbers for SDLR: spend, clicks, leads, cost per lead, what people searched and ad approvals. Updates every hour; passcode protected', u:'sdlr-ads.html', k:'app', b:['sdlr'], i:'\u{1F4C8}', c:'#2f3d2a', ours:true, s:'live', p:'free', add:'2026-11-12' },
   { id:'sdlr-hq', n:'Command Center', d:'CRM, inbox, follow-ups, BidForge estimates. The GoHighLevel replacement', u:'https://sdlr-hq.vercel.app', k:'app', b:['sdlr'], i:'🏛️', c:'#2f3a22', ours:true, s:'live', add:'2026-09-28' },
-  { id:'swo-ledger', n:'One Ledger', d:'Starts With One Properties: every investment property\u2019s money in one place \u2014 rent, mortgages, insurance, contractor payments, receipts, ARV history and profit per deal. Live and shared across every phone and computer; each person signs in with their name + PIN', u:'https://swo-ledger.shiftvisionphotos.workers.dev', k:'app', b:['svm'], i:'\u{1F3E0}', c:'#b8923d', ours:true, s:'live', p:'free', add:'2026-11-14', note:'Client app for Starts With One (SVM client). Cloudflare Worker + D1; source ~/Projects/swo-ledger, repo gio483/swo-ledger' },
+  { id:'swo-ledger', n:'One Ledger', d:'Starts With One Properties: every investment property\u2019s money in one place \u2014 rent, mortgages, insurance, contractor payments, receipts, ARV history and profit per deal. Live and shared across every phone and computer; each person signs in with their name + PIN', u:'https://swo-ledger.shiftvisionphotos.workers.dev', k:'app', b:['svm'], cl:'swo', i:'\u{1F3E0}', c:'#b8923d', ours:true, s:'live', p:'free', add:'2026-11-14', note:'Client app for Starts With One (SVM client). Cloudflare Worker + D1; source ~/Projects/swo-ledger, repo gio483/swo-ledger' },
   { id:'tally', n:'Tally', d:'Snap receipts and client checks, AI reads them, tag each to a project: what every job cost, what each client paid and still owes', u:'https://tally.shiftvisionphotos.workers.dev', k:'app', b:['sdlr','svm'], i:'🧾', c:'#1f6f4f', ours:true, s:'live', add:'2026-11-02' },
   { id:'same-spot', n:'Same Spot', d:'Before/after camera: shows the old photo over the live view so every progress and after shot matches the before exactly, then makes post images and wipe videos', u:'https://same-spot.shiftvisionphotos.workers.dev', k:'app', b:['sdlr','svm'], i:'📸', c:'#2c3a24', ours:true, s:'live', add:'2026-11-02' },
   { id:'sdlr-proposals', n:'Proposals', d:'Paste proposal text, get the house-format SDLR proposal every time: PDF, client web link, page images for GHL', u:'https://sdlr-proposals.shiftvisionphotos.workers.dev', k:'app', b:['sdlr'], i:'📄', c:'#2f3d33', ours:true, s:'live', p:'free', add:'2026-11-02' },
