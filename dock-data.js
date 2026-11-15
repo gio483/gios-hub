@@ -15,7 +15,7 @@
      k      kind: app | site | tool | util (free quick utility: downloaders, converters, generators) | course | design
      b      businesses: sdlr | svm | ksh | standby | mts | personal
      i      emoji icon (our own stuff)          dom  domain for a real logo (tools)
-     c      card color
+     c      card color (company items show the company's logo + color instead; see DOCK_BIZ bg/logo/mark)
      p      price: [amount, 'mo'|'yr'|'life'] | 'free' | 'usage' | 'incl' (comes with another plan) | null (unknown, needs a price)
      s      status chip: live | preview | local | building
      ours   true = we built it
@@ -24,11 +24,11 @@
    ===================================================================== */
 
 window.DOCK_BIZ = [
-  { id:'sdlr',     n:'San Diego Landscape', short:'SDLR',     c:'#9fb56a', key:'1' },
-  { id:'svm',      n:'Shift Vision Media',  short:'SVM',      c:'#29abe2', key:'2' },
-  { id:'ksh',      n:'KSH Construction',    short:'KSH',      c:'#3f97d3', key:'3' },
-  { id:'standby',  n:'Standby Pro',         short:'Standby',  c:'#c9a86a', key:'4' },
-  { id:'mts',      n:'Made to Serve',       short:'MTS',      c:'#e2725b', key:'5' },
+  { id:'sdlr',     n:'San Diego Landscape', short:'SDLR',     c:'#9fb56a', key:'1', bg:'#3b4a30', logo:'brand/sdlr-logo.png', mark:'brand/sdlr-mark.png' },
+  { id:'svm',      n:'Shift Vision Media',  short:'SVM',      c:'#29abe2', key:'2', bg:'#0f1d27', logo:'brand/svm-logo.png', mark:'brand/svm-mark.png' },
+  { id:'ksh',      n:'KSH Construction',    short:'KSH',      c:'#3f97d3', key:'3', bg:'#0f2a44', logo:'brand/ksh-logo.png', mark:'brand/ksh-mark.png' },
+  { id:'standby',  n:'Standby Pro',         short:'Standby',  c:'#c9a86a', key:'4', bg:'#2b2417', word:'STANDBY PRO' },
+  { id:'mts',      n:'Made to Serve',       short:'MTS',      c:'#e2725b', key:'5', bg:'#1E3250', logo:'brand/mts-logo.png', mark:'brand/mts-mark.png' },
   { id:'personal', n:'Personal',            short:'Personal', c:'#ff8a3c', key:'6' }
 ];
 

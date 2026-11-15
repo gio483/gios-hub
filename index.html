@@ -107,6 +107,20 @@
   .thumb .logo{width:54px;height:54px;border-radius:13px;object-fit:contain;background:#fff;padding:7px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
   .thumb.light .logo{box-shadow:0 0 0 1px rgba(0,0,0,.08)}
   .thumb .mono{width:54px;height:54px;border-radius:13px;background:rgba(255,255,255,.92);color:#111;display:flex;align-items:center;justify-content:center;font-family:var(--cond);font-weight:700;font-size:28px}
+  /* company-branded tiles: the company's logo is the main visual, the tool name sits under it */
+  .thumb.co{background:radial-gradient(130% 120% at var(--x,30%) 0%, color-mix(in srgb,var(--c) 80%, #fff) 0%, var(--c) 52%, color-mix(in srgb,var(--c) 62%, #000) 100%);
+    flex-direction:column;gap:7px;padding:16px 12px 12px}
+  .thumb.co .blogo{max-width:62%;max-height:44%;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
+  .thumb.co .bword{font-family:var(--cond);font-weight:700;font-size:24px;letter-spacing:.12em;color:#f3ead8;line-height:1}
+  .thumb.co .bname{max-width:100%;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.12em;
+    text-transform:uppercase;color:rgba(255,255,255,.88);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
+  .thumb.co .bname i{font-style:normal;font-size:12px;letter-spacing:0}
+  .thumb.co .bname span{overflow:hidden;text-overflow:ellipsis}
+  .thumb .cobadge{position:absolute;left:7px;bottom:9px;height:22px;min-width:22px;padding:3px 5px;border-radius:6px;background:var(--bc);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .thumb .cobadge img{height:16px;max-width:40px;object-fit:contain}
+  .thumb .cobadge b{font-family:var(--cond);font-size:10px;letter-spacing:.08em;color:#f3ead8}
+  .ri img.bm,.peek img.bm{background:none;padding:0;border-radius:0;object-fit:contain}
+  .ri .bw{font-family:var(--cond);font-weight:700;font-size:11px;letter-spacing:.04em;color:#f3ead8}
   .thumb .bar{position:absolute;left:0;right:0;bottom:0;height:3px;display:flex}
   .thumb .bar span{flex:1}
   .pill{position:absolute;top:8px;left:8px;background:var(--accent);color:#1a1205;border-radius:5px;padding:2px 7px;font-size:10.5px;font-weight:700;letter-spacing:.02em}
@@ -283,7 +297,7 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=14"></script>
+<script src="dock-data.js?v=15"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
@@ -377,9 +391,20 @@ function vary(id){
   let h = 0; for(const ch of String(id)) h = (h*31 + ch.charCodeAt(0)) >>> 0;
   return `--h:${(h % 120) - 60}deg;--x:${15 + (h >>> 7) % 70}%`;
 }
+// the company an item belongs to (first business listed). Personal items stay on their emoji.
+const coOf = it => { const b = BIZMAP[(it.b||[])[0]]; return b && b.bg ? b : null; };
+const branded = it => !!(coOf(it) && !(it.dom && !(it.ours && it.i)));   // our own stuff for a company (not a 3rd-party tool logo)
+const tileColor = it => branded(it) ? coOf(it).bg : (it.c||'#222');
+const coMark = b => b.mark ? `<img class="bm" src="${esc(b.mark)}" alt="${esc(b.short)}">` : `<span class="bw">${esc((b.word||b.short).split(' ')[0])}</span>`;
 const logoUrl = dom => `https://www.google.com/s2/favicons?domain=${encodeURIComponent(dom)}&sz=128`;
 function art(it, small){
   const letter = esc((it.n||'?')[0]);
+  if(branded(it)){
+    const b = coOf(it);
+    if(small) return coMark(b);
+    const top = b.logo ? `<img class="blogo" src="${esc(b.logo)}" alt="${esc(b.n)}" loading="lazy">` : `<span class="bword">${esc(b.word||b.short)}</span>`;
+    return `${top}<span class="bname">${it.i?`<i>${esc(it.i)}</i>`:''}<span>${esc(it.n)}</span></span>`;
+  }
   if(it.dom && !(it.ours && it.i)){
     const fb = small ? letter : `<span class=&quot;mono&quot;>${letter}</span>`;
     return `<img ${small?'':'class="logo"'} src="${logoUrl(it.dom)}" alt="" loading="lazy" onerror="this.outerHTML='${fb}'">`;
@@ -397,8 +422,9 @@ const PEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke=
 const bizTags = it => (it.b||[]).filter(b=>BIZMAP[b]).map(b => `<span style="color:${BIZMAP[b].c}">${BIZMAP[b].short}</span>`).join('');
 function card(it){
   return `<a class="card" ${linkAttrs(it)}>
-    <div class="thumb ${it.ours && !it.dom ? 'ours' : ''} ${isLight(it.c)?'light':''}" style="--c:${esc(it.c||'#222')};${vary(it.id)}">
+    <div class="thumb ${branded(it) ? 'co' : it.ours && !it.dom ? 'ours' : ''} ${!branded(it) && isLight(it.c)?'light':''}" style="--c:${esc(tileColor(it))};${vary(it.id)}">
       ${art(it)}
+      ${!branded(it) && coOf(it) && (it.b||[]).length===1 ? `<span class="cobadge" style="--bc:${esc(coOf(it).bg)}">${coOf(it).mark?`<img src="${esc(coOf(it).mark)}" alt="${esc(coOf(it).short)}">`:`<b>${esc(coOf(it).short)}</b>`}</span>` : ''}
       ${it.s ? `<span class="pill ${esc(it.s)}">${STATUS[it.s]||esc(it.s)}</span>` : ''}
       ${it.pin ? '<span class="pin-mark">📌</span>' : ''}
       <span class="bar">${(it.b||[]).filter(b=>BIZMAP[b]).map(b=>`<span style="background:${BIZMAP[b].c}"></span>`).join('')}</span>
@@ -411,7 +437,7 @@ function card(it){
 }
 function row(it){
   return `<a class="row" ${linkAttrs(it)}>
-    <span class="ri" style="--c:${esc(it.c||'#222')}">${art(it, true)}</span>
+    <span class="ri" style="--c:${esc(tileColor(it))}">${art(it, true)}</span>
     <span style="min-width:0"><div class="rn">${esc(it.n)}</div><div class="rd">${esc(it.d)}</div></span>
     <span class="tags">${bizTags(it)}</span>
     <span class="rk">${({app:'App',site:'Site',tool:'Tool',util:'Utility',course:'Course',design:'Design'})[it.k]||''}</span>
@@ -423,7 +449,7 @@ const collection = list => !list.length ? `<div class="empty">Nothing here yet.<
   : ui.layout==='list' ? `<div class="list">${list.map(row).join('')}</div>` : `<div class="grid">${list.map(card).join('')}</div>`;
 function section(id, title, list, opts={}){
   const closed = opts.toggle && ui.closed[id];
-  const peek = closed ? `<span class="peek">${list.slice(0,6).map(it=>`<span style="background:${esc(it.c)}">${art(it,true)}</span>`).join('')}</span>` : '';
+  const peek = closed ? `<span class="peek">${list.slice(0,6).map(it=>`<span style="background:${esc(tileColor(it))}">${art(it,true)}</span>`).join('')}</span>` : '';
   const head = title || opts.right ? `<div class="sec-h ${opts.toggle?'tog':''} ${closed?'closed':''}" ${opts.toggle?`data-toggle="${id}"`:''}>
       ${opts.toggle ? '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>' : ''}
       ${opts.big ? `<h2>${title}</h2>` : `<h3>${title}</h3>`}${peek}
@@ -549,7 +575,7 @@ function moneyView(all){
     .filter(x => x.v > 0).sort((a,b) => b.v - a.v);
   const maxB = Math.max(1, ...perBiz.map(x=>x.v));
   const bizLine = it => (it.b||[]).map(b=>BIZMAP[b]?BIZMAP[b].short:'').join(' · ');
-  const mrow = (it, right) => `<div class="mrow"><span class="ri" style="--c:${esc(it.c||'#222')}">${art(it,true)}</span><div style="min-width:0"><div class="mn">${esc(it.n)}</div><div class="mb">${bizLine(it)}${it.note?' · '+esc(it.note):''}</div></div>${right}<button class="flat-edit" data-edit="${esc(it.id)}" aria-label="Edit ${esc(it.n)}">${PEN}</button></div>`;
+  const mrow = (it, right) => `<div class="mrow"><span class="ri" style="--c:${esc(tileColor(it))}">${art(it,true)}</span><div style="min-width:0"><div class="mn">${esc(it.n)}</div><div class="mb">${bizLine(it)}${it.note?' · '+esc(it.note):''}</div></div>${right}<button class="flat-edit" data-edit="${esc(it.id)}" aria-label="Edit ${esc(it.n)}">${PEN}</button></div>`;
   const table = (title, rows, fn, sub) => rows.length ? `<section class="sec"><div class="sec-h"><h3>${title}</h3><span class="right">${rows.length}</span></div>${sub?`<p class="sub">${sub}</p>`:''}<div class="mtable">${rows.map(fn).join('')}</div></section>` : '';
 
   return header('Money', 'what the stack costs', bizChips()) + `
