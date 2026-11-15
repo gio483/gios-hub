@@ -99,7 +99,9 @@
   <div class="card"><h3>GoPro Hero 12 <span class="tag log">GP-Log</span> <span class="tag" style="color:#86efac;border-color:#2b5c3f">use this one</span></h3>
     <dl><dt>Protune</dt><dd>ON &middot; GP-Log if your firmware has it, else Flat</dd>
     <dt>WB</dt><dd>5500K manual</dd>
-    <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400 &middot; EV −0.5</dd></dl></div>
+    <dt>Sharpness</dt><dd>LOW &middot; ISO cap 400 &middot; EV −0.5</dd>
+    <dt>Shutter</dt><dd>Auto picks ~1/1000 in sun at 24p (choppy). ND16 in shade, ND32&ndash;64 in full sun to get near 1/50</dd>
+    <dt>In the edit</dt><dd>Input LUT <b class="k">GoPro Hero12 GP-Log to Rec709 &ndash; SVM</b>. Premiere has no GoPro log transform: without it the footage stays milky</dd></dl></div>
 
   <div class="card warn"><h3>GoPro Hero 9 <span class="tag flat">Flat</span></h3>
     <dl><dt>Protune</dt><dd>ON &middot; Color: Flat (no GP-Log on the 9 — Flat is the ceiling)</dd>
@@ -118,7 +120,7 @@
     <p class="note" style="margin-top:4px">Shot on the SDLR polo in the backyard. Measured across the graded clips: blacks and whites land within <b class="k">2/255</b> of each other, saturation within <b class="k">0.017</b>. Each body has its own normalise LUT; they all share one look.</p>
     <dl>
       <dt>Sony FX3</dt><dd>S-Log3 &rarr; official Sony transform &rarr; Mint Sky Safe</dd>
-      <dt>GoPro Hero 12</dt><dd><b class="k">SVM Normalise &mdash; GoPro Hero12 Flat</b> &rarr; Mint Sky Safe</dd>
+      <dt>GoPro Hero 12</dt><dd><b class="k">GoPro Hero12 GP-Log to Rec709 &ndash; SVM</b> &rarr; Mint Sky Safe <span class="w">(updated 15 Nov: the 9 Nov clip was GP-Log, not Flat; the old linear normalise blew out highlights)</span></dd>
       <dt>Osmo Pocket 3</dt><dd><b class="k">SVM Normalise &mdash; Osmo Pocket3 DLogM</b> &rarr; Mint Sky Safe</dd>
     </dl>
   </div>
@@ -203,7 +205,7 @@
   </div>
   <p class="note">Normalise LUTs, measured from the 9 Nov shoot. Use these on those two bodies instead of a transform node:</p>
   <div class="nodes" style="margin-top:8px">
-    <div><span class="i">▸</span><span><b class="k">SVM Normalise — GoPro Hero12 Flat to Rec709</b></span><span class="w">then Mint</span></div>
+    <div><span class="i">▸</span><span><b class="k">GoPro Hero12 GP-Log to Rec709 — SVM</b> — GoPro's log curve through the FX3's Sony tone curve</span><span class="w">then Mint</span></div>
     <div><span class="i">▸</span><span><b class="k">SVM Normalise — Osmo Pocket3 DLogM to Rec709</b></span><span class="w">then Mint</span></div>
   </div>
   <p class="note">Using the log version on non-log footage stacks two contrast curves — shadows block up and mids go olive. That's what Baked Profile is for.</p>
