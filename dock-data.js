@@ -35,7 +35,7 @@ window.DOCK_BIZ = [
 
 /* Client brands: an item with cl:'<id>' shows that client's logo instead of the business it's filed under */
 window.DOCK_CLIENTS = [
-  { id:'swo', n:'Starts With One Properties', short:'SWO', bg:'#000000', logo:'brand/swo-logo.png', mark:'brand/swo-mark.png' }
+  { id:'swo', n:'Starts With One Properties', short:'SWO', bg:'#000000', logo:'brand/swo-logo.png', mark:'brand/swo-mark.png', lw:'80%', lh:'62%' }
 ];
 
 window.DOCK_ITEMS = [

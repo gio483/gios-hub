@@ -110,7 +110,7 @@
   /* company-branded tiles: the company's logo is the main visual, the tool name sits under it */
   .thumb.co{background:radial-gradient(130% 120% at var(--x,30%) 0%, color-mix(in srgb,var(--c) 80%, #fff) 0%, var(--c) 52%, color-mix(in srgb,var(--c) 62%, #000) 100%);
     flex-direction:column;gap:6px;padding:14px 10px 12px}
-  .thumb.co .blogo{max-width:56%;max-height:38%;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
+  .thumb.co .blogo{max-width:var(--lw,56%);max-height:var(--lh,38%);object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.3))}
   .thumb.co .bword{font-family:var(--cond);font-weight:700;font-size:24px;letter-spacing:.12em;color:#f3ead8;line-height:1}
   .thumb.co .bname{max-width:100%;display:flex;align-items:center;justify-content:center;gap:5px;font-family:var(--cond);font-weight:700;font-size:20px;letter-spacing:.08em;
     text-transform:uppercase;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1}
@@ -297,7 +297,7 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=16"></script>
+<script src="dock-data.js?v=17"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
@@ -403,7 +403,7 @@ function art(it, small){
   if(branded(it)){
     const b = coOf(it);
     if(small) return coMark(b);
-    const top = b.logo ? `<img class="blogo" src="${esc(b.logo)}" alt="${esc(b.n)}" loading="lazy">` : `<span class="bword">${esc(b.word||b.short)}</span>`;
+    const top = b.logo ? `<img class="blogo" style="${b.lw?`--lw:${b.lw};--lh:${b.lh}`:''}" src="${esc(b.logo)}" alt="${esc(b.n)}" loading="lazy">` : `<span class="bword">${esc(b.word||b.short)}</span>`;
     return `${top}<span class="bname">${it.i?`<i>${esc(it.i)}</i>`:''}<span>${esc(it.n)}</span></span>`;
   }
   if(it.dom && !(it.ours && it.i)){
