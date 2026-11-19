@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wrap Site Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F5F1E8;--ink:#1F1F1F;--muted:#5A5A55;--sage:#4E5D4A;--gold:#BDA572;--line:#DDD6C6;--body:#1E3E33}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font:16px/1.6 Inter,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:44px 16px 80px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:600}
+  h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(34px,5vw,54px);line-height:1.05;margin:10px 0 14px}
+  h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:28px;margin:46px 0 10px}
+  .lede{font-size:18px;color:#33332F;max-width:780px}
+  .rule{height:2px;width:64px;background:var(--gold);margin:22px 0 4px}
+  figure{margin:26px 0 0}
+  figure img{display:block;width:100%;height:auto;border-radius:6px;border:1px solid var(--line);background:#fff}
+  figcaption{font-size:14px;color:var(--muted);margin-top:9px;max-width:820px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  table{border-collapse:collapse;width:100%;font-size:15px;margin-top:8px}
+  td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+  td:first-child{width:200px;color:var(--muted);font-weight:500}
+  .dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .dl a{display:inline-block;padding:11px 16px;border-radius:999px;background:var(--sage);color:var(--paper);text-decoration:none;font-weight:600;font-size:14px;letter-spacing:.02em}
+  .dl a.alt{background:transparent;color:var(--sage);border:1.5px solid var(--sage)}
+  .note{font-size:14px;color:var(--muted);margin-top:10px;max-width:820px}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:#ece6d8;padding:1px 6px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">San Diego Landscape Remodeling · Vehicle wrap</div>
+  <h1>Aerial site plan, pen and ink</h1>
+  <p class="lede">A landscape architect's plan of a finished SDLR backyard, drawn as hand-inked vector linework for the
+  Model Y. It shows the pool and spa, running-bond terrace, outdoor kitchen, pergola, fire circle with its built-in bench,
+  lawn panel, planting drifts and trees, with the neighbours' lot lines and rooflines at the edges. Printed one shade
+  lighter than the body: a sheen from thirty feet, a real drawing up close.</p>
+  <div class="rule"></div>
+
+  <figure>
+    <img src="sdlr-wrap-siteplan/2026-11-19/tone-on-tone-faded.jpg" alt="The site plan printed tone-on-tone on deep green, fading out toward the front of the car">
+    <figcaption><b>Tone-on-tone, with a sample fade.</b> Lines 17% lighter than the body green <code>#1E3E33</code>. Full strength
+    across the rear doors and rear quarter, dissolving before the front door and the type block. The fade is a suggestion;
+    the master file is unfaded so it can be set on the real panels.</figcaption>
+  </figure>
+
+  <div class="grid">
+    <figure>
+      <img src="sdlr-wrap-siteplan/2026-11-19/closeup-true-scale.jpg" alt="Close-up of the fire circle and planting on the rear quarter at true scale">
+      <figcaption><b>Up close, at true scale.</b> About 40 × 24 inches of the rear quarter: the fire circle, its bench, the
+      stepping stones and the planting drifts. This is what someone standing at the car sees.</figcaption>
+    </figure>
+    <figure>
+      <img src="sdlr-wrap-siteplan/2026-11-19/on-the-car.jpg" alt="The site plan composited onto the concept render of the wrapped Model Y">
+      <figcaption><b>On the car (placement check).</b> Composited onto the August TARGET concept render. Lines are drawn
+      about 2.5× heavier here so they show at photo size, and the render already carries a faint older pattern.</figcaption>
+    </figure>
+  </div>
+
+  <figure>
+    <img src="sdlr-wrap-siteplan/2026-11-19/drawing-cream.jpg" alt="The full site plan drawing in black ink on cream">
+    <figcaption><b>The whole drawing.</b> One colour, line art only. The pool and fire circle sit on the rear half of the
+    car, where the drawing shows most.</figcaption>
+  </figure>
+
+  <h2>Files</h2>
+  <div class="dl">
+    <a href="sdlr-wrap-siteplan/2026-11-19/SDLR-wrap-siteplan-2026-11-19.ai" download>Illustrator (.ai)</a>
+    <a class="alt" href="sdlr-wrap-siteplan/2026-11-19/SDLR-wrap-siteplan-2026-11-19.svg" download>Vector (.svg)</a>
+  </div>
+  <p class="note">PDF and a 12,000 px transparent PNG are in the client folder,
+  <code>02 Clients/san-diego-landscape-remodeling/Vehicle/siteplan-artwork/2026-11-19/</code>.</p>
+
+  <h2>Specs</h2>
+  <table>
+    <tr><td>Artboard</td><td>200.2 × 60.5 in at 100% (14,414 × 4,356 pt). Vector, so it scales to any panel.</td></tr>
+    <tr><td>Drawing scale</td><td>1 ft of yard = 1.1 in on the car. The pool is 40 ft (44 in), the fire circle 22 ft across.</td></tr>
+    <tr><td>Line weights</td><td>1.6 to 6.6 pt strokes. When scaling in Illustrator, keep <i>Scale Strokes &amp; Effects</i> on.</td></tr>
+    <tr><td>Colour</td><td>Supplied in ink <code>#1F1F1F</code>. Recolour to one shade lighter than the film, roughly 15–20%. If in doubt, go subtler.</td></tr>
+    <tr><td>Layers / groups</td><td>neighbours, site, terrace, garden, lawn, shadow, pool, fire, structures, furniture, house, planting, annotation.</td></tr>
+    <tr><td>Type</td><td>Labels and dimensions are outlined (Inter Medium), so no fonts are needed.</td></tr>
+    <tr><td>Placement</td><td>Across the rear doors and rear quarter, carrying onto the hatch, clear of the type block. Nothing across a door gap onto a bumper cover.</td></tr>
+  </table>
+  <p class="note">Version 1 · November 19, 2026</p>
+</div>
+</body>
+</html>
