@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SDLR Design Wall</title>
+<meta name="description" content="Every San Diego Landscape Remodeling design at its latest version, side by side, to check they read as one brand.">
+<link rel="icon" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F1E8; --ink:#1F1F1F; --muted:#5f625a; --line:#d9d3c5; --card:#fbf9f4;
+    --sage:#4E5D4A; --forest:#2E392B; --gold:#BDA572; --gold-ink:#8a7340;
+    --wall:#8f8d87; --wall-ink:#f6f4ef; --wall-muted:#e7e4dc; --tile-shadow:0 6px 22px rgba(0,0,0,.28);
+    --chip-printed:#3f6b4a; --chip-final:#2E392B; --chip-wait:#9a6a12; --chip-explore:#5a5f8a; --chip-coming:#6b6b6b;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#141713; --ink:#efece4; --muted:#a8aa9f; --line:#2c3029; --card:#1b1f1a;
+      --gold-ink:#d3bd86; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#141713; --ink:#efece4; --muted:#a8aa9f; --line:#2c3029; --card:#1b1f1a;
+    --gold-ink:#d3bd86; color-scheme: dark;
+  }
+  /* wall tones (the surface the pieces hang on) */
+  .wall[data-tone="paper"]{--wall:#e8e3d8; --wall-ink:#1F1F1F; --wall-muted:#5f625a; --tile-shadow:0 6px 20px rgba(40,35,20,.18)}
+  .wall[data-tone="stone"]{--wall:#8f8d87; --wall-ink:#f6f4ef; --wall-muted:#ecebe6}
+  .wall[data-tone="night"]{--wall:#121411; --wall-ink:#efece4; --wall-muted:#a8aa9f; --tile-shadow:0 6px 22px rgba(0,0,0,.6)}
+
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.55 Inter,system-ui,-apple-system,sans-serif}
+  a{color:inherit}
+  .wrap{max-width:1360px;margin:0 auto;padding:0 16px}
+  header{padding:28px 0 18px}
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:.9rem;font-weight:500}
+  .back:hover{color:var(--ink)}
+  .eyebrow{margin:18px 0 6px;font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);font-weight:600}
+  h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(2rem,4.6vw,3.2rem);line-height:1.05;margin:0;letter-spacing:-.01em}
+  h1 em{font-style:italic;color:var(--gold-ink)}
+  .lede{max-width:62ch;color:var(--muted);margin:10px 0 0}
+  .controls{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin:20px 0 0}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--card)}
+  .seg button{font:inherit;font-size:.84rem;font-weight:500;border:0;background:none;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+  .ctl-label{font-size:.78rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-right:2px}
+
+  /* ---------- the wall ---------- */
+  .wall{background:var(--wall);color:var(--wall-ink);padding:26px 0 30px;margin-top:22px;transition:background .25s}
+  .fam{margin:0 0 22px}
+  .fam:last-child{margin-bottom:0}
+  .fam h2{font:600 .74rem/1 Inter,sans-serif;letter-spacing:.18em;text-transform:uppercase;color:var(--wall-muted);margin:0 0 12px}
+  .wall[data-layout="one"] .fam h2{display:none}
+  .wall[data-layout="one"] .fam{margin:0}
+  .row{display:flex;flex-wrap:wrap;gap:14px}
+  .wall[data-layout="one"] .row{gap:14px}
+  .wall[data-layout="one"] .fams{display:flex;flex-wrap:wrap;gap:14px}
+  .wall[data-layout="one"] .fam,.wall[data-layout="one"] .row{display:contents}
+  .wall[data-layout="one"] .fams::after{content:"";flex-grow:999}
+  .row::after{content:"";flex-grow:999}
+  .wall[data-layout="one"] .row::after{display:none}
+  .tile{--ar:1.4;flex:var(--ar) 1 calc(var(--ar) * var(--rowh,210px));margin:0;cursor:zoom-in;position:relative;min-width:0}
+  .tile button{all:unset;display:block;width:100%;cursor:zoom-in}
+  .tile img{display:block;width:100%;aspect-ratio:var(--ar);object-fit:cover;background:#0002;box-shadow:var(--tile-shadow);border-radius:3px}
+  .tile button:focus-visible img{outline:3px solid var(--gold);outline-offset:3px}
+  .cap{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-top:8px;font-size:.8rem;line-height:1.3}
+  .cap b{font-weight:600}
+  .cap span{color:var(--wall-muted)}
+  .chip{display:inline-block;font-size:.66rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;color:#fff;white-space:nowrap}
+  .chip.printed{background:var(--chip-printed)} .chip.final{background:var(--chip-final);box-shadow:inset 0 0 0 1px var(--gold)}
+  .chip.waiting{background:var(--chip-wait)} .chip.exploring{background:var(--chip-explore)} .chip.coming{background:var(--chip-coming)}
+  .placeholder{flex:1.4 1 calc(1.4 * var(--rowh,210px));min-width:0}
+  .ph-box{aspect-ratio:1.4;border:2px dashed color-mix(in srgb,var(--wall-ink) 45%,transparent);border-radius:6px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:14px;gap:6px}
+  .ph-box strong{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.5rem;font-weight:500}
+  .ph-box span{font-size:.8rem;color:var(--wall-muted);max-width:30ch}
+  .wall-foot{margin-top:18px;font-size:.78rem;color:var(--wall-muted)}
+
+  /* ---------- checks ---------- */
+  section.checks{padding:40px 0 10px}
+  h2.sec{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:clamp(1.6rem,3vw,2.2rem);margin:0 0 6px;line-height:1.1}
+  .sec-lede{color:var(--muted);margin:0 0 22px;max-width:64ch}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+  .check{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px}
+  .check h3{margin:0 0 4px;font-size:1rem;font-weight:600;display:flex;gap:8px;align-items:center}
+  .verdict{font-size:.66rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px}
+  .verdict.fix{background:#f3e2bf;color:#6d4a07} .verdict.ok{background:#d9e8da;color:#24502f}
+  :root[data-theme="dark"] .verdict.fix{background:#4a3a14;color:#f1d79a} :root[data-theme="dark"] .verdict.ok{background:#1f3a26;color:#b9dcbf}
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .verdict.fix{background:#4a3a14;color:#f1d79a} :root:not([data-theme="light"]) .verdict.ok{background:#1f3a26;color:#b9dcbf} }
+  .check p{margin:6px 0 0;color:var(--muted);font-size:.92rem}
+  .check p strong{color:var(--ink);font-weight:600}
+  .sw-list{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+  .sw-list li{display:grid;grid-template-columns:38px 1fr;gap:10px;align-items:center;font-size:.86rem}
+  .sw{width:38px;height:38px;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+  .sw-list code{font:600 .78rem/1 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink)}
+  .sw-list small{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}
+  .type-row{display:grid;gap:10px;margin-top:12px}
+  .type-row div{border-top:1px solid var(--line);padding-top:8px}
+  .t-mont{font-family:Montserrat,sans-serif;font-weight:800;text-transform:uppercase;font-size:1.2rem;letter-spacing:.01em;line-height:1.1}
+  .t-corm{font-family:"Cormorant Garamond",Georgia,serif;font-size:1.45rem;line-height:1.1}
+  .t-corm em{color:var(--gold-ink)}
+  .type-row small{display:block;color:var(--muted);font-size:.78rem;margin-top:3px}
+
+  /* ---------- index ---------- */
+  section.index{padding:30px 0 60px}
+  table{width:100%;border-collapse:collapse;font-size:.9rem}
+  th{text-align:left;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:0 10px 8px 0;border-bottom:1px solid var(--line)}
+  td{padding:10px 10px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+  td a{color:var(--gold-ink);font-weight:500;text-decoration:none}
+  td a:hover{text-decoration:underline}
+  .table-wrap{overflow-x:auto}
+  footer{color:var(--muted);font-size:.8rem;padding:0 0 40px}
+
+  /* ---------- lightbox ---------- */
+  dialog{border:0;padding:0;background:transparent;max-width:100vw;max-height:100vh;width:100vw;height:100vh;color:#efece4}
+  dialog::backdrop{background:rgba(10,12,10,.92)}
+  .lb{display:flex;flex-direction:column;height:100%;padding:14px 16px}
+  .lb-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:.9rem}
+  .lb-top b{font-weight:600}
+  .lb-top span{color:#bdbab2}
+  .lb-img{flex:1;display:flex;align-items:center;justify-content:center;min-height:0;padding:10px 0}
+  .lb-img img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 10px 40px rgba(0,0,0,.6)}
+  .lb-btn{font:inherit;background:#ffffff1a;color:#fff;border:1px solid #ffffff33;border-radius:999px;padding:7px 14px;cursor:pointer}
+  .lb-btn:hover{background:#ffffff2e}
+  .lb-nav{display:flex;gap:8px;justify-content:center}
+
+  @media (max-width:640px){
+    .tile,.placeholder{--rowh:150px}
+    .wall{padding:18px 0 22px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="back" href="designs.html?c=sdlr">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      SDLR Design Gallery
+    </a>
+    <p class="eyebrow">San Diego Landscape Remodeling · Design wall</p>
+    <h1>Everything we've made, <em>side by side.</em></h1>
+    <p class="lede">The latest version of every SDLR piece on one wall, so you can see whether they read as one brand. Tap any piece to see it large. Updated November 22, 2026.</p>
+    <div class="controls">
+      <div><span class="ctl-label">Wall</span>
+        <div class="seg" role="group" aria-label="Wall colour" id="toneCtl">
+          <button data-tone="paper">Paper</button><button data-tone="stone">Stone</button><button data-tone="night">Night</button>
+        </div>
+      </div>
+      <div><span class="ctl-label">Layout</span>
+        <div class="seg" role="group" aria-label="Layout" id="layoutCtl">
+          <button data-layout="one">One wall</button><button data-layout="fam">By where it's seen</button>
+        </div>
+      </div>
+      <div><span class="ctl-label">Size</span>
+        <div class="seg" role="group" aria-label="Tile size" id="sizeCtl">
+          <button data-size="160">S</button><button data-size="230">M</button><button data-size="320">L</button>
+        </div>
+      </div>
+    </div>
+  </header>
+</div>
+
+<div class="wall" id="wall" data-tone="stone" data-layout="one">
+  <div class="wrap">
+    <div class="fams" id="fams"></div>
+    <p class="wall-foot">Chips: <b>Final</b> = approved, not ordered yet · <b>Printed</b> = already out in the world · <b>Waiting</b> = needs your OK · <b>Exploring</b> = still being designed.</p>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="checks">
+    <h2 class="sec">What I checked</h2>
+    <p class="sec-lede">I measured the actual colours in every file, then compared the type, wording and logo use. Most of it holds together. The greens don't yet.</p>
+    <div class="grid">
+      <div class="check">
+        <h3>The greens <span class="verdict fix">Pick one</span></h3>
+        <p>Four different greens are in use. The <strong>fence banner and the new coroplast sign</strong> will stand on the same jobsites in two different greens.</p>
+        <ul class="sw-list">
+          <li><span class="sw" style="background:#2E392B"></span><div><code>#2E392B</code> Forest<small>Business card, fence banner, door hanger, EDDM back (close)</small></div></li>
+          <li><span class="sw" style="background:#4D5E4B"></span><div><code>#4D5E4B</code> Sage<small>New 24×18 coroplast sign. This is the brand guide's sage (#4E5D4A).</small></div></li>
+          <li><span class="sw" style="background:#556B5D"></span><div><code>#556B5D</code> Old green<small>October yard signs (already printed, before the palette update)</small></div></li>
+          <li><span class="sw" style="background:#17281E"></span><div><code>#17281E</code> Midnight<small>Car wrap and site plan. Paint is its own world, so a deeper green is fine there.</small></div></li>
+        </ul>
+      </div>
+      <div class="check">
+        <h3>Gold and cream <span class="verdict ok">Match</span></h3>
+        <p>Every November piece uses the same <strong>gold</strong> and the same <strong>cream</strong>. Only the October yard sign and the EDDM postcard use the older, warmer gold.</p>
+        <ul class="sw-list">
+          <li><span class="sw" style="background:#BDA572"></span><div><code>#BDA572</code> Gold<small>Card, banner, door hanger, coroplast</small></div></li>
+          <li><span class="sw" style="background:#C9A96A"></span><div><code>#C9A96A</code> Old gold<small>October yard sign, EDDM postcard</small></div></li>
+          <li><span class="sw" style="background:#F5F1E8"></span><div><code>#F5F1E8</code> Cream<small>Card back, banner, door hanger, coroplast</small></div></li>
+        </ul>
+      </div>
+      <div class="check">
+        <h3>Two type voices <span class="verdict ok">On purpose</span></h3>
+        <p>Street pieces use <strong>bold Montserrat capitals</strong> so they read from a car. Hand-held pieces use the <strong>Cormorant serif</strong> so they feel premium up close. Brand guide v1.3 allows both, and each family stays consistent inside itself.</p>
+        <div class="type-row">
+          <div><span class="t-mont">Backyard in progress</span><small>Banner, coroplast, yard signs, car</small></div>
+          <div><span class="t-corm">Ready to remodel <em>your</em> backyard?</span><small>Door hanger, postcards, business card</small></div>
+        </div>
+      </div>
+      <div class="check">
+        <h3>Wording <span class="verdict ok">Repeats well</span></h3>
+        <p>The same lines carry from piece to piece: <strong>"Backyard in progress · Ready to remodel yours?"</strong> on the banner and the coroplast sign, <strong>"Ready to remodel your backyard?"</strong> on the door hanger and the October sign, <strong>"By design, not by dispatch."</strong> on both postcards and the door hanger, and <strong>"Book a consultation"</strong> on the card.</p>
+      </div>
+      <div class="check">
+        <h3>Logo <span class="verdict ok">Approved forms only</span></h3>
+        <p>The <strong>horizontal lockup</strong> is on the banner, the coroplast sign, the card and the car, where height is tight. The <strong>stacked lockup</strong> is on the door hanger, the October sign and the postcards. Both are approved forms.</p>
+      </div>
+      <div class="check">
+        <h3>Small things <span class="verdict fix">At reprint</span></h3>
+        <p>The October yard sign writes the phone as <strong>(619)613-2511</strong> with no space. Everything else says <strong>(619) 613-2511</strong>. Fix it, along with the old green and gold, the next time those signs are printed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="index">
+    <h2 class="sec">Piece by piece</h2>
+    <p class="sec-lede">Each piece's own page keeps every earlier version.</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Piece</th><th>Version on the wall</th><th>Size</th><th>Status</th><th></th></tr></thead>
+      <tbody id="idx"></tbody>
+    </table></div>
+  </section>
+  <footer>Colours measured from the preview files on November 22, 2026. Brand rules: <a href="sdlr-brand-guide.html">SDLR Brand Guide</a>.</footer>
+</div>
+
+<dialog id="lb" aria-label="Design preview">
+  <div class="lb">
+    <div class="lb-top"><div><b id="lbName"></b> <span id="lbSub"></span></div><button class="lb-btn" id="lbClose">Close</button></div>
+    <div class="lb-img"><img id="lbImg" alt=""></div>
+    <div class="lb-nav"><button class="lb-btn" id="lbPrev">← Previous</button><button class="lb-btn" id="lbNext">Next →</button></div>
+  </div>
+</dialog>
+
+<script>
+const W = 'sdlr-design-wall/';
+const FAMILIES = [
+  { id:'hand',   n:'In hand' },
+  { id:'street', n:'On the street' },
+  { id:'road',   n:'On the road' },
+  { id:'worn',   n:'Worn' }
+];
+const STATUS = { printed:'Printed', final:'Final', waiting:'Waiting on you', exploring:'Exploring', coming:'Coming' };
+const PIECES = [
+  { fam:'hand', n:'Business card', v:'v3', size:'3.5 × 2 in', status:'final', link:'sdlr-business-card.html', note:'Approved Nov 21, not ordered',
+    imgs:[ {src:'sdlr-business-card/2026-11-21-v3/gio-front.jpg', w:1500, h:857, l:'front'}, {src:'sdlr-business-card/2026-11-21-v3/gio-back.jpg', w:1500, h:857, l:'back'} ] },
+  { fam:'hand', n:'Door hanger', v:'v6', size:'4.25 × 11 in', status:'final', link:'sdlr-door-hangers.html', note:'Approved Nov 22, not ordered',
+    imgs:[ {src:'sdlr-door-hangers/2026-11-22-v6/flat.jpg', w:1200, h:1481, l:'front + back'}, {src:'sdlr-door-hangers/2026-11-22-v6/both-sides-on-door.jpg', w:1400, h:1314, l:'on a door'} ] },
+  { fam:'hand', n:'EDDM postcard', v:'September', size:'9 × 6.5 in', status:'printed', link:null, note:'Mailed',
+    imgs:[ {src:W+'eddm-front.jpg', w:1700, h:1228, l:'front'}, {src:W+'eddm-back.jpg', w:1700, h:1228, l:'back'} ] },
+  { fam:'hand', n:'Postcard', v:'June', size:'9 × 6 in', status:'printed', link:null, note:'Mailed',
+    imgs:[ {src:W+'postcard-front.jpg', w:1800, h:1216, l:'front'}, {src:W+'postcard-back.jpg', w:1800, h:1200, l:'back'} ] },
+  { fam:'street', n:'Fence banner', v:'v5', size:'8 × 4 ft', status:'final', link:'sdlr-fence-banner.html', note:'Your pick Nov 21, not ordered',
+    imgs:[ {src:'sdlr-fence-banner/2026-11-21-v5/photo-4x8ft.jpg', w:2400, h:1212, l:''} ] },
+  { fam:'street', n:'Coroplast yard sign', v:'v3', size:'24 × 18 in', status:'waiting', link:null, note:'Needs your OK before it goes on the hub',
+    imgs:[ {src:W+'coroplast-cream.jpg', w:1800, h:1350, l:'side 1'}, {src:W+'coroplast-green.jpg', w:1800, h:1350, l:'side 2'} ] },
+  { fam:'street', n:'Yard sign', v:'October final', size:'24 × 18 in', status:'printed', link:'sdlr-yard-signs.html', note:'Old palette, update at reprint',
+    imgs:[ {src:W+'yardsign-green.jpg', w:1800, h:1350, l:'green side'}, {src:W+'yardsign-cream.jpg', w:1800, h:1350, l:'cream side'} ] },
+  { fam:'road', n:'Model Y wrap', v:'v10 Midnight', size:'Juniper Model Y', status:'exploring', link:'sdlr-model-y-wrap.html', note:'Lead concept; still designing',
+    imgs:[ {src:'sdlr-model-y-wrap/2026-11-21-v10/photo-side.jpg', w:2000, h:1493, l:'side'}, {src:'sdlr-model-y-wrap/2026-11-21-v10/photo-rear.jpg', w:2000, h:1493, l:'rear'} ] },
+  { fam:'road', n:'Site plan artwork', v:'v4 RSF backyard', size:'150 × 112.5 in', status:'final', link:'sdlr-wrap-siteplan.html', note:'The line art behind the card and wrap',
+    imgs:[ {src:'sdlr-wrap-siteplan/2026-11-20-rsf-backyard/tone-on-tone.jpg', w:2400, h:1800, l:'tone-on-tone'} ] },
+  { fam:'worn', n:'Shirts', v:'—', size:'—', status:'coming', link:null, note:'Being rebuilt in Illustrator; lands here once you confirm which ones were printed', imgs:[] }
+];
+
+const fams = document.getElementById('fams');
+const flat = [];
+FAMILIES.forEach(f => {
+  const sec = document.createElement('div'); sec.className = 'fam';
+  sec.innerHTML = `<h2>${f.n}</h2>`;
+  const row = document.createElement('div'); row.className = 'row';
+  PIECES.filter(p => p.fam === f.id).forEach(p => {
+    if (!p.imgs.length) {
+      const ph = document.createElement('div'); ph.className = 'placeholder';
+      ph.innerHTML = `<div class="ph-box"><strong>${p.n}</strong><span>${p.note}</span></div>
+        <div class="cap"><b>${p.n}</b><span class="chip ${p.status}">${STATUS[p.status]}</span></div>`;
+      row.appendChild(ph); return;
+    }
+    p.imgs.forEach(im => {
+      const i = flat.length; flat.push({p, im});
+      const fig = document.createElement('figure'); fig.className = 'tile';
+      fig.style.setProperty('--ar', (im.w / im.h).toFixed(3));
+      fig.innerHTML = `<button type="button" aria-label="Open ${p.n} ${im.l}"><img loading="lazy" decoding="async" src="${im.src}" width="${im.w}" height="${im.h}" alt="${p.n} ${p.v} ${im.l}"></button>
+        <figcaption class="cap"><b>${p.n}</b>${im.l ? `<span>${im.l}</span>` : ''}<span class="chip ${p.status}">${STATUS[p.status]}</span></figcaption>`;
+      fig.querySelector('button').addEventListener('click', () => openLb(i));
+      row.appendChild(fig);
+    });
+  });
+  sec.appendChild(row); fams.appendChild(sec);
+});
+
+document.getElementById('idx').innerHTML = PIECES.map(p => `<tr>
+  <td><b>${p.n}</b><br><span style="color:var(--muted);font-size:.82rem">${p.note}</span></td>
+  <td>${p.v}</td><td>${p.size}</td><td><span class="chip ${p.status}">${STATUS[p.status]}</span></td>
+  <td>${p.link ? `<a href="${p.link}">All versions →</a>` : ''}</td></tr>`).join('');
+
+/* controls, remembered per viewer */
+const wall = document.getElementById('wall');
+const store = { get(k){ try { return localStorage.getItem(k); } catch(e){ return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch(e){} } };
+function seg(ctlId, attr, apply, def){
+  const ctl = document.getElementById(ctlId);
+  const set = v => { ctl.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === v))); apply(v); store.set('sdlrwall-'+attr, v); };
+  ctl.addEventListener('click', e => { const b = e.target.closest('button'); if (b) set(b.dataset[attr]); });
+  set(store.get('sdlrwall-'+attr) || def);
+}
+seg('toneCtl', 'tone', v => wall.dataset.tone = v, 'stone');
+seg('layoutCtl', 'layout', v => wall.dataset.layout = v, 'one');
+seg('sizeCtl', 'size', v => wall.style.setProperty('--rowh', v + 'px'), '230');
+
+/* lightbox */
+const lb = document.getElementById('lb'); let cur = 0;
+function show(i){ cur = (i + flat.length) % flat.length; const {p, im} = flat[cur];
+  document.getElementById('lbImg').src = im.src; document.getElementById('lbImg').alt = `${p.n} ${im.l}`;
+  document.getElementById('lbName').textContent = `${p.n} · ${p.v}`;
+  document.getElementById('lbSub').textContent = [im.l, p.size, STATUS[p.status]].filter(Boolean).join(' · '); }
+function openLb(i){ show(i); if (lb.showModal) lb.showModal(); else lb.setAttribute('open',''); }
+document.getElementById('lbClose').onclick = () => lb.close();
+document.getElementById('lbPrev').onclick = () => show(cur - 1);
+document.getElementById('lbNext').onclick = () => show(cur + 1);
+lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('lb-img')) lb.close(); });
+document.addEventListener('keydown', e => { if (!lb.open) return; if (e.key === 'ArrowRight') show(cur + 1); if (e.key === 'ArrowLeft') show(cur - 1); });
+</script>
+</body>
+</html>
