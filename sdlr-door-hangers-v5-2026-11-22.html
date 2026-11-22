@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Door Hanger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F5F1E8;--ink:#1F1F1F;--muted:#5A5A55;--sage:#4E5D4A;--gold:#BDA572;--line:#DDD6C6}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font:16px/1.6 Inter,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:44px 16px 80px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:600}
+  h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(34px,5vw,54px);line-height:1.05;margin:10px 0 14px}
+  h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:28px;margin:46px 0 10px}
+  .lede{font-size:18px;color:#33332F;max-width:780px}
+  .rule{height:2px;width:64px;background:var(--gold);margin:22px 0 4px}
+  figure{margin:26px 0 0}
+  figure img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid var(--line);background:#fff}
+  figcaption{font-size:14px;color:var(--muted);margin-top:9px;max-width:820px}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:760px){.two{grid-template-columns:1fr}}
+  ul.changes{max-width:820px;padding-left:20px;margin:8px 0 0}
+  ul.changes li{margin:4px 0}
+  table{border-collapse:collapse;width:100%;font-size:15px;margin-top:8px}
+  td{padding:9px 10px;border-top:1px solid var(--line);vertical-align:top}
+  td:first-child{width:200px;color:var(--muted);font-weight:500}
+  .note{font-size:14px;color:var(--muted);margin-top:10px;max-width:820px}
+  code{font-family:ui-monospace,Menlo,monospace;font-size:.88em;background:#ece6d8;padding:1px 6px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">San Diego Landscape Remodeling · Door hanger · Version 5 · For review</div>
+  <h1>Cream back, and every word earns its place</h1>
+  <p class="lede">Gio liked the backs of our printed mailers, cream with dark type, because they read more easily, and asked that nothing on the hanger be filler.
+  The front stays the dark dusk photo, the side that has to stop someone on the doorstep. The back is now cream like both mailers, and each line has one job.</p>
+  <div class="rule"></div>
+  <figure>
+    <img src="sdlr-door-hangers/2026-11-22-v5/both-sides-on-door.jpg" alt="Version 5 on a door" loading="lazy">
+    <figcaption>Front (backyard at dusk) and back (front yard over cream) on a door. The real print artwork is composited onto a photo of a door.</figcaption>
+  </figure>
+  <figure>
+    <img src="sdlr-door-hangers/2026-11-22-v5/v4-vs-v5.jpg" alt="Version 4 next to version 5" loading="lazy">
+    <figcaption>Version 4 (dark back) next to version 5 (cream back, trimmed copy).</figcaption>
+  </figure>
+
+  <h2>Front: stop them, say what we build, one action</h2>
+  <table>
+    <tr><td>SDLR logo</td><td>Who it's from.</td></tr>
+    <tr><td>Ready to remodel <i>your</i> backyard?</td><td>The hook: a question the right homeowner answers yes to.</td></tr>
+    <tr><td>Pergolas, patios, fire features and outdoor kitchens, designed and built by one firm.</td><td>What we build (pergolas first), plus the one promise: one firm does all of it.</td></tr>
+    <tr><td>Book a consultation · (619) 613-2511 · Call or text</td><td>The one action. "Call or text" tells them texting is fine.</td></tr>
+  </table>
+
+  <h2>Back: why us, every way to reach us, the licence</h2>
+  <table>
+    <tr><td>Ready to remodel <i>your</i> front yard?</td><td>The second hook, for driveway and front-yard work.</td></tr>
+    <tr><td>Driveways, walkways, planters, turf and lighting.</td><td>What front-yard work covers.</td></tr>
+    <tr><td>I. Founders on every project.</td><td>"Gio and Mike walk your yard, not a salesperson." Answers the fear of bad communication.</td></tr>
+    <tr><td>II. Line-item pricing.</td><td>"You see what every piece of the job costs." Answers the fear of a blown budget.</td></tr>
+    <tr><td>III. The Ten-Month Walk-Through.</td><td>"We come back and inspect every detail, at no charge." Answers the fear that it looks bad later.</td></tr>
+    <tr><td>Phone, QR, website</td><td>Every way to reach us. The QR is tracked so door-hanger visits show up in Analytics.</td></tr>
+    <tr><td>Logo · By design, not by dispatch. · CSLB #1139785</td><td>Who it's from if the back is read first, the sign-off on both mailers, and the licence number California requires on contractor ads.</td></tr>
+  </table>
+
+  <h2>Cut from version 4</h2>
+  <ul class="changes">
+    <li>"Boutique design-build · San Diego": repeated the logo and the "designed and built" line.</li>
+    <li>"The front of the house": a label for what the headline already says.</li>
+    <li>"You work directly with Gio and Mike…": said the same thing as reason I.</li>
+    <li>QR, website and licence line on the front: the back carries all three.</li>
+    <li>"No tiers. No matching.": shorthand a homeowner can't decode, replaced with what it means to them.</li>
+  </ul>
+  <figure>
+    <img src="sdlr-door-hangers/2026-11-22-v5/flat.jpg" alt="Version 5 flat" loading="lazy">
+    <figcaption>Flat, front and back, 4.25 × 11 in. Native layered Illustrator file (live type, global swatches, vector logo) and an outlined CMYK printer PDF.</figcaption>
+  </figure>
+</div>
+</body>
+</html>
