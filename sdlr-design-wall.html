@@ -182,16 +182,16 @@
         <ul class="sw-list">
           <li><span class="sw" style="background:#2E382B"></span><div><code>#2E382B</code> Forest, the print green<small>Business card, fence banner, door hanger v7 and coroplast v5 all use it now</small></div></li>
           <li><span class="sw" style="background:#4E5D4A"></span><div><code>#4E5D4A</code> Sage<small>Stays the screen green, and the line colour for the site-plan texture on Forest</small></div></li>
-          <li><span class="sw" style="background:#556B5D"></span><div><code>#556B5D</code> Old green<small>October yard signs (printed before the palette update). Change at reprint.</small></div></li>
+          <li><span class="sw" style="background:#556B5D"></span><div><code>#556B5D</code> Old green<small>October yard signs and the orange crew shirts (printed before the palette update). The shirt file already has a Forest version; change the signs at reprint.</small></div></li>
           <li><span class="sw" style="background:#17281E"></span><div><code>#17281E</code> Midnight<small>Car paint is its own world, so a deeper green is fine there</small></div></li>
         </ul>
       </div>
       <div class="check">
         <h3>Gold and cream <span class="verdict ok">Match</span></h3>
-        <p>Every November piece uses the same <strong>gold</strong> and the same <strong>cream</strong>. Only the October yard sign and the EDDM postcard use the older, warmer gold.</p>
+        <p>Every November piece uses the same <strong>gold</strong> and the same <strong>cream</strong>. Only the October yard sign, the EDDM postcard and the printed black tees use the older, warmer gold.</p>
         <ul class="sw-list">
           <li><span class="sw" style="background:#BDA572"></span><div><code>#BDA572</code> Gold<small>Card, banner, door hanger, coroplast</small></div></li>
-          <li><span class="sw" style="background:#C9A96A"></span><div><code>#C9A96A</code> Old gold<small>October yard sign, EDDM postcard</small></div></li>
+          <li><span class="sw" style="background:#C9A96A"></span><div><code>#C9A96A</code> Old gold<small>October yard sign, EDDM postcard, black tees (#C8A869)</small></div></li>
           <li><span class="sw" style="background:#F5F1E8"></span><div><code>#F5F1E8</code> Cream<small>Card back, banner, door hanger, coroplast</small></div></li>
         </ul>
       </div>
@@ -265,7 +265,10 @@ const PIECES = [
     imgs:[ {src:'sdlr-model-y-wrap/2026-11-21-v10/photo-side.jpg', w:2000, h:1493, l:'side'}, {src:'sdlr-model-y-wrap/2026-11-21-v10/photo-rear.jpg', w:2000, h:1493, l:'rear'} ] },
   { fam:'road', n:'Site plan artwork', v:'v4 RSF backyard', size:'150 × 112.5 in', status:'final', link:'sdlr-wrap-siteplan.html', note:'The line art behind the card and wrap',
     imgs:[ {src:'sdlr-wrap-siteplan/2026-11-20-rsf-backyard/tone-on-tone.jpg', w:2400, h:1800, l:'tone-on-tone'} ] },
-  { fam:'worn', n:'Shirts', v:'—', size:'—', status:'coming', link:null, note:'Being rebuilt in Illustrator; lands here once you confirm which ones were printed', imgs:[] }
+  { fam:'worn', n:'Black tees', v:'v2', size:'chest 3.5\u20134 in \u00b7 back 10\u201312 in', status:'printed', link:'sdlr-shirts.html', note:'Printed; rebuilt in Illustrator Nov 22. Gold is the older #C8A869',
+    imgs:[ {src:'sdlr-shirts/2026-11-22-v2/black-fronts.jpg', w:1720, h:1720, l:'fronts A\u2013D'}, {src:'sdlr-shirts/2026-11-22-v2/black-backs.jpg', w:1720, h:1720, l:'backs E\u2013H'} ] },
+  { fam:'worn', n:'Orange crew shirt', v:'v2', size:'pocket 3.5 in \u00b7 back 11 in', status:'printed', link:'sdlr-shirts.html', note:'Printed in the older green; Forest colourway ready for the next print',
+    imgs:[ {src:'sdlr-shirts/2026-11-22-v2/orange-as-printed.jpg', w:1840, h:960, l:'as printed'}, {src:'sdlr-shirts/2026-11-22-v2/orange-forest.jpg', w:1840, h:960, l:'Forest'} ] }
 ];
 
 const fams = document.getElementById('fams');
