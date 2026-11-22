@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#F5F1E8;--ink:#1F1F1F;--muted:#5A5A55;--sage:#4E5D4A;--gold:#BDA572;--line:#DDD6C6}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);color:var(--ink);font:16px/1.6 Inter,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1180px;margin:0 auto;padding:44px 16px 80px}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--sage);font-weight:600}
+  h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:clamp(34px,5vw,54px);line-height:1.05;margin:10px 0 14px}
+  h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:28px;margin:46px 0 10px}
+  .lede{font-size:18px;color:#33332F;max-width:780px}
+  .rule{height:2px;width:64px;background:var(--gold);margin:22px 0 4px}
+  figure{margin:22px 0 0}
+  figure img{display:block;width:100%;height:auto;border-radius:4px;border:1px solid var(--line);background:#fff}
+  figcaption{font-size:14px;color:var(--muted);margin-top:9px;max-width:820px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .pair img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:3px}
+  @media (max-width:640px){.pair{grid-template-columns:1fr}}
+  .tag{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:600;color:var(--paper);background:var(--sage);padding:3px 9px;border-radius:3px;margin-right:8px;vertical-align:2px}
+  ul.changes{max-width:820px;padding-left:20px;margin:8px 0 0}
+  ul.changes li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">San Diego Landscape Remodeling · Business card · Version 1</div>
+  <h1>Three directions for a calmer card</h1>
+  <p class="lede">The April card had the logo three times, a tagline, an eyebrow, rules and a QR all competing, so nothing led.
+  Each direction below gives every side one job: the front is the brand, the back is the person.
+  Gio picked <strong>B, the site plan</strong>, on November 21; it is finished in Version 2.</p>
+  <div class="rule"></div>
+
+  <h2>A · The monogram</h2>
+  <figure><img src="sdlr-business-card/2026-11-21-v1/direction-A-mockup.jpg" alt="Direction A mockup: deep green front with the gold stacked SDLR logo alone; cream back with name, phone, email, website, licence and a small QR"></figure>
+  <div class="pair"><img src="sdlr-business-card/2026-11-21-v1/direction-A-front.jpg" alt="Direction A front"><img src="sdlr-business-card/2026-11-21-v1/direction-A-back.jpg" alt="Direction A back"></div>
+  <p class="lede" style="font-size:16px">The gold logo alone on deep green. The quietest option.</p>
+
+  <h2>B · The site plan <span class="tag">Picked</span></h2>
+  <figure><img src="sdlr-business-card/2026-11-21-v1/direction-B-mockup.jpg" alt="Direction B mockup: the pen-and-ink Rancho Santa Fe backyard plan tone-on-tone on deep green, gold horizontal logo floating in the pool"></figure>
+  <div class="pair"><img src="sdlr-business-card/2026-11-21-v1/direction-B-front.jpg" alt="Direction B front"><img src="sdlr-business-card/2026-11-21-v1/direction-B-back.jpg" alt="Direction B back"></div>
+  <p class="lede" style="font-size:16px">The pen-and-ink Rancho Santa Fe backyard from the wrap series, cropped to the pool terrace and drawn tone-on-tone. The water is left clear so the logo floats in the pool.</p>
+
+  <h2>C · The split</h2>
+  <figure><img src="sdlr-business-card/2026-11-21-v1/direction-C-mockup.jpg" alt="Direction C mockup: front split into a green logo panel and a cream panel with name and contact; back with Book a Consultation, QR and the tagline"></figure>
+  <div class="pair"><img src="sdlr-business-card/2026-11-21-v1/direction-C-front.jpg" alt="Direction C front"><img src="sdlr-business-card/2026-11-21-v1/direction-C-back.jpg" alt="Direction C back"></div>
+  <p class="lede" style="font-size:16px">Logo and person on the same side, a QR-only back with the tagline.</p>
+
+  <h2>The card this replaces</h2>
+  <figure><img src="sdlr-business-card/2026-11-21-v1/current-card-april-2026.jpg" alt="The April 2026 card: green front with name, eyebrow, small logo, SDLR mark and tagline; cream back with logo, contact and QR">
+    <figcaption>April 2026. Gio's notes: too busy, weak hierarchy. Gio's card was also missing the CSLB number.</figcaption></figure>
+
+  <h2>What all three fix</h2>
+  <ul class="changes">
+    <li>The logo appears once, on the front.</li>
+    <li>The name leads the back: Cormorant Garamond at 21 pt, with a small eyebrow title and one gold hairline.</li>
+    <li>The phone is the second thing you read, then the email and website, then the licence.</li>
+    <li>CSLB #1139785 is on every card.</li>
+    <li>The QR is small and labelled "Book a Consultation".</li>
+    <li>Colours and type follow the brand guide v1.2.</li>
+  </ul>
+</div>
+</body>
+</html>
