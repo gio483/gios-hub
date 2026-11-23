@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SDLR Leave-Behind Booklet</title>
+<meta name="description" content="Flip through the SDLR consultation booklet (v7, 12 pages with Our Work) and the folder it comes in, page by page.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#2E382B; --sage7:#3E4A3A; --gold:#BDA572; --gold8:#826D45; --paper:#F5F1E8; --sage-t:#BAC0AF;
+    --table:#171c16; --table2:#262e24; --ink-on-dark:#E9E4D8; --muted-on-dark:#9aa294;
+    --bar-h:56px; --ctl-h:58px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--table);color:var(--ink-on-dark);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  button{font:inherit;color:inherit}
+
+  /* ---- the table the booklet sits on ---- */
+  .desk{position:relative;height:100vh;height:100dvh;min-height:560px;display:flex;flex-direction:column;
+    background:
+      radial-gradient(ellipse 70% 60% at 50% 42%, rgba(255,240,210,.10), rgba(255,240,210,0) 70%),
+      radial-gradient(ellipse at 50% 45%, var(--table2) 0%, var(--table) 72%);
+    overflow:hidden}
+  .desk::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.18;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+
+  /* ---- top bar ---- */
+  .bar{height:var(--bar-h);flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:0 16px;position:relative;z-index:5;
+    border-bottom:1px solid rgba(189,165,114,.16);background:rgba(10,13,10,.35);backdrop-filter:blur(6px)}
+  .brand{display:flex;align-items:baseline;gap:10px;min-width:0}
+  .brand b{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:21px;letter-spacing:.06em;color:var(--gold)}
+  .brand span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-on-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tabs{margin-left:auto;display:flex;gap:4px;padding:3px;border:1px solid rgba(189,165,114,.25);border-radius:999px}
+  .tabs button{background:none;border:0;cursor:pointer;padding:6px 14px;border-radius:999px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted-on-dark)}
+  .tabs button.on{background:var(--gold);color:#1b1f19;font-weight:600}
+  .tools{display:flex;gap:6px}
+  .tool{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 12px;border-radius:8px;cursor:pointer;
+    border:1px solid rgba(189,165,114,.25);background:none;color:var(--ink-on-dark);font-size:12px;letter-spacing:.06em;text-decoration:none}
+  .tool:hover{border-color:rgba(189,165,114,.6)}
+  .tool svg{width:16px;height:16px}
+
+  /* ---- stage ---- */
+  .stage{position:relative;flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:18px 16px 6px;min-height:0}
+  .view{position:absolute;inset:18px 16px 6px;display:flex;align-items:center;justify-content:center}
+  .view[hidden]{display:none}
+  .book{transition:transform .65s cubic-bezier(.3,.7,.2,1);filter:drop-shadow(0 22px 26px rgba(0,0,0,.45)) drop-shadow(0 4px 6px rgba(0,0,0,.35))}
+  .page{background:var(--paper);overflow:hidden}
+  .page img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+  /* the fold: paper curves into the spine, so the gutter darkens and the crest just off it catches light */
+  .page .fold{position:absolute;top:0;bottom:0;width:14%;pointer-events:none}
+  .pg-r .fold{left:0;background:linear-gradient(to right,rgba(0,0,0,.24) 0,rgba(0,0,0,.09) 2.2%,rgba(255,255,255,.07) 5%,rgba(255,255,255,0) 11%)}
+  .pg-l .fold{right:0;background:linear-gradient(to left,rgba(0,0,0,.24) 0,rgba(0,0,0,.09) 2.2%,rgba(255,255,255,.07) 5%,rgba(255,255,255,0) 11%)}
+  .pg-cover .fold{opacity:.45}
+  .hard .fold{opacity:.35}
+  /* paper tooth */
+  .page::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23p)'/></svg>")}
+  /* saddle-stitch staples: only seen on the centre spread, lying along the fold */
+  .staple{position:absolute;width:3px;height:4.6%;pointer-events:none;border-radius:1px;
+    background:linear-gradient(90deg,#7d8287,#eef0f2 45%,#a7acb1);box-shadow:0 0 1px rgba(0,0,0,.45)}
+  .pg-l .staple{right:0}.pg-r .staple{left:0}
+  .staple.s1{top:22%}.staple.s2{top:73.4%}
+
+  .hint{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:4;pointer-events:none;
+    background:rgba(10,13,10,.72);border:1px solid rgba(189,165,114,.3);color:var(--ink-on-dark);
+    font-size:12.5px;letter-spacing:.02em;padding:9px 16px;border-radius:999px;white-space:nowrap;transition:opacity .6s}
+  .hint.gone{opacity:0}
+
+  /* ---- controls ---- */
+  .ctl{height:var(--ctl-h);flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:16px;position:relative;z-index:5}
+  .arrow{width:42px;height:42px;border-radius:50%;border:1px solid rgba(189,165,114,.35);background:rgba(10,13,10,.3);cursor:pointer;display:grid;place-items:center}
+  .arrow:hover:not(:disabled){border-color:var(--gold);background:rgba(189,165,114,.12)}
+  .arrow:disabled{opacity:.25;cursor:default}
+  .arrow svg{width:18px;height:18px}
+  .where{min-width:250px;text-align:center;line-height:1.25}
+  .where .n{display:block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+  .where .t{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:19px;color:var(--ink-on-dark)}
+  .rail-toggle{position:absolute;right:16px}
+
+  .rail{flex:0 0 auto;display:flex;gap:10px;justify-content:flex-start;overflow-x:auto;padding:4px 16px 14px;position:relative;z-index:5;scrollbar-width:thin}
+  .rail::before,.rail::after{content:"";margin:auto}   /* centred when it fits, scrollable from the first page when it doesn't */
+  .rail[hidden]{display:none}
+  .thumb{flex:0 0 auto;display:flex;gap:0;padding:3px;border-radius:4px;border:1px solid transparent;background:none;cursor:pointer;opacity:.55;transition:opacity .2s,border-color .2s}
+  .thumb img{height:54px;width:auto;display:block;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .thumb:hover{opacity:.9}
+  .thumb.on{opacity:1;border-color:var(--gold)}
+
+  /* ---- notes below the desk ---- */
+  .notes{background:var(--paper);color:#1F1F1F;padding:56px 20px 80px}
+  .notes .in{max-width:860px;margin:0 auto}
+  .eyebrow{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--sage7);font-weight:500}
+  .rule{width:64px;height:1px;background:var(--gold);margin:12px 0 16px}
+  .notes h2{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;font-size:34px;line-height:1.1;margin:0 0 18px;color:#1F1F1F}
+  .notes h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;font-size:22px;margin:30px 0 8px}
+  .notes p,.notes li{font-size:15px;line-height:1.65;color:#2b2b28}
+  .notes ul{padding-left:20px;margin:6px 0}
+  .flag{border-left:3px solid var(--gold);background:#EFE9DB;padding:14px 18px;margin:22px 0}
+  .flag p{margin:0}
+  .dl{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+  .dl a{display:inline-flex;align-items:center;gap:8px;padding:11px 16px;border-radius:8px;background:var(--forest);color:var(--paper);text-decoration:none;font-size:14px}
+  .dl a span{color:var(--sage-t);font-size:12px}
+  table.pages{border-collapse:collapse;width:100%;margin-top:8px;font-size:14px}
+  table.pages td{border-top:1px solid #E5DECA;padding:8px 10px;vertical-align:top}
+  table.pages td:first-child{white-space:nowrap;color:var(--gold8);font-weight:600;width:110px}
+
+  @media (max-width:760px){
+    :root{--bar-h:52px}
+    .brand span{display:none}
+    .tools .tool .lbl{display:none}
+    .tools .tool{padding:0 10px}
+    .where{min-width:0}
+    .where .t{font-size:16px}
+    .rail-toggle{display:none}
+    .hint{white-space:normal;width:min(88vw,360px);text-align:center}
+    .notes h2{font-size:28px}
+  }
+</style>
+</head>
+<body>
+
+<div class="desk" id="desk">
+  <header class="bar">
+    <div class="brand"><b>SDLR</b><span>Leave-behind kit · v7 · Nov 23, 2026</span></div>
+    <nav class="tabs" aria-label="What to look at">
+      <button type="button" data-view="booklet" class="on">Booklet</button>
+      <button type="button" data-view="folder">Folder</button>
+    </nav>
+    <div class="tools">
+      <a class="tool" id="pdf" href="sdlr-leave-behind-kit/2026-11-23-v7/SDLR-leave-behind-booklet-v7-2026-11-23-print-CMYK.pdf" title="Download the print PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14"/></svg><span class="lbl">PDF</span></a>
+      <button class="tool" id="fs" type="button" title="Full screen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Full screen</span></button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <div class="view" id="v-booklet"><div class="book" id="book"></div></div>
+    <div class="view" id="v-folder" hidden><div class="book" id="folder"></div></div>
+    <div class="hint" id="hint">Click a page or drag its corner to turn it. The arrow keys work too.</div>
+  </main>
+
+  <div class="ctl">
+    <button class="arrow" id="prev" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <div class="where" aria-live="polite"><span class="n" id="where-n">Front cover</span><span class="t" id="where-t">Why families choose SDLR</span></div>
+    <button class="arrow" id="next" type="button" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5l7 7-7 7"/></svg></button>
+    <button class="tool rail-toggle" id="railBtn" type="button" title="Show or hide the page strip">Pages</button>
+  </div>
+  <div class="rail" id="rail"></div>
+</div>
+
+<section class="notes">
+  <div class="in">
+    <div class="eyebrow">Version 7 · November 23, 2026</div>
+    <div class="rule"></div>
+    <h2>The booklet now has an Our Work section.</h2>
+    <p>Gio asked for a past work section built from the projects folder in Google Drive, and a flipbook so he and Mike can read the booklet the way a homeowner would. The booklet grew from 8 to 12 pages (stapled booklets come in multiples of four). The five new pages replace v6's "Ideas to start from" page. Everything else is the same words as v6.</p>
+
+    <h3>What's on each page</h3>
+    <table class="pages">
+      <tr><td>Page 1</td><td>Front cover: the backyard that finally matches the home you've built.</td></tr>
+      <tr><td>Pages 2–3</td><td>The five worries, then how we build.</td></tr>
+      <tr><td>Pages 4–5</td><td>Materials by brand, then the six steps.</td></tr>
+      <tr><td>Pages 6–7</td><td><b>Our Work opens.</b> Chelsea Street, La Jolla across the centre spread (the one the staples go through).</td></tr>
+      <tr><td>Pages 8–9</td><td>Rancho Santa Fe estate, then Del Mar and Mount Helix.</td></tr>
+      <tr><td>Pages 10–11</td><td>North Park and Point Loma, then after we finish (the 10-month walk-through).</td></tr>
+      <tr><td>Page 12</td><td>Back cover: what we build, Book a Consultation, phone and QR.</td></tr>
+    </table>
+
+    <div class="flag">
+      <p><b>Read before printing.</b> Every image in Our Work is a design rendering, and page 6 says so in one small line. The captions name a place and what's in the picture: no client names, dates or prices. One decision is still open: keep all six projects, or print Chelsea Street only.</p>
+    </div>
+
+    <h3>Not changed from v6</h3>
+    <ul>
+      <li>The folder: the same pergola front, letter and pockets. Only the contents line inside now reads Why SDLR · How we build · How a project works · Our work.</li>
+      <li>The booklet's QR code still goes to the booking page, tagged so booklet scans show up on their own.</li>
+      <li>Cecilia's Eastlake yard is not in the projects folder and is not in the booklet.</li>
+    </ul>
+
+    <h3>To order (nothing ordered yet)</h3>
+    <ul>
+      <li>Booklet: 12 pages, 8.5 × 11, saddle stitch (two staples on the fold), self-cover, 100 lb silk or gloss text, full colour, full bleed. The PDF is 12 single pages in reading order, which is what booklet printers ask for.</li>
+      <li>Folder: 9 × 12 two-pocket presentation folder; the panels go onto the printer's die template at order time.</li>
+    </ul>
+    <div class="dl">
+      <a href="sdlr-leave-behind-kit/2026-11-23-v7/SDLR-leave-behind-booklet-v7-2026-11-23-print-CMYK.pdf">Booklet print PDF <span>12 pages · 18 MB</span></a>
+      <a href="sdlr-leave-behind-kit/2026-11-23-v7/SDLR-leave-behind-folder-v7-2026-11-23-print-CMYK.pdf">Folder print PDF <span>4 pages · 2 MB</span></a>
+    </div>
+
+    <h3>Still open</h3>
+    <ul>
+      <li>Keep all six projects, or Chelsea Street only.</li>
+      <li>Gio and Mike to confirm the promises in the copy (every material named, a project manager on site every phase, the handover binder, the 10-Month Walk-Through).</li>
+      <li>Pick the printers for the folder and the booklet.</li>
+    </ul>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
+<script>
+(function(){
+  var A = 'sdlr-leave-behind-kit/2026-11-23-v7/';
+  var MIN_W = 360;                       // a page narrower than this shows one page at a time
+
+  var BOOKLET = {
+    el: 'book', ratio: 8.5 / 11, hard: false,
+    pages: ['p01','p02','p03','p04','p05','p06','p07','p08','p09','p10','p11','p12'],
+    staples: [5, 6],                     // pages 6 and 7: the centre spread
+    names: ['Front cover','Five worries','How we build','Materials','How a project works','Our work',
+            'Chelsea Street, La Jolla','Rancho Santa Fe','Del Mar · Mount Helix','North Park · Point Loma',
+            'After we finish','Back cover'],
+    spreadTitle: { 0:'Why families choose SDLR', 1:'Five worries · How we build', 3:'Materials · How a project works',
+                   5:'Our work · Chelsea Street, La Jolla', 7:'Rancho Santa Fe · Del Mar, Mount Helix',
+                   9:'North Park, Point Loma · After we finish', 11:'Book a consultation' }
+  };
+  var FOLDER = {
+    el: 'folder', ratio: 9 / 12, hard: true,
+    pages: ['folder-front','folder-inside-left','folder-inside-right','folder-back'],
+    staples: [],
+    names: ['Folder front','Inside left','Inside right','Folder back'],
+    spreadTitle: { 0:'Done right, the first time.', 1:'The letter, and the booklet in its pocket', 3:'Book a consultation' }
+  };
+
+  var stage = document.getElementById('stage');
+  var views = { booklet: document.getElementById('v-booklet'), folder: document.getElementById('v-folder') };
+  var active = 'booklet';
+  var books = {};
+
+  function build(cfg){
+    var host = document.getElementById(cfg.el);
+    var n = cfg.pages.length;
+    cfg.pages.forEach(function(name, i){
+      var d = document.createElement('div');
+      var side = (i % 2 === 0) ? 'pg-r' : 'pg-l';
+      d.className = 'page ' + side + ((i === 0 || i === n - 1) ? ' pg-cover' : '') + (cfg.hard ? ' hard' : '');
+      d.setAttribute('data-density', cfg.hard ? 'hard' : 'soft');
+      var img = document.createElement('img');
+      img.src = A + 'pages/' + name + '.jpg';
+      img.alt = cfg.names[i];
+      img.draggable = false;
+      d.appendChild(img);
+      var f = document.createElement('i'); f.className = 'fold'; d.appendChild(f);
+      if (cfg.staples.indexOf(i) > -1) {
+        ['s1','s2'].forEach(function(s){ var st = document.createElement('i'); st.className = 'staple ' + s; d.appendChild(st); });
+      }
+      host.appendChild(d);
+    });
+    size(cfg);
+    var pf = new St.PageFlip(host, {
+      width: 850, height: Math.round(850 / cfg.ratio), size: 'stretch',
+      minWidth: MIN_W, maxWidth: 1200, minHeight: Math.round(MIN_W / cfg.ratio), maxHeight: Math.round(1200 / cfg.ratio),
+      showCover: true, usePortrait: true, autoSize: true, drawShadow: true, maxShadowOpacity: 0.55,
+      flippingTime: cfg.hard ? 1100 : 900, showPageCorners: true, mobileScrollSupport: true, swipeDistance: 24
+    });
+    pf.loadFromHTML(host.querySelectorAll('.page'));
+    size(cfg); pf.update();              // the library sets width:100% on start; fit the book to the desk again
+    // a self-cover booklet is one paper all the way through: keep its covers soft (the library stiffens covers)
+    if (!cfg.hard) {
+      try { var pc = pf.getPageCollection(); [0, n - 1].forEach(function(i){ pc.getPage(i).setDensity('soft'); }); } catch(e) {}
+    }
+    var b = { cfg: cfg, pf: pf, host: host, n: n };
+    pf.on('flip', function(){ settle(b); report(b); });
+    pf.on('changeOrientation', function(){ settle(b); report(b); });
+    pf.on('changeState', function(e){
+      // as soon as a closed book starts to open, slide it to the middle of the desk
+      if ((e.data === 'flipping' || e.data === 'user_fold') && b.host.style.transform) {
+        var i = pf.getCurrentPageIndex();
+        if (i === 0 || i === n - 1) b.host.style.transform = '';
+      }
+      hideHint();
+    });
+    books[cfg.el] = b;
+    settle(b); report(b); rail(b);
+    return b;
+  }
+
+  // size the book to the desk: a two-page spread when there's room, otherwise one page
+  function size(cfg){
+    var r = stage.getBoundingClientRect();
+    var W = Math.max(280, r.width - 32), H = Math.max(300, r.height - 30);
+    var spreadW = Math.min(W, H * 2 * cfg.ratio);
+    var landscape = spreadW >= 2 * MIN_W && W > H * 1.0;
+    var w = landscape ? spreadW : Math.min(W, H * cfg.ratio, 2 * MIN_W - 1);
+    document.getElementById(cfg.el).style.width = Math.floor(w) + 'px';
+  }
+
+  // closed on the front, the book sits in the middle of the desk; closed on the back, likewise
+  function settle(b){
+    var pf = b.pf, i = pf.getCurrentPageIndex();
+    if (pf.getOrientation() !== 'landscape') { b.host.style.transform = ''; return; }
+    var pw = b.host.getBoundingClientRect().width / 4;
+    b.host.style.transform = i === 0 ? 'translateX(' + (-pw) + 'px)' : (i === b.n - 1 ? 'translateX(' + pw + 'px)' : '');
+  }
+
+  function report(b){
+    if (b.cfg.el !== (active === 'booklet' ? 'book' : 'folder')) return;
+    var pf = b.pf, i = pf.getCurrentPageIndex(), n = b.n, land = pf.getOrientation() === 'landscape';
+    var label, title;
+    if (land && i > 0 && i < n - 1) {
+      var L = i % 2 === 1 ? i : i - 1;
+      label = b.cfg.hard ? 'Inside' : ('Pages ' + (L + 1) + '–' + (L + 2) + ' of ' + n);
+      title = b.cfg.spreadTitle[L] || (b.cfg.names[L] + ' · ' + b.cfg.names[L + 1]);
+    } else {
+      label = b.cfg.hard ? b.cfg.names[i] : (i === 0 ? 'Front cover' : (i === n - 1 ? 'Back cover' : 'Page ' + (i + 1) + ' of ' + n));
+      title = b.cfg.hard ? (b.cfg.spreadTitle[i] || b.cfg.spreadTitle[i - 1] || '') : (i === 0 || i === n - 1 ? b.cfg.spreadTitle[i] : b.cfg.names[i]);
+    }
+    document.getElementById('where-n').textContent = label;
+    document.getElementById('where-t').textContent = title;
+    document.getElementById('prev').disabled = i === 0;
+    document.getElementById('next').disabled = land ? (i >= n - 1 || (i === n - 2 && i % 2 === 1)) : i >= n - 1;
+    var groups = document.querySelectorAll('#rail .thumb');
+    var R = document.getElementById('rail');
+    groups.forEach(function(t){
+      var a = +t.dataset.a, z = +t.dataset.z, on = i >= a && i <= z;
+      t.classList.toggle('on', on);
+      if (on && R.scrollWidth > R.clientWidth) R.scrollTo({ left: t.offsetLeft - R.clientWidth / 2 + t.offsetWidth / 2, behavior: 'smooth' });
+    });
+  }
+
+  function rail(b){
+    var R = document.getElementById('rail'); R.innerHTML = '';
+    var n = b.n, groups = [[0]];
+    for (var k = 1; k < n - 1; k += 2) groups.push(k + 1 < n - 1 ? [k, k + 1] : [k]);
+    groups.push([n - 1]);
+    groups.forEach(function(g){
+      var t = document.createElement('button'); t.type = 'button'; t.className = 'thumb';
+      t.dataset.a = g[0]; t.dataset.z = g[g.length - 1];
+      t.title = g.map(function(i){ return b.cfg.names[i]; }).join(' · ');
+      g.forEach(function(i){ var im = document.createElement('img'); im.src = A + 'thumbs/' + b.cfg.pages[i] + '.jpg'; im.alt = ''; t.appendChild(im); });
+      t.onclick = function(){ hideHint(); var cur = b.pf.getCurrentPageIndex(); if (g.indexOf(cur) < 0) b.pf.flip(g[0]); };
+      R.appendChild(t);
+    });
+    report(b);
+  }
+
+  function current(){ return books[active === 'booklet' ? 'book' : 'folder']; }
+
+  // tabs
+  document.querySelectorAll('.tabs button').forEach(function(btn){
+    btn.onclick = function(){
+      active = btn.dataset.view;
+      document.querySelectorAll('.tabs button').forEach(function(x){ x.classList.toggle('on', x === btn); });
+      views.booklet.hidden = active !== 'booklet'; views.folder.hidden = active !== 'folder';
+      document.getElementById('pdf').href = 'sdlr-leave-behind-kit/2026-11-23-v7/SDLR-leave-behind-' + active + '-v7-2026-11-23-print-CMYK.pdf';
+      var b = current();
+      if (!b) b = build(active === 'booklet' ? BOOKLET : FOLDER);
+      else { size(b.cfg); b.pf.update(); settle(b); rail(b); }
+    };
+  });
+
+  document.getElementById('prev').onclick = function(){ hideHint(); current().pf.flipPrev(); };
+  document.getElementById('next').onclick = function(){ hideHint(); current().pf.flipNext(); };
+  document.addEventListener('keydown', function(e){
+    if (e.target.closest && e.target.closest('input,textarea')) return;
+    if (e.key === 'ArrowRight') { hideHint(); current().pf.flipNext(); }
+    if (e.key === 'ArrowLeft') { hideHint(); current().pf.flipPrev(); }
+  });
+  document.getElementById('railBtn').onclick = function(){ var R = document.getElementById('rail'); R.hidden = !R.hidden; window.dispatchEvent(new Event('resize')); };
+
+  window.addEventListener('resize', function(){
+    Object.keys(books).forEach(function(k){ size(books[k].cfg); });
+    setTimeout(function(){ Object.keys(books).forEach(function(k){ settle(books[k]); }); }, 60);
+  });
+
+  document.getElementById('fs').onclick = function(){
+    var d = document.getElementById('desk');
+    if (document.fullscreenElement) { document.exitFullscreen(); return; }
+    if (d.requestFullscreen && document.fullscreenEnabled) d.requestFullscreen().catch(function(){ window.open(location.href, '_blank'); });
+    else window.open(location.href, '_blank');
+  };
+  document.addEventListener('fullscreenchange', function(){ setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 80); });
+
+  var hint = document.getElementById('hint'), hintT = setTimeout(hideHint, 7000);
+  function hideHint(){ clearTimeout(hintT); hint.classList.add('gone'); }
+
+  build(BOOKLET);
+})();
+</script>
+</body>
+</html>
