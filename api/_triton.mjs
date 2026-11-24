@@ -2,7 +2,8 @@
 // Served through /api/lifeos?ns=triton (underscore file = not its own function,
 // which keeps the hub under the Hobby plan's 12-function limit).
 //
-// Data: { "<YYYY-MM-DD>": { u: <ms timestamp>, rec: {...} | null } }
+// Data: { "<YYYY-MM-DD>" | "ex:<id>" | "cfg:<name>": { u: <ms timestamp>, rec: {...} | null } }
+// POST { action: 'classify', ... } is AI exercise classification (see _triton-classify.mjs).
 // Newest `u` wins per day, so devices editing different days never clash.
 //
 // Why snapshots: an overwritten blob can be served stale from the CDN for up
@@ -54,12 +55,18 @@ export default async function handler(req, res) {
         for await (const c of req) chunks.push(c);
         try { body = JSON.parse(Buffer.concat(chunks).toString() || '{}'); } catch { body = {}; }
       }
+      if (body && body.action === 'classify') {
+        const { classify } = await import('./_triton-classify.mjs');
+        const out = await classify(body);
+        return send(res, out.status, out.json);
+      }
       const incoming = (body && body.data) || {};
       const snaps = await snapshots();
       const merged = { ...(await latest(snaps)) };
       let changed = 0;
       for (const [d, v] of Object.entries(incoming)) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !v || typeof v !== 'object') continue;
+        // days (YYYY-MM-DD), exercise records (ex:<id>) and settings (cfg:<name>)
+        if (!/^(\d{4}-\d{2}-\d{2}|ex:[a-z0-9-]{1,64}|cfg:[a-z0-9-]{1,32})$/.test(d) || !v || typeof v !== 'object') continue;
         if (Number(v.u || 0) > Number((merged[d] || {}).u || 0)) { merged[d] = { u: Number(v.u), rec: v.rec || null }; changed++; }
       }
       if (changed) {

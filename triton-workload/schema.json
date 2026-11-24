@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://gios-hub.vercel.app/bj-workload-schema.json",
+  "title": "Triton Workload export",
+  "description": "Portable export of the lifting workload system: exercise database, training log and engine metadata. Spec v2.0, engine 1.0.0.",
+  "type": "object",
+  "required": ["format", "exportedAt", "engine", "exercises", "sessions"],
+  "properties": {
+    "format": { "const": "triton-workload/1" },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "engine": {
+      "type": "object",
+      "required": ["engineVersion", "rulesVersion", "specVersion", "rules"],
+      "properties": {
+        "engineVersion": { "type": "string" },
+        "rulesVersion": { "type": "string" },
+        "specVersion": { "type": "string" },
+        "rules": { "type": "object", "description": "Thresholds/conventions used (see engine.js RULES)." },
+        "compositeWeights": { "type": "object" }
+      }
+    },
+    "athlete": { "type": "object", "properties": { "name": { "type": "string" }, "throws": { "enum": ["L", "R"] } } },
+    "muscles": { "type": "array", "items": { "$ref": "#/$defs/Muscle" } },
+    "exercises": { "type": "array", "items": { "$ref": "#/$defs/ExerciseRecord" } },
+    "sessions": { "type": "array", "items": { "$ref": "#/$defs/Session" } }
+  },
+  "$defs": {
+    "Muscle": {
+      "type": "object", "required": ["id", "label", "region"],
+      "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "region": { "enum": ["upper", "lower", "trunk"] }, "extra": { "type": "boolean" } }
+    },
+    "ExerciseRecord": {
+      "type": "object",
+      "required": ["id", "name", "pattern", "category", "primary", "secondary", "stabilizers", "equipment", "unilateral", "axial", "explosive", "contraction"],
+      "properties": {
+        "id": { "type": "string", "description": "Library ids are plain (e.g. 'rdl'); user exercises start with 'u-'." },
+        "name": { "type": "string" },
+        "aliases": { "type": "array", "items": { "type": "string" } },
+        "pattern": { "type": "string" },
+        "category": { "type": "string" },
+        "primary": { "type": "array", "items": { "type": "string" } },
+        "secondary": { "type": "array", "items": { "type": "string" } },
+        "stabilizers": { "type": "array", "items": { "type": "string" } },
+        "equipment": { "type": "string" },
+        "unilateral": { "type": "boolean" },
+        "axial": { "type": "boolean" },
+        "explosive": { "type": "boolean" },
+        "compound": { "type": "boolean" },
+        "impact": { "enum": ["none", "low", "high"] },
+        "contraction": { "enum": ["dynamic", "concentric", "eccentric", "isometric", "stretch-shortening"] },
+        "rom": { "enum": ["full", "partial"] },
+        "stability": { "enum": ["stable", "unstable"] },
+        "bwLoad": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fraction of bodyweight counted as external load (convention)." },
+        "loadComparable": { "type": "boolean", "description": "false = displayed load (e.g. pneumatic) excluded from volume totals." },
+        "oneRm": { "type": "object", "properties": { "tested": { "type": ["number", "null"] }, "testedDate": { "type": ["string", "null"] }, "unit": { "enum": ["lb", "kg"] } } },
+        "classification": {
+          "type": "object",
+          "properties": {
+            "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+            "source": { "type": "string", "description": "library | rules | ai:<model> | manual" },
+            "classifierVersion": { "type": "string" },
+            "explanation": { "type": "array", "items": { "type": "string" } },
+            "questions": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "auto": { "type": ["object", "null"], "description": "The original automatic classification, never modified." },
+        "overridden": { "type": "array", "items": { "type": "string" }, "description": "Fields changed by hand." },
+        "created": { "type": "string", "format": "date-time" },
+        "modified": { "type": "string", "format": "date-time" },
+        "history": { "type": "array", "items": { "type": "object", "properties": { "at": { "type": "string" }, "by": { "type": "string" }, "action": { "type": "string" }, "changes": { "type": "object" }, "snapshot": { "type": "object" } } } }
+      }
+    },
+    "Set": {
+      "type": "object", "required": ["reps"],
+      "properties": {
+        "load": { "type": ["number", "string", "null"], "description": "External load per side; 'BW' or 0 for bodyweight." },
+        "reps": { "type": "number", "description": "Reps per side for unilateral exercises." },
+        "rpe": { "type": ["number", "null"], "minimum": 0, "maximum": 10 },
+        "rir": { "type": ["number", "null"], "minimum": 0 },
+        "explosive": { "type": "boolean" },
+        "velocity": { "type": ["number", "null"], "description": "Mean bar velocity, m/s (optional)." },
+        "durationSec": { "type": ["number", "null"] },
+        "restSec": { "type": ["number", "null"] }
+      }
+    },
+    "LoggedExercise": {
+      "type": "object", "required": ["exerciseId", "name", "sets"],
+      "properties": {
+        "exerciseId": { "type": "string" }, "name": { "type": "string" }, "unit": { "enum": ["lb", "kg"] },
+        "sets": { "type": "array", "items": { "$ref": "#/$defs/Set" } },
+        "tempo": { "type": "string" }, "rom": { "type": "string" }, "contraction": { "type": "string" }, "note": { "type": "string" }
+      }
+    },
+    "Session": {
+      "type": "object", "required": ["date", "exercises"],
+      "properties": {
+        "date": { "type": "string", "format": "date" },
+        "bodyweightLb": { "type": ["number", "null"] },
+        "sessionRpe": { "type": ["number", "null"], "minimum": 0, "maximum": 10 },
+        "durationMin": { "type": ["number", "null"] },
+        "exercises": { "type": "array", "items": { "$ref": "#/$defs/LoggedExercise" } },
+        "calculated": { "type": "object", "description": "analyzeSession() output frozen at save time, with engineVersion and rulesVersion, so historical calculations are preserved." }
+      }
+    }
+  }
+}
