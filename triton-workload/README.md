@@ -29,3 +29,17 @@ W.METHODS;                          // formula, units, evidence class, limitatio
 - **AI-assisted classification:** `classifier.classifyAI()` posts to the hub (`/api/lifeos?ns=triton`, action `classify`), which asks Claude with a strict JSON schema. The rules engine works offline without it.
 
 Nothing here measures fatigue, CNS stress, muscle activation or hypertrophy. See `METHODS` for what each number is and is not.
+
+## Throwing workload (`throwing-engine.js`)
+
+Implements *Personalized Throwing Workload Calculator — Technical Specification v2.0*. Standalone and deterministic (`window.TritonThrowing` / `require`).
+
+```js
+const T = require('./throwing-engine.js');
+const model = T.fitModel(days);            // days: [{ date, pulseWorkload, restDay, activities: [{ type, throws, effort, ballG, distFt, avgV, maxV, radarN }] }]
+const day = T.resolveDay(days[0], model);  // Pulse → measured; rest → 0; nothing logged → missing (null); else model estimate + confidence
+T.rolling(resolvedByDate, '2026-11-23', 7); T.calendarMonth(resolvedByDate, '2026-11'); T.acwr(resolvedByDate, '2026-11-23');
+T.symptomFlags(days, '2026-11-23');        // arm-response review prompts, never part of workload
+```
+
+Model: non-negative ridge regression (no intercept) predicting his own Pulse One Day Workload; candidates M1→M5 compared on chronological and leave-one-out error; a richer model wins only if it is meaningfully better on unseen days. Stages: cold start (provisional weights, not on the Pulse scale) → early (scale fit) → developing → established. Tests: `throwing-engine.test.js` (`TritonThrowing.runTests()`). Monitoring only: not injury prediction, prescription or clearance.

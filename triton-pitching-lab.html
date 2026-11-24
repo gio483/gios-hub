@@ -366,6 +366,26 @@ textarea.input{min-height:110px;resize:vertical}
   .mrow{grid-template-columns:96px 1fr 44px}
 }
 
+/* throwing workload */
+[hidden]{display:none!important}
+.safety-note{font-size:12px;color:var(--muted);border-left:3px solid var(--gold-2);padding:6px 10px;margin:-6px 0 14px;background:rgba(255,205,0,.04);border-radius:0 8px 8px 0}
+.act-card{margin-bottom:10px;padding:12px;background:var(--navy-2);display:flex;flex-direction:column;gap:8px}
+.act-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.act-type{font-weight:700;flex:1;min-width:0}
+.mchip{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid var(--line)}
+.m-pulse{color:var(--gold);border-color:rgba(255,205,0,.5);background:rgba(255,205,0,.08)}
+.m-est{color:var(--teal);border-color:rgba(0,198,215,.5);background:rgba(0,198,215,.08)}
+.m-rest{color:var(--muted)}
+.m-miss{color:var(--amber);border-color:rgba(255,181,71,.5);background:rgba(255,181,71,.08)}
+.m-ovr{color:#ff8a80;border-color:rgba(224,84,75,.5)}
+.tw-status{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.tw-status-side{max-width:460px;line-height:1.6}
+.review{background:rgba(224,84,75,.1);border:1px solid rgba(224,84,75,.45);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:12px}
+.review b{color:#ff8a80}
+#t-status{margin-bottom:12px}
+#tw-body > .entry-layout > div > .card{margin-bottom:12px}
+@media (max-width:820px){ .act-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .tw-status-side{max-width:none} }
+
 /* cloud sync status */
 .sync{font-size:11px;font-weight:600;margin-top:4px;display:flex;align-items:center;gap:5px;color:var(--muted);white-space:nowrap}
 .sync::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted);flex:0 0 7px}
@@ -426,6 +446,7 @@ textarea.input{min-height:110px;resize:vertical}
       <button data-view="bests"><span class="ico">★</span>Personal Bests</button>
       <button data-view="insights"><span class="ico">⟋</span>Insights</button>
       <button data-view="entry"><span class="ico">＋</span>Daily Entry</button>
+      <button data-view="throwing"><span class="ico">◎</span>Throwing Workload</button>
       <button data-view="lifts"><span class="ico">▲</span>Lifting Log</button>
       <button data-view="journal"><span class="ico">✎</span>Journal</button>
       <button data-view="data"><span class="ico">⇅</span>Import / Export</button>
@@ -442,6 +463,7 @@ textarea.input{min-height:110px;resize:vertical}
     <section class="view" id="v-bests"></section>
     <section class="view" id="v-insights"></section>
     <section class="view" id="v-entry"></section>
+    <section class="view" id="v-throwing"></section>
     <section class="view" id="v-lifts"></section>
     <section class="view" id="v-journal"></section>
     <section class="view" id="v-data"></section>
@@ -1182,6 +1204,577 @@ window.SEED_CSV = "Date,Day of Week,notes ,Throw,throw location,Throwing ,Pitche
 
 </script>
 <script>
+/* Triton Throwing Workload — Calculation Engine
+   ------------------------------------------------------------------
+   Implements "Personalized Throwing Workload Calculator — Technical Specification v2.0".
+   Deterministic, dependency-free, no DOM, no network: same input → same output.
+   Use in a browser (window.TritonThrowing) or Node (require('./throwing-engine.js')).
+
+   Personalized Throwing Workload (PTW) is expressed in Pulse-equivalent units (PEU):
+     • Pulse day      → PTW = the official Driveline Pulse One Day Workload (never blended)
+     • Rest day       → PTW = 0
+     • Missing data   → PTW = null (never treated as zero)
+     • Otherwise      → PTW = the individual model's prediction of Pulse workload
+
+   This is a monitoring metric. It does not measure tissue stress, predict injury,
+   prescribe throwing or clear an athlete to throw.
+*/
+(function (root) {
+  'use strict';
+
+  const ENGINE_VERSION = '1.0.0';
+  const SPEC_VERSION = '2.0';
+
+  /* ---------- vocabularies ---------- */
+  const ACTIVITIES = [
+    { id: 'recovery-catch', label: 'Recovery catch', group: 'catch' },
+    { id: 'catch', label: 'Normal catch', group: 'catch' },
+    { id: 'high-intent-catch', label: 'High-intent catch', group: 'catch' },
+    { id: 'long-toss', label: 'Long toss', group: 'long-toss' },
+    { id: 'flatground', label: 'Flatground', group: 'mound' },
+    { id: 'bullpen', label: 'Bullpen', group: 'mound' },
+    { id: 'live-bp', label: 'Live batting practice', group: 'mound' },
+    { id: 'game', label: 'Game', group: 'mound' },
+    { id: 'plyo', label: 'Plyocare / weighted balls', group: 'plyo' },
+    { id: 'custom', label: 'Other / custom', group: 'other' },
+  ];
+  const GROUPS = { catch: 'Catch', 'long-toss': 'Long toss', mound: 'Mound (flatground, pen, live, game)', plyo: 'Weighted-ball work', other: 'Custom' };
+  const EFFORTS = [
+    { id: 'recovery', label: 'Recovery / very low intent', tier: 'low' },
+    { id: 'low', label: 'Low intent', tier: 'low' },
+    { id: 'moderate', label: 'Moderate intent', tier: 'mod' },
+    { id: 'high', label: 'High intent', tier: 'high' },
+    { id: 'max', label: 'Maximum intent', tier: 'high' },
+  ];
+  // Ball classes by weight (grams). A regulation baseball is 5–5.25 oz (142–149 g).
+  const BALL_PRESETS = [
+    { g: 142, label: 'Baseball (5 oz)' }, { g: 85, label: '3 oz' }, { g: 113, label: '4 oz' }, { g: 170, label: '6 oz' },
+    { g: 198, label: '7 oz' }, { g: 255, label: '9 oz' }, { g: 100, label: 'Plyo 100 g' }, { g: 150, label: 'Plyo 150 g' },
+    { g: 225, label: 'Plyo 225 g' }, { g: 450, label: 'Plyo 450 g' }, { g: 1000, label: 'Plyo 1 kg' }, { g: 2000, label: 'Plyo 2 kg' },
+  ];
+  function ballClass(g) {
+    const w = +g || 142;
+    if (w < 141) return 'underweight';
+    if (w <= 149) return 'baseball';
+    if (w <= 454) return 'overweight';
+    return 'heavy-implement';
+  }
+  const LONG_DISTANCE_FT = 120;   // "long" throws for the distance feature (operational bin, not a physiological threshold)
+
+  /* Provisional cold-start weights: relative PEU per throw by effort.
+     PLACEHOLDERS that only encode the ordering of effort levels. Not Pulse values,
+     not scientific multipliers; the user can inspect and replace them. */
+  const PROVISIONAL_WEIGHTS = { recovery: 0.05, low: 0.1, moderate: 0.2, high: 0.35, max: 0.5 };
+
+  /* Model-maturity conventions (operational, not accuracy guarantees). Confidence
+     comes from measured out-of-sample error, not from these counts. */
+  const STAGES = {
+    earlyMin: 1,           // ≥1 paired Pulse+activity day: fit a single scale factor
+    developingMin: 4,      // ≥4: cross-validated candidate models
+    establishedMin: 15,    // ≥15 paired days AND ≥8 chronological held-out predictions
+    establishedHeldOut: 8,
+    complexityGain: 0.05,  // a more complex model must cut out-of-sample MAE by ≥5% …
+    complexityAbs: 0.01,   // … AND by ≥1% of his average Pulse workload (ignores trivial gains when errors are tiny)
+  };
+  const ALPHAS = [0.001, 0.01, 0.1, 1];   // ridge strengths tried (× mean Gram diagonal)
+
+  /* ---------- helpers ---------- */
+  const num = v => (v === '' || v == null || isNaN(+v)) ? null : +v;
+  const r2 = v => v == null || !isFinite(v) ? null : Math.round(v * 100) / 100;
+  const sum = a => a.reduce((s, x) => s + (x || 0), 0);
+  const mean = a => a.length ? sum(a) / a.length : null;
+  const addDays = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10); };
+  const daysInMonth = ym => { const [y, m] = ym.split('-').map(Number); return new Date(Date.UTC(y, m, 0)).getUTCDate(); };
+  const effortTier = e => (EFFORTS.find(x => x.id === e) || EFFORTS[2]).tier;
+  const actGroup = (a, custom) => { const t = ACTIVITIES.find(x => x.id === a.type); if (t && t.id !== 'custom') return t.group; const c = custom && custom[a.customId]; return (c && c.group) || 'other'; };
+  const throwsOf = a => Math.max(0, Math.round(num(a.throws) || 0));
+
+  /* ---------- features ---------- */
+  // Every feature is a SUM over activities, so a day's prediction splits exactly into per-activity contributions.
+  const FEATURE_SETS = {
+    S0: { label: 'Provisional effort-weighted throws', features: ['effortWeighted'] },
+    M1: { label: 'Total throws', features: ['total'] },
+    M2: { label: 'Throws by effort (low / moderate / high)', features: ['tLow', 'tMod', 'tHigh'] },
+    M3: { label: 'Effort + high-effort mound vs off-mound', features: ['tLow', 'tMod', 'tHighOff', 'tHighMound'] },
+    M4: { label: 'M3 + ball weight + long distance', features: ['tLow', 'tMod', 'tHighOff', 'tHighMound', 'tOver', 'tUnder', 'tLong'] },
+    M5: { label: 'M4 + velocity-scaled mound throws', features: ['tLow', 'tMod', 'tHighOff', 'tHighMound', 'tOver', 'tUnder', 'tLong', 'tVeloMound'] },
+  };
+  const FEATURE_LABELS = { effortWeighted: 'Effort-weighted throws (provisional weights)', total: 'All throws', tLow: 'Recovery/low-intent throws', tMod: 'Moderate-intent throws',
+    tHigh: 'High/max-intent throws', tHighOff: 'High/max-intent throws off the mound', tHighMound: 'High/max-intent mound throws', tOver: 'Overweight-ball throws',
+    tUnder: 'Underweight-ball throws', tLong: `Throws beyond ${LONG_DISTANCE_FT} ft`, tVeloMound: 'High-intent mound throws × (velo ÷ his reference)²' };
+  function activityFeatures(a, ctx) {
+    const n = throwsOf(a), tier = effortTier(a.effort), grp = actGroup(a, ctx.custom), ball = ballClass(a.ballG);
+    const w = (ctx.provisional || PROVISIONAL_WEIGHTS)[a.effort] ?? PROVISIONAL_WEIGHTS.moderate;
+    const v = num(a.avgV), ref = ctx.refV;
+    const veloRatio = (v && ref && ball === 'baseball') ? (v / ref) ** 2 : 1;
+    const hi = tier === 'high' ? n : 0;
+    return {
+      effortWeighted: n * w, total: n,
+      tLow: tier === 'low' ? n : 0, tMod: tier === 'mod' ? n : 0, tHigh: hi,
+      tHighOff: grp === 'mound' ? 0 : hi, tHighMound: grp === 'mound' ? hi : 0,
+      tOver: (ball === 'overweight' || ball === 'heavy-implement') ? n : 0, tUnder: ball === 'underweight' ? n : 0,
+      tLong: (num(a.distFt) || 0) > LONG_DISTANCE_FT ? n : 0,
+      tVeloMound: grp === 'mound' ? hi * veloRatio : 0,
+    };
+  }
+  function buildFeatures(acts, setId, ctx) {
+    const names = FEATURE_SETS[setId].features;
+    const x = names.map(() => 0);
+    for (const a of acts || []) { const f = activityFeatures(a, ctx || {}); names.forEach((k, i) => { x[i] += f[k]; }); }
+    return x;
+  }
+
+  /* ---------- non-negative ridge regression (no intercept) ---------- */
+  // minimise ‖y − Xb‖² + λ‖b‖² subject to b ≥ 0, by coordinate descent on the Gram matrix.
+  // No intercept: zero throws must predict zero workload.
+  function gram(X, y) {
+    const p = X[0] ? X[0].length : 0, G = Array.from({ length: p }, () => Array(p).fill(0)), c = Array(p).fill(0);
+    X.forEach((row, i) => { for (let j = 0; j < p; j++) { c[j] += row[j] * y[i]; for (let k = 0; k < p; k++) G[j][k] += row[j] * row[k]; } });
+    return { G, c };
+  }
+  function nnRidgeFromGram(G, c, lambda) {
+    const p = c.length, b = Array(p).fill(0);
+    for (let it = 0; it < 500; it++) {
+      let delta = 0;
+      for (let j = 0; j < p; j++) {
+        const den = G[j][j] + lambda; if (den <= 0) { b[j] = 0; continue; }
+        let s = c[j]; for (let k = 0; k < p; k++) if (k !== j) s -= G[j][k] * b[k];
+        const nb = Math.max(0, s / den); delta = Math.max(delta, Math.abs(nb - b[j])); b[j] = nb;
+      }
+      if (delta < 1e-10) break;
+    }
+    return b;
+  }
+  const lambdaFor = (G, alpha) => { const d = G.map((r, i) => r[i]).filter(v => v > 0); return alpha * (d.length ? mean(d) : 0); };
+  function nnRidge(X, y, alpha) { const { G, c } = gram(X, y); return nnRidgeFromGram(G, c, lambdaFor(G, alpha)); }
+  const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
+
+  /* ---------- validation ---------- */
+  function metrics(pairs) {   // pairs: [{ pred, actual, date, ... }]
+    if (!pairs.length) return null;
+    const err = pairs.map(p => p.pred - p.actual);
+    const pct = pairs.filter(p => p.actual > 0).map(p => Math.abs(p.pred - p.actual) / p.actual * 100);
+    return { n: pairs.length, mae: r2(mean(err.map(Math.abs))), rmse: r2(Math.sqrt(mean(err.map(e => e * e)))), bias: r2(mean(err)), mape: pct.length ? r2(mean(pct)) : null, mapeN: pct.length };
+  }
+  // leave-one-out using Gram down-dating
+  function looPairs(X, y, dates, alpha) {
+    const { G, c } = gram(X, y), out = [];
+    for (let i = 0; i < X.length; i++) {
+      const Gi = G.map((row, j) => row.map((v, k) => v - X[i][j] * X[i][k])), ci = c.map((v, j) => v - X[i][j] * y[i]);
+      const b = nnRidgeFromGram(Gi, ci, lambdaFor(Gi, alpha));
+      out.push({ date: dates[i], pred: Math.max(0, dot(b, X[i])), actual: y[i] });
+    }
+    return out;
+  }
+  // chronological expanding window: train on everything before day k, predict day k
+  function chronoPairs(X, y, dates, alpha, minTrain) {
+    const out = [];
+    for (let k = minTrain; k < X.length; k++) {
+      const b = nnRidge(X.slice(0, k), y.slice(0, k), alpha);
+      out.push({ date: dates[k], pred: Math.max(0, dot(b, X[k])), actual: y[k] });
+    }
+    return out;
+  }
+
+  /* ---------- fitting ---------- */
+  // days: [{ date, pulseWorkload, activities: [...] }]; only days with BOTH are calibration days.
+  function calibrationDays(days) { return days.filter(d => num(d.pulseWorkload) != null && (d.activities || []).some(a => throwsOf(a) > 0)).sort((a, b) => a.date < b.date ? -1 : 1); }
+  function referenceVelocity(cal) {
+    const v = []; for (const d of cal) for (const a of d.activities) if (effortTier(a.effort) === 'high' && actGroup(a) === 'mound' && num(a.avgV) && ballClass(a.ballG) === 'baseball') v.push(+a.avgV);
+    return v.length ? r2(mean(v)) : null;
+  }
+  function radarCoverage(cal) { return cal.length ? cal.filter(d => d.activities.some(a => num(a.avgV))).length / cal.length : 0; }
+
+  function fitModel(days, opts) {
+    opts = opts || {};
+    const ctxBase = { custom: opts.custom || {}, provisional: Object.assign({}, PROVISIONAL_WEIGHTS, opts.provisional || {}) };
+    const cal = calibrationDays(days);
+    const n = cal.length;
+    const refV = referenceVelocity(cal);
+    const ctx = Object.assign({}, ctxBase, { refV });
+    const support = supportCounts(cal, ctx);
+    const base = { engineVersion: ENGINE_VERSION, nCalibration: n, refV, support, provisional: ctxBase.provisional, fittedThrough: n ? cal[n - 1].date : null };
+
+    if (n < STAGES.earlyMin) {
+      return finish(Object.assign(base, { stage: 'cold-start', featureSet: 'S0', coefs: [1], alpha: 0, scaleOnly: true, cv: null, candidates: [],
+        note: 'No paired Pulse days yet. Values use the provisional effort weights and are NOT on the Pulse scale.' }));
+    }
+    if (n < STAGES.developingMin) {
+      const X = cal.map(d => buildFeatures(d.activities, 'S0', ctx)), y = cal.map(d => +d.pulseWorkload);
+      const k = nnRidge(X, y, 0)[0] || 0;
+      const fit = metrics(cal.map((d, i) => ({ date: d.date, pred: k * X[i][0], actual: y[i] })));
+      return finish(Object.assign(base, { stage: 'early', featureSet: 'S0', coefs: [r2Coef(k)], alpha: 0, scaleOnly: true, cv: null, trainFit: fit, candidates: [],
+        note: 'Provisional effort weights rescaled to his Pulse days. In-sample fit only; not yet validated on unseen days.' }));
+    }
+    const X0 = {}, y = cal.map(d => +d.pulseWorkload), dates = cal.map(d => d.date);
+    const cover = radarCoverage(cal);
+    const candidates = [];
+    for (const setId of ['M1', 'M2', 'M3', 'M4', 'M5']) {
+      const p = FEATURE_SETS[setId].features.length;
+      const reason = n < p + 3 ? `needs ≥ ${p + 3} paired days` : (setId === 'M5' && (cover < 0.5 || !refV)) ? 'radar on < 50% of calibration days' : null;
+      if (reason) { candidates.push({ featureSet: setId, eligible: false, reason }); continue; }
+      X0[setId] = cal.map(d => buildFeatures(d.activities, setId, ctx));
+      let best = null;
+      for (const alpha of ALPHAS) {
+        const chrono = chronoPairs(X0[setId], y, dates, alpha, Math.max(p + 2, 3));
+        const loo = looPairs(X0[setId], y, dates, alpha);
+        const cm = metrics(chrono), lm = metrics(loo);
+        const score = cm && cm.n >= 3 ? cm.mae : lm.mae;
+        if (!best || score < best.score - 1e-9) best = { alpha, score, chrono: cm, loo: lm, chronoPairs: chrono, looPairs: loo };
+      }
+      candidates.push({ featureSet: setId, eligible: true, alpha: best.alpha, score: best.score, chrono: best.chrono, loo: best.loo, _pairs: best });
+    }
+    // simplest first; a richer model must beat the current choice out of sample by ≥ complexityGain
+    let chosen = null;
+    const minAbs = STAGES.complexityAbs * mean(y);
+    for (const c of candidates) { if (!c.eligible) continue; if (!chosen || (c.score < chosen.score * (1 - STAGES.complexityGain) && chosen.score - c.score >= minAbs)) chosen = c; }
+    if (!chosen) return fitModel(days.slice(0, 0), opts);
+    const coefs = nnRidge(X0[chosen.featureSet], y, chosen.alpha).map(r2Coef);
+    // features never seen in calibration get no learned coefficient; predictions fall back to the
+    // provisional effort weights rescaled to his Pulse days (flagged), instead of silently returning 0
+    const chosenFeatures = FEATURE_SETS[chosen.featureSet].features;
+    const unsupported = chosenFeatures.filter((f, j) => X0[chosen.featureSet].every(row => row[j] === 0));
+    const fallbackScale = r2Coef(nnRidge(cal.map(d => buildFeatures(d.activities, 'S0', ctx)), y, 0)[0] || 0);
+    const heldOut = chosen.chrono ? chosen.chrono.n : 0;
+    const stage = (n >= STAGES.establishedMin && heldOut >= STAGES.establishedHeldOut) ? 'established' : 'developing';
+    const fitPairs = cal.map((d, i) => ({ date: d.date, pred: dot(coefs, X0[chosen.featureSet][i]), actual: y[i], acts: d.activities }));
+    const errorBy = errorBreakdown(chosen._pairs.chronoPairs.length >= 3 ? chosen._pairs.chronoPairs : chosen._pairs.looPairs, cal, ctx);
+    candidates.forEach(c => { c.chosen = c === chosen; delete c._pairs; });
+    return finish(Object.assign(base, { stage, featureSet: chosen.featureSet, coefs, alpha: chosen.alpha, scaleOnly: false, unsupported, fallbackScale,
+      cv: { chrono: chosen.chrono, loo: chosen.loo, primary: chosen.chrono && chosen.chrono.n >= 3 ? 'chronological' : 'leave-one-out' },
+      trainFit: metrics(fitPairs), heldOutPairs: (chosen.chrono && chosen.chrono.n >= 3 ? chronoPairsCache(chosen, X0, y, dates) : null),
+      errorBy, candidates, radarCoverage: r2(cover) }));
+  }
+  function chronoPairsCache(c, X0, y, dates) { const p = FEATURE_SETS[c.featureSet].features.length; return chronoPairs(X0[c.featureSet], y, dates, c.alpha, Math.max(p + 2, 3)).map(q => ({ date: q.date, pred: r2(q.pred), actual: q.actual })); }
+  const r2Coef = v => Math.round(v * 10000) / 10000;
+  function finish(m) {
+    // version = engine + stage + feature set + data through + coefficient fingerprint
+    const fp = (m.coefs || []).map(v => v.toFixed(4)).join('|') + '|' + (m.alpha || 0) + '|' + JSON.stringify(m.provisional);
+    let h = 0; for (let i = 0; i < fp.length; i++) h = (h * 31 + fp.charCodeAt(i)) >>> 0;
+    m.version = `tw${ENGINE_VERSION}-${m.featureSet}-${m.nCalibration}d-${h.toString(36)}`;
+    m.features = FEATURE_SETS[m.featureSet].features;
+    return m;
+  }
+  function supportCounts(cal, ctx) {
+    const s = { activities: {}, efforts: {}, balls: {}, groups: {} };
+    for (const d of cal) {
+      const seenA = new Set(), seenE = new Set(), seenB = new Set(), seenG = new Set();
+      for (const a of d.activities) { if (!throwsOf(a)) continue; seenA.add(a.type === 'custom' ? 'custom:' + (a.customId || '') : a.type); seenE.add(a.effort); seenB.add(ballClass(a.ballG)); seenG.add(actGroup(a, ctx.custom)); }
+      seenA.forEach(k => s.activities[k] = (s.activities[k] || 0) + 1); seenE.forEach(k => s.efforts[k] = (s.efforts[k] || 0) + 1);
+      seenB.forEach(k => s.balls[k] = (s.balls[k] || 0) + 1); seenG.forEach(k => s.groups[k] = (s.groups[k] || 0) + 1);
+    }
+    return s;
+  }
+  function errorBreakdown(pairs, cal, ctx) {
+    const byDate = Object.fromEntries(cal.map(d => [d.date, d]));
+    const out = { activity: {}, effort: {}, context: {} };
+    for (const p of pairs) {
+      const d = byDate[p.date]; if (!d) continue;
+      const e = Math.abs(p.pred - p.actual);
+      const dom = d.activities.reduce((a, b) => throwsOf(b) > throwsOf(a) ? b : a);
+      const keys = { activity: dom.type, effort: dom.effort, context: actGroup(dom, ctx.custom) };
+      for (const [g, k] of Object.entries(keys)) { const t = out[g][k] || (out[g][k] = { n: 0, sumAbs: 0, sumErr: 0 }); t.n++; t.sumAbs += e; t.sumErr += p.pred - p.actual; }
+    }
+    for (const g of Object.values(out)) for (const t of Object.values(g)) { t.mae = r2(t.sumAbs / t.n); t.bias = r2(t.sumErr / t.n); delete t.sumAbs; delete t.sumErr; }
+    return out;
+  }
+
+  /* ---------- prediction & confidence ---------- */
+  function predict(model, acts, opts) {
+    const ctx = { custom: (opts && opts.custom) || {}, provisional: model.provisional, refV: model.refV };
+    const flags = [];
+    const unsup = new Set(model.unsupported || []);
+    const perActivity = (acts || []).map(a => {
+      const x = buildFeatures([a], model.featureSet, ctx);
+      const live = model.features.map((f, j) => x[j] !== 0 ? f : null).filter(Boolean);
+      if (live.length && unsup.size && live.every(f => unsup.has(f)) && model.fallbackScale > 0) {
+        flags.push('fallback-provisional-weights');
+        return r2(model.fallbackScale * buildFeatures([a], 'S0', ctx)[0]);
+      }
+      return r2(Math.max(0, dot(model.coefs, x)));
+    });
+    const value = r2(sum(perActivity));
+    const s = model.support || { activities: {}, efforts: {}, balls: {}, groups: {} };
+    if (model.stage !== 'cold-start') for (const a of acts || []) {
+      if (!throwsOf(a)) continue;
+      const key = a.type === 'custom' ? 'custom:' + (a.customId || '') : a.type;
+      if (!s.activities[key]) flags.push(`unfamiliar-activity:${a.type === 'custom' ? (a.customLabel || 'custom') : a.type}`);
+      if (!s.balls[ballClass(a.ballG)]) flags.push(`unfamiliar-ball:${ballClass(a.ballG)}`);
+      if (!s.efforts[a.effort]) flags.push(`unfamiliar-effort:${a.effort}`);
+      if (actGroup(a, ctx.custom) === 'other') flags.push('custom-activity-unmapped');
+    }
+    if (model.featureSet === 'M5' && !(acts || []).some(a => num(a.avgV))) flags.push('no-radar-velocity-term-at-reference');
+    const uniqFlags = [...new Set(flags)];
+    return { value, perActivity, flags: uniqFlags, confidence: confidence(model, uniqFlags), modelVersion: model.version };
+  }
+  function confidence(model, flags) {
+    if (model.stage === 'cold-start') return { level: 'provisional', interval: null, basis: 'No paired Pulse data: not on the Pulse scale.' };
+    if (model.stage === 'early') return { level: 'low', interval: null, basis: `Scale fitted to ${model.nCalibration} Pulse day(s); no out-of-sample test yet.` };
+    const m = model.cv[model.cv.primary === 'chronological' ? 'chrono' : 'loo'];
+    const levels = ['low', 'moderate', 'high'];
+    let i = m.mape == null ? 0 : m.mape <= 15 ? 2 : m.mape <= 30 ? 1 : 0;
+    i = Math.max(0, i - flags.length);
+    return { level: levels[i], interval: m.rmse, basis: `${model.cv.primary} error on ${m.n} unseen day(s): MAE ${m.mae}, RMSE ${m.rmse}${m.mape != null ? `, MAPE ${m.mape}%` : ''}${flags.length ? `; lowered for ${flags.length} unfamiliar input(s)` : ''}.` };
+  }
+
+  /* ---------- the daily rule (spec §4 / §16) ---------- */
+  // day: { date, pulseWorkload, restDay (bool), activities, override: { value, reason } }
+  function resolveDay(day, model, opts) {
+    const acts = (day.activities || []).filter(a => throwsOf(a) > 0);
+    const pulse = num(day.pulseWorkload);
+    const est = acts.length ? predict(model, acts, opts) : null;
+    let out;
+    if (pulse != null) {
+      out = { finalPtw: pulse, mode: 'pulse_measured', confidence: { level: 'measured', interval: null, basis: 'Official Pulse One Day Workload.' } };
+      if (est) Object.assign(out, { estimatedPtw: est.value, predictionError: r2(est.value - pulse), absoluteError: r2(Math.abs(est.value - pulse)),
+        percentError: pulse > 0 ? r2(Math.abs(est.value - pulse) / pulse * 100) : null, estimateFlags: est.flags });
+    } else if (acts.length) {
+      out = { finalPtw: est.value, mode: 'estimated', confidence: est.confidence, estimatedPtw: est.value, estimateFlags: est.flags };
+    } else if (day.restDay) {
+      out = { finalPtw: 0, mode: 'rest_day', confidence: { level: 'not_applicable' } };
+    } else {
+      out = { finalPtw: null, mode: 'missing_data', confidence: { level: 'not_applicable' } };
+    }
+    if (est) out.perActivity = est.perActivity;
+    out.modelVersion = model.version; out.engineVersion = ENGINE_VERSION; out.date = day.date;
+    if (day.override && num(day.override.value) != null) {
+      out.override = { value: +day.override.value, reason: day.override.reason || '', original: { finalPtw: out.finalPtw, mode: out.mode } };
+      out.finalPtw = +day.override.value; out.mode = 'manual_override';
+      out.confidence = { level: 'override', interval: null, basis: `Set by hand: ${day.override.reason || 'no reason given'}` };
+    }
+    return out;
+  }
+
+  /* ---------- periods ---------- */
+  // resolved: { 'YYYY-MM-DD': resolveDay output (plus .throws, .highEffort) }
+  function window_(resolved, endDate, nDays) {
+    let sumW = 0, known = 0, missing = 0, measured = 0, estimated = 0, manual = 0, throwDays = 0, rest = 0, throws = 0, high = 0, maxDay = null;
+    for (let i = 0; i < nDays; i++) {
+      const d = addDays(endDate, -i), r = resolved[d];
+      if (!r || r.finalPtw == null) { missing++; continue; }
+      known++; sumW += r.finalPtw;
+      if (r.mode === 'rest_day') rest++; else throwDays++;
+      if (r.mode === 'pulse_measured') measured += r.finalPtw; else if (r.mode === 'estimated') estimated += r.finalPtw; else if (r.mode === 'manual_override') manual += r.finalPtw;
+      throws += r.throws || 0; high += r.highEffort || 0;
+      if (r.mode !== 'rest_day' && (!maxDay || r.finalPtw > maxDay.value)) maxDay = { date: d, value: r.finalPtw };
+    }
+    return { from: addDays(endDate, -(nDays - 1)), to: endDate, days: nDays, total: r2(sumW), avgDaily: r2(sumW / nDays), avgPerThrowingDay: throwDays ? r2(sumW / throwDays) : null,
+      knownDays: known, missingDays: missing, throwingDays: throwDays, restDays: rest, throws, highEffort: high, highestDay: maxDay,
+      pctMeasured: sumW > 0 ? r2(measured / sumW * 100) : null, pctEstimated: sumW > 0 ? r2(estimated / sumW * 100) : null, pctManual: sumW > 0 ? r2(manual / sumW * 100) : null, complete: missing === 0 };
+  }
+  const rolling = (resolved, end, n) => window_(resolved, end, n);
+  function calendarMonth(resolved, ym) {
+    const n = daysInMonth(ym);
+    const w = window_(resolved, `${ym}-${String(n).padStart(2, '0')}`, n);
+    return Object.assign(w, { month: ym, calendarDays: n, avgPerCalendarDay: r2(w.total / n) });
+  }
+  function pctChange(cur, prev) { return (prev == null || cur == null || prev === 0) ? null : r2((cur - prev) / prev * 100); }
+  // optional contextual ratio, not a safety zone
+  function acwr(resolved, end) {
+    const a = window_(resolved, end, 9), c = window_(resolved, end, 28);
+    return { value: c.avgDaily > 0 ? r2(a.avgDaily / c.avgDaily) : null, acute: a, chronic: c };
+  }
+
+  /* ---------- arm response review flags (never part of workload) ---------- */
+  // days: sorted [{ date, elbow, shoulder, armHealth, readiness, sxDuring, sxAfter, nextMorning }]
+  function symptomFlags(days, date) {
+    const byDate = Object.fromEntries(days.map(d => [d.date, d]));
+    const today = byDate[date]; if (!today) return [];
+    const prior = k => days.filter(d => d.date < date && d.date >= addDays(date, -14) && num(d[k]) != null).map(d => +d[k]);
+    const flags = [];
+    for (const [k, label] of [['elbow', 'Elbow discomfort'], ['shoulder', 'Shoulder discomfort']]) {
+      const v = num(today[k]); if (v == null) continue;
+      const base = prior(k), avg = base.length ? mean(base) : null;
+      if (v >= 3) flags.push({ key: k + '-level', level: v >= 5 ? 'high' : 'review', text: `${label} ${v}/10.` });
+      if (avg != null && v - avg >= 2) flags.push({ key: k + '-rise', level: 'review', text: `${label} is ${r2(v - avg)} above his 14-day average (${r2(avg)}).` });
+      const y = byDate[addDays(date, -1)], yy = byDate[addDays(date, -2)];
+      if (v > 0 && y && num(y[k]) > 0 && yy && num(yy[k]) > 0 && v >= +y[k] && +y[k] >= +yy[k]) flags.push({ key: k + '-persist', level: 'review', text: `${label} present 3 days running and not easing.` });
+    }
+    if (today.sxDuring && String(today.sxDuring).trim()) flags.push({ key: 'during', level: 'high', text: `Symptoms during throwing: "${String(today.sxDuring).trim()}".` });
+    if (today.sxAfter && String(today.sxAfter).trim()) flags.push({ key: 'after', level: 'review', text: `Symptoms after throwing: "${String(today.sxAfter).trim()}".` });
+    if (today.nextMorning === 'worse') flags.push({ key: 'morning', level: 'review', text: 'Next-morning response: worse than the day before.' });
+    const ah = num(today.armHealth), ahBase = prior('armHealth');
+    if (ah != null && ahBase.length >= 3 && mean(ahBase) - ah >= 2) flags.push({ key: 'armhealth-drop', level: 'review', text: `Arm health ${ah}/10, ${r2(mean(ahBase) - ah)} below his 14-day average.` });
+    return flags;
+  }
+
+  /* ---------- documentation ---------- */
+  const REF = {
+    pulse: 'Driveline Baseball. Pulse workload methodology and acute/chronic workload documentation (manufacturer documentation; methodology not independently validated).',
+    makhni2018: 'Makhni EC, Lizzio VA, Meta F, et al. Assessment of elbow torque and other parameters during the pitching motion: comparison of fastball, curveball, and change-up. Arthroscopy. 2018;34(3):816-822.',
+    camp2017: 'Camp CL, Tubbs TG, Fleisig GS, et al. The relationship of throwing arm mechanics and elbow varus torque: within-subject variation for professional baseball pitchers across 82,000 throws. Am J Sports Med. 2017;45(13):3030-3035.',
+    impellizzeri2020: 'Impellizzeri FM, Tenan MS, Kempton T, Novak A, Coutts AJ. Acute:chronic workload ratio: conceptual issues and fundamental pitfalls. Int J Sports Physiol Perform. 2020;15(6):907-913.',
+    lolli2019: 'Lolli L, Batterham AM, Hawkins R, et al. Mathematical coupling causes spurious correlation within the conventional acute-to-chronic workload ratio calculations. Br J Sports Med. 2019;53(15):921-922.',
+    hoerl1970: 'Hoerl AE, Kennard RW. Ridge regression: biased estimation for nonorthogonal problems. Technometrics. 1970;12(1):55-67.',
+    lawson1974: 'Lawson CL, Hanson RJ. Solving Least Squares Problems. Prentice-Hall; 1974 (non-negative least squares).',
+    hyndman2006: 'Hyndman RJ, Koehler AB. Another look at measures of forecast accuracy. Int J Forecast. 2006;22(4):679-688.',
+    fleisig2011: 'Fleisig GS, Bolt B, Fortenbaugh D, Wilk KE, Andrews JR. Biomechanical comparison of baseball pitching and long-toss: implications for training and rehabilitation. J Orthop Sports Phys Ther. 2011;41(5):296-303.',
+    reinold2018: 'Reinold MM, Macrina LC, Fleisig GS, Aune K, Andrews JR. Effect of a 6-week weighted baseball throwing program on pitch velocity, pitching arm biomechanics, passive range of motion, and injury rates. Sports Health. 2018;10(4):327-333.',
+  };
+  const METHODS = [
+    { id: 'ptw', name: 'Daily Personalized Throwing Workload (PTW)', class: 'established',
+      formula: 'Pulse day: PTW = official Pulse One Day Workload. Confirmed rest day: PTW = 0. Throwing logged without Pulse: PTW = model estimate. Nothing logged: PTW missing (never 0). A manual override replaces PTW and keeps the original and the reason.',
+      variables: 'Pulse One Day Workload; activity log; rest-day flag', units: 'Pulse-equivalent units (PEU)',
+      rationale: 'Pulse is the reference measurement; the estimator only fills days without it. Measured and estimated values are kept separate so one never silently becomes the other.',
+      limitations: 'Pulse torque and workload are sensor-based estimates of elbow loading, not direct measures of ligament strain or tissue stress.', references: [REF.pulse, REF.camp2017, REF.makhni2018], validation: 'Pulse days are measured values; see the model page for estimated days.' },
+    { id: 'model', name: 'Estimated workload model', class: 'evidence-informed',
+      formula: 'PTŴ = Σ βⱼ·Xⱼ with βⱼ ≥ 0, fitted by non-negative ridge regression: minimise ‖y − Xβ‖² + λ‖β‖², λ = α × mean(diag XᵀX). No intercept (zero throws → zero workload). y = his Pulse One Day Workload.',
+      variables: 'Xⱼ = daily sums of throws by effort tier, mound vs off-mound high-effort throws, overweight/underweight-ball throws, throws beyond 120 ft, and (optional) high-intent mound throws × (velocity ÷ his reference velocity)²', units: 'PEU',
+      rationale: 'The model predicts his own Pulse number, so estimates live on the same scale. Ridge penalties stabilise correlated features; non-negativity stops more throwing from lowering workload. Distance and ball weight enter as categories, so no linear dose is assumed.',
+      limitations: 'Only as good as the paired Pulse days it learns from. Daily Pulse aggregates cannot attribute load to individual activities exactly; per-activity splits are model attributions. The velocity-squared term is a hypothesis the model keeps only if it improves out-of-sample error. An activity whose inputs never appeared on a calibration day has no learned coefficient; it is estimated with the provisional effort weights rescaled to his Pulse days and flagged as a fallback, rather than counted as zero.', references: [REF.hoerl1970, REF.lawson1974, REF.fleisig2011, REF.reinold2018], validation: 'Measured on his own held-out days (model page).' },
+    { id: 'selection', name: 'Model selection and maturity', class: 'evidence-informed',
+      formula: `Candidates M1 (total throws) → M5 (adds velocity). A richer model is chosen only if its out-of-sample MAE is ≥ ${STAGES.complexityGain * 100}% lower AND lower by ≥ ${STAGES.complexityAbs * 100}% of his average Pulse workload. Stages: cold start (0 paired days, provisional weights), early (≥${STAGES.earlyMin}: one scale factor), developing (≥${STAGES.developingMin}: cross-validated), established (≥${STAGES.establishedMin} paired days and ≥${STAGES.establishedHeldOut} chronological held-out predictions).`,
+      variables: 'paired Pulse + activity days', units: '—',
+      rationale: 'Prefers the simplest model that predicts unseen days, as the spec requires. Chronological validation (train on the past, predict the next day) tests the real use case.',
+      limitations: 'Stage thresholds are operational conventions, not guarantees of accuracy. Confidence comes from measured error, not from the count of days.', references: [REF.hyndman2006], validation: 'Self-reported on the model page.' },
+    { id: 'provisional', name: 'Provisional cold-start weights', class: 'experimental',
+      formula: 'PEU per throw: recovery 0.05, low 0.10, moderate 0.20, high 0.35, max 0.50 (editable)',
+      variables: 'effort category', units: 'provisional units (not Pulse units)',
+      rationale: 'Gives an ordered placeholder before any Pulse calibration exists. Once Pulse days exist they are rescaled, then replaced by fitted coefficients.',
+      limitations: 'Placeholders, not scientific multipliers. Cold-start values are not on the Pulse scale and must not be compared with Pulse numbers.', references: [], validation: 'None (provisional by design).' },
+    { id: 'accuracy', name: 'Prediction error', class: 'established',
+      formula: 'Error = estimate − Pulse; |Error|; % error = |Error| ÷ Pulse × 100 (omitted when Pulse = 0). Summaries: MAE, RMSE, MAPE, bias (mean error), by activity, effort and context.',
+      variables: 'held-out predictions vs Pulse', units: 'PEU; %',
+      rationale: 'Standard forecast-accuracy measures. Bias shows systematic over/under-estimation.', limitations: 'MAPE is unstable when Pulse workloads are small.', references: [REF.hyndman2006], validation: 'Computed from his data.' },
+    { id: 'confidence', name: 'Confidence of an estimate', class: 'evidence-informed',
+      formula: 'Provisional (cold start) · low (early) · otherwise from held-out MAPE: ≤15% high, ≤30% moderate, else low; lowered one level per unfamiliar input (activity, ball class or effort with no calibration days, unmapped custom activity, missing radar when the model uses velocity). Interval = ± held-out RMSE.',
+      variables: 'model error, input novelty', units: 'level; ± PEU',
+      rationale: 'Shows how far to trust a number separately from its size.', limitations: 'Cut-points are display conventions.', references: [REF.hyndman2006], validation: 'Convention.' },
+    { id: 'periods', name: '7-day, 28-day and calendar-month totals', class: 'established',
+      formula: 'PTW₇ = Σ last 7 calendar days; average = PTW₇ ÷ 7. PTW₂₈ = Σ last 28 days; average ÷ 28. Month: Σ month; average per calendar day ÷ days in that month (28–31). Rest days add 0; missing days add nothing and are counted and shown.',
+      variables: 'daily PTW', units: 'PEU',
+      rationale: 'Plain sums over fixed windows; calendar months stay separate from rolling windows.', limitations: 'Windows with missing days under-count; the dashboard shows how many days are missing.', references: [REF.pulse], validation: 'Arithmetic.' },
+    { id: 'change', name: 'Period-to-period change', class: 'established',
+      formula: '% change = (current − prior) ÷ prior × 100; unavailable when prior is 0. Months compare average per calendar day.',
+      variables: 'period totals', units: '%', rationale: 'Shows direction of workload change.', limitations: 'Monitoring information, not an instruction to throw more or less.', references: [], validation: 'Arithmetic.' },
+    { id: 'acwr', name: '9:28 workload ratio (optional)', class: 'experimental',
+      formula: 'ratio = (PTW₉ ÷ 9) ÷ (PTW₂₈ ÷ 28)', variables: 'daily PTW', units: 'ratio',
+      rationale: 'A contextual comparison of recent with longer-term workload, aligned with the windows Pulse reports.',
+      limitations: 'No range is a proven safe zone. Acute:chronic ratios have serious methodological problems (including mathematical coupling) and must not be used to predict injury or clear throwing.', references: [REF.impellizzeri2020, REF.lolli2019], validation: 'Not validated for injury risk.' },
+    { id: 'velocity', name: 'Velocity tracking', class: 'established',
+      formula: 'Per context (activity type), baseball-weight throws only: average of session averages, maximum, and 90th percentile when ≥ 10 individual readings exist; trends over 7, 28 and 90 days.',
+      variables: 'radar average, max, readings, radar-measured throws', units: 'mph',
+      rationale: 'Velocity is a performance output and intensity indicator. Contexts are never mixed (a bullpen average is not compared with a flatground average).', limitations: 'Not a measure of elbow stress. Weighted-ball velocities are excluded from fastball trends.', references: [REF.camp2017], validation: 'Measurement only.' },
+    { id: 'response', name: 'Arm-response review flags', class: 'evidence-informed',
+      formula: 'Flag when elbow or shoulder discomfort ≥ 3/10; ≥ 2 above his 14-day average; present 3 days running without easing; any symptoms during or after throwing; next-morning response "worse"; arm health ≥ 2 below his 14-day average.',
+      variables: 'daily arm-response inputs', units: '—',
+      rationale: 'Keeps a worsening response visible even when workload is low. Never added to the workload score.', limitations: 'Review prompts, not diagnoses. Decisions belong to his treating clinician and performance staff.', references: [], validation: 'Convention.' },
+  ];
+
+  const api = { ENGINE_VERSION, SPEC_VERSION, ACTIVITIES, GROUPS, EFFORTS, BALL_PRESETS, PROVISIONAL_WEIGHTS, STAGES, FEATURE_SETS, FEATURE_LABELS, LONG_DISTANCE_FT, METHODS, REF,
+    ballClass, effortTier, buildFeatures, activityFeatures, nnRidge, metrics, fitModel, predict, resolveDay, rolling, calendarMonth, pctChange, acwr, symptomFlags, addDays, daysInMonth, calibrationDays };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.TritonThrowing = api;
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+<script>
+/* Unit tests for throwing-engine.js — TritonThrowing.runTests() in a browser, or `node throwing-engine.test.js`. */
+(function (root) {
+  const T = (typeof module !== 'undefined' && module.exports) ? require('./throwing-engine.js') : root.TritonThrowing;
+
+  // deterministic pseudo-random numbers
+  function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+
+  // Synthetic athlete whose true Pulse workload = 0.1·low + 0.3·moderate + 0.8·high-intent throws (no noise)
+  function synthDays(n, noise) {
+    const r = rng(7), days = [];
+    for (let i = 0; i < n; i++) {
+      const date = T.addDays('2026-09-01', i);
+      const low = Math.round(10 + r() * 30), mod = Math.round(r() * 25), high = Math.round(r() * 20);
+      const acts = [{ type: 'catch', throws: low, effort: 'low', ballG: 142, distFt: 90 }];
+      if (mod) acts.push({ type: 'long-toss', throws: mod, effort: 'moderate', ballG: 142, distFt: 150 });
+      if (high) acts.push({ type: 'bullpen', throws: high, effort: 'high', ballG: 142, distFt: 60 });
+      const truth = 0.1 * low + 0.3 * mod + 0.8 * high;
+      days.push({ date, pulseWorkload: Math.round((truth + (noise ? (r() - 0.5) * noise : 0)) * 100) / 100, activities: acts });
+    }
+    return days;
+  }
+
+  function runTests() {
+    const res = []; const t = (name, ok, got) => res.push({ name, pass: !!ok, got });
+    const near = (a, b, tol) => Math.abs(a - b) <= tol;
+
+    // NN ridge: exact recovery and non-negativity
+    const b = T.nnRidge([[1, 0], [0, 1], [1, 1], [2, 1]], [2, 3, 5, 7], 0);
+    t('NN ridge recovers exact coefficients', near(b[0], 2, 1e-6) && near(b[1], 3, 1e-6), b);
+    const neg = T.nnRidge([[1, 1], [2, 1], [3, 1]], [3, 2, 1], 0);
+    t('NN ridge clips negative coefficients to 0', neg.every(v => v >= 0), neg);
+
+    // cold start
+    const cold = T.fitModel([]);
+    t('cold start stage', cold.stage === 'cold-start');
+    const p0 = T.predict(cold, [{ type: 'bullpen', throws: 20, effort: 'high', ballG: 142 }]);
+    t('cold start uses provisional weights (20 × 0.35)', p0.value === 7 && p0.confidence.level === 'provisional', p0);
+
+    // early calibration: one scale factor
+    const early = T.fitModel(synthDays(2));
+    t('early stage with 2 paired days', early.stage === 'early' && early.scaleOnly, early.stage);
+
+    // developing/established: recovers the true structure out of sample
+    const days = synthDays(30);
+    const m = T.fitModel(days);
+    t('established stage with 30 paired days', m.stage === 'established', m.stage);
+    t('chooses an effort-based model (M2/M3)', ['M2', 'M3'].includes(m.featureSet), m.featureSet);
+    t('chronological MAPE < 5% on noiseless data', m.cv.chrono && m.cv.chrono.mape < 5, m.cv.chrono);
+    const pred = T.predict(m, [{ type: 'catch', throws: 20, effort: 'low', ballG: 142 }, { type: 'bullpen', throws: 10, effort: 'high', ballG: 142 }]);
+    t('prediction ≈ truth (0.1·20 + 0.8·10 = 10)', near(pred.value, 10, 0.5), pred.value);
+    t('per-activity contributions sum to total', near(pred.perActivity.reduce((s, v) => s + v, 0), pred.value, 0.02), pred.perActivity);
+    t('model version recorded', /^tw1\.0\.0-M\d-30d-/.test(m.version), m.version);
+    const novel = T.predict(m, [{ type: 'plyo', throws: 20, effort: 'high', ballG: 450 }]);
+    t('unfamiliar activity/ball lowers confidence and is flagged', novel.flags.length >= 2 && novel.confidence.level === 'low', novel);
+    const noisy = T.fitModel(synthDays(40, 4));
+    t('noisy data (±2 PEU): still effort-based, held-out MAPE < 20%', ['M2', 'M3'].includes(noisy.featureSet) && noisy.cv.chrono.mape < 20, { fs: noisy.featureSet, cv: noisy.cv.chrono });
+    t('noisy data: high-intent coefficient ≈ 0.8', near(noisy.coefs[noisy.features.indexOf(noisy.featureSet === 'M2' ? 'tHigh' : 'tHighMound')], 0.8, 0.1), noisy.coefs);
+    const noMod = T.fitModel(synthDays(30).map(d => Object.assign({}, d, { activities: d.activities.filter(a => a.effort !== 'moderate'), pulseWorkload: d.activities.filter(a => a.effort !== 'moderate').reduce((s, a) => s + (a.effort === 'low' ? 0.1 : 0.8) * a.throws, 0) })));
+    const unseen = T.predict(noMod, [{ type: 'catch', throws: 40, effort: 'moderate', ballG: 142 }]);
+    t('input never seen in calibration: not 0, uses flagged fallback', unseen.value > 0 && unseen.flags.includes('fallback-provisional-weights') && unseen.flags.includes('unfamiliar-effort:moderate'), unseen);
+    const simpler = T.fitModel(synthDays(30, 0)).candidates.filter(c => c.eligible).length;
+    t('several candidate models evaluated', simpler >= 3, simpler);
+
+    // daily rule
+    const pulseDay = T.resolveDay({ date: '2026-11-01', pulseWorkload: 12, activities: [{ type: 'bullpen', throws: 10, effort: 'high', ballG: 142 }] }, m);
+    t('Pulse day: final = Pulse (not blended)', pulseDay.finalPtw === 12 && pulseDay.mode === 'pulse_measured', pulseDay);
+    t('Pulse day: background estimate + error kept', pulseDay.estimatedPtw != null && pulseDay.predictionError === Math.round((pulseDay.estimatedPtw - 12) * 100) / 100);
+    const zeroPulse = T.resolveDay({ date: '2026-11-01', pulseWorkload: 0, activities: [{ type: 'catch', throws: 5, effort: 'low' }] }, m);
+    t('% error omitted when Pulse = 0', zeroPulse.percentError === null);
+    t('rest day = 0', T.resolveDay({ date: '2026-11-02', restDay: true }, m).finalPtw === 0);
+    const miss = T.resolveDay({ date: '2026-11-03' }, m);
+    t('missing day stays missing (null, not 0)', miss.finalPtw === null && miss.mode === 'missing_data');
+    const ov = T.resolveDay({ date: '2026-11-04', activities: [{ type: 'catch', throws: 30, effort: 'low' }], override: { value: 9, reason: 'Pulse battery died' } }, m);
+    t('override replaces PTW and keeps the original + reason', ov.finalPtw === 9 && ov.mode === 'manual_override' && ov.override.original.mode === 'estimated' && ov.override.reason);
+
+    // windows
+    const resolved = {};
+    for (let i = 0; i < 28; i++) { const d = T.addDays('2026-11-01', i); resolved[d] = i % 7 === 6 ? { finalPtw: 0, mode: 'rest_day' } : i === 10 ? { finalPtw: null, mode: 'missing_data' } : { finalPtw: 10, mode: i % 2 ? 'pulse_measured' : 'estimated', throws: 40, highEffort: 5 }; }
+    const w7 = T.rolling(resolved, '2026-11-07', 7);
+    t('7-day total and average ÷ 7', w7.total === 60 && w7.avgDaily === 8.57 && w7.restDays === 1, w7);
+    const w28 = T.rolling(resolved, '2026-11-28', 28);
+    t('28-day: missing day counted, not zero', w28.missingDays === 1 && w28.total === 230 && !w28.complete, w28);
+    const nov = T.calendarMonth(resolved, '2026-11');
+    t('November uses 30 calendar days', nov.calendarDays === 30 && nov.avgPerCalendarDay === Math.round(230 / 30 * 100) / 100, nov);
+    t('February 2027 has 28 days', T.daysInMonth('2027-02') === 28);
+    t('% change unavailable when prior = 0', T.pctChange(10, 0) === null && T.pctChange(15, 10) === 50);
+    const r = T.acwr(resolved, '2026-11-28');
+    t('9:28 ratio computed from daily averages', r.value != null && r.acute.days === 9 && r.chronic.days === 28, r.value);
+
+    // symptom flags
+    const sx = [{ date: '2026-11-01', elbow: 1 }, { date: '2026-11-02', elbow: 1 }, { date: '2026-11-03', elbow: 2 }, { date: '2026-11-04', elbow: 4, sxDuring: 'sharp at release' }];
+    const f = T.symptomFlags(sx, '2026-11-04');
+    t('elbow ≥3, rise vs baseline, persistence and pain-during all flagged', ['elbow-level', 'elbow-rise', 'elbow-persist', 'during'].every(k => f.some(x => x.key === k)), f.map(x => x.key));
+    t('no flags on a clean day', T.symptomFlags([{ date: '2026-11-05', elbow: 0, shoulder: 0 }], '2026-11-05').length === 0);
+
+    // determinism
+    t('fit is deterministic', JSON.stringify(T.fitModel(days)) === JSON.stringify(T.fitModel(days)));
+    const passed = res.filter(x => x.pass).length;
+    return { passed, total: res.length, failed: res.filter(x => !x.pass) };
+  }
+  T.runTests = runTests;
+  if (typeof module !== 'undefined' && require.main === module) { const r = runTests(); console.log(JSON.stringify(r, null, 2)); process.exit(r.failed.length ? 1 : 0); }
+})(typeof self !== 'undefined' ? self : this);
+
+</script>
+<script>
 /* Triton Pitching Lab — Branden Jackel
    Single-page app: seed data (seed-data.js) + browser-saved entries (localStorage). */
 'use strict';
@@ -1192,15 +1785,17 @@ window.SEED_CSV = "Date,Day of Week,notes ,Throw,throw location,Throwing ,Pitche
    dir: 1 higher is better, -1 lower is better, 0 neutral, 'T1' closest to 1.0 is best */
 const GROUPS = {
   well:  'Wellness & Journal',
+  resp:  'Arm Response',
   day:   'Day & Throwing',
   sleep: 'Sleep & Recovery',
   body:  'Body & Nutrition',
-  load:  'Throwing Load',
+  load:  'Pulse (throwing sensor)',
   velo:  'Velocity',
   live:  'Live ABs & Command',
   arm:   'Arm Care',
   power: 'Power & Strength',
   lift:  'Lifting Workload',
+  twl:   'Throwing Workload',
 };
 const FIELD_ROWS = [
   ['date','Date','day','date','',0,'Date'],
@@ -1229,12 +1824,14 @@ const FIELD_ROWS = [
   ['carbs','Carbs','body','num','g',0,'Carbs'],
   ['fats','Fats','body','num','g',0,'Fats'],
 
-  ['totalThrows','Total Throws','load','num','',0,'total throws'],
-  ['highEffort','High-Effort Throws','load','num','',0,'high effort throws'],
-  ['workload','Workload','load','num','',0,'workload'],
-  ['torque','Avg Torque','load','num','Nm',0,'averge torque'],
-  ['armSpeedMax','Arm Speed Max','load','num','',1,'arm speed max'],
-  ['armSpeedAvg','Arm Speed Avg','load','num','',1,'arm speed average'],
+  ['totalThrows','Pulse Total Throws','load','num','',0,'total throws'],
+  ['highEffort','Pulse High-Effort Throws','load','num','',0,'high effort throws'],
+  ['workload','Pulse One Day Workload','load','num','',0,'workload'],
+  ['torque','Pulse Avg Torque','load','num','Nm',0,'averge torque'],
+  ['torqueMax','Pulse Max Torque','load','num','Nm',0,'pulse max torque'],
+  ['armSpeedMax','Pulse Max Arm Speed','load','num','',1,'arm speed max'],
+  ['armSpeedAvg','Pulse Avg Arm Speed','load','num','',1,'arm speed average'],
+  ['pulseArmHealth','Pulse Arm Health Survey','load','scale','/10',1,'pulse arm health'],
 
   ['cpSpread','CP Velo Range','velo','range','mph',0,'CP Velo Spread'],
   ['cpAvg','CP Velo Avg','velo','num','mph',1,'CP Velo AVG'],
@@ -1303,6 +1900,28 @@ const FIELD_ROWS = [
   ['soreness','Soreness','well','scale','/10',-1,'Soreness'],
   ['journal','How are you feeling?','well','long','',0,'Journal'],
 
+  ['armHealth','Overall Arm Health','resp','scale','/10',1,'Arm Health'],
+  ['readiness','Readiness','resp','scale','/10',1,'Readiness'],
+  ['elbow','Elbow Discomfort','resp','scale0','/10',-1,'Elbow Discomfort'],
+  ['shoulder','Shoulder Discomfort','resp','scale0','/10',-1,'Shoulder Discomfort'],
+  ['armSore','Arm Soreness','resp','scale0','/10',-1,'Arm Soreness'],
+  ['armFatigue','Arm Fatigue','resp','scale0','/10',-1,'Arm Fatigue'],
+  ['armStiff','Arm Stiffness','resp','scale0','/10',-1,'Arm Stiffness'],
+  ['sxDuring','Symptoms During Throwing','resp','text','',0,'Symptoms During Throwing'],
+  ['sxAfter','Symptoms After Throwing','resp','text','',0,'Symptoms After Throwing'],
+  ['nextMorning','This Morning vs Yesterday','resp','choice','',0,'Next-Morning Response'],
+  ['nextMorningNote','Morning Note','resp','text','',0,'Next-Morning Note'],
+
+  // filled in automatically from the Throwing Workload page
+  ['twFinal','Throwing Workload (PTW)','twl','num','PEU',0,'Throwing Workload PTW'],
+  ['twEst','Estimated PTW','twl','num','PEU',0,'Estimated PTW'],
+  ['twMode','Workload Measurement','twl','text','',0,'Workload Measurement'],
+  ['tw7','7-Day Throwing Workload','twl','num','PEU',0,'7-Day PTW'],
+  ['tw28','28-Day Throwing Workload','twl','num','PEU',0,'28-Day PTW'],
+  ['twAcwr','9:28 Workload Ratio (contextual)','twl','num','',0,'9:28 Ratio'],
+  ['twThrows','Throws Logged','twl','num','',0,'Throws Logged'],
+  ['twHigh','High/Max-Intent Throws Logged','twl','num','',0,'High-Intent Throws Logged'],
+
   // filled in automatically from the Lifting Log page (not typed in the daily form)
   ['liftsText','Lifting Log','lift','text','',0,'Lifting Log'],
   ['liftSets','Lifting Sets','lift','num','',0,'Lifting Sets'],
@@ -1318,10 +1937,10 @@ const FIELD_ROWS = [
   ['liftSessLoad','Session Load (sRPE)','lift','num','AU',0,'Session Load'],
   ['liftLWI','Lifting Workload Index (experimental)','lift','num','',0,'Lifting Workload Index'],
 ];
-const DERIVED = new Set(['liftsText','liftSets','liftHard','liftVol','liftUpper','liftLower','liftHiInt','liftExpl','liftAxial','liftSRPE','liftMin','liftSessLoad','liftLWI']);
+const DERIVED = new Set(['twFinal','twEst','twMode','tw7','tw28','twAcwr','twThrows','twHigh','liftsText','liftSets','liftHard','liftVol','liftUpper','liftLower','liftHiInt','liftExpl','liftAxial','liftSRPE','liftMin','liftSessLoad','liftLWI']);
 const FIELDS = FIELD_ROWS.map(([k,label,g,t,u,dir,csv]) => ({k,label,g,t,u,dir,csv,derived:DERIVED.has(k)}));
 const FK = Object.fromEntries(FIELDS.map(f => [f.k, f]));
-const NUMERIC_T = new Set(['num','dur','pct','frac','scale']);
+const NUMERIC_T = new Set(['num','dur','pct','frac','scale','scale0']);
 const NUM_FIELDS = FIELDS.filter(f => NUMERIC_T.has(f.t));
 
 /* ---------------- utils ---------------- */
@@ -1357,7 +1976,7 @@ function parseVal(f, raw) {
   if (!s) return undefined;
   switch (f.t) {
     case 'bool': return /^(true|yes|y|1|x|✓)$/i.test(s) ? true : /^(false|no|n|0)$/i.test(s) ? false : undefined;
-    case 'num': case 'pct': case 'scale': { const n = parseFloat(s.replace(/[,%\s]/g,'')); return isNaN(n) ? undefined : n; }
+    case 'num': case 'pct': case 'scale': case 'scale0': { const n = parseFloat(s.replace(/[,%\s]/g,'')); return isNaN(n) ? undefined : n; }
     case 'dur': {
       let n;
       const m = s.match(/^(\d+):(\d{1,2})/);
@@ -1398,7 +2017,7 @@ function fmt(f, v, opts={}) {
       const n = nv({[f.k]: v}, f);
       return opts.pct && n != null ? `${round(n,0)}%` : String(v);
     }
-    case 'num': case 'scale': return fmtNum(v) + (opts.unit && f.u && f.u !== '%' ? ` ${f.u}` : '');
+    case 'num': case 'scale': case 'scale0': return fmtNum(v) + (opts.unit && f.u && f.u !== '%' ? ` ${f.u}` : '');
     default: return String(v);
   }
 }
@@ -1518,6 +2137,7 @@ const Store = {
     this.rows = all;
     this.byDate = Object.fromEntries(all.map(r => [r.date, r]));
     computeLiftDerived(all);
+    computeThrowDerived(all);
     this.computeStats();
   },
   computeStats() {
@@ -1624,7 +2244,7 @@ const Sync = {
       if (changed) {
         Store.save(); sideStats();
         // never redraw the entry form under someone who is typing
-        if (rerender && S.view !== 'entry' && S.view !== 'lifts') RENDER[S.view]();
+        if (rerender && !['entry', 'lifts', 'throwing'].includes(S.view)) RENDER[S.view]();
       }
       this.status = 'synced'; this.lastAt = Date.now();
       await this.push();
@@ -1730,7 +2350,8 @@ function sparkSVG(vals, color = C.gold) {
 const S = { view: 'dash', range: 90, cmp: { a: 'sleep', b: 'hrv', c: '', smooth: true }, log: { q:'', from:'', to:'', groups: new Set(['day','sleep','velo','arm']), throwOnly:false, liftOnly:false, sort:'date', dir:-1 }, bestsGroup:'all', ins: { x:'sleep', y:'armScore', lag:0, target:'armScore', same:false }, entryDate: null, jq:'' };
 const RENDER = {};
 function go(view, opts={}) {
-  flushLifts();
+  flushLifts(); if (typeof flushThrow === 'function') flushThrow();
+  if (view === 'throwing') { S.twDraft = null; if (opts.date) S.twDate = opts.date; }
   if (view === 'lifts') { S.liftDraft = null; if (opts.date) S.liftDate = opts.date; }
   S.view = view;
   $$('#nav button').forEach(b => b.classList.toggle('active', b.dataset.view === view));
@@ -2298,8 +2919,8 @@ function drawRecipe() {
 }
 
 /* ================= DAILY ENTRY ================= */
-const ENTRY_ORDER = ['well','day','sleep','body','velo','live','arm','power','load'];
-const OPEN_BY_DEFAULT = new Set(['well','day','sleep','body']);
+const ENTRY_ORDER = ['well','resp','day','sleep','body','velo','live','arm','power','load'];
+const OPEN_BY_DEFAULT = new Set(['well','resp','day','sleep','body']);
 RENDER.entry = function () {
   const date = S.entryDate || todayIso();
   S.entryDate = date;
@@ -2311,6 +2932,8 @@ RENDER.entry = function () {
     const lbl = `<span>${esc(f.label)}${f.u && f.t !== 'scale' ? `<em class="unit">${f.u}</em>` : ''}</span>`;
     switch (f.t) {
       case 'bool': return `<div class="field">${lbl}<div class="toggle" data-k="${f.k}" data-v="${v === true ? 'y' : v === false ? 'n' : ''}"><button type="button" data-v="y" class="${v === true ? 'on' : ''}">Yes</button><button type="button" data-v="n" class="${v === false ? 'on' : ''}">No</button></div></div>`;
+      case 'scale0': return `<div class="field">${lbl}<div class="scale" data-k="${f.k}" data-v="${v ?? ''}">${Array.from({ length: 11 }, (_, i) => `<button type="button" data-v="${i}" class="${v === i ? 'on' : ''}">${i}</button>`).join('')}</div></div>`;
+      case 'choice': return `<div class="field">${lbl}<div class="toggle" data-k="${f.k}" data-v="${v ?? ''}">${[['better', 'Better'], ['same', 'Same'], ['worse', 'Worse']].map(([o, l]) => `<button type="button" data-v="${o}" class="${v === o ? 'on' : ''}">${l}</button>`).join('')}</div></div>`;
       case 'scale': return `<div class="field">${lbl}<div class="scale" data-k="${f.k}" data-v="${v ?? ''}">${Array.from({ length: 10 }, (_, i) => `<button type="button" data-v="${i+1}" class="${v == i+1 ? 'on' : ''}">${i+1}</button>`).join('')}</div></div>`;
       case 'long': return `<label class="field wide">${lbl}<textarea class="input" id="${id}" placeholder="How's the body? How's the arm? Anything on your mind — sleep, school, stress, what felt good in the bullpen…">${esc(v || '')}</textarea></label>`;
       case 'dur': return `<label class="field">${lbl}<input class="input" id="${id}" placeholder="h:mm e.g. 7:45" value="${v != null ? (Math.floor(v) + ':' + String(Math.round((v - Math.floor(v))*60)).padStart(2,'0')) : ''}"></label>`;
@@ -2356,12 +2979,13 @@ RENDER.entry = function () {
   $('#e-save').onclick = () => {
     const rec = { date };
     // keep the day's lifting log (edited on its own page)
-    if (Store.byDate[date] && Store.byDate[date].lifts) rec.lifts = Store.byDate[date].lifts;
+    for (const k of ['lifts', 'ls', 'liftCalc', 'throwActs', 'twOverride', 'twCalc']) if (Store.byDate[date] && Store.byDate[date][k] != null) rec[k] = Store.byDate[date][k];
     for (const f of FIELDS) {
       if (f.k === 'date' || f.derived) continue;
       let v;
       if (f.t === 'bool') { const w = $(`.toggle[data-k="${f.k}"]`); v = w.dataset.v === 'y' ? true : w.dataset.v === 'n' ? false : undefined; }
-      else if (f.t === 'scale') { const w = $(`.scale[data-k="${f.k}"]`); v = w.dataset.v ? +w.dataset.v : undefined; }
+      else if (f.t === 'scale' || f.t === 'scale0') { const w = $(`.scale[data-k="${f.k}"]`); v = w.dataset.v !== '' && w.dataset.v != null ? +w.dataset.v : undefined; }
+      else if (f.t === 'choice') { const w = $(`.toggle[data-k="${f.k}"]`); v = w.dataset.v || undefined; }
       else { const inp = $('#f-' + f.k); v = parseVal(f, inp.value); if (inp.value.trim() && v === undefined) { toast(`Check "${f.label}" — couldn't read "${inp.value}"`); inp.focus(); return; } }
       // null marks a field that was cleared so it overrides the spreadsheet value
       rec[f.k] = v === undefined ? (Store.seed[date] && Store.seed[date][f.k] != null ? null : undefined) : v;
@@ -3168,6 +3792,529 @@ function importWorkload(text) {
     Store.local[s.date] = Object.assign(base, { _u: now, _updated: new Date(now).toISOString() }); keys.push(s.date);
   }
   Store.save(); Sync.queue(keys); sideStats(); toast(`Imported ${(j.sessions || []).length} sessions, ${(j.exercises || []).length} exercises`); RENDER.lifts();
+}
+
+/* ================= THROWING WORKLOAD =================
+   Engine: workload/throwing-engine.js (window.TritonThrowing). Day record fields:
+   Pulse → workload, totalThrows, highEffort, torque, torqueMax, armSpeedAvg, armSpeedMax, pulseArmHealth
+   Activities → r.throwActs = [{ type, customId, throws, effort, ballG, distFt, avgV, maxV, radarN, readings, notes }]
+   Rest day → r.throw === false.  Override → r.twOverride = { value, reason, at, original }.
+   Stored at entry → r.twCalc (prediction + model version), never rewritten by later models. */
+const TT = window.TritonThrowing;
+const TW = { model: null, resolved: {}, sig: '' };
+const cfgGet = k => { const v = Store.local['cfg:' + k]; return v && !v._gone ? v : null; };
+function cfgPut(k, obj) { Store.local['cfg:' + k] = Object.assign(strip(obj), { _u: Date.now() }); Store.save(); Sync.queue(['cfg:' + k]); }
+const twCustom = () => (cfgGet('twacts') || {}).items || {};
+function twDay(r) {
+  return { date: r.date, pulseWorkload: r.workload, restDay: r.throw === false, activities: (r.throwActs || []).filter(a => +a.throws > 0), override: r.twOverride,
+    elbow: r.elbow, shoulder: r.shoulder, armHealth: r.armHealth, readiness: r.readiness, sxDuring: r.sxDuring, sxAfter: r.sxAfter, nextMorning: r.nextMorning };
+}
+function computeThrowDerived(rows) {
+  if (!TT) return;
+  const days = rows.map(twDay);
+  const provisional = (cfgGet('twprov') || {}).weights || null, custom = twCustom();
+  const sig = JSON.stringify(TT.calibrationDays(days).map(d => [d.date, d.pulseWorkload, d.activities])) + JSON.stringify(provisional) + JSON.stringify(custom);
+  if (sig !== TW.sig || !TW.model) { TW.model = TT.fitModel(days, { provisional, custom }); TW.sig = sig; }
+  TW.resolved = {};
+  for (const r of rows) {
+    const d = twDay(r), res = TT.resolveDay(d, TW.model, { custom });
+    const acts = d.activities;
+    res.throws = acts.length ? acts.reduce((s, a) => s + (+a.throws || 0), 0) : (r.totalThrows || 0);
+    res.highEffort = acts.length ? acts.filter(a => TT.effortTier(a.effort) === 'high').reduce((s, a) => s + (+a.throws || 0), 0) : (r.highEffort || 0);
+    TW.resolved[r.date] = res;
+    if (res.finalPtw != null) r.twFinal = res.finalPtw;
+    if (res.estimatedPtw != null) r.twEst = res.estimatedPtw;
+    r.twMode = TW_MODE[res.mode] ? TW_MODE[res.mode][0] : res.mode;
+    if (acts.length) { r.twThrows = res.throws; r.twHigh = res.highEffort; }
+  }
+  for (const r of rows) {
+    const res = TW.resolved[r.date]; if (!res || res.mode === 'missing_data') continue;
+    r.tw7 = TT.rolling(TW.resolved, r.date, 7).total; r.tw28 = TT.rolling(TW.resolved, r.date, 28).total;
+    const a = TT.acwr(TW.resolved, r.date).value; if (a != null) r.twAcwr = a;
+  }
+}
+const TW_MODE = { pulse_measured: ['Pulse measured', 'm-pulse'], estimated: ['Estimated', 'm-est'], rest_day: ['Rest day', 'm-rest'], missing_data: ['Missing data', 'm-miss'], manual_override: ['Manual override', 'm-ovr'] };
+const CONF_TXT = { measured: 'Measured', override: 'Set by hand', provisional: 'Provisional', low: 'Low confidence', moderate: 'Moderate confidence', high: 'High confidence', not_applicable: '' };
+const modeChip = m => { const [t, c] = TW_MODE[m] || [m, '']; return `<span class="mchip ${c}">${t}</span>`; };
+const confBadge = c => c && CONF_TXT[c.level] ? `<span class="conf ${c.level === 'high' || c.level === 'measured' ? 'hi' : c.level === 'moderate' ? 'mid' : 'lo'}" title="${esc(c.basis || '')}">${CONF_TXT[c.level]}${c.interval ? ` · ±${fmtNum(c.interval)}` : ''}</span>` : '';
+const unitLbl = () => TW.model && TW.model.stage === 'cold-start' ? 'prov.' : 'PEU';
+const actLabel = a => a.type === 'custom' ? ((twCustom()[a.customId] || {}).label || a.customLabel || 'Custom') : (TT.ACTIVITIES.find(x => x.id === a.type) || {}).label || a.type;
+function saveModelHistory() {
+  const m = TW.model; if (!m) return;
+  const h = cfgGet('twmodels') || { versions: [] };
+  if (h.versions.length && h.versions[h.versions.length - 1].version === m.version) return;
+  const cv = m.cv ? m.cv[m.cv.primary === 'chronological' ? 'chrono' : 'loo'] : null;
+  h.versions = h.versions.concat([{ version: m.version, at: new Date().toISOString(), stage: m.stage, featureSet: m.featureSet, coefs: m.coefs, alpha: m.alpha, nCalibration: m.nCalibration, fittedThrough: m.fittedThrough, error: cv }]).slice(-40);
+  cfgPut('twmodels', h);
+}
+
+/* ---------- page shell ---------- */
+const TW_TABS = [['day', 'Day'], ['dash', 'Dashboard'], ['model', 'Model accuracy'], ['methods', 'Methods & export']];
+RENDER.throwing = function () {
+  S.twTab = S.twTab || 'day';
+  const date = S.twDate || todayIso(); S.twDate = date;
+  saveModelHistory();
+  $('#v-throwing').innerHTML = `
+  <div class="page-head"><div><h2>Throwing Workload</h2><p>${{ day: 'Log Pulse numbers, every throwing activity and how the arm feels. Saves automatically.', dash: 'Daily, 7-day, 28-day and monthly workload, velocity and arm response.', model: 'How well the estimate predicts his real Pulse workload.', methods: 'Every calculation, its evidence level, and full data export.' }[S.twTab]}</p></div>
+    ${S.twTab === 'day' || S.twTab === 'dash' ? `<div class="toolbar" style="margin:0"><button class="btn ghost" id="t-prev" aria-label="Previous day">‹</button><input class="input" type="date" id="t-date" value="${date}" style="width:auto"><button class="btn ghost" id="t-next" aria-label="Next day">›</button><button class="btn ghost" id="t-today">Today</button></div>` : ''}
+  </div>
+  <div class="safety-note">Monitoring only. This does not measure tissue stress, predict injury, prescribe throwing or clear him to throw. Progression decisions stay with his treating clinician and performance staff.</div>
+  <div class="tabs" role="tablist">${TW_TABS.map(([k, l]) => `<button role="tab" aria-selected="${S.twTab === k}" class="${S.twTab === k ? 'on' : ''}" data-tab="${k}">${l}</button>`).join('')}</div>
+  <div id="tw-body"></div>`;
+  $$('#v-throwing .tabs button').forEach(b => b.onclick = () => { flushThrow(); S.twTab = b.dataset.tab; RENDER.throwing(); });
+  const setDate = d => { flushThrow(); S.twDate = d; S.twDraft = null; RENDER.throwing(); };
+  if ($('#t-date')) {
+    $('#t-date').onchange = e => e.target.value && setDate(e.target.value);
+    $('#t-prev').onclick = () => setDate(addDays(date, -1));
+    $('#t-next').onclick = () => setDate(addDays(date, 1));
+    $('#t-today').onclick = () => setDate(todayIso());
+  }
+  ({ day: renderThrowDay, dash: renderThrowDash, model: renderThrowModel, methods: renderThrowMethods })[S.twTab](date);
+};
+
+/* ---------- DAY ---------- */
+const PULSE_FIELDS = [['workload', 'One Day Workload'], ['totalThrows', 'Total throws'], ['highEffort', 'High-effort throws'], ['torque', 'Avg torque (Nm)'], ['torqueMax', 'Max torque (Nm)'], ['armSpeedAvg', 'Avg arm speed'], ['armSpeedMax', 'Max arm speed'], ['pulseArmHealth', 'Arm Health survey (1–10)']];
+const RESP_SCALES = [['armHealth', 'Overall arm health', 1], ['readiness', 'Readiness', 1], ['elbow', 'Elbow discomfort', 0], ['shoulder', 'Shoulder discomfort', 0], ['armSore', 'Arm soreness', 0], ['armFatigue', 'Arm fatigue', 0], ['armStiff', 'Arm stiffness', 0]];
+function flushThrow() { if (S.twTimer) { clearTimeout(S.twTimer); S.twTimer = null; saveThrowDay(); } }
+function queueThrowSave() { clearTimeout(S.twTimer); const el = $('#t-saved'); if (el) el.textContent = 'Saving…'; S.twTimer = setTimeout(() => { S.twTimer = null; saveThrowDay(); }, 700); }
+function saveThrowDay() {
+  const D = S.twDraft; if (!D) return;
+  const base = Store.edited(D.date) ? Object.assign({}, Store.local[D.date]) : { date: D.date };
+  for (const k of Object.keys(base)) if (k[0] === '_') delete base[k];
+  base.date = D.date;
+  for (const [k] of PULSE_FIELDS) { const v = numOrU(D.pulse[k]); base[k] = v == null ? (Store.seed[D.date] && Store.seed[D.date][k] != null ? null : undefined) : v; if (base[k] === undefined) delete base[k]; }
+  for (const [k] of RESP_SCALES) { const v = numOrU(D.resp[k]); if (v == null) delete base[k]; else base[k] = v; }
+  for (const k of ['sxDuring', 'sxAfter', 'nextMorning', 'nextMorningNote']) { const v = (D.resp[k] || '').trim(); if (v) base[k] = v; else delete base[k]; }
+  const acts = D.acts.filter(a => +a.throws > 0 || a.notes).map(a => { const o = { type: a.type, throws: Math.max(0, Math.round(+a.throws || 0)), effort: a.effort, ballG: +a.ballG || 142 };
+    for (const k of ['customId', 'notes', 'readings']) if (a[k]) o[k] = String(a[k]).trim(); for (const k of ['distFt', 'avgV', 'maxV', 'radarN']) if (numOrU(a[k]) != null) o[k] = +a[k]; return o; });
+  base.throwActs = acts.length ? acts : null;
+  if (acts.length || numOrU(D.pulse.workload) != null) base.throw = true;
+  else if (D.rest) base.throw = false;
+  else if (D.rest === false && base.throw === false) delete base.throw;
+  base.twOverride = D.override && numOrU(D.override.value) != null ? D.override : null;
+  // freeze what the model said on the day of entry (never rewritten later)
+  const tmp = TT.resolveDay(twDay(Object.assign({}, base, { workload: base.workload })), TW.model, { custom: twCustom() });
+  base.twCalc = { finalPtw: tmp.finalPtw, mode: tmp.mode, estimatedPtw: tmp.estimatedPtw ?? null, predictionError: tmp.predictionError ?? null, confidence: tmp.confidence && tmp.confidence.level, interval: tmp.confidence && tmp.confidence.interval || null, flags: tmp.estimateFlags || [], modelVersion: tmp.modelVersion, engineVersion: TT.ENGINE_VERSION, at: new Date().toISOString() };
+  Store.put(base); sideStats();
+  const el = $('#t-saved'); if (el) el.textContent = '✓ Saved ' + new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + (Sync.enabled ? ' · syncing' : '');
+  if (S.view === 'throwing' && S.twTab === 'day') updateThrowStatus();
+}
+function draftFromRecord(date) {
+  const r = Store.byDate[date] || {};
+  return { date, pulse: Object.fromEntries(PULSE_FIELDS.map(([k]) => [k, r[k] ?? ''])),
+    resp: Object.assign(Object.fromEntries(RESP_SCALES.map(([k]) => [k, r[k] ?? ''])), { sxDuring: r.sxDuring || '', sxAfter: r.sxAfter || '', nextMorning: r.nextMorning || '', nextMorningNote: r.nextMorningNote || '' }),
+    acts: (r.throwActs || []).map(a => Object.assign({ effort: 'moderate', ballG: 142 }, a)), rest: r.throw === false && !(r.throwActs || []).length && r.workload == null, override: r.twOverride || null };
+}
+function ballOptions(g) {
+  const presets = TT.BALL_PRESETS; const isPreset = presets.some(p => p.g === +g);
+  return presets.map(p => `<option value="${p.g}" ${+g === p.g ? 'selected' : ''}>${esc(p.label)}</option>`).join('') + `<option value="custom" ${!isPreset ? 'selected' : ''}>Other (grams)…</option>`;
+}
+function actCard(a, i) {
+  const custom = twCustom();
+  const res = TW.resolved[S.twDraft.date];
+  return `<div class="card act-card" data-i="${i}">
+    <div class="lift-head">
+      <select class="input act-type" data-i="${i}" data-f="type" aria-label="Activity">${TT.ACTIVITIES.filter(x => x.id !== 'custom').map(x => `<option value="${x.id}" ${a.type === x.id ? 'selected' : ''}>${esc(x.label)}</option>`).join('')}${Object.entries(custom).map(([id, c]) => `<option value="custom:${esc(id)}" ${a.type === 'custom' && a.customId === id ? 'selected' : ''}>${esc(c.label)} (custom)</option>`).join('')}<option value="new-custom">＋ New custom activity…</option></select>
+      <button class="icon-btn" data-del-act="${i}" aria-label="Remove activity">✕</button>
+    </div>
+    <div class="act-grid">
+      <label class="field"><span>Throws</span><input class="input" inputmode="numeric" data-i="${i}" data-f="throws" value="${esc(a.throws ?? '')}" placeholder="0"></label>
+      <label class="field"><span>Effort</span><select class="input" data-i="${i}" data-f="effort">${TT.EFFORTS.map(e => `<option value="${e.id}" ${a.effort === e.id ? 'selected' : ''}>${esc(e.label)}</option>`).join('')}</select></label>
+      <label class="field"><span>Ball</span><select class="input" data-i="${i}" data-f="ballSel">${ballOptions(a.ballG)}</select></label>
+      <label class="field"${TT.BALL_PRESETS.some(p => p.g === +a.ballG) ? ' hidden' : ''} data-ballg="${i}"><span>Ball weight (g)</span><input class="input" inputmode="numeric" data-i="${i}" data-f="ballG" value="${esc(a.ballG ?? '')}"></label>
+      <label class="field"><span>Distance (ft)</span><input class="input" inputmode="numeric" data-i="${i}" data-f="distFt" value="${esc(a.distFt ?? '')}" placeholder="e.g. 60"></label>
+      <label class="field"><span>Avg velo (mph)</span><input class="input" inputmode="decimal" data-i="${i}" data-f="avgV" value="${esc(a.avgV ?? '')}" placeholder="optional"></label>
+      <label class="field"><span>Max velo (mph)</span><input class="input" inputmode="decimal" data-i="${i}" data-f="maxV" value="${esc(a.maxV ?? '')}" placeholder="optional"></label>
+      <label class="field"><span>Radar-measured throws</span><input class="input" inputmode="numeric" data-i="${i}" data-f="radarN" value="${esc(a.radarN ?? '')}" placeholder="optional"></label>
+    </div>
+    <details class="lift-more"${a.readings || a.notes ? ' open' : ''}><summary>Radar readings & notes (optional)</summary>
+      <label class="field"><span>Individual readings, comma separated (enables 90th percentile)</span><input class="input" data-i="${i}" data-f="readings" value="${esc(a.readings || '')}" placeholder="e.g. 88.4, 89.1, 90.2"></label>
+      <label class="field" style="margin-top:8px"><span>Notes</span><input class="input" data-i="${i}" data-f="notes" value="${esc(a.notes || '')}"></label>
+    </details>
+    <div class="muted small" data-contrib="${i}">${res && res.perActivity && res.perActivity[i] != null ? `≈ ${fmtNum(res.perActivity[i])} ${unitLbl()} of today's estimate` : ''}</div>
+  </div>`;
+}
+function renderThrowDay(date) {
+  if (!S.twDraft || S.twDraft.date !== date) S.twDraft = draftFromRecord(date);
+  const D = S.twDraft;
+  const rec = Store.byDate[date] || {};
+  $('#tw-body').innerHTML = `
+  <div class="entry-layout">
+    <div>
+      <div class="card" id="t-status"></div>
+      <div id="t-flags"></div>
+      <div class="card" data-sec="tw-acts"><div class="card-head"><h3>Throwing activities</h3><span class="muted small">Every throw counts: catch, long toss, plyos, pens, lives, games</span></div>
+        <div id="t-acts">${D.acts.map(actCard).join('') || '<div class="muted small" style="margin-bottom:10px">No activities logged for this day.</div>'}</div>
+        <div id="t-dupe"></div>
+        <div class="chips">${TT.ACTIVITIES.filter(x => x.id !== 'custom').map(x => `<button class="chip" data-add-act="${x.id}">＋ ${esc(x.label)}</button>`).join('')}</div>
+        <div class="muted small" style="margin-top:8px">Mixed-intensity session? Add the same activity twice with different efforts (e.g. 10 low, 15 moderate, 10 high).</div>
+        <div class="toolbar" style="margin-top:12px"><button class="btn ghost" id="t-rest">${D.rest ? '✓ Marked as rest day (no throwing)' : 'No throwing today → mark rest day'}</button></div>
+      </div>
+      <div class="card" data-sec="tw-pulse"><div class="card-head"><h3>Pulse</h3><span class="muted small">From the Pulse app's daily summary, when he wore it</span></div>
+        <div class="act-grid">${PULSE_FIELDS.map(([k, l]) => `<label class="field"><span>${l}</span><input class="input" inputmode="decimal" data-p="${k}" value="${esc(D.pulse[k])}" placeholder="—"></label>`).join('')}</div>
+        <div id="t-pulsecheck"></div>
+      </div>
+      <div class="card" data-sec="tw-resp"><div class="card-head"><h3>Arm response</h3><span class="muted small">Tracked next to workload, never added to it</span></div>
+        ${RESP_SCALES.map(([k, l, lo]) => `<div class="field" style="margin-bottom:10px"><span>${l} (${lo}–10${lo ? ', 10 = best' : ', 0 = none'})</span><div class="scale" data-r="${k}">${Array.from({ length: 11 - lo }, (_, i) => i + lo).map(v => `<button type="button" data-v="${v}" class="${String(D.resp[k]) === String(v) ? 'on' : ''}">${v}</button>`).join('')}</div></div>`).join('')}
+        <div class="act-grid">
+          <label class="field"><span>Symptoms during throwing</span><input class="input" data-rt="sxDuring" value="${esc(D.resp.sxDuring)}" placeholder="none"></label>
+          <label class="field"><span>Symptoms after throwing</span><input class="input" data-rt="sxAfter" value="${esc(D.resp.sxAfter)}" placeholder="none"></label>
+        </div>
+        <div class="field" style="margin-top:10px"><span>This morning vs yesterday</span><div class="toggle" id="t-morning">${[['better', 'Better'], ['same', 'Same'], ['worse', 'Worse']].map(([v, l]) => `<button type="button" data-v="${v}" class="${D.resp.nextMorning === v ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+        <label class="field" style="margin-top:8px"><span>Morning note</span><input class="input" data-rt="nextMorningNote" value="${esc(D.resp.nextMorningNote)}" placeholder="optional"></label>
+      </div>
+    </div>
+    <div class="sticky-panel">
+      <div class="card kpi"><div class="kpi-lbl">Week so far</div><div id="t-week"></div><div class="kpi-sub" id="t-saved" style="color:var(--green)"></div></div>
+      <div class="card" id="t-override"></div>
+    </div>
+  </div>`;
+  setupCollapse($('#tw-body'));
+  const v = $('#tw-body');
+  const rerender = () => { renderThrowDay(date); };
+  v.oninput = e => {
+    const t = e.target;
+    if (t.dataset.p) { D.pulse[t.dataset.p] = t.value.trim(); queueThrowSave(); updatePulseCheck(); return; }
+    if (t.dataset.rt) { D.resp[t.dataset.rt] = t.value; queueThrowSave(); return; }
+    const i = t.dataset.i; if (i == null || !D.acts[+i]) return;
+    const f = t.dataset.f;
+    if (f === 'type' || f === 'ballSel') return;
+    D.acts[+i][f] = t.value.trim(); queueThrowSave(); checkDupes(); updatePulseCheck();
+  };
+  v.onchange = e => {
+    const t = e.target, i = t.dataset.i; if (i == null || !D.acts[+i]) return;
+    const a = D.acts[+i];
+    if (t.dataset.f === 'type') {
+      if (t.value === 'new-custom') {
+        const label = (prompt('Name of the new throwing activity:') || '').trim();
+        if (!label) { rerender(); return; }
+        const grp = (prompt('Which is it most like? Type one: catch, long-toss, mound, plyo, other', 'other') || 'other').trim().toLowerCase();
+        const id = 'c-' + WCL.slug(label);
+        const cur = cfgGet('twacts') || { items: {} };
+        cur.items = Object.assign({}, cur.items, { [id]: { label, group: ['catch', 'long-toss', 'mound', 'plyo'].includes(grp) ? grp : 'other', created: new Date().toISOString() } });
+        cfgPut('twacts', cur); a.type = 'custom'; a.customId = id;
+      } else if (t.value.startsWith('custom:')) { a.type = 'custom'; a.customId = t.value.slice(7); }
+      else { a.type = t.value; delete a.customId; if (['flatground', 'bullpen', 'live-bp', 'game'].includes(t.value) && !a.distFt) a.distFt = 60.5; }
+      queueThrowSave(); rerender(); return;
+    }
+    if (t.dataset.f === 'ballSel') { if (t.value === 'custom') { $(`[data-ballg="${i}"]`).hidden = false; } else { a.ballG = +t.value; $(`[data-ballg="${i}"]`).hidden = true; } queueThrowSave(); return; }
+    if (t.dataset.f === 'effort') { a.effort = t.value; queueThrowSave(); checkDupes(); }
+  };
+  v.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.addAct) { D.rest = false; D.acts.push({ type: b.dataset.addAct, effort: b.dataset.addAct.includes('recovery') ? 'recovery' : b.dataset.addAct === 'high-intent-catch' ? 'high' : ['game', 'live-bp'].includes(b.dataset.addAct) ? 'max' : 'moderate', ballG: b.dataset.addAct === 'plyo' ? 225 : 142, throws: '', distFt: ['flatground', 'bullpen', 'live-bp', 'game'].includes(b.dataset.addAct) ? 60.5 : '' }); rerender(); const inp = $(`#t-acts [data-i="${D.acts.length - 1}"][data-f="throws"]`); if (inp) inp.focus(); return; }
+    if (b.dataset.delAct != null) { D.acts.splice(+b.dataset.delAct, 1); queueThrowSave(); rerender(); return; }
+    if (b.id === 't-rest') { D.rest = !D.rest; if (D.rest && D.acts.some(a => +a.throws > 0) && !confirm('Mark as a rest day? Logged activities stay and still count; remove them if he did not throw.')) { D.rest = false; return; } queueThrowSave(); rerender(); return; }
+    if (b.dataset.merge) { const [x, y] = b.dataset.merge.split(':').map(Number); D.acts[x].throws = (+D.acts[x].throws || 0) + (+D.acts[y].throws || 0); D.acts.splice(y, 1); queueThrowSave(); rerender(); return; }
+    const sc = b.closest('.scale[data-r]');
+    if (sc) { const k = sc.dataset.r, same = String(D.resp[k]) === b.dataset.v; D.resp[k] = same ? '' : b.dataset.v; $$('button', sc).forEach(x => x.classList.toggle('on', !same && x === b)); queueThrowSave(); return; }
+    if (b.closest('#t-morning')) { const same = D.resp.nextMorning === b.dataset.v; D.resp.nextMorning = same ? '' : b.dataset.v; $$('#t-morning button').forEach(x => x.classList.toggle('on', !same && x === b)); queueThrowSave(); return; }
+  };
+  checkDupes(); updatePulseCheck(); updateThrowStatus();
+}
+function checkDupes() {
+  const A = S.twDraft.acts, seen = {}; let html = '';
+  A.forEach((a, i) => { const k = [a.type, a.customId || '', a.effort, +a.ballG || 142, +a.distFt || ''].join('|'); if (seen[k] != null && +a.throws > 0) html += `<div class="flags" style="margin:0 0 10px">• ${esc(actLabel(a))} at the same effort, ball and distance is logged twice. <button class="btn ghost small-btn" data-merge="${seen[k]}:${i}">Merge into one</button></div>`; else seen[k] = i; });
+  const el = $('#t-dupe'); if (el) el.innerHTML = html;
+}
+function updatePulseCheck() {
+  const D = S.twDraft, el = $('#t-pulsecheck'); if (!el) return;
+  const pt = numOrU(D.pulse.totalThrows), at = D.acts.reduce((s, a) => s + (+a.throws || 0), 0);
+  el.innerHTML = pt != null && at > 0 && Math.abs(pt - at) > Math.max(5, pt * 0.1) ? `<div class="flags">• Pulse counted ${pt} throws; the activities add up to ${at}. Check for a missing or duplicated activity (Pulse can also miss or add throws).</div>` : (pt != null && at > 0 ? `<div class="muted small" style="margin-top:8px">Activities (${at}) match Pulse total throws (${pt}).</div>` : '');
+}
+function updateThrowStatus() {
+  const date = S.twDraft.date, res = TW.resolved[date] || { mode: 'missing_data', finalPtw: null };
+  const r = Store.byDate[date] || {};
+  const tc = r.twCalc;
+  $('#t-status').innerHTML = `
+    <div class="tw-status">
+      <div><div class="kpi-lbl">Throwing workload · ${short(date)}</div><div class="kpi-val">${res.finalPtw != null ? fmtNum(res.finalPtw) : '—'}<small class="muted" style="font-size:15px"> ${res.mode === 'rest_day' ? '' : unitLbl()}</small></div>
+        <div class="chips" style="margin-top:6px">${modeChip(res.mode)}${confBadge(res.confidence)}</div></div>
+      <div class="small muted tw-status-side">
+        ${res.mode === 'pulse_measured' && res.estimatedPtw != null ? `Model estimate <b style="color:var(--text)">${fmtNum(res.estimatedPtw)}</b> · error ${res.predictionError > 0 ? '+' : ''}${fmtNum(res.predictionError)}${res.percentError != null ? ` (${fmtNum(res.percentError)}%)` : ''}<br>` : ''}
+        ${res.mode === 'missing_data' ? `${r.throw ? 'He threw but no activities or Pulse were logged, so this day counts as <b>missing</b>, not zero.' : 'Nothing logged. Add activities or Pulse, or mark a rest day.'}<br>` : ''}
+        ${res.mode === 'estimated' && TW.model.stage === 'cold-start' ? 'No Pulse days yet: this uses provisional weights and is <b>not</b> on the Pulse scale.<br>' : ''}
+        ${(res.estimateFlags || []).length ? `Unfamiliar inputs: ${res.estimateFlags.map(f => esc(f.replace(/^unfamiliar-/, '').replace(/[:-]/g, ' '))).join(', ')}<br>` : ''}
+        ${res.override ? `Overridden from ${fmtNum(res.override.original.finalPtw)} (${esc((TW_MODE[res.override.original.mode] || [''])[0])}): "${esc(res.override.reason)}"<br>` : ''}
+        Model ${esc(res.modelVersion || '')}${tc && tc.modelVersion && tc.modelVersion !== res.modelVersion ? ` · at entry: ${esc(tc.modelVersion)} said ${tc.finalPtw != null ? fmtNum(tc.finalPtw) : '—'}` : ''}
+      </div>
+    </div>`;
+  const flags = TT.symptomFlags(Store.rows.map(twDay).concat([]), date);
+  $('#t-flags').innerHTML = flags.length ? `<div class="review"><b>For review</b> · ${flags.map(f => `<div>• ${esc(f.text)}</div>`).join('')}<div class="muted small" style="margin-top:4px">Shown regardless of workload. Share with his clinician / performance staff; the app does not interpret symptoms.</div></div>` : '';
+  const w = TT.rolling(TW.resolved, date, 7);
+  $('#t-week').innerHTML = `<div class="mini-kpis"><div><div class="mk-v">${fmtNum(w.total)}</div><div class="mk-l">7-day ${unitLbl()}</div></div><div><div class="mk-v">${w.throws}</div><div class="mk-l">throws</div></div><div><div class="mk-v">${w.highEffort}</div><div class="mk-l">high-intent</div></div></div><div class="kpi-sub">${w.throwingDays} throwing · ${w.restDays} rest · ${w.missingDays} missing day${w.missingDays === 1 ? '' : 's'}</div>`;
+  const D = S.twDraft;
+  $('#t-override').innerHTML = `<div class="card-head"><h3>Manual override</h3></div>
+    ${D.override ? `<div class="small">Overridden to <b>${esc(D.override.value)}</b>: "${esc(D.override.reason)}"<br><span class="muted">${esc(new Date(D.override.at).toLocaleString())}</span></div><button class="btn ghost small-btn" id="ov-clear" style="margin-top:8px">Remove override</button>`
+      : `<div class="muted small" style="margin-bottom:8px">Only when the calculated value is clearly wrong (e.g. Pulse misread). The original and your reason are kept.</div><div class="lift-more-grid"><label class="field"><span>Value</span><input class="input" id="ov-val" inputmode="decimal"></label><label class="field"><span>Reason (required)</span><input class="input" id="ov-reason"></label></div><button class="btn ghost small-btn" id="ov-save" style="margin-top:8px">Save override</button>`}`;
+  const sv = $('#ov-save');
+  if (sv) sv.onclick = () => { const val = numOrU($('#ov-val').value), reason = $('#ov-reason').value.trim(); if (val == null || !reason) { toast('Enter a value and a reason'); return; } D.override = { value: val, reason, at: new Date().toISOString(), original: { finalPtw: res.finalPtw, mode: res.mode, modelVersion: res.modelVersion } }; saveThrowDay(); renderThrowDay(date); };
+  const cl = $('#ov-clear'); if (cl) cl.onclick = () => { if (!confirm('Remove the override? It stays in this day\'s history only if you export first.')) return; D.override = null; saveThrowDay(); renderThrowDay(date); };
+  (S.twDraft.acts || []).forEach((a, i) => { const el = $(`#tw-body [data-contrib="${i}"]`); if (el) el.textContent = res.perActivity && res.perActivity[i] != null ? `≈ ${fmtNum(res.perActivity[i])} ${unitLbl()} of today's estimate` : ''; });
+}
+
+/* ---------- DASHBOARD ---------- */
+const VELO_CTX = [['bullpen', 'Bullpen', 'penAvg', 'penMax'], ['live-bp', 'Live BP', 'liveAvg', 'liveMax'], ['game', 'Game', null, null], ['flatground', 'Flatground', null, null], ['catch', 'Catch play', 'cpAvg', 'cpMax'], ['long-toss', 'Long toss', null, null]];
+function veloSessions(ctx, legacyAvg, legacyMax) {
+  const out = [];
+  for (const r of Store.rows) {
+    const acts = (r.throwActs || []).filter(a => (ctx === 'catch' ? ['catch', 'high-intent-catch', 'recovery-catch'].includes(a.type) : a.type === ctx) && TT.ballClass(a.ballG) === 'baseball' && (numOrU(a.avgV) != null || numOrU(a.maxV) != null));
+    if (acts.length) { for (const a of acts) out.push({ date: r.date, avg: numOrU(a.avgV), max: numOrU(a.maxV), readings: String(a.readings || '').split(',').map(Number).filter(x => x > 30 && x < 110), effort: a.effort }); }
+    else if (legacyAvg && (r[legacyAvg] != null || r[legacyMax] != null)) out.push({ date: r.date, avg: r[legacyAvg] ?? null, max: r[legacyMax] ?? null, readings: [], legacy: true });
+  }
+  return out;
+}
+function veloSummary(sess, end, days) {
+  const s = sess.filter(x => x.date > addDays(end, -days) && x.date <= end);
+  const avgs = s.map(x => x.avg).filter(v => v != null), maxes = s.map(x => x.max).filter(v => v != null);
+  const rd = s.flatMap(x => x.readings).sort((a, b) => a - b);
+  const p90 = rd.length >= 10 ? rd[Math.min(rd.length - 1, Math.floor(0.9 * (rd.length - 1)))] : null;
+  return { n: s.length, avg: avgs.length ? round(mean(avgs), 1) : null, max: maxes.length ? Math.max(...maxes) : null, p90, readings: rd.length };
+}
+function renderThrowDash(date) {
+  saveModelHistory();
+  const R = TW.resolved, today = R[date] || { mode: 'missing_data', finalPtw: null };
+  const w7 = TT.rolling(R, date, 7), w7p = TT.rolling(R, addDays(date, -7), 7), w28 = TT.rolling(R, date, 28), w28p = TT.rolling(R, addDays(date, -28), 28);
+  const ym = date.slice(0, 7), pm = TT.addDays(ym + '-01', -1).slice(0, 7);
+  const mo = TT.calendarMonth(R, ym), mop = TT.calendarMonth(R, pm);
+  const ratio = TT.acwr(R, date), showA = !!(cfgGet('twui') || {}).acwr;
+  const chg = (a, b) => { const c = TT.pctChange(a, b); return c == null ? '<span class="muted">change n/a</span>' : `<span class="${c > 0 ? 'up' : c < 0 ? 'down' : 'flat'}" style="color:var(--muted)">${c > 0 ? '▲' : c < 0 ? '▼' : '•'} ${Math.abs(Math.round(c))}% vs prior</span>`; };
+  const miss = w => w.missingDays ? ` · <span style="color:var(--amber)">${w.missingDays} day${w.missingDays > 1 ? 's' : ''} missing</span>` : '';
+  const u = unitLbl();
+  const bull = veloSummary(veloSessions('bullpen', 'penAvg', 'penMax'), date, 28), live = veloSummary(veloSessions('live-bp', 'liveAvg', 'liveMax'), date, 28);
+  const recentFlags = []; for (let i = 0; i < 7; i++) { const d = addDays(date, -i); TT.symptomFlags(Store.rows.map(twDay), d).forEach(f => recentFlags.push(Object.assign({ date: d }, f))); }
+  const latestResp = [...Store.rows].reverse().find(r => r.date <= date && (r.armHealth != null || r.elbow != null));
+  const tile = (l, v, s) => `<div class="card kpi"><div class="kpi-lbl">${l}</div><div class="kpi-val">${v}</div><div class="kpi-sub">${s || ''}</div></div>`;
+  $('#tw-body').innerHTML = `
+  ${recentFlags.length ? `<div class="review" style="margin-bottom:14px"><b>Arm response, last 7 days, for review</b>${recentFlags.map(f => `<div>• ${short(f.date)}: ${esc(f.text)}</div>`).join('')}<div class="muted small" style="margin-top:4px">Visible no matter how low the workload is. Decisions stay with his clinician and performance staff.</div></div>` : ''}
+  ${TW.model.stage === 'cold-start' ? `<div class="callout" style="margin-bottom:14px"><b>No Pulse days yet.</b> Estimated days use provisional weights (“prov.” units) and are not on the Pulse scale. Log Pulse's One Day Workload on days he wears it, along with the activities, and the model calibrates itself.</div>` : ''}
+  <div class="grid kpis">
+    ${tile('Today · ' + short(date), today.finalPtw != null ? `${fmtNum(today.finalPtw)}<small class="muted" style="font-size:15px"> ${today.mode === 'rest_day' ? '' : u}</small>` : '—', `${modeChip(today.mode)} ${confBadge(today.confidence)}`)}
+    ${tile('7-day workload', `${fmtNum(w7.total)}<small class="muted" style="font-size:15px"> ${u}</small>`, `${fmtNum(w7.avgDaily)}/day · ${chg(w7.total, w7p.total)}${miss(w7)}`)}
+    ${tile('28-day workload', `${fmtNum(w28.total)}<small class="muted" style="font-size:15px"> ${u}</small>`, `${fmtNum(w28.avgDaily)}/day · ${chg(w28.total, w28p.total)}${miss(w28)}`)}
+    ${tile(MON[+ym.slice(5) - 1] + ' ' + ym.slice(0, 4), `${fmtNum(mo.total)}<small class="muted" style="font-size:15px"> ${u}</small>`, `${fmtNum(mo.avgPerCalendarDay)}/calendar day · ${chg(mo.avgPerCalendarDay, mop.avgPerCalendarDay)}`)}
+    ${tile('Throws · 7 days', w7.throws, `${w7.highEffort} high/max intent · ${w7.throwingDays} throwing day${w7.throwingDays === 1 ? '' : 's'}`)}
+    ${tile('Measured vs estimated', w28.pctMeasured != null ? `${fmtNum(w28.pctMeasured)}%` : '—', `of 28-day workload from Pulse${w28.pctEstimated != null ? ` · ${fmtNum(w28.pctEstimated)}% estimated` : ''}${w28.pctManual ? ` · ${fmtNum(w28.pctManual)}% set by hand` : ''}`)}
+    ${tile('Bullpen velo · 28 days', bull.avg != null ? bull.avg : '—', bull.n ? `max ${bull.max ?? '—'}${bull.p90 ? ` · P90 ${bull.p90}` : ''} · ${bull.n} session${bull.n > 1 ? 's' : ''}${live.avg != null ? ` · live avg ${live.avg}` : ''}` : 'no radar logged')}
+    ${tile('Arm response', latestResp ? `${latestResp.armHealth ?? '—'}<small class="muted" style="font-size:15px">/10</small>` : '—', latestResp ? `health · elbow ${latestResp.elbow ?? '—'} · shoulder ${latestResp.shoulder ?? '—'} · ${short(latestResp.date)}` : 'not logged yet')}
+  </div>
+  <label class="chk" style="margin:4px 0 14px"><input type="checkbox" id="tw-acwr-show" ${showA ? 'checked' : ''}> Show the optional 9:28 workload ratio</label>
+  ${showA ? `<div class="callout" style="margin-bottom:14px"><b>9:28 ratio: ${ratio.value != null ? ratio.value : 'n/a'}</b> (9-day avg ${fmtNum(ratio.acute.avgDaily)} ÷ 28-day avg ${fmtNum(ratio.chronic.avgDaily)}${ratio.chronic.missingDays ? `; ${ratio.chronic.missingDays} of 28 days missing` : ''}). Contextual only: no range is a proven safe zone, and acute:chronic ratios cannot predict injury or clear throwing.</div>` : ''}
+  <div class="grid charts">
+    <div class="card span-12" data-sec="tw-daily"><div class="card-head"><h3>Daily workload</h3><span class="muted small">Gold = Pulse measured · teal = estimated · red = override · ✕ = missing</span></div><div class="chart-box tall"><canvas id="ch-tw-daily"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-rolling"><div class="card-head"><h3>Rolling 7- and 28-day workload</h3></div><div class="chart-box"><canvas id="ch-tw-roll"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-throws"><div class="card-head"><h3>Throws by activity</h3><span class="muted small">with high/max-intent throws</span></div><div class="chart-box"><canvas id="ch-tw-throws"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-velo"><div class="card-head"><h3>Fastball velocity by context</h3><span class="muted small">Baseball-weight only; contexts never mixed</span></div><div class="chart-box"><canvas id="ch-tw-velo"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-pulse"><div class="card-head"><h3>Pulse torque & arm speed</h3><span class="muted small">Daily averages from Pulse</span></div><div class="chart-box"><canvas id="ch-tw-pulse"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-arm"><div class="card-head"><h3>Arm health & symptoms</h3></div><div class="chart-box"><canvas id="ch-tw-arm"></canvas></div></div>
+    <div class="card span-6" data-sec="tw-resp"><div class="card-head"><h3>Workload vs next-day response</h3></div><div id="tw-resp"></div></div>
+    <div class="card span-7" data-sec="tw-breakdown"><div class="card-head"><h3>Activity breakdown</h3><div class="seg" id="tw-bk">${[['7', '7 days'], ['28', '28 days'], ['month', 'Month'], ['all', 'All']].map(([k, l]) => `<button data-k="${k}" class="${(S.twBk || '28') === k ? 'on' : ''}">${l}</button>`).join('')}</div></div><div id="tw-bk-table"></div></div>
+    <div class="card span-5" data-sec="tw-perf"><div class="card-head"><h3>Velocity trends</h3><span class="muted small">Average of session averages</span></div><div id="tw-perf"></div></div>
+    <div class="card span-12" data-sec="tw-months"><div class="card-head"><h3>Calendar months</h3><span class="muted small">Separate from rolling 28-day windows</span></div><div class="table-scroll" id="tw-months"></div></div>
+  </div>`;
+  setupCollapse($('#tw-body'));
+  $('#tw-acwr-show').onchange = e => { cfgPut('twui', Object.assign({}, cfgGet('twui') || {}, { acwr: e.target.checked })); renderThrowDash(date); };
+  $$('#tw-bk button').forEach(b => b.onclick = () => { S.twBk = b.dataset.k; renderThrowDash(date); });
+
+  const days = Array.from({ length: 56 }, (_, i) => addDays(date, i - 55));
+  const val = (d, modes) => { const r = R[d]; return r && modes.includes(r.mode) ? r.finalPtw : null; };
+  chart('ch-tw-daily', { data: { labels: days.map(short), datasets: [
+    { type: 'bar', label: 'Pulse measured', data: days.map(d => val(d, ['pulse_measured'])), backgroundColor: C.gold, stack: 'w', borderRadius: 3 },
+    { type: 'bar', label: 'Estimated', data: days.map(d => val(d, ['estimated'])), backgroundColor: 'rgba(0,198,215,.55)', borderColor: C.teal, borderWidth: 1, stack: 'w', borderRadius: 3 },
+    { type: 'bar', label: 'Override', data: days.map(d => val(d, ['manual_override'])), backgroundColor: C.stitch, stack: 'w', borderRadius: 3 },
+    { type: 'line', label: 'Missing data', data: days.map(d => (!R[d] || R[d].mode === 'missing_data') ? 0 : null), showLine: false, pointStyle: 'crossRot', pointRadius: 5, borderColor: C.amber || '#FFB547', backgroundColor: '#FFB547' },
+    { type: 'line', label: 'Estimate on Pulse days', data: days.map(d => R[d] && R[d].mode === 'pulse_measured' ? (R[d].estimatedPtw ?? null) : null), showLine: false, pointStyle: 'line', pointRadius: 9, borderWidth: 2, borderColor: C.white },
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { x: { stacked: true, ticks: { maxTicksLimit: 10 } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: u } } },
+    plugins: { tooltip: { callbacks: { footer: items => { const r = R[days[items[0].dataIndex]]; return r ? `${(TW_MODE[r.mode] || [r.mode])[0]}${r.confidence && CONF_TXT[r.confidence.level] ? ' · ' + CONF_TXT[r.confidence.level] : ''}` : 'Missing data'; } } } } } });
+  chart('ch-tw-roll', { type: 'line', data: { labels: days.map(short), datasets: [
+    lineDs('7-day total', days.map(d => TT.rolling(R, d, 7).total), C.gold, { borderWidth: 3 }),
+    lineDs('28-day total', days.map(d => TT.rolling(R, d, 28).total), C.teal, { yAxisID: 'y1' }),
+  ]}, options: { interaction: { mode: 'index', intersect: false }, scales: { x: { ticks: { maxTicksLimit: 8 } }, y: { beginAtZero: true, title: { display: true, text: '7-day ' + u } }, y1: { position: 'right', beginAtZero: true, grid: { display: false }, title: { display: true, text: '28-day ' + u } } } } });
+  const groups = Object.keys(TT.GROUPS), gcol = { catch: C.sky, 'long-toss': C.teal, mound: C.gold, plyo: C.stitch, other: 'rgba(143,163,191,.6)' };
+  const gThrows = (d, g) => (Store.byDate[d] && Store.byDate[d].throwActs || []).filter(a => (a.type === 'custom' ? ((twCustom()[a.customId] || {}).group || 'other') : (TT.ACTIVITIES.find(x => x.id === a.type) || {}).group) === g).reduce((s, a) => s + (+a.throws || 0), 0) || null;
+  chart('ch-tw-throws', { data: { labels: days.map(short), datasets: groups.map(g => ({ type: 'bar', label: TT.GROUPS[g].split(' (')[0], data: days.map(d => gThrows(d, g)), backgroundColor: gcol[g], stack: 't' }))
+    .concat([{ type: 'line', label: 'High/max intent', data: days.map(d => R[d] && R[d].highEffort ? R[d].highEffort : null), borderColor: C.white, pointRadius: 3, showLine: false }]) },
+    options: { interaction: { mode: 'index', intersect: false }, scales: { x: { stacked: true, ticks: { maxTicksLimit: 8 } }, y: { stacked: true, beginAtZero: true, title: { display: true, text: 'throws' } } } } });
+  const vctx = VELO_CTX.map(([k, l, a, m]) => [l, veloSessions(k, a, m)]).filter(([, s]) => s.length);
+  const vdates = [...new Set(vctx.flatMap(([, s]) => s.map(x => x.date)))].sort();
+  const vcols = [C.gold, C.stitch, C.teal, C.sky, C.white, C.gold2];
+  chart('ch-tw-velo', { type: 'line', data: { labels: vdates.map(short), datasets: vctx.flatMap(([l, s], i) => [
+    lineDs(l + ' avg', vdates.map(d => { const x = s.find(y => y.date === d); return x ? x.avg : null; }), vcols[i], { pointRadius: 3 }),
+    lineDs(l + ' max', vdates.map(d => { const x = s.find(y => y.date === d); return x ? x.max : null; }), vcols[i], { pointRadius: 2, borderDash: [4, 4], borderWidth: 1 }) ]) },
+    options: { interaction: { mode: 'index', intersect: false }, scales: { y: { title: { display: true, text: 'mph' } } } } });
+  const pd = Store.rows.filter(r => r.torque != null || r.armSpeedAvg != null);
+  chart('ch-tw-pulse', { type: 'line', data: { labels: pd.map(r => short(r.date)), datasets: [
+    lineDs('Avg torque', pd.map(r => r.torque ?? null), C.gold, { pointRadius: 3 }), lineDs('Avg arm speed', pd.map(r => r.armSpeedAvg ?? null), C.teal, { pointRadius: 3, yAxisID: 'y1' }) ]},
+    options: { scales: { y: { title: { display: true, text: 'Nm' } }, y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'arm speed' } } } } });
+  const ad = Store.rows.filter(r => r.date > addDays(date, -56) && r.date <= date && ['armHealth', 'readiness', 'elbow', 'shoulder', 'armSore', 'armFatigue'].some(k => r[k] != null));
+  chart('ch-tw-arm', { type: 'line', data: { labels: ad.map(r => short(r.date)), datasets: [
+    lineDs('Arm health', ad.map(r => r.armHealth ?? null), C.green, { pointRadius: 3, borderWidth: 3 }), lineDs('Readiness', ad.map(r => r.readiness ?? null), C.sky, { pointRadius: 2 }),
+    lineDs('Elbow', ad.map(r => r.elbow ?? null), C.stitch, { pointRadius: 3, borderWidth: 3 }), lineDs('Shoulder', ad.map(r => r.shoulder ?? null), '#FFB547', { pointRadius: 3 }),
+    lineDs('Soreness', ad.map(r => r.armSore ?? null), C.gold, { pointRadius: 2, borderDash: [4, 4] }), lineDs('Fatigue', ad.map(r => r.armFatigue ?? null), C.teal, { pointRadius: 2, borderDash: [4, 4] }) ]},
+    options: { interaction: { mode: 'index', intersect: false }, scales: { y: { min: 0, max: 10 } } } });
+
+  // workload vs next-day response (lag 1) and weekly workload vs weekly symptoms
+  const xs = ['twFinal', 'twHigh'].map(k => FK[k]), ys = ['elbow', 'shoulder', 'armSore', 'armFatigue', 'readiness', 'armHealth'].map(k => FK[k]);
+  const res = []; for (const fx of xs) for (const fy of ys) { const p = pairs(fx, fy, 1), pr = pearson(p); res.push({ fx, fy, n: p.length, r: pr ? pr.r : null }); }
+  const weeks = []; let ws = addDays(date, -6); for (let i = 0; i < 12; i++) { const w = TT.rolling(R, addDays(date, -7 * i), 7); const sx = Store.rows.filter(r => r.date >= w.from && r.date <= w.to && r.elbow != null).map(r => r.elbow); if (w.knownDays && sx.length) weeks.push({ x: w.total, y: mean(sx) }); }
+  const wpr = weeks.length >= 4 ? pearson(weeks.map(w => ({ x: w.x, y: w.y }))) : null;
+  const ok = res.filter(x => x.r != null && x.n >= 5);
+  $('#tw-resp').innerHTML = (ok.length ? `<table class="recipe"><thead><tr><th>Day before</th><th>Next day</th><th>r</th><th>days</th></tr></thead><tbody>${ok.map(x => `<tr><td>${esc(x.fx.label)}</td><td>${esc(x.fy.label)}</td><td style="color:${x.r >= 0 ? C.gold : C.sky};font-weight:700">${x.r > 0 ? '+' : ''}${x.r.toFixed(2)}</td><td class="muted">${x.n}</td></tr>`).join('')}</tbody></table>` : `<div class="muted small">Needs at least 5 throwing days followed by a day with arm response logged.</div>`)
+    + `<div class="small" style="margin-top:8px">Weekly workload vs weekly elbow average: ${wpr ? `<b>${wpr.r > 0 ? '+' : ''}${wpr.r.toFixed(2)}</b> over ${weeks.length} weeks` : '<span class="muted">needs 4+ weeks with both</span>'}.</div><p class="muted small" style="margin-bottom:0">Correlation, not cause. Symptoms are never folded into the workload number.</p>`;
+
+  // activity breakdown, PTW attributed per activity (Pulse days scaled to the measured value)
+  const bk = S.twBk || '28';
+  const from = bk === 'all' ? '0000' : bk === 'month' ? ym + '-01' : addDays(date, -(+bk - 1));
+  const to = bk === 'month' ? `${ym}-${TT.daysInMonth(ym)}` : date;
+  const agg = {}; let tot = 0;
+  for (const r of Store.rows) {
+    if (r.date < from || r.date > to) continue;
+    const res2 = R[r.date]; if (!res2 || !res2.perActivity) continue;
+    const acts = (r.throwActs || []).filter(a => +a.throws > 0);
+    const estSum = res2.perActivity.reduce((s, v) => s + (v || 0), 0);
+    const scale = res2.finalPtw != null && estSum > 0 ? res2.finalPtw / estSum : 0;
+    acts.forEach((a, i) => { const k = actLabel(a); const t = agg[k] || (agg[k] = { throws: 0, high: 0, days: new Set(), ptw: 0 }); t.throws += +a.throws; if (TT.effortTier(a.effort) === 'high') t.high += +a.throws; t.days.add(r.date); t.ptw += (res2.perActivity[i] || 0) * scale; });
+  }
+  Object.values(agg).forEach(t => tot += t.ptw);
+  const rowsB = Object.entries(agg).sort((a, b) => b[1].ptw - a[1].ptw || b[1].throws - a[1].throws);
+  $('#tw-bk-table').innerHTML = rowsB.length ? `<table class="recipe"><thead><tr><th>Activity</th><th>Throws</th><th>High/max</th><th>Days</th><th>Workload</th><th>Share</th></tr></thead><tbody>${rowsB.map(([k, t]) => `<tr><td>${esc(k)}</td><td>${t.throws}</td><td>${t.high}</td><td>${t.days.size}</td><td>${fmtNum(t.ptw)}</td><td>${tot ? Math.round(t.ptw / tot * 100) + '%' : '—'}</td></tr>`).join('')}</tbody></table><p class="muted small" style="margin-bottom:0">Workload per activity is attributed using the model's per-activity split (on Pulse days, scaled to the measured total). Pulse itself only reports a daily total.</p>` : '<div class="muted small">No throwing activities logged in this period.</div>';
+
+  // velocity trends 7 / 28 / 90
+  $('#tw-perf').innerHTML = `<table class="recipe"><thead><tr><th>Context</th><th>7 d</th><th>28 d</th><th>90 d</th><th>Max 90 d</th></tr></thead><tbody>${VELO_CTX.map(([k, l, a, m]) => { const s = veloSessions(k, a, m); if (!s.length) return ''; const v = n => veloSummary(s, date, n); const s90 = v(90); return `<tr><td>${l}</td><td>${v(7).avg ?? '—'}</td><td>${v(28).avg ?? '—'}</td><td>${s90.avg ?? '—'}</td><td>${s90.max ?? '—'}${s90.p90 ? `<div class="muted small">P90 ${s90.p90}</div>` : ''}</td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">No radar logged yet.</td></tr>'}</tbody></table><p class="muted small" style="margin-bottom:0">Older sessions use the spreadsheet's catch-play, bullpen and live velocity columns.</p>`;
+
+  // calendar months
+  const months = []; let mcur = ym; for (let i = 0; i < 6; i++) { months.push(mcur); mcur = TT.addDays(mcur + '-01', -1).slice(0, 7); }
+  const mrow = m => { const c = TT.calendarMonth(R, m); const vs = Store.rows.filter(r => r.date.startsWith(m)); const velos = vs.flatMap(r => (r.throwActs || []).filter(a => TT.ballClass(a.ballG) === 'baseball' && numOrU(a.avgV) != null).map(a => +a.avgV)).concat(vs.flatMap(r => [r.penAvg, r.liveAvg].filter(v => v != null))); const maxV = vs.flatMap(r => (r.throwActs || []).map(a => numOrU(a.maxV)).concat([r.penMax, r.liveMax])).filter(v => v != null); const tq = vs.map(r => r.torque).filter(v => v != null), as = vs.map(r => r.armSpeedAvg).filter(v => v != null);
+    return `<tr><td>${MON[+m.slice(5) - 1]} ${m.slice(0, 4)}</td><td>${fmtNum(c.total)}</td><td>${fmtNum(c.avgPerCalendarDay)}</td><td>${c.avgPerThrowingDay != null ? fmtNum(c.avgPerThrowingDay) : '—'}</td><td>${c.highestDay ? `${fmtNum(c.highestDay.value)} <span class="muted">${short(c.highestDay.date)}</span>` : '—'}</td><td>${c.throws}</td><td>${c.highEffort}</td><td>${c.throwingDays}</td><td>${c.restDays}</td><td style="color:${c.missingDays ? '#FFB547' : 'inherit'}">${c.missingDays}</td><td>${c.pctMeasured != null ? fmtNum(c.pctMeasured) + '%' : '—'}</td><td>${velos.length ? round(mean(velos), 1) : '—'}</td><td>${maxV.length ? Math.max(...maxV) : '—'}</td><td>${tq.length ? round(mean(tq), 1) : '—'}</td><td>${as.length ? round(mean(as), 1) : '—'}</td></tr>`; };
+  $('#tw-months').innerHTML = `<table class="recipe mtable"><thead><tr><th>Month</th><th>Total</th><th>Avg / calendar day</th><th>Avg / throwing day</th><th>Highest day</th><th>Throws</th><th>High/max</th><th>Throwing days</th><th>Rest days</th><th>Missing days</th><th>% Pulse</th><th>Avg velo</th><th>Max velo</th><th>Avg torque</th><th>Avg arm speed</th></tr></thead><tbody>${months.map(mrow).join('')}</tbody></table>`;
+}
+
+/* ---------- MODEL ACCURACY ---------- */
+function renderThrowModel() {
+  saveModelHistory();
+  const m = TW.model;
+  const STG = { 'cold-start': ['Cold start', 'No paired Pulse + activity days yet. Estimates use provisional weights and are not on the Pulse scale.'], early: ['Early calibration', 'Provisional weights rescaled to his first Pulse days. Not yet tested on unseen days: low confidence.'], developing: ['Developing model', 'Cross-validated regression on his own data.'], established: ['Established personal model', 'Validated on many held-out days. Error shown below is measured, not assumed.'] };
+  const cv = m.cv ? m.cv[m.cv.primary === 'chronological' ? 'chrono' : 'loo'] : null;
+  const pulseNoActs = Store.rows.filter(r => r.workload != null && !(r.throwActs || []).some(a => +a.throws > 0)).length;
+  const sup = m.support || { activities: {} };
+  const insufficient = TT.ACTIVITIES.filter(a => a.id !== 'custom' && (sup.activities[a.id] || 0) < 2).map(a => `${a.label} (${sup.activities[a.id] || 0})`);
+  const hist = (cfgGet('twmodels') || { versions: [] }).versions.slice().reverse();
+  const prov = Object.assign({}, TT.PROVISIONAL_WEIGHTS, (cfgGet('twprov') || {}).weights || {});
+  const entryPairs = Store.rows.filter(r => r.workload != null && r.twCalc && r.twCalc.estimatedPtw != null).map(r => ({ date: r.date, est: r.twCalc.estimatedPtw, act: r.workload, ver: r.twCalc.modelVersion }));
+  $('#tw-body').innerHTML = `
+  <div class="grid charts">
+    <div class="card span-12"><div class="card-head"><h3>${STG[m.stage][0]}</h3><span class="badge ${m.stage === 'established' ? 'b-est' : m.stage === 'developing' ? 'b-evi' : 'b-exp'}">${m.stage}</span></div>
+      <p class="small" style="margin-top:0">${STG[m.stage][1]}</p>
+      <div class="grid kpis" style="margin-bottom:0">
+        <div class="card kpi"><div class="kpi-lbl">Calibration days</div><div class="kpi-val">${m.nCalibration}</div><div class="kpi-sub">Pulse + activities on the same day${pulseNoActs ? ` · ${pulseNoActs} Pulse day(s) lack activity detail` : ''}</div></div>
+        <div class="card kpi"><div class="kpi-lbl">Out-of-sample MAE</div><div class="kpi-val">${cv ? fmtNum(cv.mae) : '—'}</div><div class="kpi-sub">${cv ? `${m.cv.primary} · ${cv.n} unseen days` : 'needs 4+ calibration days'}</div></div>
+        <div class="card kpi"><div class="kpi-lbl">Out-of-sample MAPE</div><div class="kpi-val">${cv && cv.mape != null ? fmtNum(cv.mape) + '%' : '—'}</div><div class="kpi-sub">${cv ? `RMSE ${fmtNum(cv.rmse)} · bias ${cv.bias > 0 ? '+' : ''}${fmtNum(cv.bias)}` : ''}</div></div>
+        <div class="card kpi"><div class="kpi-lbl">Model version</div><div class="kpi-val" style="font-size:15px;word-break:break-all">${esc(m.version)}</div><div class="kpi-sub">${esc(TT.FEATURE_SETS[m.featureSet].label)}${m.alpha ? ` · α ${m.alpha}` : ''}${m.refV ? ` · ref velo ${m.refV}` : ''}</div></div>
+      </div>
+    </div>
+    <div class="card span-6"><div class="card-head"><h3>Coefficients</h3><span class="muted small">${m.scaleOnly ? 'provisional weights × scale' : 'learned from his Pulse days'}</span></div>
+      <table class="recipe"><thead><tr><th>Feature</th><th>β (per throw)</th></tr></thead><tbody>${m.features.map((f, i) => `<tr><td>${esc(TT.FEATURE_LABELS[f])}</td><td>${m.coefs[i]}${m.stage === 'cold-start' ? ' <span class="badge b-exp">provisional</span>' : ''}</td></tr>`).join('')}</tbody></table>
+      ${m.scaleOnly ? `<div class="mk-l" style="margin:12px 0 6px">Provisional weights (editable)</div><div class="lift-more-grid">${TT.EFFORTS.map(e => `<label class="field"><span>${esc(e.label)}</span><input class="input" inputmode="decimal" data-prov="${e.id}" value="${prov[e.id]}"></label>`).join('')}</div><div class="toolbar" style="margin-top:8px"><button class="btn ghost small-btn" id="prov-save">Save weights</button><button class="btn ghost small-btn" id="prov-reset">Reset</button></div><p class="muted small" style="margin-bottom:0">Placeholders that only encode the order of effort levels. Replaced by learned coefficients once he has 4+ calibration days.</p>` : ''}
+    </div>
+    <div class="card span-6"><div class="card-head"><h3>Candidate models</h3><span class="muted small">Simplest wins unless a richer one is ≥ 5% better on unseen days</span></div>
+      ${m.candidates && m.candidates.length ? `<table class="recipe"><thead><tr><th>Model</th><th>Out-of-sample MAE</th><th></th></tr></thead><tbody>${m.candidates.map(c => `<tr><td>${c.featureSet}: ${esc(TT.FEATURE_SETS[c.featureSet].label)}</td><td>${c.eligible ? fmtNum(c.score) : `<span class="muted">${esc(c.reason)}</span>`}</td><td>${c.chosen ? '<b style="color:var(--gold)">chosen</b>' : ''}</td></tr>`).join('')}</tbody></table>` : '<div class="muted small">Candidates are compared once there are 4+ calibration days.</div>'}
+    </div>
+    <div class="card span-7"><div class="card-head"><h3>Estimated vs actual Pulse</h3><span class="muted small">${m.heldOutPairs ? 'Each day predicted only from earlier days' : 'Appears once held-out predictions exist'}</span></div><div class="chart-box tall"><canvas id="ch-tw-acc"></canvas></div></div>
+    <div class="card span-5"><div class="card-head"><h3>Error by context</h3></div>
+      ${m.errorBy ? ['activity', 'effort', 'context'].map(g => `<div class="mk-l" style="margin:6px 0">${g}</div><table class="recipe"><tbody>${Object.entries(m.errorBy[g]).map(([k, t]) => `<tr><td>${esc(k)}</td><td>MAE ${fmtNum(t.mae)}</td><td>bias ${t.bias > 0 ? '+' : ''}${fmtNum(t.bias)}</td><td class="muted">${t.n} d</td></tr>`).join('')}</tbody></table>`).join('') : '<div class="muted small">Needs validated predictions.</div>'}
+      <div class="mk-l" style="margin:12px 0 6px">Activities with too little data (&lt; 2 calibration days)</div><div class="small">${insufficient.join(', ') || 'None'}</div>
+    </div>
+    <div class="card span-6"><div class="card-head"><h3>Predictions recorded at entry</h3><span class="muted small">Never rewritten when the model changes</span></div>
+      ${entryPairs.length ? `<table class="recipe"><thead><tr><th>Day</th><th>Estimate then</th><th>Pulse</th><th>Error</th><th>Model then</th></tr></thead><tbody>${entryPairs.slice(-12).reverse().map(p => `<tr><td>${short(p.date)}</td><td>${fmtNum(p.est)}</td><td>${fmtNum(p.act)}</td><td>${p.est - p.act > 0 ? '+' : ''}${fmtNum(p.est - p.act)}</td><td class="muted small">${esc(p.ver || '')}</td></tr>`).join('')}</tbody></table>` : '<div class="muted small">No Pulse days with an estimate recorded yet.</div>'}
+    </div>
+    <div class="card span-6"><div class="card-head"><h3>Model version history</h3></div>
+      ${hist.length ? `<table class="recipe"><tbody>${hist.slice(0, 12).map(h => `<tr><td class="small">${esc(h.version)}</td><td class="muted small">${esc(h.stage)} · ${h.nCalibration} d${h.error ? ` · MAE ${fmtNum(h.error.mae)}` : ''}</td><td class="muted small">${esc(new Date(h.at).toLocaleDateString())}</td></tr>`).join('')}</tbody></table>` : '<div class="muted small">First version recorded now.</div>'}
+    </div>
+  </div>`;
+  const hp = m.heldOutPairs || [];
+  chart('ch-tw-acc', { type: 'scatter', data: { datasets: [
+    { label: 'Held-out day', data: hp.map(p => ({ x: p.actual, y: p.pred, d: p.date })), backgroundColor: C.gold, pointRadius: 5 },
+    { type: 'line', label: 'Perfect', data: hp.length ? [{ x: 0, y: 0 }, { x: Math.max(...hp.map(p => Math.max(p.actual, p.pred))), y: Math.max(...hp.map(p => Math.max(p.actual, p.pred))) }] : [], borderColor: C.teal, borderDash: [6, 4], pointRadius: 0 },
+  ]}, options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.raw.d ? `${short(c.raw.d)}: Pulse ${fmtNum(c.raw.x)} · estimate ${fmtNum(c.raw.y)}` : '' } } }, scales: { x: { title: { display: true, text: 'Actual Pulse workload' }, beginAtZero: true }, y: { title: { display: true, text: 'Estimated' }, beginAtZero: true } } } });
+  const ps = $('#prov-save');
+  if (ps) ps.onclick = () => { const w = {}; $$('[data-prov]').forEach(i => { const v = numOrU(i.value); if (v != null && v >= 0) w[i.dataset.prov] = v; }); cfgPut('twprov', { weights: w, at: new Date().toISOString() }); toast('Weights saved'); RENDER.throwing(); };
+  const pr = $('#prov-reset'); if (pr) pr.onclick = () => { cfgPut('twprov', { weights: Object.assign({}, TT.PROVISIONAL_WEIGHTS), at: new Date().toISOString() }); RENDER.throwing(); };
+}
+
+/* ---------- METHODS & EXPORT ---------- */
+function renderThrowMethods() {
+  const t = TT.runTests ? TT.runTests() : null;
+  $('#tw-body').innerHTML = `
+  <div class="grid charts">
+    <div class="card span-12"><div class="card-head"><h3>Versions</h3></div>
+      <div class="small">Specification <b>v${TT.SPEC_VERSION}</b> · throwing engine <b>${TT.ENGINE_VERSION}</b> · current model <b>${esc(TW.model.version)}</b></div>
+      <div class="small" style="margin-top:6px">Engine self-test: ${t ? `<b style="color:${t.failed.length ? C.stitch : C.green}">${t.passed}/${t.total} checks pass</b>${t.failed.length ? ' · failing: ' + t.failed.map(f => esc(f.name)).join(', ') : ''}` : 'not loaded'}</div>
+      <div class="small muted" style="margin-top:6px">Every saved day stores what the model said at the time (value, mode, confidence, model version). New models never rewrite those records.</div>
+    </div>
+    ${TT.METHODS.map(m => `<div class="card span-6 method"><div class="card-head"><h3>${esc(m.name)}</h3><span class="badge ${CLASS_BADGE[m.class][1]}">${CLASS_BADGE[m.class][0]}</span></div>
+      <div class="formula">${esc(m.formula)}</div>
+      <dl class="small"><dt>Variables</dt><dd>${esc(m.variables)}</dd><dt>Units</dt><dd>${esc(m.units)}</dd><dt>Why</dt><dd>${esc(m.rationale)}</dd><dt>Limitations</dt><dd>${esc(m.limitations)}</dd><dt>Validation</dt><dd>${esc(m.validation)}</dd>${m.references.length ? `<dt>Sources</dt><dd>${m.references.map(r => `<div>${esc(r)}</div>`).join('')}</dd>` : ''}</dl>
+    </div>`).join('')}
+    <div class="card span-12"><div class="card-head"><h3>Export & import</h3></div>
+      <div class="toolbar">
+        <button class="btn" id="tx-json">⇩ Throwing data (JSON)</button>
+        <button class="btn ghost" id="tx-days">⇩ Daily records (CSV)</button>
+        <button class="btn ghost" id="tx-acts">⇩ Activity records (CSV)</button>
+        <label class="btn ghost">⇧ Import throwing JSON<input type="file" id="tx-import" accept=".json,application/json" hidden></label>
+      </div>
+      <p class="small muted" style="margin-bottom:0">Records follow the spec's daily and activity structures (format <code>triton-throwing/1</code>). The engine runs on its own: <a href="${WL_BASE}throwing-engine.js" download>throwing-engine.js</a> · <a href="${WL_BASE}throwing-engine.test.js" download>tests</a>.</p>
+    </div>
+  </div>`;
+  $('#tx-json').onclick = () => { download(`triton-throwing-${todayIso()}.json`, JSON.stringify(throwExport(), null, 1), 'application/json'); toast('Exported'); };
+  $('#tx-days').onclick = () => { download(`triton-throwing-days-${todayIso()}.csv`, toCSV(throwExport().days)); toast('Exported'); };
+  $('#tx-acts').onclick = () => { download(`triton-throwing-activities-${todayIso()}.csv`, toCSV(throwExport().activities)); toast('Exported'); };
+  $('#tx-import').onchange = e => { const f = e.target.files[0]; if (f) f.text().then(importThrowing).catch(() => toast('That file is not a throwing export')); };
+}
+function toCSV(rows) {
+  if (!rows.length) return '';
+  const keys = Object.keys(rows[0]);
+  const q = v => { const s = v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  return [keys.join(',')].concat(rows.map(r => keys.map(k => q(r[k])).join(','))).join('\n');
+}
+function throwExport() {
+  const days = [], activities = [];
+  for (const r of Store.rows) {
+    const res = TW.resolved[r.date]; if (!res) continue;
+    if (res.mode === 'missing_data' && r.throw !== true) continue;
+    const acts = (r.throwActs || []).filter(a => +a.throws > 0);
+    const radarN = acts.reduce((s, a) => s + (+a.radarN || 0), 0), tot = acts.reduce((s, a) => s + (+a.throws || 0), 0);
+    days.push({ date: r.date, measurement_mode: res.mode, pulse_one_day_workload: r.workload ?? null, pulse_total_throws: r.totalThrows ?? null, pulse_average_torque: r.torque ?? null, pulse_max_torque: r.torqueMax ?? null,
+      pulse_high_effort_throws: r.highEffort ?? null, pulse_average_arm_speed: r.armSpeedAvg ?? null, pulse_max_arm_speed: r.armSpeedMax ?? null, pulse_arm_health: r.pulseArmHealth ?? null,
+      estimated_workload: res.estimatedPtw ?? null, final_ptw: res.finalPtw, model_version: res.modelVersion, confidence: res.confidence ? res.confidence.level : null, confidence_interval: res.confidence ? res.confidence.interval : null,
+      prediction_error: res.predictionError ?? null, percent_error: res.percentError ?? null, override: res.override || null, recorded_at_entry: r.twCalc || null,
+      total_throws: res.throws, radar_coverage: tot ? Math.round(radarN / tot * 1000) / 10 : null, arm_health: r.armHealth ?? null, elbow_discomfort: r.elbow ?? null, shoulder_discomfort: r.shoulder ?? null,
+      arm_soreness: r.armSore ?? null, arm_fatigue: r.armFatigue ?? null, arm_stiffness: r.armStiff ?? null, readiness: r.readiness ?? null, symptoms_during: r.sxDuring || '', symptoms_after: r.sxAfter || '',
+      next_morning_response: r.nextMorning || '', notes: r.notes || '' });
+    acts.forEach(a => activities.push({ date: r.date, activity_type: a.type === 'custom' ? 'custom:' + actLabel(a) : a.type, throw_count: +a.throws, effort_category: a.effort, ball_weight_grams: +a.ballG || 142,
+      distance_feet: a.distFt ?? null, average_velocity_mph: a.avgV ?? null, maximum_velocity_mph: a.maxV ?? null, radar_measured_throws: a.radarN ?? null, radar_readings: a.readings || '', notes: a.notes || '' }));
+  }
+  return { format: 'triton-throwing/1', exportedAt: new Date().toISOString(), engine: { engineVersion: TT.ENGINE_VERSION, specVersion: TT.SPEC_VERSION }, model: TW.model,
+    modelHistory: (cfgGet('twmodels') || {}).versions || [], customActivities: twCustom(), athlete: { name: 'Branden Jackel', throws: 'L' }, days, activities };
+}
+function importThrowing(text) {
+  const j = JSON.parse(text); if (j.format !== 'triton-throwing/1') throw new Error('format');
+  const now = Date.now(), keys = [], byDate = {};
+  for (const a of j.activities || []) (byDate[a.date] = byDate[a.date] || []).push(a);
+  for (const d of j.days || []) {
+    const base = Store.edited(d.date) ? Object.assign({}, Store.local[d.date]) : { date: d.date };
+    for (const k of Object.keys(base)) if (k[0] === '_') delete base[k];
+    const map = { workload: 'pulse_one_day_workload', totalThrows: 'pulse_total_throws', torque: 'pulse_average_torque', torqueMax: 'pulse_max_torque', highEffort: 'pulse_high_effort_throws', armSpeedAvg: 'pulse_average_arm_speed', armSpeedMax: 'pulse_max_arm_speed', pulseArmHealth: 'pulse_arm_health',
+      armHealth: 'arm_health', elbow: 'elbow_discomfort', shoulder: 'shoulder_discomfort', armSore: 'arm_soreness', armFatigue: 'arm_fatigue', armStiff: 'arm_stiffness', readiness: 'readiness' };
+    for (const [k, src] of Object.entries(map)) if (d[src] != null) base[k] = d[src];
+    if (d.symptoms_during) base.sxDuring = d.symptoms_during; if (d.symptoms_after) base.sxAfter = d.symptoms_after; if (d.next_morning_response) base.nextMorning = d.next_morning_response;
+    const acts = (byDate[d.date] || []).map(a => { const custom = String(a.activity_type).startsWith('custom:'); const o = { type: custom ? 'custom' : a.activity_type, throws: +a.throw_count, effort: a.effort_category, ballG: +a.ball_weight_grams || 142 }; if (custom) o.customLabel = a.activity_type.slice(7); for (const [k, s] of [['distFt', 'distance_feet'], ['avgV', 'average_velocity_mph'], ['maxV', 'maximum_velocity_mph'], ['radarN', 'radar_measured_throws']]) if (a[s] != null) o[k] = +a[s]; if (a.radar_readings) o.readings = a.radar_readings; if (a.notes) o.notes = a.notes; return o; });
+    if (acts.length) base.throwActs = acts;
+    if (d.measurement_mode === 'rest_day') base.throw = false; else if (acts.length || d.pulse_one_day_workload != null) base.throw = true;
+    if (d.override) base.twOverride = d.override;
+    if (d.recorded_at_entry) base.twCalc = d.recorded_at_entry;
+    Store.local[d.date] = Object.assign(base, { _u: now, _updated: new Date(now).toISOString() }); keys.push(d.date);
+  }
+  Store.save(); Sync.queue(keys); sideStats(); toast(`Imported ${(j.days || []).length} days`); RENDER.throwing();
 }
 
 /* ================= JOURNAL ================= */
