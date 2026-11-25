@@ -26,6 +26,13 @@
   .card p{margin:0;font-size:.84rem;color:var(--muted);line-height:1.35}
   .meta{margin-top:auto;font-size:.74rem;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .pill{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
+  .sec{margin:22px 4px 10px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .sec:first-child{margin-top:0}
+  .chip{border-radius:999px;padding:2px 9px;font-weight:700}
+  .chip.final{background:rgba(52,211,153,.16);color:#34d399}
+  .chip.review{background:rgba(251,191,36,.16);color:#fbbf24}
+  .chip.printed{background:rgba(148,163,184,.16);color:#cbd5e1}
+  .chip.reference{background:rgba(56,189,248,.14);color:#7dd3fc}
   .empty{background:var(--card);border:1px dashed var(--line);border-radius:18px;padding:30px 20px;text-align:center;color:var(--muted);font-size:.92rem}
 </style>
 </head>
@@ -48,24 +55,26 @@ const DESIGNS = {
     { name:'Designer Flipbook', desc:'Lookbook & client handbook', updated:'June 2, 2026', versions:2, href:'flipbook.html', icon:'📖' }
   ]},
   sdlr: { company:'San Diego Landscape', color:'#34d399', projects:[
-    { name:'Uniform: Tee + Cap', desc:'FINAL Black + Gold (Gio\'s pick of five colourways): a black heavyweight tee and black cap for upper management, friends and family, everything in SDLR gold \u2014 full logo on the chest; Designed in San Diego pool-deck plan, logo and website on the back; woven gold-on-black logo patch on the cap; layered Illustrator file and one-ink printer PDF, not ordered', updated:'November 24, 2026', versions:3, href:'sdlr-uniform.html', icon:'\u{1F9E2}' },
-    { name:'Metal Yard Sign', desc:'36 \u00d7 24 aluminum jobsite sign for the JustSignFrames H-frame: BACKYARD REMODELS one side, FRONT YARD REMODELS the other, a full-width website and the number + QR on a 36 \u00d7 6 rider; final v6 = the v4 cream top with the yard sign number (619) 613-2201 on a two-sided cream rider (backyard QR under BACKYARD, front yard QR under FRONT YARD); layered Illustrator file and print PDFs', updated:'November 25, 2026', versions:6, href:'sdlr-metal-sign.html', icon:'\u{1FAA7}' },
-    { name:'Leave-Behind Kit', desc:'What a homeowner keeps on the counter after the consultation \u2014 a 9 \u00d7 12 pocket folder (full-bleed pergola front, a note from your project manager) and a 12-page stapled booklet (why SDLR and the five-worries table, how we build and the materials we install, the six steps, our work from Chelsea Street to Point Loma, care after we finish), the same for every homeowner; flip through it page by page; layered Illustrator files + CMYK PDFs', updated:'November 23, 2026', versions:7, href:'sdlr-leave-behind-kit.html', icon:'\u{1F4C2}' },
-    { name:'Design Wall', desc:'Every SDLR piece at its latest version, side by side on one wall, with a colour, type and wording check to make sure they all read as one brand', updated:'November 22, 2026', versions:1, href:'sdlr-design-wall.html', icon:'\u{1F9F1}' },
-    { name:'Outdoor Living Club', desc:'Lifestyle tees from SDLR for friends, family, clients, referral partners and the community \u2014 16 designs over two rounds, and v3 puts the full SDLR logo on every shirt (chest or back yoke plus inside each design); lifestyle mockups and layered Illustrator files', updated:'November 22, 2026', versions:3, href:'sdlr-outdoor-living-club.html', icon:'\u{1F3D6}\u{FE0F}' },
-    { name:'Coroplast Yard Sign', desc:'Cheap two-sided 24 \u00d7 18 coroplast jobsite sign, final v9 matches the approved metal sign (cream top): BACKYARD REMODELS one side, FRONT YARD REMODELS the other, Forest website band, the yard sign number (619) 613-2201 + QR to the yard sign page; street test, layered Illustrator file and print PDFs', updated:'November 25, 2026', versions:10, href:'sdlr-coroplast-sign.html', icon:'\u{1FAA7}' },
-    { name:'Shirts', desc:'FINAL: the SDLR shirts that were printed, rebuilt as layered Illustrator files with live type \u2014 the black tee set (round San Diego \u00b7 California badge, arch, big gold badge and billboard backs) and the orange safety crew shirt, also in the Forest print green; outlined printer PDFs', updated:'November 22, 2026', versions:2, href:'sdlr-shirts.html', icon:'\u{1F455}' },
-    { name:'Door Hanger', desc:'FINAL 4.25 \u00d7 11 door hanger \u2014 in the brand Forest green (matches the business card), the printed-mailer look with a cream back, every line given one job, and the front services in capitals you can read from the doorstep; dusk backyard on the front, front yard on the back; layered Illustrator file and CMYK printer PDF', updated:'November 22, 2026', versions:7, href:'sdlr-door-hangers.html', icon:'\u{1F6AA}' },
-    { name:'Business Card', desc:'FINAL two-sided card for Gio and Mike \u2014 pen-and-ink backyard garden plan tone-on-tone with the gold logo in the pool (foil-ready); name-first back with phone, email, CSLB number and a small QR; layered Illustrator file and print PDFs', updated:'November 21, 2026', versions:3, href:'sdlr-business-card.html', icon:'\u{1F4C7}' },
-    { name:'Model Y Wrap', desc:'Company-car wrap for the Juniper Model Y \u2014 newest: House Car, a quieter take on Midnight (near-black midnight green metallic flake, one gold SDLR crest on each front door, phone and website on the back); also Midnight, Duotone, Pergola Shade in cream and green, metallic green with a gold site plan; flat lay, proofs, 3D mockups and realistic photos of the real car', updated:'November 22, 2026', versions:12, href:'sdlr-model-y-wrap.html', icon:'\u{1F697}' },
-    { name:'Fence Banner', desc:'8 \u00d7 4 or 10 \u00d7 4 ft jobsite banner for a La Jolla fence \u2014 \u201cBackyard in progress\u201d, full-yard photo (kitchen, pergola, fire, pool, turf, fence), print PDF with bleed', updated:'November 22, 2026', versions:7, href:'sdlr-fence-banner.html', icon:'\u{1F3F3}\u{FE0F}' },
-    { name:'Wrap Site Plan', desc:'Pen-and-ink aerial site plans \u2014 the Model Y wrap strip, a 4:3 backyard, a Rancho Santa Fe estate and its planted backyard, no wording', updated:'November 20, 2026', versions:4, href:'sdlr-wrap-siteplan.html', icon:'\u{1F58B}\u{FE0F}' },
-    { name:'Logo Animations', desc:'Three animated logo stings \u2014 intro and outro, landscape and vertical, MP4 plus transparent ProRes', updated:'November 15, 2026', versions:2, href:'sdlr-logo-animations.html', icon:'\u{1F3AC}' },
-    { name:'Brand Guide', desc:'Full handover guide for designers, editors and printers — logo, color, type, layout, photography, video, voice, specs; v1.4 makes Forest #2E382B the one print green', updated:'November 22, 2026', versions:4, href:'sdlr-brand-guide.html', icon:'\u{1F4D8}' },
-    { name:'Yard Signs', desc:'FINAL two-sided 24×18 jobsite sign — green face + cream face, print files with bleed', updated:'October 23, 2026', versions:11, href:'sdlr-yard-signs.html', icon:'🪧' },
-      { name:'Page One Plan', desc:'How SDLR reaches page 1 — the one-backlink problem, 3 phases, live checklist', updated:'September 23, 2026', versions:1, href:'sdlr-page-one-plan.html', icon:'🗺️' },
-    { name:'Founder-Led Ad Scripts', desc:'Meta video ad script package — 12 hooks, offers, CTAs, 60/30/15s cuts', updated:'August 28, 2026', versions:1, href:'sdlr-ad-scripts.html', icon:'🎬' },
-    { name:'Digital E-Card', desc:'Shareable contact card — tap to call, email, save', updated:'July 8, 2026', versions:1, href:'sdlr-ecard.html', icon:'💳' }
+    // status: final | review (waiting on Gio) | printed (older piece in use, do not reprint) | reference
+    // Cleaned up 2026-11-25: every final opens on its final version; captions say what is final and what is still open.
+    { status:'final', name:'Coroplast Yard Sign', desc:'Final v10: two-sided 24 × 18 jobsite sign, BACKYARD REMODELS one face and FRONT YARD REMODELS the other, the yard sign number (619) 613-2201 and a QR on each face to the yard sign page. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 25, 2026', versions:10, href:'sdlr-coroplast-sign.html', icon:'\u{1FAA7}' },
+    { status:'final', name:'Metal Yard Sign', desc:'Final v6: 36 × 24 aluminum panel for the H-frames (cream top, BACKYARD / FRONT YARD faces) and a two-sided 36 × 6 rider with 613-2201 and the backyard and front yard QRs. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 25, 2026', versions:6, href:'sdlr-metal-sign.html', icon:'\u{1FAA7}' },
+    { status:'final', name:'Uniform: Tee + Cap', desc:'Final v3 Black + Gold: black heavyweight tee and cap, everything in SDLR gold, woven logo patch on the cap. For upper management, friends and family. Layered Illustrator file and printer PDF. Not ordered.', updated:'November 24, 2026', versions:3, href:'sdlr-uniform.html', icon:'\u{1F9E2}' },
+    { status:'final', name:'Door Hanger', desc:'Final v7: 4.25 × 11 door hanger in the brand Forest green with a cream back, services in capitals you can read from the doorstep. Layered Illustrator file and CMYK printer PDF. Not ordered.', updated:'November 22, 2026', versions:7, href:'sdlr-door-hangers.html', icon:'\u{1F6AA}' },
+    { status:'final', name:'Fence Banner', desc:'Final v5: “Backyard in progress” jobsite banner with a full-yard photo, in 8 × 4 and 10 × 4 ft. Print PDFs with bleed. Not ordered.', updated:'November 22, 2026', versions:7, href:'sdlr-fence-banner.html', icon:'\u{1F3F3}\u{FE0F}' },
+    { status:'final', name:'Shirts', desc:'Final v2: the printed black tee set and orange crew shirt, rebuilt as layered Illustrator files, with a Forest green version ready for the next print. Outlined printer PDFs.', updated:'November 22, 2026', versions:2, href:'sdlr-shirts.html', icon:'\u{1F455}' },
+    { status:'final', name:'Brand Guide', desc:'v1.4: the handover guide for designers, editors and printers (logo, colour, type, layout, photo, video, voice, specs). Forest #2E382B is the one print green.', updated:'November 22, 2026', versions:4, href:'sdlr-brand-guide.html', icon:'\u{1F4D8}' },
+    { status:'final', name:'Business Card', desc:'Final v3: two-sided card for Gio and Mike, a pen-and-ink backyard plan with the gold logo in the pool (foil-ready), phone, email, CSLB number and a small QR on the back. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 21, 2026', versions:3, href:'sdlr-business-card.html', icon:'\u{1F4C7}' },
+    { status:'final', name:'Wrap Site Plan', desc:'v4: the pen-and-ink aerial site plan line art behind the business card and the car wrap (strip, backyard, Rancho Santa Fe estate and planted backyard). No wording.', updated:'November 20, 2026', versions:4, href:'sdlr-wrap-siteplan.html', icon:'\u{1F58B}\u{FE0F}' },
+    { status:'final', name:'Logo Animations', desc:'Three animated logo stings, intro and outro, landscape and vertical: MP4 plus transparent ProRes for video edits.', updated:'November 15, 2026', versions:2, href:'sdlr-logo-animations.html', icon:'\u{1F3AC}' },
+    { status:'final', name:'Digital E-Card', desc:'Shareable contact card: tap to call, email or save the contact.', updated:'July 8, 2026', versions:1, href:'sdlr-ecard.html', icon:'\u{1F4B3}' },
+    { status:'review', name:'Leave-Behind Kit', desc:'v7: 9 × 12 pocket folder and 12-page booklet a homeowner keeps after the consultation. Open: show all six projects or Chelsea Street only, the claims, and which printer.', updated:'November 23, 2026', versions:7, href:'sdlr-leave-behind-kit.html', icon:'\u{1F4C2}' },
+    { status:'review', name:'Outdoor Living Club', desc:'v3: 16 lifestyle tee designs for friends, family, clients and referral partners, each with the full SDLR logo. Waiting on your picks.', updated:'November 22, 2026', versions:3, href:'sdlr-outdoor-living-club.html', icon:'\u{1F3D6}\u{FE0F}' },
+    { status:'review', name:'Model Y Wrap', desc:'Newest v12 House Car (one gold crest per front door, phone and website on the back); v10 Midnight was the lead before it. Not chosen yet.', updated:'November 22, 2026', versions:12, href:'sdlr-model-y-wrap.html', icon:'\u{1F697}' },
+    { status:'printed', name:'Yard Signs (October)', desc:'The two-sided sign printed in October, with the main line 613-2511 and the older palette. Do not reprint: use the Coroplast Yard Sign v10, so sign calls are counted on their own.', updated:'October 23, 2026', versions:11, href:'sdlr-yard-signs.html', icon:'\u{1FAA7}' },
+    { status:'reference', name:'Design Wall', desc:'Every SDLR piece at its latest version on one wall, with a colour, type and wording check across them.', updated:'November 25, 2026', versions:1, href:'sdlr-design-wall.html', icon:'\u{1F9F1}' },
+    { status:'reference', name:'Page One Plan', desc:'How SDLR reaches page 1 of Google: the backlink problem, three phases and a live checklist.', updated:'September 23, 2026', versions:1, href:'sdlr-page-one-plan.html', icon:'\u{1F5FA}\u{FE0F}' },
+    { status:'reference', name:'Founder-Led Ad Scripts', desc:'Meta video ad script package: 12 hooks, offers, CTAs, 60/30/15 second cuts.', updated:'August 28, 2026', versions:1, href:'sdlr-ad-scripts.html', icon:'\u{1F3AC}' }
   ]},
   personal: { company:'Personal', color:'#a78bfa', projects:[] }
 };
@@ -83,16 +92,33 @@ const grid = document.getElementById('grid');
 if (!data.projects.length) {
   grid.outerHTML = '<div class="empty">No finished designs here yet. Flipbooks, slideshows, and other visual pieces for ' + data.company + ' will appear here automatically.</div>';
 } else {
-  grid.innerHTML = data.projects.map(p => `
+  const STATUS = { final:'Final', review:'Waiting on you', printed:'Printed earlier', reference:'Reference' };
+  const GROUPS = [
+    ['final','Final, ready to use'],
+    ['review','Waiting on your decision'],
+    ['printed','Printed earlier, do not reprint'],
+    ['reference','Plans and references']
+  ];
+  const card = p => `
     <a class="card" href="${p.href}">
       <div class="ico" style="background:color-mix(in srgb, ${data.color} 16%, transparent)">${p.icon}</div>
       <h3>${p.name}</h3>
       <p>${p.desc}</p>
       <div class="meta">
+        ${p.status ? `<span class="chip ${p.status}">${STATUS[p.status]}</span>` : ''}
         <span class="pill">Updated ${p.updated}</span>
         <span class="pill" style="color:${data.color}">${p.versions} version${p.versions>1?'s':''}</span>
       </div>
-    </a>`).join('');
+    </a>`;
+  if (data.projects.some(p => p.status)) {
+    grid.outerHTML = GROUPS
+      .map(([k, label]) => [label, data.projects.filter(p => (p.status || 'reference') === k)])
+      .filter(([, list]) => list.length)
+      .map(([label, list]) => `<h2 class="sec">${label}</h2><div class="grid">${list.map(card).join('')}</div>`)
+      .join('');
+  } else {
+    grid.innerHTML = data.projects.map(card).join('');
+  }
 }
 </script>
 </body>
