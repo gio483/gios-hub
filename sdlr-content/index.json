@@ -1,10 +1,40 @@
 {
   "weeks": [
     {
+      "label": "Week of Jan 18 – Jan 22, 2027 · Process Carousel · The Green Weeks",
+      "folder": "week-2027-01-18",
+      "manifest": "sdlr-content/week-2027-01-18/manifest.json",
+      "generated": "2026-11-22"
+    },
+    {
+      "label": "Week of Jan 11 – Jan 15, 2027 · After the Rain",
+      "folder": "week-2027-01-11",
+      "manifest": "sdlr-content/week-2027-01-11/manifest.json",
+      "generated": "2026-11-16"
+    },
+    {
+      "label": "Week of Jan 4 – Jan 8, 2027 · Process Carousel · The New-Year Plan",
+      "folder": "week-2027-01-04",
+      "manifest": "sdlr-content/week-2027-01-04/manifest.json",
+      "generated": "2026-11-09"
+    },
+    {
+      "label": "Week of Dec 28 – Jan 1, 2027 · New Year's Eve",
+      "folder": "week-2026-12-28",
+      "manifest": "sdlr-content/week-2026-12-28/manifest.json",
+      "generated": "2026-11-02"
+    },
+    {
       "label": "Week of Dec 21 – Dec 25, 2026 · Process Carousel · Christmas Eve",
       "folder": "week-2026-12-21",
       "manifest": "sdlr-content/week-2026-12-21/manifest.json",
       "generated": "2026-10-26"
+    },
+    {
+      "label": "Week of Dec 14 – Dec 18, 2026 · The Longest Night",
+      "folder": "week-2026-12-14",
+      "manifest": "sdlr-content/week-2026-12-14/manifest.json",
+      "generated": "2026-10-19"
     },
     {
       "label": "Week of Dec 7 – Dec 11, 2026 · The Winter Design Window",
