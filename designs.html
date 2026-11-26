@@ -3,123 +3,429 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1220">
-<title>Design Gallery — Gio's Hub</title>
+<meta name="theme-color" content="#0c0d0f">
+<link rel="icon" type="image/svg+xml" href="favicon.svg?v=2">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<title>Design Gallery · Gio's Hub</title>
 <style>
-  :root{--bg:#0b1220;--card:#151f33;--card-hover:#1c2a44;--text:#f1f5f9;--muted:#94a3b8;--line:#26344f;--accent:#38bdf8}
+  :root{
+    --bg:#0c0d0f; --card:#16171a; --card2:#1c1d21; --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+    --text:#eceef0; --muted:#8b8f96; --faint:#5d6168; --accent:#9fb56a;
+    --good:#86cf8a; --warn:#e8a33d; --old:#a8adb5; --ref:#7fa9db;
+    --shadow:0 18px 40px rgba(0,0,0,.45); --cond:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  :root[data-theme="light"]{
+    --bg:#f3f2ef; --card:#ffffff; --card2:#f7f6f3; --line:rgba(0,0,0,.08); --line2:rgba(0,0,0,.16);
+    --text:#15161a; --muted:#5f636b; --faint:#9a9da3; --good:#2f8a37; --warn:#b26b00; --old:#6b7078; --ref:#2f6fb3;
+    --shadow:0 14px 30px rgba(0,0,0,.12);
+  }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 600px at 50% -10%, #16233e 0%, var(--bg) 55%) fixed;color:var(--text);min-height:100vh;padding:max(24px,env(safe-area-inset-top)) 18px calc(40px + env(safe-area-inset-bottom))}
-  header{max-width:760px;margin:0 auto 18px}
-  .back{display:inline-flex;align-items:center;gap:7px;background:none;border:0;color:var(--muted);font-size:.92rem;cursor:pointer;padding:6px 2px;font-weight:600;text-decoration:none}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+    padding:max(18px,env(safe-area-inset-top)) 20px calc(60px + env(safe-area-inset-bottom))}
+  a{color:inherit}
+  button{font:inherit;color:inherit}
+  .wrap{max-width:1120px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .back{display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;padding:6px 2px}
   .back:hover{color:var(--text)}
-  .title-row{display:flex;align-items:center;gap:11px;margin-top:8px}
-  .dot{width:12px;height:12px;border-radius:50%}
-  h1{font-size:1.5rem;margin:0;letter-spacing:-.02em}
-  .sub{color:var(--muted);font-size:.92rem;margin:6px 4px 0}
-  main{max-width:760px;margin:18px auto 0}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
-  .card{display:flex;flex-direction:column;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;text-decoration:none;color:inherit;transition:transform .12s ease,background .12s ease,border-color .12s ease;min-height:132px}
-  .card:active{transform:scale(.98)}
-  @media(hover:hover){.card:hover{background:var(--card-hover);border-color:#3a4d72;transform:translateY(-2px)}}
-  .ico{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;background:rgba(255,255,255,.06)}
-  .card h3{margin:0;font-size:1.06rem;line-height:1.2}
-  .card p{margin:0;font-size:.84rem;color:var(--muted);line-height:1.35}
-  .meta{margin-top:auto;font-size:.74rem;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .pill{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--muted)}
-  .sec{margin:22px 4px 10px;font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-  .sec:first-child{margin-top:0}
-  .chip{border-radius:999px;padding:2px 9px;font-weight:700}
-  .chip.final{background:rgba(52,211,153,.16);color:#34d399}
-  .chip.review{background:rgba(251,191,36,.16);color:#fbbf24}
-  .chip.printed{background:rgba(148,163,184,.16);color:#cbd5e1}
-  .chip.reference{background:rgba(56,189,248,.14);color:#7dd3fc}
-  .empty{background:var(--card);border:1px dashed var(--line);border-radius:18px;padding:30px 20px;text-align:center;color:var(--muted);font-size:.92rem}
+  .head{display:flex;align-items:center;gap:14px;margin-top:10px}
+  .mark{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--mbg,#222)}
+  .mark img{max-width:70%;max-height:70%;object-fit:contain}
+  .mark b{font-family:var(--cond);font-size:17px;letter-spacing:.06em;color:#f3ead8}
+  h1{margin:0;font-family:var(--cond);font-size:34px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1}
+  .head small{display:block;margin-top:5px;color:var(--muted);font-size:13px}
+  .head .share{margin-left:auto}
+  .btn{height:38px;padding:0 13px;border-radius:10px;border:1px solid var(--line2);background:var(--card);cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+    font-family:var(--cond);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;text-decoration:none}
+  .btn:hover{border-color:var(--text)}
+  .lead{color:var(--muted);font-size:14px;margin:14px 0 0;max-width:760px}
+
+  /* ---------- controls ---------- */
+  .bar{position:sticky;top:0;z-index:5;background:var(--bg);padding:14px 0 12px;margin-top:8px;border-bottom:1px solid var(--line);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{border:1px solid var(--line2);background:none;border-radius:999px;padding:7px 13px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+  .chip b{font-family:var(--mono);font-weight:500;font-size:11px;opacity:.75}
+  .chip:hover{color:var(--text);border-color:var(--text)}
+  .chip.on{background:var(--text);color:var(--bg);border-color:var(--text)}
+  .search{flex:1 1 200px;min-width:160px;display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line2);border-radius:10px;padding:0 12px;height:38px;margin-left:auto;max-width:300px}
+  .search svg{flex:none;color:var(--muted)}
+  .search input{flex:1;min-width:0;background:none;border:0;outline:0;color:var(--text);font-size:14px}
+  .search input::placeholder{color:var(--faint)}
+  .tools{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0 0;color:var(--muted);font-size:12.5px}
+  .legend{display:flex;gap:14px;flex-wrap:wrap}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .tools .right{margin-left:auto;display:flex;gap:14px}
+  .link{background:none;border:0;padding:0;cursor:pointer;color:var(--muted);font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase}
+  .link:hover{color:var(--text)}
+
+  /* ---------- groups + dropdown sections ---------- */
+  .group{margin-top:30px}
+  .group > h2{margin:0 0 10px;font-family:var(--cond);font-size:26px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:1;display:flex;align-items:baseline;gap:10px}
+  .group > h2 small{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted);letter-spacing:0;text-transform:none}
+  .sec{border:1px solid var(--line);border-radius:14px;background:var(--card);margin-top:10px;scroll-margin-top:80px;overflow:hidden}
+  .sec-h{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;background:none;border:0;cursor:pointer;text-align:left}
+  .sec-h:hover{background:var(--card2)}
+  .sec-h .chev{flex:none;color:var(--muted);transition:transform .2s}
+  .sec.open .sec-h .chev{transform:rotate(90deg)}
+  .sec-h .t{min-width:0}
+  .sec-h .t b{display:block;font-family:var(--cond);font-size:21px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;line-height:1.05}
+  .sec-h .t span{display:block;color:var(--muted);font-size:12.5px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .peek{margin-left:auto;display:flex;gap:5px;flex:none}
+  .peek img,.peek i{width:46px;height:34px;border-radius:6px;object-fit:cover;background:var(--card2);box-shadow:inset 0 0 0 1px var(--line);display:flex;align-items:center;justify-content:center;font-style:normal;font-size:16px}
+  .sec.open .peek{display:none}
+  .sec-h .n{flex:none;font-family:var(--mono);font-size:11px;color:var(--muted);min-width:54px;text-align:right}
+  .sec.open .sec-h .n{margin-left:auto}
+  .sec-body{display:none;padding:4px 16px 18px}
+  .sec.open .sec-body{display:block}
+  .sec-foot{display:flex;justify-content:flex-end;margin-top:12px}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(232px,1fr));gap:16px}
+  .card{display:flex;flex-direction:column;text-decoration:none;color:inherit;border-radius:12px;background:var(--card2);border:1px solid var(--line);overflow:hidden;transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease}
+  .flat .card{background:var(--card)}
+  @media(hover:hover){.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--line2)}}
+  .card:active{transform:scale(.985)}
+  .shot{position:relative;aspect-ratio:4/3;background:var(--tile,#2a2d33);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .shot .emo{font-size:46px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
+  .st{position:absolute;top:9px;left:9px;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:700;letter-spacing:.02em;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+  .st.final{background:#86cf8a;color:#0b1a0c}
+  .st.review{background:#f2b544;color:#1a1205}
+  .st.printed{background:#d9d9d9;color:#111}
+  .st.reference{background:#7fa9db;color:#08131f}
+  .st.in{display:none;position:static;align-self:flex-start;box-shadow:none}
+  .card .body{padding:12px 13px 13px;display:flex;flex-direction:column;gap:5px;flex:1}
+  .card h3{margin:0;font-family:var(--cond);font-weight:700;font-size:19px;letter-spacing:.04em;text-transform:uppercase;line-height:1.1}
+  .card p{margin:0;color:var(--muted);font-size:12.8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+  .card .meta{margin-top:auto;padding-top:8px;display:flex;justify-content:space-between;gap:2px 8px;flex-wrap:wrap;font-family:var(--mono);font-size:10.8px;color:var(--faint)}
+  .card .meta span{white-space:nowrap}
+  .card .meta .where{color:var(--accent)}
+  .empty{color:var(--muted);padding:44px 0;text-align:center}
+  mark{background:color-mix(in srgb,var(--accent) 35%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+
+  .toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--text);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:600;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:20}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  @media (max-width:640px){
+    body{padding-left:14px;padding-right:14px}
+    h1{font-size:27px}
+    .mark{width:44px;height:44px}
+    .head .share span{display:none}
+    .bar{position:static;padding-bottom:10px}
+    .search{max-width:none;flex-basis:100%;margin-left:0;order:-1}
+    .chips{flex-wrap:nowrap;overflow-x:auto;margin:0 -14px;padding:0 14px;scrollbar-width:none;width:calc(100% + 28px)}
+    .chips::-webkit-scrollbar{display:none}
+    .legend{flex-direction:column;gap:5px}
+    .tools .right{margin-left:0}
+    .group > h2{flex-direction:column;gap:5px}
+    .sec{scroll-margin-top:10px}
+    .peek img:nth-child(n+3),.peek i:nth-child(n+3){display:none}
+    .peek img,.peek i{width:40px;height:30px}
+    .sec-h{padding:13px 12px;gap:10px}
+    .sec-h .n{display:none}
+    .sec-body{padding:2px 10px 12px}
+    /* phones: each piece is a row, picture on the left */
+    .grid{grid-template-columns:1fr;gap:9px}
+    .card{flex-direction:row;align-items:stretch}
+    .shot{flex:none;width:116px;aspect-ratio:auto;min-height:104px}
+    .shot .st{display:none}
+    .st.in{display:inline-block}
+    .card .body{padding:10px 12px 10px;gap:4px;min-width:0}
+    .card h3{font-size:17px}
+    .card p{font-size:12.2px;-webkit-line-clamp:3}
+    .card .meta{padding-top:5px;font-size:10.2px}
+  }
 </style>
 </head>
 <body>
-  <header>
-    <a class="back" href="index.html" id="back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-      <span id="backLabel">Back</span>
-    </a>
-    <div class="title-row"><span class="dot" id="dot"></span><h1 id="title">Design Gallery</h1></div>
-    <p class="sub" id="sub">Flipbooks, slideshows & visual deliverables — newest first.</p>
-  </header>
-  <main><div class="grid" id="grid"></div></main>
+<div class="wrap">
+  <a class="back" href="index.html" id="back">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+    <span id="backLabel">Gio's Hub</span>
+  </a>
+  <div class="head">
+    <div class="mark" id="mark"></div>
+    <div>
+      <h1 id="title">Design Gallery</h1>
+      <small id="sub"></small>
+    </div>
+    <button class="btn share" id="shareAll" title="Copy the link to this page">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>
+      <span>Copy link</span>
+    </button>
+  </div>
+  <p class="lead" id="lead"></p>
+
+  <div class="bar" id="bar">
+    <div class="chips" id="chips"></div>
+    <label class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search designs" autocomplete="off" aria-label="Search designs">
+    </label>
+  </div>
+  <div class="tools" id="tools"></div>
+  <main id="view"></main>
+</div>
+<div class="toast" id="toast"></div>
 
 <script>
-// Design pieces per business. Each piece links to its own version-history viewer
-// (newest version opens by default). Add new pieces at the TOP of the list.
+/* =====================================================================
+   DESIGN GALLERY: one page per business, opened as designs.html?c=<company>
+   ---------------------------------------------------------------------
+   Every design piece is ONE entry in its company's `projects` list below.
+   Each piece links to its own version viewer (the viewer opens on the
+   final version; see design-viewer.js).
+
+   To add a piece: add an entry under its section (pieces show in the order
+   they are listed here, so keep the main piece first), give it a `cat`, and drop an 800 x 600 JPG in design-thumbs/ named after the
+   viewer page (sdlr-door-hangers.html -> design-thumbs/sdlr-door-hangers.jpg).
+   With no thumb the card shows the emoji instead.
+
+   Fields
+     cat      which section it files under (a key of the company's `cats`)
+     status   final (approved, use this) | review (not final yet) |
+              printed (older piece in use, do not reprint) | reference
+     ver      the version that is current, e.g. 'v10' (shown on the chip)
+     name     piece name                    href   its viewer page
+     desc     what it is, what files are inside, ordered or not (keep it short)
+     updated  'Month D, YYYY' of the last change      versions  how many exist
+     thumb    path to the 800 x 600 thumbnail          icon      emoji fallback
+
+   Deep links: designs.html?c=sdlr#signs opens that section;
+               designs.html?c=sdlr#print shows only that group.
+   ===================================================================== */
 const DESIGNS = {
-  ksh: { company:'KSH Construction', color:'#fbbf24', projects:[
-    { name:'Designer Flipbook', desc:'Lookbook & client handbook', updated:'June 2, 2026', versions:2, href:'flipbook.html', icon:'📖' }
+  ksh: { company:'KSH Construction', short:'KSH', color:'#3f97d3', bg:'#0f2a44', mark:'brand/ksh-mark.png', projects:[
+    { name:'Designer Flipbook', desc:'Lookbook and client handbook.', updated:'June 2, 2026', versions:2, href:'flipbook.html', icon:'📖' }
   ]},
-  sdlr: { company:'San Diego Landscape', color:'#34d399', projects:[
-    // status: final | review (waiting on Gio) | printed (older piece in use, do not reprint) | reference
-    // Cleaned up 2026-11-25: every final opens on its final version; captions say what is final and what is still open.
-    { status:'final', name:'Coroplast Yard Sign', desc:'Final v10: two-sided 24 × 18 jobsite sign, BACKYARD REMODELS one face and FRONT YARD REMODELS the other, the yard sign number (619) 613-2201 and a QR on each face to the yard sign page. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 25, 2026', versions:10, href:'sdlr-coroplast-sign.html', icon:'\u{1FAA7}' },
-    { status:'final', name:'Metal Yard Sign', desc:'Final v6: 36 × 24 aluminum panel for the H-frames (cream top, BACKYARD / FRONT YARD faces) and a two-sided 36 × 6 rider with 613-2201 and the backyard and front yard QRs. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 25, 2026', versions:6, href:'sdlr-metal-sign.html', icon:'\u{1FAA7}' },
-    { status:'final', name:'Uniform: Tee + Cap', desc:'Final v3 Black + Gold: black heavyweight tee and cap, everything in SDLR gold, woven logo patch on the cap. For upper management, friends and family. Layered Illustrator file and printer PDF. Not ordered.', updated:'November 24, 2026', versions:3, href:'sdlr-uniform.html', icon:'\u{1F9E2}' },
-    { status:'final', name:'Door Hanger', desc:'Final v7: 4.25 × 11 door hanger in the brand Forest green with a cream back, services in capitals you can read from the doorstep. Layered Illustrator file and CMYK printer PDF. Not ordered.', updated:'November 22, 2026', versions:7, href:'sdlr-door-hangers.html', icon:'\u{1F6AA}' },
-    { status:'final', name:'Fence Banner', desc:'Final v5: “Backyard in progress” jobsite banner with a full-yard photo, in 8 × 4 and 10 × 4 ft. Print PDFs with bleed. Not ordered.', updated:'November 22, 2026', versions:7, href:'sdlr-fence-banner.html', icon:'\u{1F3F3}\u{FE0F}' },
-    { status:'final', name:'Shirts', desc:'Final v2: the printed black tee set and orange crew shirt, rebuilt as layered Illustrator files, with a Forest green version ready for the next print. Outlined printer PDFs.', updated:'November 22, 2026', versions:2, href:'sdlr-shirts.html', icon:'\u{1F455}' },
-    { status:'final', name:'Brand Guide', desc:'v1.4: the handover guide for designers, editors and printers (logo, colour, type, layout, photo, video, voice, specs). Forest #2E382B is the one print green.', updated:'November 22, 2026', versions:4, href:'sdlr-brand-guide.html', icon:'\u{1F4D8}' },
-    { status:'final', name:'Business Card', desc:'Final v3: two-sided card for Gio and Mike, a pen-and-ink backyard plan with the gold logo in the pool (foil-ready), phone, email, CSLB number and a small QR on the back. Layered Illustrator file and print PDFs. Not ordered.', updated:'November 21, 2026', versions:3, href:'sdlr-business-card.html', icon:'\u{1F4C7}' },
-    { status:'final', name:'Wrap Site Plan', desc:'v4: the pen-and-ink aerial site plan line art behind the business card and the car wrap (strip, backyard, Rancho Santa Fe estate and planted backyard). No wording.', updated:'November 20, 2026', versions:4, href:'sdlr-wrap-siteplan.html', icon:'\u{1F58B}\u{FE0F}' },
-    { status:'final', name:'Logo Animations', desc:'Three animated logo stings, intro and outro, landscape and vertical: MP4 plus transparent ProRes for video edits.', updated:'November 15, 2026', versions:2, href:'sdlr-logo-animations.html', icon:'\u{1F3AC}' },
-    { status:'final', name:'Digital E-Card', desc:'Shareable contact card: tap to call, email or save the contact.', updated:'July 8, 2026', versions:1, href:'sdlr-ecard.html', icon:'\u{1F4B3}' },
-    { status:'review', name:'Leave-Behind Kit', desc:'v7: 9 × 12 pocket folder and 12-page booklet a homeowner keeps after the consultation. Open: show all six projects or Chelsea Street only, the claims, and which printer.', updated:'November 23, 2026', versions:7, href:'sdlr-leave-behind-kit.html', icon:'\u{1F4C2}' },
-    { status:'review', name:'Outdoor Living Club', desc:'v3: 16 lifestyle tee designs for friends, family, clients and referral partners, each with the full SDLR logo. Waiting on your picks.', updated:'November 22, 2026', versions:3, href:'sdlr-outdoor-living-club.html', icon:'\u{1F3D6}\u{FE0F}' },
-    { status:'review', name:'Model Y Wrap', desc:'Newest v12 House Car (one gold crest per front door, phone and website on the back); v10 Midnight was the lead before it. Not chosen yet.', updated:'November 22, 2026', versions:12, href:'sdlr-model-y-wrap.html', icon:'\u{1F697}' },
-    { status:'printed', name:'Yard Signs (October)', desc:'The two-sided sign printed in October, with the main line 613-2511 and the older palette. Do not reprint: use the Coroplast Yard Sign v10, so sign calls are counted on their own.', updated:'October 23, 2026', versions:11, href:'sdlr-yard-signs.html', icon:'\u{1FAA7}' },
-    { status:'reference', name:'Design Wall', desc:'Every SDLR piece at its latest version on one wall, with a colour, type and wording check across them.', updated:'November 25, 2026', versions:1, href:'sdlr-design-wall.html', icon:'\u{1F9F1}' },
-    { status:'reference', name:'Page One Plan', desc:'How SDLR reaches page 1 of Google: the backlink problem, three phases and a live checklist.', updated:'September 23, 2026', versions:1, href:'sdlr-page-one-plan.html', icon:'\u{1F5FA}\u{FE0F}' },
-    { status:'reference', name:'Founder-Led Ad Scripts', desc:'Meta video ad script package: 12 hooks, offers, CTAs, 60/30/15 second cuts.', updated:'August 28, 2026', versions:1, href:'sdlr-ad-scripts.html', icon:'\u{1F3AC}' }
+
+  sdlr: { company:'San Diego Landscape Remodeling', short:'SDLR', color:'#9fb56a', bg:'#3b4a30', mark:'brand/sdlr-mark.png',
+    lead:'Everything designed for SDLR, sorted by what it is. Open a section, tap a piece, and it opens on the version to use, with the print files on that page.',
+    groups:[ ['print','Print material'], ['online','Online assets'], ['brand','Brand'] ],
+    cats:{
+      signs:    { group:'print',  label:'Signs & banners',  blurb:'Yard signs and the jobsite fence banner' },
+      handouts: { group:'print',  label:'Cards & handouts', blurb:'Business card, door hanger, leave-behind kit' },
+      apparel:  { group:'print',  label:'Shirts & uniform', blurb:'Crew shirts, the uniform, the lifestyle tees' },
+      wrap:     { group:'print',  label:'Car wrap',         blurb:'The Model Y wrap and its line art' },
+      online:   { group:'online', label:'Online & video',   blurb:'Digital card, logo animations, the 1-to-1 deck' },
+      brand:    { group:'brand',  label:'Brand guide',      blurb:'The rules every piece follows, and all of them side by side' }
+    },
+    projects:[
+    /* ---- Print · signs & banners ---- */
+    { cat:'signs', status:'final', ver:'v10', name:'Coroplast Yard Sign', desc:'Two-sided 24 × 18 jobsite sign: BACKYARD REMODELS on one face, FRONT YARD REMODELS on the other, with the yard sign number (619) 613-2201 and a QR code on each. Print PDFs and Illustrator file. Not ordered yet.', updated:'November 25, 2026', versions:10, href:'sdlr-coroplast-sign.html', thumb:'design-thumbs/sdlr-coroplast-sign.jpg', icon:'\u{1FAA7}' },
+    { cat:'signs', status:'final', ver:'v6', name:'Metal Yard Sign', desc:'36 × 24 aluminum panel for the H-frames, plus a two-sided 36 × 6 rider with (619) 613-2201 and the backyard and front yard QR codes. Print PDFs and Illustrator file. Not ordered yet.', updated:'November 25, 2026', versions:6, href:'sdlr-metal-sign.html', thumb:'design-thumbs/sdlr-metal-sign.jpg', icon:'\u{1FAA7}' },
+    { cat:'signs', status:'final', ver:'v5', name:'Fence Banner', desc:'“Backyard in progress” jobsite banner with a full-yard photo, in 8 × 4 ft and 10 × 4 ft. Print PDFs with bleed. Not ordered yet.', updated:'November 22, 2026', versions:7, href:'sdlr-fence-banner.html', thumb:'design-thumbs/sdlr-fence-banner.jpg', icon:'\u{1F3F3}\u{FE0F}' },
+    { cat:'signs', status:'printed', name:'Yard Signs (October)', desc:'The two-sided sign printed in October, with the main line 613-2511 and the older colours. Do not reprint: use the Coroplast Yard Sign, so sign calls are counted on their own.', updated:'October 23, 2026', versions:11, href:'sdlr-yard-signs.html', thumb:'design-thumbs/sdlr-yard-signs.jpg', icon:'\u{1FAA7}' },
+
+    /* ---- Print · cards & handouts ---- */
+    { cat:'handouts', status:'final', ver:'v3', name:'Business Card', desc:'Two-sided card for Gio and Mike: a pen-and-ink backyard plan with the gold logo in the pool (foil-ready), phone, email, CSLB number and a small QR on the back. Print PDFs and Illustrator file. Not ordered yet.', updated:'November 21, 2026', versions:3, href:'sdlr-business-card.html', thumb:'design-thumbs/sdlr-business-card.jpg', icon:'\u{1F4C7}' },
+    { cat:'handouts', status:'final', ver:'v7', name:'Door Hanger', desc:'4.25 × 11 door hanger in the brand Forest green with a cream back, services in capitals you can read from the doorstep. CMYK printer PDF and Illustrator file. Not ordered yet.', updated:'November 22, 2026', versions:7, href:'sdlr-door-hangers.html', thumb:'design-thumbs/sdlr-door-hangers.jpg', icon:'\u{1F6AA}' },
+    { cat:'handouts', status:'review', ver:'v7', name:'Leave-Behind Kit', desc:'9 × 12 pocket folder and 12-page booklet a homeowner keeps after the consultation. Still open: show all six projects or Chelsea Street only, the claims, and which printer.', updated:'November 23, 2026', versions:7, href:'sdlr-leave-behind-kit.html', thumb:'design-thumbs/sdlr-leave-behind-kit.jpg', icon:'\u{1F4C2}' },
+
+    /* ---- Print · shirts & uniform ---- */
+    { cat:'apparel', status:'final', ver:'v3', name:'Uniform: Tee + Cap', desc:'Black + Gold: black heavyweight tee and cap, everything in SDLR gold, woven logo patch on the cap. For upper management, friends and family. Printer PDF and Illustrator file. Not ordered yet.', updated:'November 24, 2026', versions:3, href:'sdlr-uniform.html', thumb:'design-thumbs/sdlr-uniform.jpg', icon:'\u{1F9E2}' },
+    { cat:'apparel', status:'final', ver:'v2', name:'Shirts', desc:'The printed black tee set and the orange crew shirt, rebuilt as Illustrator files, with a Forest green version ready for the next print. Printer PDFs.', updated:'November 22, 2026', versions:2, href:'sdlr-shirts.html', thumb:'design-thumbs/sdlr-shirts.jpg', icon:'\u{1F455}' },
+    { cat:'apparel', status:'review', ver:'v3', name:'Outdoor Living Club', desc:'16 lifestyle tee designs for friends, family, clients and referral partners, each with the full SDLR logo. Waiting on Gio’s picks.', updated:'November 22, 2026', versions:3, href:'sdlr-outdoor-living-club.html', thumb:'design-thumbs/sdlr-outdoor-living-club.jpg', icon:'\u{1F3D6}\u{FE0F}' },
+
+    /* ---- Print · car wrap ---- */
+    { cat:'wrap', status:'review', ver:'v12', name:'Model Y Wrap', desc:'Company-car wrap for the Model Y. Newest is v12 House Car (one gold crest per front door, phone and website on the back); v10 Midnight was the lead before it. Not chosen yet.', updated:'November 22, 2026', versions:12, href:'sdlr-model-y-wrap.html', thumb:'design-thumbs/sdlr-model-y-wrap.jpg', icon:'\u{1F697}' },
+    { cat:'wrap', status:'final', ver:'v4', name:'Wrap Site Plan', desc:'The pen-and-ink aerial site plan line art behind the business card and the car wrap: strip, backyard, Rancho Santa Fe estate and planted backyard. No wording.', updated:'November 20, 2026', versions:4, href:'sdlr-wrap-siteplan.html', thumb:'design-thumbs/sdlr-wrap-siteplan.jpg', icon:'\u{1F58B}\u{FE0F}' },
+
+    /* ---- Online assets ---- */
+    { cat:'online', status:'final', name:'Logo Animations', desc:'Three animated logo stings, intro and outro, landscape and vertical: MP4 plus transparent ProRes for video edits.', updated:'November 15, 2026', versions:2, href:'sdlr-logo-animations.html', thumb:'design-thumbs/sdlr-logo-animations.jpg', icon:'\u{1F3AC}' },
+    { cat:'online', status:'final', ver:'v1', name:'Digital E-Card', desc:'Shareable contact card: tap to call, email or save the contact.', updated:'July 8, 2026', versions:1, href:'sdlr-ecard.html', thumb:'design-thumbs/sdlr-ecard.jpg', icon:'\u{1F4B3}' },
+    { cat:'online', name:'1-to-1 Deck', desc:'The story, the work and the $200K mortgage play, for networking meetings.', updated:'August 20, 2026', versions:1, href:'sdlr-deck.html', thumb:'design-thumbs/sdlr-deck.jpg', icon:'\u{1F5BC}\u{FE0F}' },
+
+    /* ---- Brand ---- */
+    { cat:'brand', status:'final', ver:'v1.4', name:'Brand Guide', desc:'The handover guide for designers, editors and printers: logo, colour, type, layout, photo, video, voice and print specs. Forest #2E382B is the one print green.', updated:'November 22, 2026', versions:4, href:'sdlr-brand-guide.html', thumb:'design-thumbs/sdlr-brand-guide.jpg', icon:'\u{1F4D8}' },
+    { cat:'brand', status:'reference', name:'Design Wall', desc:'Every SDLR piece at its latest version on one wall, with a colour, type and wording check across them.', updated:'November 25, 2026', versions:1, href:'sdlr-design-wall.html', thumb:'design-thumbs/sdlr-design-wall.jpg', icon:'\u{1F9F1}' }
   ]},
-  personal: { company:'Personal', color:'#a78bfa', projects:[] }
+
+  personal: { company:'Personal', short:'Personal', color:'#ff8a3c', bg:'#2a2d33', projects:[] }
 };
 
+const STATUS = {
+  final:     { chip:'Final',          legend:'Final: approved, use this one' },
+  review:    { chip:'Not final yet',  legend:'Not final yet: still being decided, do not print' },
+  printed:   { chip:'Printed earlier',legend:'Printed earlier: do not reprint' },
+  reference: { chip:'Reference',      legend:'' }
+};
+const DOT = { final:'var(--good)', review:'#f2b544', printed:'var(--old)' };
+
+/* ---------- setup ---------- */
 const params = new URLSearchParams(location.search);
-const key = params.get('c') || 'ksh';
-const data = DESIGNS[key] || DESIGNS.ksh;
+const key = DESIGNS[params.get('c')] ? params.get('c') : 'ksh';
+const data = DESIGNS[key];
+const cats = data.cats || null;
+const groups = data.groups || [];
+const LS = 'gio-gallery-' + key;
+let state = Object.assign({ open:{}, mode:'type' }, read(LS, {}));
+let filter = '';            // '' = everything, else a group id
+let q = '';
 
-document.getElementById('dot').style.background = data.color;
-document.getElementById('title').textContent = data.company + ' · Design Gallery';
-document.getElementById('backLabel').textContent = data.company;
+function read(k, d){ try{ return JSON.parse(localStorage.getItem(k)) || d; }catch(e){ return d; } }
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const when = p => { const d = new Date(p.updated); return isNaN(d) ? 0 : d.getTime(); };
+const shortDate = p => { const d = new Date(p.updated); return isNaN(d) ? p.updated : d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); };
+
+try{ const t = (JSON.parse(localStorage.getItem('gio-dock-ui-v1'))||{}).theme; if(t==='light') document.documentElement.dataset.theme = 'light'; }catch(e){}
+document.documentElement.style.setProperty('--accent', data.color);
+document.title = data.short + ' Design Gallery · Gio’s Hub';
+document.getElementById('title').textContent = (data.short==='Personal' ? 'Personal' : data.short) + ' Design Gallery';
 document.getElementById('back').href = 'index.html#' + key;
+document.getElementById('backLabel').textContent = 'Gio’s Hub · ' + data.short;
+const markEl = document.getElementById('mark');
+markEl.style.setProperty('--mbg', data.bg);
+markEl.innerHTML = data.mark ? `<img src="${esc(data.mark)}" alt="${esc(data.short)}">` : `<b>${esc(data.short.slice(0,4))}</b>`;
+document.getElementById('lead').textContent = data.lead || '';
+if(!data.lead) document.getElementById('lead').style.display = 'none';
 
-const grid = document.getElementById('grid');
-if (!data.projects.length) {
-  grid.outerHTML = '<div class="empty">No finished designs here yet. Flipbooks, slideshows, and other visual pieces for ' + data.company + ' will appear here automatically.</div>';
-} else {
-  const STATUS = { final:'Final', review:'Waiting on you', printed:'Printed earlier', reference:'Reference' };
-  const GROUPS = [
-    ['final','Final, ready to use'],
-    ['review','Waiting on your decision'],
-    ['printed','Printed earlier, do not reprint'],
-    ['reference','Plans and references']
-  ];
-  const card = p => `
-    <a class="card" href="${p.href}">
-      <div class="ico" style="background:color-mix(in srgb, ${data.color} 16%, transparent)">${p.icon}</div>
-      <h3>${p.name}</h3>
-      <p>${p.desc}</p>
-      <div class="meta">
-        ${p.status ? `<span class="chip ${p.status}">${STATUS[p.status]}</span>` : ''}
-        <span class="pill">Updated ${p.updated}</span>
-        <span class="pill" style="color:${data.color}">${p.versions} version${p.versions>1?'s':''}</span>
-      </div>
-    </a>`;
-  if (data.projects.some(p => p.status)) {
-    grid.outerHTML = GROUPS
-      .map(([k, label]) => [label, data.projects.filter(p => (p.status || 'reference') === k)])
-      .filter(([, list]) => list.length)
-      .map(([label, list]) => `<h2 class="sec">${label}</h2><div class="grid">${list.map(card).join('')}</div>`)
-      .join('');
-  } else {
-    grid.innerHTML = data.projects.map(card).join('');
-  }
+/* ---------- pieces ---------- */
+function hl(text){
+  const s = esc(text);
+  if(!q) return s;
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean).map(t => t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  return terms.length ? s.replace(new RegExp('(' + terms.join('|') + ')','gi'), '<mark>$1</mark>') : s;
 }
+function card(p, showWhere){
+  const st = p.status && STATUS[p.status];
+  const chip = st ? `<span class="st ${p.status}">${st.chip}${p.ver && p.status!=='reference' ? ' · ' + esc(p.ver) : ''}</span>` : '';
+  const chipIn = chip.replace('class="st ', 'class="st in ');
+  const where = showWhere && cats && cats[p.cat] ? `<span class="where">${esc(cats[p.cat].label)}</span>` : `<span>${p.versions} version${p.versions>1?'s':''}</span>`;
+  return `<a class="card" href="${esc(p.href)}">
+    <div class="shot" style="--tile:${esc(data.bg)}">
+      ${p.thumb ? `<img src="${esc(p.thumb)}" alt="" loading="lazy" onerror="this.outerHTML='<span class=&quot;emo&quot;>${esc(p.icon||'')}</span>'">` : `<span class="emo">${esc(p.icon||'')}</span>`}
+      ${chip}
+    </div>
+    <div class="body">
+      <h3>${hl(p.name)}</h3>
+      ${chipIn}
+      <p title="${esc(p.desc)}">${hl(p.desc)}</p>
+      <div class="meta"><span>Updated ${esc(shortDate(p))}</span>${where}</div>
+    </div>
+  </a>`;
+}
+const matches = p => {
+  if(!q) return true;
+  const hay = [p.name, p.desc, p.ver, cats && cats[p.cat] ? cats[p.cat].label : '', p.status ? STATUS[p.status].chip : ''].join(' ').toLowerCase();
+  return q.toLowerCase().split(/\s+/).filter(Boolean).every(t => hay.includes(t));
+};
+const inFilter = p => !filter || !cats || (cats[p.cat] && cats[p.cat].group === filter);
+
+function summary(list){
+  const n = s => list.filter(p => p.status===s).length;
+  const bits = [];
+  if(n('final')) bits.push(n('final') + ' final');
+  if(n('review')) bits.push(n('review') + ' not final yet');
+  if(n('printed')) bits.push(n('printed') + ' printed earlier');
+  return bits.join(' · ');
+}
+function sectionHTML(catId, list){
+  const c = cats[catId], open = q ? true : !!state.open[catId];
+  const peek = list.slice(0,4).map(p => p.thumb ? `<img src="${esc(p.thumb)}" alt="" loading="lazy">` : `<i>${esc(p.icon||'')}</i>`).join('');
+  return `<section class="sec ${open?'open':''}" id="${esc(catId)}">
+    <button class="sec-h" data-sec="${esc(catId)}" aria-expanded="${open}">
+      <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+      <span class="t"><b>${esc(c.label)}</b><span>${esc(list.map(p => p.name).join(', '))}</span></span>
+      <span class="peek">${peek}</span>
+      <span class="n">${list.length} piece${list.length>1?'s':''}</span>
+    </button>
+    <div class="sec-body">
+      <div class="grid">${list.map(p => card(p)).join('')}</div>
+      <div class="sec-foot"><button class="link" data-copy="${esc(catId)}">Copy link to ${esc(c.label)}</button></div>
+    </div>
+  </section>`;
+}
+
+function renderChips(){
+  const el = document.getElementById('chips');
+  if(!cats){ el.innerHTML = ''; return; }
+  const count = g => data.projects.filter(p => !g || (cats[p.cat] && cats[p.cat].group===g)).length;
+  el.innerHTML = [['','Everything'], ...groups].map(([id,label]) =>
+    `<button class="chip ${filter===id?'on':''}" data-filter="${esc(id)}">${esc(label)} <b>${count(id)}</b></button>`).join('');
+}
+function renderTools(){
+  const el = document.getElementById('tools');
+  if(!cats){ el.innerHTML = ''; return; }
+  const used = ['final','review','printed'].filter(s => data.projects.some(p => p.status===s));
+  const allOpen = Object.keys(cats).every(c => state.open[c]);
+  el.innerHTML = `<div class="legend">${used.map(s => `<span><i style="background:${DOT[s]}"></i>${STATUS[s].legend}</span>`).join('')}</div>
+    <div class="right">
+      <button class="link" data-mode="${state.mode==='type' ? 'latest' : 'type'}">${state.mode==='type' ? 'Show latest updates' : 'Show by type'}</button>
+      ${state.mode==='type' ? `<button class="link" data-all="${allOpen ? 'close' : 'open'}">${allOpen ? 'Close all' : 'Open all'}</button>` : ''}
+    </div>`;
+}
+function render(){
+  const view = document.getElementById('view');
+  const list = data.projects.filter(p => inFilter(p) && matches(p));
+  document.getElementById('sub').textContent = data.company + ' · ' + data.projects.length + ' piece' + (data.projects.length===1?'':'s');
+  renderChips(); renderTools();
+  if(!data.projects.length){
+    view.innerHTML = `<div class="empty">No finished designs here yet. Flipbooks, slideshows and other visual pieces for ${esc(data.company)} will show up here.</div>`;
+    document.getElementById('bar').style.display = 'none';
+    return;
+  }
+  if(!list.length){ view.innerHTML = `<div class="empty">Nothing matches “${esc(q)}”.</div>`; return; }
+  if(!cats){ view.innerHTML = `<div class="group flat"><div class="grid">${list.map(p => card(p)).join('')}</div></div>`; return; }
+  if(state.mode==='latest'){
+    const sorted = [...list].sort((a,b) => when(b) - when(a));
+    view.innerHTML = `<div class="group flat"><h2>Latest updates <small>newest first</small></h2><div class="grid">${sorted.map(p => card(p, true)).join('')}</div></div>`;
+    return;
+  }
+  view.innerHTML = groups.filter(([g]) => !filter || filter===g).map(([g,label]) => {
+    const secs = Object.keys(cats).filter(c => cats[c].group===g)
+      .map(c => [c, list.filter(p => p.cat===c)]).filter(([,l]) => l.length);
+    if(!secs.length) return '';
+    const total = secs.reduce((s,[,l]) => s + l.length, 0);
+    return `<div class="group" id="g-${esc(g)}"><h2>${esc(label)} <small>${total} piece${total>1?'s':''} · ${esc(summary(secs.flatMap(([,l]) => l)))}</small></h2>${secs.map(([c,l]) => sectionHTML(c,l)).join('')}</div>`;
+  }).join('');
+}
+
+/* ---------- actions ---------- */
+let toastT;
+function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2200); }
+async function copy(url, label){
+  try{ await navigator.clipboard.writeText(url); toast(label || 'Link copied'); }
+  catch(e){ prompt('Copy this link', url); }
+}
+const pageUrl = hash => location.origin + location.pathname + '?c=' + key + (hash ? '#' + hash : '');
+
+document.addEventListener('click', e => {
+  const f = e.target.closest('[data-filter]');
+  if(f){ filter = f.dataset.filter; history.replaceState(null, '', pageUrl(filter)); render(); return; }
+  const cp = e.target.closest('[data-copy]');
+  if(cp){ copy(pageUrl(cp.dataset.copy), 'Link to ' + cats[cp.dataset.copy].label + ' copied'); return; }
+  const s = e.target.closest('[data-sec]');
+  if(s){ state.open[s.dataset.sec] = !state.open[s.dataset.sec]; save(); render(); return; }
+  const m = e.target.closest('[data-mode]');
+  if(m){ state.mode = m.dataset.mode; save(); render(); return; }
+  const a = e.target.closest('[data-all]');
+  if(a){ Object.keys(cats).forEach(c => state.open[c] = a.dataset.all==='open'); save(); render(); return; }
+});
+document.getElementById('shareAll').onclick = () => copy(pageUrl(filter), 'Link to this page copied');
+const qEl = document.getElementById('q');
+qEl.addEventListener('input', () => { q = qEl.value.trim(); render(); });
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape' && q){ qEl.value = ''; q = ''; render(); }
+  if(e.key==='/' && document.activeElement !== qEl){ e.preventDefault(); qEl.focus(); }
+});
+
+/* deep links: #signs opens that section, #print shows only that group */
+function route(scroll){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if(cats && cats[h]){ filter = ''; state.mode = 'type'; state.open[h] = true; render(); if(scroll){ const el = document.getElementById(h); if(el) el.scrollIntoView({ block:'start' }); } return; }
+  if(groups.some(([g]) => g===h)){ filter = h; state.mode = 'type'; }
+  render();
+}
+window.addEventListener('hashchange', () => route(true));
+route(true);
 </script>
 </body>
 </html>

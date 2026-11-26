@@ -76,7 +76,8 @@
   .chip i{width:7px;height:7px;border-radius:50%;display:inline-block}
 
   /* ---------- sections ---------- */
-  .sec{margin-top:26px}
+  .sec{margin-top:26px;scroll-margin-top:84px}
+  @media (max-width:900px){ .sec{scroll-margin-top:140px} }
   .sec-h{display:flex;align-items:center;gap:10px;margin-bottom:14px}
   .sec-h.tog{cursor:pointer;user-select:none}
   .sec-h .chev{transition:transform .2s;color:var(--muted)}
@@ -90,6 +91,10 @@
   .sec-h .right button{background:none;border:0;cursor:pointer;font-family:var(--cond);font-weight:600;letter-spacing:.12em;font-size:13px;color:var(--muted)}
   .sec-h .right button:hover{color:var(--text)}
   .sub{color:var(--muted);margin:-6px 0 14px;font-size:13px}
+  .chips.jump{margin:0}
+  .chips.jump .chip b{font-family:var(--mono);font-weight:500;font-size:10.5px;opacity:.7}
+  .sec-h .right a.golink{font-family:var(--cond);font-weight:600;letter-spacing:.12em;font-size:13px;color:var(--accent);text-decoration:none;text-transform:uppercase}
+  .sec-h .right a.golink:hover{color:var(--text)}
 
   /* ---------- grid cards ---------- */
   .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:18px 14px}
@@ -102,6 +107,9 @@
     background:radial-gradient(120% 120% at var(--x,30%) 10%, color-mix(in srgb,var(--c) 78%, #fff) 0%, var(--c) 46%, color-mix(in srgb,var(--c) 60%, #000) 100%)}
   .thumb > *{position:relative}
   .thumb > .pill,.thumb > .pin-mark,.thumb > .edit,.thumb > .bar{position:absolute}
+  /* design tiles with a picture (th) show the piece itself */
+  .thumb.pic{background:#15171a}
+  .thumb > .shot{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .thumb.light{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
   .thumb .emo{font-size:42px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.35))}
   .thumb .logo{width:54px;height:54px;border-radius:13px;object-fit:contain;background:#fff;padding:7px;box-shadow:0 8px 20px rgba(0,0,0,.25)}
@@ -297,7 +305,7 @@
 </form></dialog>
 <div class="toast" id="toast"></div>
 
-<script src="dock-data.js?v=74"></script>
+<script src="dock-data.js?v=75"></script>
 <script>
 /* ============ STATE ============ */
 const BIZ = window.DOCK_BIZ, BASE = window.DOCK_ITEMS;
@@ -308,6 +316,12 @@ const LS = 'gio-dock-v1', LS_UI = 'gio-dock-ui-v1', API = '/api/lifeos?ns=dock';
 const SEED = ['magnific','svm-highlevel','youtube','ghl','gdocs','gmail','github','ga4','chatgpt','gdrive','gcal','canva','sdlr-hq','stripe','instagram','site-bni','linkedin','claude','bni-connect','cloudflare'];
 const KINDS = { app:'Apps we built', site:'Websites', design:'Designs & decks', tool:'Tools & subscriptions', util:'Quick utilities', course:'Courses & learning' };
 const KIND_ORDER = ['app','site','design','tool','util','course'];
+// design tiles carry g (see dock-data.js): a business's designs show in these groups, same as its Design Gallery
+const DGROUPS = [['signs','Print · Signs & banners'],['handouts','Print · Cards & handouts'],['apparel','Print · Shirts & uniform'],['wrap','Print · Car wrap'],['online','Online & video'],['brand','Brand']];
+const PRINT_G = ['signs','handouts','apparel','wrap'];
+const JUMP = { app:'Apps', site:'Websites', design:'Designs', tool:'Tools & subs', util:'Utilities', course:'Courses' };
+// #sdlr/print style links: the part after the slash scrolls to that block of the business page
+const PARTS = { apps:'app', websites:'site', sites:'site', designs:'design', print:'design', online:'d-online', brand:'d-brand', tools:'tool', utilities:'util', courses:'course' };
 
 let store = read(LS, {});           // synced: it:<id> = edits/additions, op:<id> = open counts
 let ui = Object.assign({ view:'used', layout:'grid', theme:'dark', closed:{ recent:true, added:true }, biz:'' }, read(LS_UI, {}));
@@ -423,9 +437,9 @@ const PEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke=
 const bizTags = it => (it.b||[]).filter(b=>BIZMAP[b]).map(b => `<span style="color:${BIZMAP[b].c}">${BIZMAP[b].short}</span>`).join('');
 function card(it){
   return `<a class="card" ${linkAttrs(it)}>
-    <div class="thumb ${branded(it) ? 'co' : it.ours && !it.dom ? 'ours' : ''} ${!branded(it) && isLight(it.c)?'light':''}" style="--c:${esc(tileColor(it))};${vary(it.id)}">
-      ${art(it)}
-      ${!branded(it) && coOf(it) && (it.b||[]).length===1 ? `<span class="cobadge" style="--bc:${esc(coOf(it).bg)}">${coOf(it).mark?`<img src="${esc(coOf(it).mark)}" alt="${esc(coOf(it).short)}">`:`<b>${esc(coOf(it).short)}</b>`}</span>` : ''}
+    <div class="thumb ${it.th ? 'pic' : branded(it) ? 'co' : it.ours && !it.dom ? 'ours' : ''} ${!it.th && !branded(it) && isLight(it.c)?'light':''}" style="--c:${esc(tileColor(it))};${vary(it.id)}">
+      ${it.th ? `<img class="shot" src="${esc(it.th)}" alt="" loading="lazy">` : art(it)}
+      ${!it.th && !branded(it) && coOf(it) && (it.b||[]).length===1 ? `<span class="cobadge" style="--bc:${esc(coOf(it).bg)}">${coOf(it).mark?`<img src="${esc(coOf(it).mark)}" alt="${esc(coOf(it).short)}">`:`<b>${esc(coOf(it).short)}</b>`}</span>` : ''}
       ${it.s ? `<span class="pill ${esc(it.s)}">${STATUS[it.s]||esc(it.s)}</span>` : ''}
       ${it.pin ? '<span class="pin-mark">📌</span>' : ''}
       <span class="bar">${(it.b||[]).filter(b=>BIZMAP[b]).map(b=>`<span style="background:${BIZMAP[b].c}"></span>`).join('')}</span>
@@ -456,7 +470,7 @@ function section(id, title, list, opts={}){
       ${opts.big ? `<h2>${title}</h2>` : `<h3>${title}</h3>`}${peek}
       <span class="right">${opts.right||''}${opts.toggle ? `<button>${closed?'EXPAND':'COLLAPSE'}</button>` : ''}</span>
     </div>` : '';
-  return `<section class="sec">${head}${closed ? '' : collection(list)}</section>`;
+  return `<section class="sec" id="sec-${id}">${head}${closed ? '' : collection(list)}</section>`;
 }
 
 /* ============ VIEWS ============ */
@@ -528,12 +542,31 @@ function viewHTML(all){
     const unknown = mine.filter(needsPrice).length;
     let html = `<section class="sec"><div class="sec-h"><h2 style="color:${b.c}">${esc(b.n)}</h2><span class="right">${mine.length} links</span></div>
       <p class="sub">Known tool costs: <b style="color:var(--text)">${money(burn)}/mo</b>${unknown ? ` · <a href="#money" data-view="money" style="color:var(--warn)">${unknown} still need a price</a>` : ''}</p></section>`;
+    const jumps = []; let body = '';
     for(const k of KIND_ORDER){
       const list = mine.filter(i => i.k===k);
+      if(!list.length) continue;
       if(k==='tool') list.sort(sortTools);
-      if(list.length) html += section(v+'-'+k, KINDS[k], list, { right:`${list.length}` });
+      if(k==='design' && list.some(i => i.g)){
+        // designs sorted the same way as the business's Design Gallery: print material, online, brand
+        const gal = list.find(i => /^designs\.html\?c=/.test(i.u||''));
+        const grouped = DGROUPS.map(([g,label]) => [g, label, list.filter(i => i.g===g)]).filter(x => x[2].length);
+        const rest = list.filter(i => !DGROUPS.some(([g]) => g===i.g));
+        body += `<section class="sec" id="sec-${v}-design"><div class="sec-h"><h3>Designs</h3><span class="right">${list.length}${gal ? `<a class="golink" href="${esc(gal.u)}" data-open="${esc(gal.id)}">Open the design gallery →</a>` : ''}</span></div>
+          <p class="sub" style="margin:-8px 0 0">Sorted by what it is. Tap a heading to open or close it.</p></section>`;
+        for(const [g,label,sub] of grouped) body += section(v+'-d-'+g, label, sub, { toggle:true, right:`${sub.length}` });
+        if(rest.length) body += section(v+'-d-other', 'More designs', rest, { toggle:true, right:`${rest.length}` });
+        const nPrint = list.filter(i => PRINT_G.includes(i.g)).length, nOther = list.length - nPrint;
+        if(nPrint) jumps.push([v+'-design', 'Print material', nPrint]);
+        const firstOther = grouped.find(x => !PRINT_G.includes(x[0]));
+        if(nOther) jumps.push([firstOther ? v+'-d-'+firstOther[0] : v+'-d-other', 'Online & brand', nOther]);
+      } else {
+        body += section(v+'-'+k, KINDS[k], list, { toggle:true, right:`${list.length}` });
+        jumps.push([v+'-'+k, JUMP[k], list.length]);
+      }
     }
-    return html;
+    if(jumps.length > 1) html += `<div class="chips jump">${jumps.map(([id,label,n]) => `<button class="chip" data-jump="${esc(id)}">${esc(label)} <b>${n}</b></button>`).join('')}</div>`;
+    return html + body;
   }
   if(v==='ours'){
     const list = byBiz(all.filter(i => i.ours));
@@ -620,6 +653,11 @@ function go(view){
   history.replaceState(null, '', view==='used' ? location.pathname : '#'+view);
   closeSide(); render(); window.scrollTo(0,0);
 }
+function jumpTo(id, instant){
+  if(ui.closed[id]){ ui.closed[id] = false; write(LS_UI, ui); render(); }
+  const el = document.getElementById('sec-'+id);
+  if(el) el.scrollIntoView({ behavior: instant ? 'auto' : 'smooth', block:'start' });
+}
 function recordOpen(id){ const o = opens(id); put('op:'+id, { n:(o.n||0)+1, t:Date.now() }); }
 let toastT;
 function toast(msg){ const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('show'), 2200); }
@@ -687,6 +725,8 @@ document.addEventListener('click', e => {
   if(nav){ e.preventDefault(); go(nav.dataset.view); return; }
   const bz = e.target.closest('[data-biz]');
   if(bz){ ui.biz = bz.dataset.biz; write(LS_UI, ui); render(); return; }
+  const jp = e.target.closest('[data-jump]');
+  if(jp){ jumpTo(jp.dataset.jump); return; }
   const tg = e.target.closest('[data-toggle]');
   if(tg){ ui.closed[tg.dataset.toggle] = !ui.closed[tg.dataset.toggle]; write(LS_UI, ui); render(); return; }
   const rs = e.target.closest('[data-restore]');
@@ -734,13 +774,22 @@ document.getElementById('menuBtn').onclick = () => { side.classList.add('open');
 scrim.onclick = closeSide;
 
 /* old hub links (#sdlr, #ksh, #personal …) still land on the right bucket */
+let pendingJump = '';
 function route(){
-  const h = location.hash.replace('#','');
+  const [h, part] = location.hash.replace('#','').split('/');
   const v = ({ tools:'tool', sites:'site', websites:'site', designs:'design', courses:'course' })[h] || h;
   if(v && (BIZMAP[v] || KINDS[v] || ['used','ours','all','money'].includes(v))) ui.view = v;
+  pendingJump = BIZMAP[v] && PARTS[part] ? v+'-'+PARTS[part] : '';
 }
-window.addEventListener('hashchange', () => { route(); render(); });
-route(); render(); pull();
+function landed(){
+  if(!pendingJump) return;
+  const id = pendingJump, hop = () => jumpTo(id, true); pendingJump = '';
+  // the page is still settling (fonts, logos) on a fresh open, so land again once it has
+  setTimeout(hop, 60); setTimeout(hop, 700);
+  if(document.readyState !== 'complete') window.addEventListener('load', hop, { once:true });
+}
+window.addEventListener('hashchange', () => { route(); render(); landed(); });
+route(); render(); landed(); pull();
 document.addEventListener('visibilitychange', () => { if(!document.hidden) pull(); });
 </script>
 </body>
